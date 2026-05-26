@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Zap, LayoutDashboard, Lightbulb, Swords, DollarSign,
-  Brain, TrendingUp, Target, MessageSquare, Palette, ArrowLeft, LogOut,
+  Brain, TrendingUp, Target, MessageSquare, Palette, ArrowLeft, LogOut, UserCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
@@ -37,6 +37,7 @@ const navGroups = [
   {
     label: "Account",
     items: [
+      { label: "Profile", href: "/profile", icon: UserCircle, color: "text-emerald-600" },
       { label: "Upgrade Plan", href: "/payment", icon: Zap, color: "text-amber-600" },
     ],
   },

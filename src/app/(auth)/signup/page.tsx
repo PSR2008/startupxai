@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
+import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle, Sparkles, RefreshCw } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -17,10 +18,12 @@ function validatePassword(v: string) {
 }
 
 export default function SignupPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
+  const [resendStatus, setResendStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
 
@@ -41,13 +44,57 @@ export default function SignupPage() {
 
     try {
       const supabase = getSupabaseBrowserClient();
-      const { error } = await supabase.auth.signUp({ email, password });
+      const redirectTo =
+        typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectTo,
+        },
+      });
       if (error) throw error;
+
+      if (data.session) {
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+
       setStatus("success");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Signup failed. Please try again.";
       setErrorMsg(msg);
       setStatus("error");
+    }
+  };
+
+  const handleResend = async () => {
+    if (!validateEmail(email)) return;
+
+    setResendStatus("loading");
+    setErrorMsg("");
+
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const redirectTo =
+        typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
+
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo: redirectTo,
+        },
+      });
+
+      if (error) throw error;
+      setResendStatus("success");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Could not resend confirmation email.";
+      setErrorMsg(msg);
+      setResendStatus("error");
     }
   };
 
@@ -74,7 +121,7 @@ export default function SignupPage() {
             <p className="font-jakarta text-sm text-gray-500 leading-relaxed">
               We sent a confirmation link to{" "}
               <span className="text-gray-900 font-semibold">{email}</span>.
-              <br />Click it to activate your account and get started.
+              <br />Click it to activate your account. You&apos;ll be redirected to the dashboard after confirmation.
             </p>
           </div>
           <div className="rounded-2xl border border-black/8 bg-white p-5 text-left space-y-2.5 shadow-sm">
@@ -94,6 +141,22 @@ export default function SignupPage() {
           >
             Go to sign in <ArrowRight size={14} />
           </Link>
+          <div className="space-y-2">
+            <button
+              onClick={handleResend}
+              disabled={resendStatus === "loading"}
+              className="inline-flex items-center gap-2 rounded-xl border border-black/8 bg-white px-4 py-2.5 font-bricolage text-xs font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              <RefreshCw size={13} className={resendStatus === "loading" ? "animate-spin" : ""} />
+              Resend confirmation email
+            </button>
+            {resendStatus === "success" && (
+              <p className="font-jakarta text-xs text-emerald-600">Confirmation email sent again.</p>
+            )}
+            {resendStatus === "error" && errorMsg && (
+              <p className="font-jakarta text-xs text-rose-600">{errorMsg}</p>
+            )}
+          </div>
         </motion.div>
       </div>
     );
@@ -132,7 +195,7 @@ export default function SignupPage() {
           <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-3.5 flex items-start gap-3">
             <Sparkles size={15} className="text-emerald-600 flex-shrink-0 mt-0.5" />
             <p className="font-jakarta text-xs text-emerald-700 leading-relaxed">
-              <strong className="font-semibold">Free to start</strong> — Get access to 6 AI intelligence engines, ColdDM AI, and BrandForge AI instantly.
+              <strong className="font-semibold">Free to start</strong> - Get access to 6 AI intelligence engines, ColdDM AI, and BrandForge AI instantly.
             </p>
           </div>
 
@@ -240,7 +303,7 @@ export default function SignupPage() {
             {status === "loading" ? (
               <>
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Creating account…
+                Creating account...
               </>
             ) : (
               <>Create free account <ArrowRight size={15} /></>
@@ -260,3 +323,5 @@ export default function SignupPage() {
     </div>
   );
 }
+
+

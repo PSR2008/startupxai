@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, Zap, LayoutDashboard, Lightbulb, Swords, DollarSign, Brain, TrendingUp, Target, MessageSquare, Palette, LogOut } from "lucide-react";
+import { Menu, X, Zap, LayoutDashboard, Lightbulb, Swords, DollarSign, Brain, TrendingUp, Target, MessageSquare, Palette, LogOut, UserCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
@@ -17,6 +17,7 @@ const routes: Record<string, { label: string; icon: React.ElementType; color: st
   "/founder-decision": { label: "Founder Decision Engine", icon: Target, color: "text-violet-600" },
   "/cold-dm": { label: "ColdDM AI", icon: MessageSquare, color: "text-emerald-600" },
   "/brand-forge": { label: "BrandForge AI", icon: Palette, color: "text-violet-600" },
+  "/profile": { label: "Profile", icon: UserCircle, color: "text-emerald-600" },
 };
 
 const mobileNavItems = Object.entries(routes);
@@ -63,6 +64,13 @@ export default function AppTopbar() {
 
         {/* Right */}
         <div className="flex items-center gap-2">
+          <Link
+            href="/profile"
+            title="Profile"
+            className="hidden lg:flex w-8 h-8 rounded-lg items-center justify-center text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
+          >
+            <UserCircle size={15} />
+          </Link>
           <Link href="/" className="flex items-center gap-2 lg:hidden">
             <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
               <Zap size={12} className="text-white" strokeWidth={2.5} />

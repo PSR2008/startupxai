@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "StartupX AI — Sign In",
+    default: "StartupX AI - Sign In",
     template: "%s | StartupX AI",
   },
 };
@@ -17,3 +17,4 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     </div>
   );
 }
+

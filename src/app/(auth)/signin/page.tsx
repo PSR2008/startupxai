@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -176,7 +176,7 @@ export default function SigninPage() {
             {status === "loading" ? (
               <>
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Signing in…
+                Signing in...
               </>
             ) : (
               <>Sign in to StartupX <ArrowRight size={15} /></>
@@ -194,3 +194,4 @@ export default function SigninPage() {
     </div>
   );
 }
+
