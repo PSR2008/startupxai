@@ -19,18 +19,18 @@ export function LoadingSpinner({ size = "md", label }: { size?: "sm" | "md" | "l
 }
 
 const engineMessages: Record<string, string[]> = {
-  idea: ["Evaluating market signals…", "Scoring idea clarity…", "Detecting hidden risks…", "Identifying opportunities…"],
-  competitor: ["Mapping the competitive landscape…", "Analyzing competitor weaknesses…", "Finding positioning gaps…", "Building your battle plan…"],
-  revenue: ["Modeling monetization options…", "Crafting pricing tiers…", "Detecting revenue leaks…", "Optimizing conversion strategy…"],
-  psychology: ["Profiling your target users…", "Scoring trust & credibility…", "Identifying friction points…", "Auditing first impressions…"],
-  growth: ["Plotting your first 10 customers…", "Selecting highest-impact channels…", "Crafting outreach strategies…", "Building your launch playbook…"],
-  decision: ["Processing founder context…", "Ranking strategic priorities…", "Calculating confidence score…", "Finalizing your action brief…"],
-  "cold-dm": ["Writing your outreach messages…", "Optimizing copy for conversions…", "Generating variants…", "Crafting follow-up sequences…"],
-  "brand-forge": ["Brainstorming brand names…", "Crafting your positioning…", "Defining brand personality…", "Assembling your brand pack…"],
+  idea: ["Evaluating market signals...", "Scoring idea clarity...", "Detecting hidden risks...", "Identifying opportunities..."],
+  competitor: ["Mapping the competitive landscape...", "Analyzing competitor weaknesses...", "Finding positioning gaps...", "Building your battle plan..."],
+  revenue: ["Modeling monetization options...", "Crafting pricing tiers...", "Detecting revenue leaks...", "Optimizing conversion strategy..."],
+  psychology: ["Profiling your target users...", "Scoring trust & credibility...", "Identifying friction points...", "Auditing first impressions..."],
+  growth: ["Plotting your first 10 customers...", "Selecting highest-impact channels...", "Crafting outreach strategies...", "Building your launch playbook..."],
+  decision: ["Processing founder context...", "Ranking strategic priorities...", "Calculating confidence score...", "Finalizing your action brief..."],
+  "cold-dm": ["Writing your outreach messages...", "Optimizing copy for conversions...", "Generating variants...", "Crafting follow-up sequences..."],
+  "brand-forge": ["Brainstorming brand names...", "Crafting your positioning...", "Defining brand personality...", "Assembling your brand pack..."],
 };
 
 export function AnalysisLoading({ engine }: { engine: string }) {
-  const messages = engineMessages[engine] || ["Analyzing…"];
+  const messages = engineMessages[engine] || ["Analyzing..."];
 
   return (
     <motion.div
@@ -75,7 +75,7 @@ export function AnalysisLoading({ engine }: { engine: string }) {
             </motion.p>
           ))}
         </motion.div>
-        <p className="font-jakarta text-xs text-gray-400">This usually takes 10–20 seconds</p>
+        <p className="font-jakarta text-xs text-gray-400">This usually takes 10-20 seconds</p>
       </div>
 
       {/* Progress bar */}
@@ -134,3 +134,4 @@ export function EmptyState({ icon, title, description, action }: { icon?: React.
     </motion.div>
   );
 }
+

@@ -12,6 +12,10 @@ import {
   ShieldAlert,
   Sparkles,
   ArrowRight,
+  Copy,
+  CheckCircle2,
+  RefreshCw,
+  Rocket,
 } from "lucide-react";
 import EngineHeader from "@/components/app/EngineHeader";
 import { Input, Textarea, Select } from "@/components/ui/FormFields";
@@ -72,6 +76,7 @@ export default function IdeaEnginePage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [improving, setImproving] = useState(false);
   const [improvedIdea, setImprovedIdea] = useState<ImprovedIdeaState | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const validate = (): boolean => {
     const e: Partial<FormState> = {};
@@ -175,21 +180,88 @@ export default function IdeaEnginePage() {
       }
     };
 
+  const verdict =
+    result && result.marketDemandScore > 70 && result.ideaClarityScore > 60
+      ? "Strong opportunity. Worth building with focused differentiation."
+      : result && result.marketDemandScore > 50
+      ? "Moderate potential. Reposition before serious execution."
+      : result
+      ? "Weak signal. Pivot or narrow the market before building."
+      : "";
+
+  const copyReport = async () => {
+    if (!result) return;
+
+    const report = [
+      `StartupX AI - Idea & Market Report`,
+      ``,
+      `Idea: ${form.idea}`,
+      `Market Demand: ${result.marketDemandScore}/100`,
+      `Idea Clarity: ${result.ideaClarityScore}/100`,
+      ``,
+      `Executive Summary`,
+      result.executiveSummary,
+      ``,
+      `Verdict`,
+      result.overallVerdict,
+      ``,
+      `Category Positioning`,
+      result.categoryPositioning,
+      ``,
+      `Risk Factors`,
+      ...result.riskFactors.map((item) => `- ${item}`),
+      ``,
+      `Hidden Opportunities`,
+      ...result.hiddenOpportunities.map((item) => `- ${item}`),
+      ``,
+      `Ideal ICP`,
+      ...result.idealICP.map((item) => `- ${item}`),
+    ].join("\n");
+
+    await navigator.clipboard.writeText(report);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  };
+
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <EngineHeader
         icon={<Lightbulb size={22} />}
         title="Idea & Market Engine"
-        description="Score your startup idea's viability. Uncover hidden risks, assumptions, opportunities, and ICP — before you write a single line of code."
+        description="Turn a rough startup idea into a scored founder brief with market demand, clarity, risk, positioning, ICP, and next-step signals."
         badge="Intelligence Engine"
         badgeVariant="sage"
         accentColor="#10b981"
       />
 
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          { icon: Compass, label: "Market read", text: "Demand, ICP, and category signals" },
+          { icon: ShieldAlert, label: "Risk map", text: "Failure points before you build" },
+          { icon: Rocket, label: "Next moves", text: "Positioning and execution direction" },
+        ].map(({ icon: Icon, label, text }) => (
+          <div key={label} className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
+            <Icon size={16} className="text-emerald-600 mb-2" />
+            <p className="font-bricolage text-xs font-bold text-gray-900">{label}</p>
+            <p className="font-jakarta text-xs text-gray-400 mt-1">{text}</p>
+          </div>
+        ))}
+      </div>
+
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-2 space-y-5">
-          <div className="rounded-2xl border border-black/6 bg-gray-50 p-6 space-y-5">
-            <h3 className="font-bricolage text-sm font-bold text-gray-800">About Your Startup</h3>
+          <div className="rounded-2xl border border-black/6 bg-white p-6 space-y-5 shadow-sm">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="font-bricolage text-sm font-bold text-gray-900">Startup context</h3>
+                <p className="font-jakarta text-xs text-gray-400 mt-1">
+                  Better input creates a sharper market report.
+                </p>
+              </div>
+              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-bricolage text-[10px] font-bold uppercase tracking-wide text-emerald-700">
+                3 required
+              </span>
+            </div>
 
             <Input
               label="Startup Idea"
@@ -215,7 +287,7 @@ export default function IdeaEnginePage() {
 
             <Textarea
               label="Target Audience"
-              placeholder="Who is your ideal customer? Be specific — industry, role, company size, pain point."
+              placeholder="Who is your ideal customer? Be specific - industry, role, company size, pain point."
               rows={3}
               value={form.targetAudience}
               onChange={setField("targetAudience")}
@@ -236,7 +308,7 @@ export default function IdeaEnginePage() {
               placeholder="e.g. India, Southeast Asia, US SMBs"
               value={form.region}
               onChange={setField("region")}
-              hint="Optional — helps with market-specific analysis"
+              hint="Optional - helps with market-specific analysis"
             />
 
             <Input
@@ -245,7 +317,7 @@ export default function IdeaEnginePage() {
               placeholder="https://yourstartup.com"
               value={form.productUrl}
               onChange={setField("productUrl")}
-              hint="Optional — if you already have a site"
+              hint="Optional - if you already have a site"
             />
           </div>
 
@@ -258,12 +330,12 @@ export default function IdeaEnginePage() {
             icon={<ArrowRight size={16} />}
             iconPosition="right"
           >
-            {status === "loading" ? "Analyzing…" : "Run Market Analysis"}
+            {status === "loading" ? "Analyzing..." : "Run Market Analysis"}
           </Button>
 
           {status === "success" && result && (
             <p className="font-jakarta text-xs text-gray-400 text-center">
-              Analysis complete · Scroll right to see full results
+              Analysis complete · Report generated on the right
             </p>
           )}
         </div>
@@ -286,6 +358,13 @@ export default function IdeaEnginePage() {
                   <p className="font-jakarta text-sm text-gray-400 max-w-xs">
                     Fill in your startup details on the left and click Run Market Analysis.
                   </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full max-w-lg mt-2">
+                  {["Market demand", "Risk factors", "Ideal ICP"].map((item) => (
+                    <div key={item} className="rounded-xl border border-black/6 bg-white px-3 py-2">
+                      <p className="font-jakarta text-xs text-gray-500">{item}</p>
+                    </div>
+                  ))}
                 </div>
               </motion.div>
             )}
@@ -320,28 +399,59 @@ export default function IdeaEnginePage() {
                 transition={{ duration: 0.5 }}
                 className="space-y-5"
               >
-                <div className="rounded-2xl border border-black/6 bg-gray-50 p-6">
-                  <h3 className="font-bricolage text-sm font-bold text-gray-800 mb-5">Scores</h3>
-                  <div className="flex items-center justify-around flex-wrap gap-6">
-                    <ScoreRing
-                      score={result.marketDemandScore}
-                      label="Market Demand"
-                      sublabel={getScoreColor(result.marketDemandScore).label}
-                      size={110}
-                    />
-                    <ScoreRing
-                      score={result.ideaClarityScore}
-                      label="Idea Clarity"
-                      sublabel={getScoreColor(result.ideaClarityScore).label}
-                      size={110}
-                    />
+                <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                      <p className="font-bricolage text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">
+                        Founder report
+                      </p>
+                      <h3 className="font-bricolage text-xl font-bold text-gray-900">
+                        {form.idea || "Idea analysis"}
+                      </h3>
+                    </div>
+                    <button
+                      onClick={copyReport}
+                      className="h-10 px-4 rounded-xl border border-black/8 bg-gray-50 font-bricolage text-xs font-bold text-gray-700 hover:bg-white transition-colors flex items-center gap-2 w-fit"
+                    >
+                      {copied ? <CheckCircle2 size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                      {copied ? "Copied" : "Copy report"}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr] gap-5 mb-6">
+                    <div className="rounded-2xl border border-black/6 bg-gray-50 p-5 flex items-center justify-center">
+                      <ScoreRing
+                        score={result.marketDemandScore}
+                        label="Market Demand"
+                        sublabel={getScoreColor(result.marketDemandScore).label}
+                        size={120}
+                      />
+                    </div>
+                    <div className="rounded-2xl border border-black/6 bg-gray-50 p-5 flex items-center justify-center">
+                      <ScoreRing
+                        score={result.ideaClarityScore}
+                        label="Idea Clarity"
+                        sublabel={getScoreColor(result.ideaClarityScore).label}
+                        size={120}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 size={16} className="text-emerald-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-bricolage text-sm font-bold text-emerald-800 mb-1">AI verdict</p>
+                        <p className="font-jakarta text-sm text-emerald-700 leading-relaxed">{verdict}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-black/6 bg-gray-50 p-6">
+                <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles size={15} className="text-gray-600" />
-                    <h3 className="font-bricolage text-sm font-bold text-gray-800">Executive Summary</h3>
+                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Executive Summary</h3>
                   </div>
 
                   <p className="font-jakarta text-sm text-gray-600 leading-relaxed">
@@ -349,21 +459,8 @@ export default function IdeaEnginePage() {
                   </p>
 
                   <div className="mt-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
-                    <p className="font-jakarta text-sm text-emerald-500 leading-relaxed italic">
+                    <p className="font-jakarta text-sm text-emerald-700 leading-relaxed italic">
                       {result.overallVerdict}
-                    </p>
-                  </div>
-
-                  <div className="mt-6 p-4 rounded-xl border border-black/10 bg-black/40">
-                    <h3 className="font-bricolage text-sm font-bold text-gray-800 mb-2">
-                      🚨 AI Verdict
-                    </h3>
-                    <p className="text-sm text-gray-300">
-                      {result.marketDemandScore > 70 && result.ideaClarityScore > 60
-                        ? "Strong opportunity. Worth building with focused differentiation."
-                        : result.marketDemandScore > 50
-                        ? "Moderate potential. Needs repositioning before execution."
-                        : "Weak idea. Pivot strongly or reconsider before building."}
                     </p>
                   </div>
 
@@ -374,10 +471,10 @@ export default function IdeaEnginePage() {
                       onClick={handleImproveIdea}
                       className="bg-gradient-to-r from-cocoa-600 to-orange-500 hover:from-cocoa-500 hover:to-orange-400"
                       loading={improving}
-                      icon={<Sparkles size={16} />}
+                      icon={improving ? <RefreshCw size={16} /> : <Sparkles size={16} />}
                       iconPosition="right"
                     >
-                      {improving ? "Refining your idea..." : "AI Refine Idea"}
+                      {improving ? "Refining your idea..." : "Refine positioning with AI"}
                     </Button>
                   </div>
 
@@ -429,7 +526,7 @@ export default function IdeaEnginePage() {
                   )}
                 </div>
 
-                <div className="rounded-2xl border border-black/6 bg-gray-50 p-5">
+                <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
                     <Compass size={14} className="text-emerald-600" />
                     <span className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">
@@ -504,7 +601,7 @@ function ResultList({
   chipVariant: "sage" | "cocoa" | "forest" | "peach" | "midnight" | "neutral" | "blush";
 }) {
   return (
-    <div className="rounded-2xl border border-black/6 bg-gray-50 p-5">
+    <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
       <div className="flex items-center gap-2 mb-3">
         {icon}
         <h4 className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">
