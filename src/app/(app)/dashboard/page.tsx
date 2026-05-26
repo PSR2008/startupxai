@@ -1,13 +1,12 @@
-"use client";
+﻿"use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Lightbulb, Swords, DollarSign, Brain, TrendingUp,
   Target, MessageSquare, Palette, ArrowRight, Zap,
-  BarChart3, Users, TrendingDown, Sparkles,
+  BarChart3, Users, TrendingDown, Sparkles, Crown, ShieldCheck,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
-// ── ADDED: Phase 2 usage + subscription components ─────────────
 import UsageWidget from "@/components/app/UsageWidget";
 import SubscriptionStatusCard from "@/components/app/SubscriptionStatusCard";
 
@@ -40,7 +39,7 @@ const tips = [
 export default function DashboardPage() {
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto">
-      {/* Welcome header — UNCHANGED */}
+
       <AnimatedSection className="mb-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
@@ -48,17 +47,24 @@ export default function DashboardPage() {
               Founder Command Center
             </h1>
             <p className="font-jakarta text-sm text-gray-500">
-              Six intelligence engines. Two revenue tools. One platform. Let&apos;s build.
+              Pick the decision in front of you and turn it into a structured action plan.
             </p>
           </div>
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 w-fit">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-jakarta text-xs font-semibold text-emerald-700">AI Engines Online</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/payment?plan=founder&billing=monthly">
+              <button className="h-9 px-3.5 rounded-xl bg-emerald-600 text-white font-bricolage text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-emerald-500/20 hover:bg-emerald-700 transition-colors">
+                <Crown size={13} />
+                Upgrade Founder
+              </button>
+            </Link>
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-emerald-200 bg-emerald-50 w-fit">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-jakarta text-xs font-semibold text-emerald-700">AI Engines Online</span>
+            </div>
           </div>
         </div>
       </AnimatedSection>
 
-      {/* Stats — UNCHANGED */}
       <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" staggerDelay={0.06}>
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -84,7 +90,6 @@ export default function DashboardPage() {
         })}
       </StaggerContainer>
 
-      {/* ── ADDED: Subscription + Usage section ──────────────────── */}
       <AnimatedSection className="mb-10" delay={0.08}>
         <div className="flex items-center gap-2 mb-3">
           <Zap size={14} className="text-emerald-500" />
@@ -97,9 +102,52 @@ export default function DashboardPage() {
           <SubscriptionStatusCard />
         </div>
       </AnimatedSection>
-      {/* ── END ADDED ─────────────────────────────────────────────── */}
 
-      {/* Engine grid header — UNCHANGED */}
+      <AnimatedSection className="mb-10" delay={0.1}>
+        <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-5">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <ShieldCheck size={15} className="text-emerald-500" />
+                <h2 className="font-bricolage text-sm font-bold text-gray-900">Recommended next moves</h2>
+              </div>
+              <p className="font-jakarta text-sm text-gray-500">
+                Not sure where to start? Choose the workflow that matches today&apos;s founder decision.
+              </p>
+            </div>
+            <Link href="/idea-engine">
+              <button className="h-10 px-4 rounded-xl border border-black/8 font-bricolage text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-1.5">
+                Start with validation <ArrowRight size={13} />
+              </button>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[
+              { title: "Validate a new idea", description: "Test demand, ICP, assumptions, and market clarity.", href: "/idea-engine", icon: Lightbulb, color: "#10b981" },
+              { title: "Find your positioning gap", description: "Use this before writing copy, choosing a niche, or launching ads.", href: "/competitor-intelligence", icon: Swords, color: "#f59e0b" },
+              { title: "Prepare outreach", description: "Turn your offer into WhatsApp, LinkedIn, and email messages.", href: "/cold-dm", icon: MessageSquare, color: "#10b981" },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link key={item.href} href={item.href}>
+                  <motion.div
+                    whileHover={{ y: -2 }}
+                    className="h-full rounded-xl border border-black/6 bg-gray-50 p-4 hover:bg-white hover:shadow-sm transition-all"
+                  >
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style={{ background: `${item.color}12`, border: `1px solid ${item.color}22` }}>
+                      <Icon size={14} style={{ color: item.color }} />
+                    </div>
+                    <p className="font-bricolage text-sm font-bold text-gray-900 mb-1">{item.title}</p>
+                    <p className="font-jakarta text-xs text-gray-500 leading-relaxed">{item.description}</p>
+                  </motion.div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </AnimatedSection>
+
       <AnimatedSection className="mb-3">
         <div className="flex items-center gap-2">
           <Sparkles size={14} className="text-emerald-500" />
@@ -109,7 +157,6 @@ export default function DashboardPage() {
         </div>
       </AnimatedSection>
 
-      {/* Engine grid — UNCHANGED */}
       <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10" staggerDelay={0.05}>
         {engines.map((engine) => {
           const Icon = engine.icon;
@@ -156,7 +203,6 @@ export default function DashboardPage() {
         })}
       </StaggerContainer>
 
-      {/* Bottom panels — UNCHANGED */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Recommended workflow */}
         <AnimatedSection className="lg:col-span-2" delay={0.1}>
@@ -232,3 +278,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

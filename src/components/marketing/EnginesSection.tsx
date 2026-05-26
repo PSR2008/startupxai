@@ -587,7 +587,7 @@ const plans = [
     description: "For founders exploring the platform",
     features: ["15 analyses/month", "All 6 Intelligence Engines", "ColdDM AI", "BrandForge AI", "Community support"],
     cta: "Start Free",
-    href: "/dashboard",
+    href: "/signup",
     highlighted: false,
   },
   {
@@ -709,7 +709,7 @@ export function CTASection() {
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/dashboard">
+                <Link href="/signup">
                   <motion.button
                     whileHover={{ scale: 1.02, y: -1 }}
                     whileTap={{ scale: 0.98 }}
@@ -738,6 +738,7 @@ export function CTASection() {
     </section>
   );
 }
+
 
 
 

@@ -159,7 +159,7 @@ export default function HeroSection() {
           transition={{ delay: 0.6, duration: 0.5 }}
           className="flex flex-col sm:flex-row items-center gap-4"
         >
-          <Link href="/dashboard">
+          <Link href="/signup">
             <Button size="xl" icon={<ArrowRight size={18} />} iconPosition="right">
               Start Analyzing Free
             </Button>
@@ -247,6 +247,7 @@ export default function HeroSection() {
     </section>
   );
 }
+
 
 
 

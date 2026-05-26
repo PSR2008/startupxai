@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Zap, Twitter, Linkedin, Github } from "lucide-react";
 
 const footerLinks = {
@@ -21,6 +21,11 @@ const footerLinks = {
     { label: "Support", href: "/support" },
     { label: "Contact Us", href: "/support#contact" },
   ],
+  Account: [
+    { label: "Create account", href: "/signup" },
+    { label: "Sign in", href: "/signin" },
+    { label: "Dashboard", href: "/dashboard" },
+  ],
 };
 
 export default function Footer() {
@@ -28,7 +33,7 @@ export default function Footer() {
     <footer className="border-t border-black/6 bg-white">
       <div className="container-custom py-16">
         {/* Top */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-14">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-14">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2.5 mb-4">
@@ -97,3 +102,4 @@ export default function Footer() {
     </footer>
   );
 }
+
