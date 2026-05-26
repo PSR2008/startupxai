@@ -2,7 +2,17 @@ import type { Metadata } from "next";
 import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
 import HeroSection from "@/components/marketing/HeroSection";
-import { LogoMarquee, EnginesSection, FeaturesSection, TestimonialsSection, PricingSection, CTASection } from "@/components/marketing/EnginesSection";
+import {
+  LogoMarquee,
+  EnginesSection,
+  FeaturesSection,
+  HowItWorksSection,
+  ComparisonSection,
+  TrustSection,
+  TestimonialsSection,
+  PricingSection,
+  CTASection,
+} from "@/components/marketing/EnginesSection";
 
 export const metadata: Metadata = {
   title: "StartupX AI — Your AI Co-Founder for Market, Product & Growth",
@@ -18,6 +28,9 @@ export default function LandingPage() {
       <LogoMarquee />
       <EnginesSection />
       <FeaturesSection />
+      <HowItWorksSection />
+      <ComparisonSection />
+      <TrustSection />
       <TestimonialsSection />
       <PricingSection />
       <CTASection />

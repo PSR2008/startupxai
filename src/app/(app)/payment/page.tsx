@@ -4,7 +4,7 @@ import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  Lock, CheckCircle2, Shield, RefreshCw, Zap, ArrowLeft, Sparkles, Star,
+  Lock, CheckCircle2, Shield, RefreshCw, Zap, ArrowLeft, Sparkles, Star, Globe, BarChart3,
 } from "lucide-react";
 import Link from "next/link";
 import Script from "next/script";
@@ -40,6 +40,12 @@ const plans = {
     ],
   },
 } as const;
+
+const founderHighlights = [
+  { icon: BarChart3, label: "500 analyses/month", detail: "Enough room for serious iteration" },
+  { icon: Globe, label: "USD billing", detail: "Clear international pricing" },
+  { icon: Shield, label: "Private dashboard", detail: "Usage and plan tied to your account" },
+];
 
 type PlanKey = keyof typeof plans;
 type BillingCycle = "monthly" | "annual";
@@ -202,7 +208,8 @@ function PaymentPageContent() {
             </h1>
             <p className="font-jakarta text-sm text-gray-500">
               Upgrading to{" "}
-              <span className="text-emerald-600 font-semibold">{plan.name} Plan</span>
+              <span className="text-emerald-600 font-semibold">{plan.name} Plan</span>{" "}
+              unlocks higher usage and founder-grade workflow tools.
             </p>
           </div>
 
@@ -247,6 +254,19 @@ function PaymentPageContent() {
                     </button>
                   ))}
                 </div>
+                <p className="font-jakarta text-xs text-gray-400 mt-2">
+                  Annual billing is $49/year. Monthly billing is $5/month. Prices are shown in USD.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {founderHighlights.map(({ icon: Icon, label, detail }) => (
+                  <div key={label} className="rounded-xl border border-black/6 bg-gray-50 p-4">
+                    <Icon size={15} className="text-emerald-600 mb-2" />
+                    <p className="font-bricolage text-xs font-bold text-gray-800">{label}</p>
+                    <p className="font-jakarta text-[11px] text-gray-400 mt-1 leading-relaxed">{detail}</p>
+                  </div>
+                ))}
               </div>
 
               {/* Account details */}
@@ -337,7 +357,7 @@ function PaymentPageContent() {
               </button>
 
               <p className="text-center font-jakarta text-xs text-gray-400 flex items-center justify-center gap-1.5">
-                <Shield size={11} /> Your payment is protected by bank-grade encryption
+                <Shield size={11} /> Your payment is processed securely by Razorpay
               </p>
             </div>
 
@@ -345,7 +365,7 @@ function PaymentPageContent() {
             <div className="h-fit sticky top-6 space-y-4">
               <div className="rounded-2xl border border-black/6 bg-white p-7 shadow-sm">
                 <p className="font-bricolage text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">
-                  Order Summary
+                  Founder unlocks
                 </p>
 
                 {/* Plan name + stars */}
@@ -389,6 +409,12 @@ function PaymentPageContent() {
                   ))}
                 </div>
 
+                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 mb-4">
+                  <p className="font-jakarta text-xs text-emerald-700 leading-relaxed">
+                    Your plan activates instantly after successful payment and appears on the dashboard subscription card.
+                  </p>
+                </div>
+
                 <hr className="border-black/5 my-4" />
 
                 {/* Price breakdown */}
@@ -418,9 +444,9 @@ function PaymentPageContent() {
                 <div className="space-y-2.5">
                   {[
                     { icon: Shield, text: "SSL encrypted transaction" },
-                    { icon: RefreshCw, text: "7-day full refund policy" },
+                    { icon: RefreshCw, text: "Cancel anytime" },
                     { icon: Zap, text: "Instant plan activation" },
-                    { icon: Lock, text: "PCI-DSS compliant payment" },
+                    { icon: Lock, text: "Handled through Razorpay checkout" },
                   ].map(({ icon: Icon, text }) => (
                     <div key={text} className="flex items-center gap-2.5">
                       <div className="w-6 h-6 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0">

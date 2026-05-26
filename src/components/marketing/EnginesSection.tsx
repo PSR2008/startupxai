@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   Lightbulb, Swords, DollarSign, Brain, TrendingUp,
   Target, MessageSquare, Palette, ArrowRight, CheckCircle2,
-  Shield, Zap, Globe, BarChart3, Users, Sparkles, Star,
+  Shield, Zap, Globe, BarChart3, Users, Sparkles, Star, FileText, Lock, Scale,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import Button from "@/components/ui/Button";
@@ -308,6 +308,200 @@ export function FeaturesSection() {
             );
           })}
         </StaggerContainer>
+      </div>
+    </section>
+  );
+}
+
+// ============================================
+// HOW IT WORKS SECTION
+// ============================================
+const workflow = [
+  {
+    icon: FileText,
+    title: "Share the startup context",
+    description: "Add your idea, audience, market, current page, or offer. Each engine asks only for the context it needs.",
+  },
+  {
+    icon: Sparkles,
+    title: "Run focused intelligence engines",
+    description: "Choose the engine for the decision in front of you: market, competitors, revenue, psychology, growth, decision, outreach, or brand.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Act on scored recommendations",
+    description: "Get structured scores, risks, action steps, and messaging you can use immediately instead of another generic AI chat.",
+  },
+];
+
+export function HowItWorksSection() {
+  return (
+    <section className="py-24 px-5 bg-[#f7f8fc]">
+      <div className="container-custom">
+        <AnimatedSection className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 mb-5">
+            <Zap size={12} className="text-emerald-600" />
+            <span className="font-jakarta text-xs font-semibold text-emerald-700 uppercase tracking-wide">
+              Workflow
+            </span>
+          </div>
+          <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+            From uncertainty to execution in minutes
+          </h2>
+          <p className="font-jakarta text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            StartupX AI is designed around founder decisions, not blank prompts.
+          </p>
+        </AnimatedSection>
+
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-5" staggerDelay={0.1}>
+          {workflow.map((step, i) => {
+            const Icon = step.icon;
+            return (
+              <StaggerItem key={step.title}>
+                <div className="h-full rounded-2xl border border-black/6 bg-white p-7 shadow-sm">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                      <Icon size={18} className="text-emerald-600" />
+                    </div>
+                    <span className="font-mono text-xs font-bold text-gray-300">0{i + 1}</span>
+                  </div>
+                  <h3 className="font-bricolage text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
+                  <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{step.description}</p>
+                </div>
+              </StaggerItem>
+            );
+          })}
+        </StaggerContainer>
+      </div>
+    </section>
+  );
+}
+
+// ============================================
+// COMPARISON SECTION
+// ============================================
+const comparisonRows = [
+  ["Startup-specific workflows", true, false, false],
+  ["Scores, risks, and action plans", true, true, false],
+  ["Market, revenue, growth, brand, and outreach in one place", true, false, false],
+  ["Useful for rapid iteration", true, false, true],
+  ["Affordable for early founders", true, false, true],
+  ["Available instantly", true, false, true],
+];
+
+export function ComparisonSection() {
+  const columns = ["StartupX AI", "Consultants", "Generic AI chat"];
+
+  return (
+    <section className="py-24 px-5 bg-white">
+      <div className="container-custom">
+        <AnimatedSection className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-blue-200 bg-blue-50 mb-5">
+            <Scale size={12} className="text-blue-600" />
+            <span className="font-jakarta text-xs font-semibold text-blue-700 uppercase tracking-wide">
+              Comparison
+            </span>
+          </div>
+          <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+            Built for the gap between prompts and consultants
+          </h2>
+          <p className="font-jakarta text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            Get structured startup thinking without waiting weeks or paying advisor-level retainers.
+          </p>
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <div className="overflow-hidden rounded-2xl border border-black/6 bg-white shadow-sm">
+            <div className="grid grid-cols-[1.5fr_repeat(3,1fr)] bg-gray-50 border-b border-black/6">
+              <div className="p-4 font-bricolage text-xs font-bold text-gray-400 uppercase tracking-wide">Capability</div>
+              {columns.map((column) => (
+                <div key={column} className="p-4 text-center font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">
+                  {column}
+                </div>
+              ))}
+            </div>
+            {comparisonRows.map(([label, startupx, consultants, chat]) => (
+              <div key={String(label)} className="grid grid-cols-[1.5fr_repeat(3,1fr)] border-b border-black/5 last:border-b-0">
+                <div className="p-4 font-jakarta text-sm text-gray-600">{label}</div>
+                {[startupx, consultants, chat].map((value, i) => (
+                  <div key={i} className="p-4 flex items-center justify-center">
+                    {value ? (
+                      <CheckCircle2 size={17} className="text-emerald-500" />
+                    ) : (
+                      <span className="w-4 h-px bg-gray-200" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </AnimatedSection>
+      </div>
+    </section>
+  );
+}
+
+// ============================================
+// TRUST SECTION
+// ============================================
+const trustItems = [
+  {
+    icon: Lock,
+    title: "Private founder workspace",
+    description: "Your startup inputs are used to generate your own analysis, not displayed publicly on the product.",
+  },
+  {
+    icon: Shield,
+    title: "Authenticated dashboard",
+    description: "Usage and subscription status are tied to your account through Supabase authentication.",
+  },
+  {
+    icon: Globe,
+    title: "International pricing",
+    description: "Founder is billed in USD with clear monthly and annual options.",
+  },
+  {
+    icon: BarChart3,
+    title: "Transparent usage",
+    description: "Your dashboard shows monthly analysis usage, remaining quota, and subscription state.",
+  },
+];
+
+export function TrustSection() {
+  return (
+    <section className="py-24 px-5 bg-[#f7f8fc]">
+      <div className="container-custom">
+        <AnimatedSection className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 mb-5">
+              <Shield size={12} className="text-emerald-600" />
+              <span className="font-jakarta text-xs font-semibold text-emerald-700 uppercase tracking-wide">
+                Trust layer
+              </span>
+            </div>
+            <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-5">
+              Serious enough for real founder work
+            </h2>
+            <p className="font-jakarta text-lg text-gray-500 leading-relaxed">
+              Strategy tools should feel clear, private, and accountable. StartupX AI keeps the product focused on what founders need to decide, test, and improve.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {trustItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
+                  <div className="w-9 h-9 rounded-xl bg-gray-50 border border-black/6 flex items-center justify-center mb-4">
+                    <Icon size={16} className="text-emerald-600" />
+                  </div>
+                  <h3 className="font-bricolage text-sm font-bold text-gray-900 mb-2">{item.title}</h3>
+                  <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{item.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </AnimatedSection>
       </div>
     </section>
   );
