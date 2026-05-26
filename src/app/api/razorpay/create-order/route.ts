@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 
+const prices = {
+  founder: {
+    monthly: 500,
+    annual: 4900,
+  },
+} as const;
+
 export async function POST(req: NextRequest) {
   try {
     const keyId = process.env.RAZORPAY_KEY_ID;
@@ -21,27 +28,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { plan = "founder", billing = "monthly" } = body ?? {};
 
-    const prices = {
-      founder: {
-        monthly: 4900, // ₹49.00 if you want rupees, change to 4900 for ₹49? usually 4900 = ₹49.00? No: ₹49.00 = 4900 paise
-        annual: 49900,
-      },
-      studio: {
-        monthly: 14900,
-        annual: 119000,
-      },
-    } as const;
-
-    const selectedPlan =
-      plan in prices ? (plan as keyof typeof prices) : "founder";
-    const selectedBilling =
-      billing === "annual" ? "annual" : "monthly";
-
+    const selectedPlan = plan in prices ? (plan as keyof typeof prices) : "founder";
+    const selectedBilling = billing === "annual" || billing === "yearly" ? "annual" : "monthly";
     const amount = prices[selectedPlan][selectedBilling];
 
     const order = await razorpay.orders.create({
       amount,
-      currency: "INR",
+      currency: "USD",
       receipt: `startupx_${selectedPlan}_${selectedBilling}_${Date.now()}`,
       notes: {
         plan: selectedPlan,

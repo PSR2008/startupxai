@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Script from "next/script";
+import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 declare global {
   interface Window {
@@ -26,30 +27,16 @@ declare global {
 const plans = {
   founder: {
     name: "Founder",
-    price: 49,
-    annualPrice: 499,
+    price: 5,
+    annualPrice: 49,
     desc: "For founders building seriously",
     features: [
-      "Unlimited analyses",
+      "500 analyses/month",
       "All 6 intelligence engines",
-      "ColdDM AI (unlimited)",
-      "BrandForge AI (unlimited)",
+      "ColdDM AI",
+      "BrandForge AI",
       "PDF exports",
       "Priority processing",
-    ],
-  },
-  studio: {
-    name: "Studio",
-    price: 1499,
-    annualPrice: 11999,
-    desc: "For teams moving fast",
-    features: [
-      "Everything in Founder",
-      "3 team seats included",
-      "Saved analysis history",
-      "API access (soon)",
-      "White-label exports",
-      "Slack support channel",
     ],
   },
 } as const;
@@ -63,7 +50,10 @@ function PaymentPageContent() {
   const planParam = (searchParams.get("plan") as PlanKey) || "founder";
   const plan = plans[planParam] || plans.founder;
 
-  const [billing, setBilling] = useState<BillingCycle>("monthly");
+  const billingParam = searchParams.get("billing");
+  const initialBilling: BillingCycle =
+    billingParam === "annual" || billingParam === "yearly" ? "annual" : "monthly";
+  const [billing, setBilling] = useState<BillingCycle>(initialBilling);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [coupon, setCoupon] = useState("");
@@ -98,9 +88,18 @@ function PaymentPageContent() {
 
       if (!window.Razorpay) throw new Error("Razorpay SDK failed to load.");
 
+      const supabase = getSupabaseBrowserClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const authHeaders: Record<string, string> = {};
+      if (session?.access_token) {
+        authHeaders.Authorization = `Bearer ${session.access_token}`;
+      }
+
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders },
         body: JSON.stringify({ plan: planParam, billing }),
       });
 
@@ -123,8 +122,14 @@ function PaymentPageContent() {
           try {
             const verifyRes = await fetch("/api/razorpay/verify-payment", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(response),
+              headers: { "Content-Type": "application/json", ...authHeaders },
+              body: JSON.stringify({
+                ...response,
+                plan: planParam,
+                billing,
+                amount: orderData.order.amount,
+                currency: orderData.order.currency,
+              }),
             });
             const verifyData = await verifyRes.json();
             if (!verifyRes.ok || !verifyData?.success) throw new Error(verifyData?.message || "Payment verification failed.");
@@ -206,7 +211,7 @@ function PaymentPageContent() {
             {[
               { icon: Shield, label: "256-bit SSL encryption" },
               { icon: Lock, label: "Secured by Razorpay" },
-              { icon: RefreshCw, label: "7-day money back guarantee" },
+              { icon: RefreshCw, label: "Cancel anytime" },
               { icon: Zap, label: "Instant activation" },
             ].map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-2">
@@ -237,7 +242,7 @@ function PaymentPageContent() {
                     >
                       {c === "monthly" ? "Monthly" : "Annual"}
                       {c === "annual" && (
-                        <span className="ml-2 text-xs font-bold text-emerald-600">Save 20%</span>
+                        <span className="ml-2 text-xs font-bold text-emerald-600">Save $11/year</span>
                       )}
                     </button>
                   ))}
@@ -326,7 +331,7 @@ function PaymentPageContent() {
                 ) : (
                   <>
                     <Lock size={15} />
-                    Pay ₹{finalPrice} with Razorpay
+                    Pay ${finalPrice} with Razorpay
                   </>
                 )}
               </button>
@@ -358,7 +363,7 @@ function PaymentPageContent() {
 
                 {/* Price display */}
                 <div className="flex items-end gap-1.5 mb-1">
-                  <span className="font-bricolage text-4xl font-bold text-gray-900">₹{finalPrice}</span>
+                  <span className="font-bricolage text-4xl font-bold text-gray-900">${finalPrice}</span>
                   <span className="font-jakarta text-sm text-gray-400 mb-2">
                     {billing === "annual" ? "/year" : "/month"}
                   </span>
@@ -367,7 +372,7 @@ function PaymentPageContent() {
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 mb-4">
                     <Sparkles size={10} className="text-emerald-600" />
                     <p className="font-jakarta text-xs font-semibold text-emerald-700">
-                      Save ₹{plan.price * 12 - plan.annualPrice}/year
+                      Save ${plan.price * 12 - plan.annualPrice}/year
                     </p>
                   </div>
                 )}
@@ -390,17 +395,17 @@ function PaymentPageContent() {
                 <div className="space-y-2 font-jakarta text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-500">Subtotal</span>
-                    <span className="text-gray-800">₹{price}</span>
+                    <span className="text-gray-800">${price}</span>
                   </div>
                   {discount > 0 && (
                     <div className="flex justify-between text-emerald-600">
                       <span>Discount (FOUNDER20)</span>
-                      <span>-₹{discount}</span>
+                      <span>-${discount}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-bricolage font-bold text-base pt-2 border-t border-black/5">
                     <span className="text-gray-700">Total</span>
-                    <span className="text-gray-900">₹{finalPrice}</span>
+                    <span className="text-gray-900">${finalPrice}</span>
                   </div>
                 </div>
               </div>
@@ -449,3 +454,4 @@ export default function PaymentPage() {
     </Suspense>
   );
 }
+

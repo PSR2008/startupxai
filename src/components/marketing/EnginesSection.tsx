@@ -392,31 +392,21 @@ const plans = [
     name: "Starter",
     price: "Free",
     description: "For founders exploring the platform",
-    features: ["3 analyses per day", "Idea & Market Engine", "Growth Engine (basic)", "ColdDM AI (3/day)", "Community support"],
+    features: ["15 analyses/month", "All 6 Intelligence Engines", "ColdDM AI", "BrandForge AI", "Community support"],
     cta: "Start Free",
     href: "/dashboard",
     highlighted: false,
   },
   {
     name: "Founder",
-    price: "₹49",
+    price: "$5",
     period: "/month",
     description: "For founders building seriously",
-    features: ["Unlimited analyses", "All 6 Intelligence Engines", "ColdDM AI (unlimited)", "BrandForge AI (unlimited)", "Priority AI processing", "PDF report exports", "Email support"],
-    cta: "Start 7-Day Free Trial",
-    href: "/payment?plan=founder",
+    features: ["500 analyses/month", "All 6 Intelligence Engines", "ColdDM AI", "BrandForge AI", "Priority AI processing", "PDF report exports", "Email support"],
+    cta: "Upgrade to Founder",
+    href: "/payment?plan=founder&billing=monthly",
     highlighted: true,
     badge: "Most Popular",
-  },
-  {
-    name: "Studio",
-    price: "₹1,499",
-    period: "/month",
-    description: "For founders and small teams",
-    features: ["Everything in Founder", "3 team seats", "Saved analysis history", "API access (coming soon)", "Custom brand voice", "Slack support", "Dedicated onboarding"],
-    cta: "Start 7-Day Free Trial",
-    href: "/payment?plan=studio",
-    highlighted: false,
   },
 ];
 
@@ -439,7 +429,7 @@ export function PricingSection() {
           </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto" staggerDelay={0.1}>
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto" staggerDelay={0.1}>
           {plans.map((plan) => (
             <StaggerItem key={plan.name}>
               <div
@@ -557,3 +547,4 @@ export function CTASection() {
     </section>
   );
 }
+

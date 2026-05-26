@@ -18,15 +18,15 @@ const plans = [
     priceNote: "forever",
     color: "#72845e",
     features: [
-      { text: "3 analyses per day", included: true },
+      { text: "15 analyses/month", included: true },
       { text: "Idea & Market Engine", included: true },
-      { text: "Growth Engine (basic)", included: true },
-      { text: "ColdDM AI (3 messages/day)", included: true },
-      { text: "BrandForge AI", included: false },
-      { text: "Competitor Intelligence", included: false },
-      { text: "Revenue Engine", included: false },
-      { text: "User Psychology Engine", included: false },
-      { text: "Founder Decision Engine", included: false },
+      { text: "Growth Engine", included: true },
+      { text: "ColdDM AI", included: true },
+      { text: "BrandForge AI", included: true },
+      { text: "Competitor Intelligence", included: true },
+      { text: "Revenue Engine", included: true },
+      { text: "User Psychology Engine", included: true },
+      { text: "Founder Decision Engine", included: true },
       { text: "PDF exports", included: false },
       { text: "Priority processing", included: false },
     ],
@@ -37,17 +37,17 @@ const plans = [
   {
     name: "Founder",
     tagline: "For founders building seriously",
-    price: "₹49",
+    price: "$5",
     priceNote: "per month",
-    annualNote: "₹499 billed annually",
+    annualNote: "$49 billed annually",
     color: "#72845e",
     badge: "Most Popular",
     features: [
-      { text: "Unlimited analyses", included: true },
+      { text: "500 analyses/month", included: true },
       { text: "Idea & Market Engine", included: true },
       { text: "Growth Engine (full)", included: true },
-      { text: "ColdDM AI (unlimited)", included: true },
-      { text: "BrandForge AI (unlimited)", included: true },
+      { text: "ColdDM AI", included: true },
+      { text: "BrandForge AI", included: true },
       { text: "Competitor Intelligence", included: true },
       { text: "Revenue Engine", included: true },
       { text: "User Psychology Engine", included: true },
@@ -55,44 +55,20 @@ const plans = [
       { text: "PDF exports", included: true },
       { text: "Priority processing", included: true },
     ],
-    cta: "Start 7-Day Free Trial",
-    href: "/payment?plan=founder",
+    cta: "Upgrade to Founder",
+    href: "/payment?plan=founder&billing=monthly",
     highlighted: true,
-  },
-  {
-    name: "Studio",
-    tagline: "For teams moving fast",
-    price: "$149",
-    priceNote: "per month",
-    annualNote: "$119/mo billed annually",
-    color: "#9e724e",
-    features: [
-      { text: "Everything in Founder", included: true },
-      { text: "3 team seats included", included: true },
-      { text: "Saved analysis history", included: true },
-      { text: "API access (coming soon)", included: true },
-      { text: "Custom brand voice presets", included: true },
-      { text: "White-label report exports", included: true },
-      { text: "Slack support channel", included: true },
-      { text: "Dedicated onboarding call", included: true },
-      { text: "Usage analytics dashboard", included: true },
-      { text: "Priority processing", included: true },
-      { text: "SLA guarantee", included: true },
-    ],
-    cta: "Start 7-Day Free Trial",
-    href: "/payment?plan=studio",
-    highlighted: false,
   },
 ];
 
 const faqs = [
   {
     q: "Do I need a credit card to start?",
-    a: "No. The Starter plan is completely free with no credit card required. You only need payment details when upgrading to Founder or Studio.",
+    a: "No. The Starter plan is completely free with no credit card required. You only need payment details when upgrading to Founder.",
   },
   {
-    q: "What happens after the 7-day trial?",
-    a: "You'll be automatically moved to your chosen paid plan. If you're not satisfied, cancel before day 7 and you won't be charged.",
+    q: "Is there a free trial?",
+    a: "The free plan is available without a card. Upgrade whenever you need 500 analyses/month.",
   },
   {
     q: "Can I switch plans at any time?",
@@ -108,7 +84,7 @@ const faqs = [
   },
   {
     q: "Can I use StartupX AI for client work or agencies?",
-    a: "The Studio plan covers small agency use. For larger agency or reseller arrangements, contact us at support@startupxai.com for custom pricing.",
+    a: "Founder is designed for solo founders and early teams. For larger agency or reseller arrangements, contact us at support@startupxai.com for custom pricing.",
   },
 ];
 
@@ -135,7 +111,7 @@ export default function PricingPage() {
         </AnimatedSection>
 
         {/* Plans */}
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20 max-w-5xl mx-auto" staggerDelay={0.1}>
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20 max-w-5xl mx-auto" staggerDelay={0.1}>
           {plans.map((plan) => (
             <StaggerItem key={plan.name}>
               <div
@@ -251,3 +227,4 @@ export default function PricingPage() {
     </div>
   );
 }
+
