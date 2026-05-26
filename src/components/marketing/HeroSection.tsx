@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { useRef } from "react";
@@ -125,7 +125,7 @@ export default function HeroSection() {
         >
           <Sparkles size={12} className="text-emerald-500" />
           <span className="font-jakarta text-xs font-semibold text-emerald-700">
-            Built for the next generation of founders
+            Global startup intelligence platform
           </span>
         </motion.div>
 
@@ -136,11 +136,8 @@ export default function HeroSection() {
           transition={{ delay: 0.3, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="font-bricolage font-bold text-5xl sm:text-6xl lg:text-7xl xl:text-[5.25rem] leading-[1.08] tracking-tight mb-6 text-gray-900"
         >
-          Your AI{" "}
-          <span className="text-gradient-brand">Co-Founder</span>
-          <br />
-          for Serious{" "}
-          <span className="text-gradient-violet">Founders</span>
+          Validate, position, and grow your startup with{" "}
+          <span className="text-gradient-brand">AI intelligence</span>
         </motion.h1>
 
         {/* Sub */}
@@ -150,9 +147,9 @@ export default function HeroSection() {
           transition={{ delay: 0.45, duration: 0.6 }}
           className="font-jakarta text-lg sm:text-xl text-gray-500 max-w-2xl leading-relaxed mb-10"
         >
-          Validate ideas. Crush competitors. Unlock revenue. Decode user psychology.
-          Accelerate growth. All in one intelligence platform —
-          <span className="text-gray-800 font-semibold"> powered by AI, built for founders</span>.
+          Turn rough ideas into sharper strategy across market validation,
+          competitors, pricing, psychology, growth, outreach, and brand.
+          <span className="text-gray-800 font-semibold"> Built for founders who need clarity before they spend months building.</span>
         </motion.p>
 
         {/* CTA */}
@@ -181,7 +178,7 @@ export default function HeroSection() {
           transition={{ delay: 0.85 }}
           className="mt-6 font-jakarta text-xs text-gray-400"
         >
-          No credit card required · 6 intelligence engines · Results in seconds
+          Free to start · USD pricing · 8 founder tools · Results in seconds
         </motion.p>
 
         {/* Dashboard preview */}
@@ -202,7 +199,7 @@ export default function HeroSection() {
               <div className="flex-1 flex items-center justify-center">
                 <div className="px-8 py-1 rounded-md bg-white border border-black/8">
                   <span className="font-mono text-[10px] text-gray-400">
-                    app.startupxai.com/dashboard
+                    startupxai.in/dashboard
                   </span>
                 </div>
               </div>
@@ -250,4 +247,6 @@ export default function HeroSection() {
     </section>
   );
 }
+
+
 

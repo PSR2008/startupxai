@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -161,7 +161,7 @@ export default function Navbar() {
               <div className="p-5 border-t border-black/5 space-y-3">
                 <Link href="/signup" onClick={() => setMobileOpen(false)}>
                   <Button fullWidth icon={<Sparkles size={14} />}>
-                    Get Started — Free
+                    Get Started - Free
                   </Button>
                 </Link>
                 <Link
@@ -179,3 +179,4 @@ export default function Navbar() {
     </>
   );
 }
+

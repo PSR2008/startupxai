@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle2, X, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 
 export const metadata: Metadata = {
-  title: "Pricing — StartupX AI",
+  title: "Pricing - StartupX AI",
   description:
     "Simple, transparent pricing for founders. Start free, upgrade when you need the full intelligence stack.",
 };
@@ -76,11 +76,11 @@ const faqs = [
   },
   {
     q: "What AI model powers the engines?",
-    a: "All six intelligence engines and generation tools are powered by Claude — Anthropic's leading AI model — chosen for its nuanced strategic reasoning and long-context understanding.",
+    a: "All six intelligence engines and generation tools are powered by Claude, Anthropic's leading AI model, chosen for its nuanced strategic reasoning and long-context understanding.",
   },
   {
     q: "Is there a money-back guarantee?",
-    a: "Yes. All paid plans include a 7-day money-back guarantee. If you're not satisfied with the results, contact us and we'll issue a full refund.",
+    a: "Founder includes a simple 7-day refund window. If StartupX AI is not useful for your workflow, contact support and we will help.",
   },
   {
     q: "Can I use StartupX AI for client work or agencies?",
@@ -150,7 +150,7 @@ export default function PricingPage() {
                   </div>
                   {"annualNote" in plan && plan.annualNote && (
                     <p className="font-jakarta text-xs text-emerald-600 mt-1">
-                      💡 {plan.annualNote}
+                      ðŸ’¡ {plan.annualNote}
                     </p>
                   )}
                 </div>
@@ -227,4 +227,5 @@ export default function PricingPage() {
     </div>
   );
 }
+
 

@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
   Lightbulb, Swords, DollarSign, Brain, TrendingUp,
   Target, MessageSquare, Palette, ArrowRight, CheckCircle2,
-  Shield, Zap, Globe, BarChart3, Users, Sparkles,
+  Shield, Zap, Globe, BarChart3, Users, Sparkles, Star,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import Button from "@/components/ui/Button";
@@ -13,9 +13,9 @@ import Button from "@/components/ui/Button";
 // LOGO MARQUEE
 // ============================================
 const logos = [
-  "Y Combinator", "Sequoia", "Andreessen", "Product Hunt",
-  "TechCrunch", "IndieHackers", "AppSumo", "Stripe Atlas",
-  "AWS Startups", "Google for Startups", "Notion", "Figma",
+  "Validation", "Positioning", "Pricing", "Growth",
+  "Outreach", "Branding", "Psychology", "Competition",
+  "Launch", "Retention", "Revenue", "Strategy",
 ];
 
 export function LogoMarquee() {
@@ -23,7 +23,7 @@ export function LogoMarquee() {
     <section className="py-14 border-y border-black/5 bg-white">
       <div className="container-custom mb-6">
         <p className="text-center font-jakarta text-xs font-semibold text-gray-400 uppercase tracking-widest">
-          Trusted by founders building at
+          Strategy areas covered
         </p>
       </div>
       <div className="marquee-wrapper">
@@ -81,7 +81,7 @@ const engines = [
   {
     icon: Brain,
     title: "User Psychology Engine",
-    description: "Brutal audit of your trust, UX, and copy. Understand exactly why users don't buy — and what to fix first.",
+    description: "Brutal audit of your trust, UX, and copy. Understand exactly why users do not buy - and what to fix first.",
     href: "/user-psychology",
     color: "#f43f5e",
     bg: "rgba(244,63,94,0.06)",
@@ -122,7 +122,7 @@ const revenueTools = [
   {
     icon: Palette,
     title: "BrandForge AI",
-    description: "Generate startup names, taglines, positioning lines, brand personality, and a color direction — in seconds.",
+    description: "Generate startup names, taglines, positioning lines, brand personality, and a color direction in seconds.",
     href: "/brand-forge",
     color: "#7c3aed",
     badge: "NEW",
@@ -141,12 +141,11 @@ export function EnginesSection() {
             </span>
           </div>
           <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-5">
-            Six engines. One mission.{" "}
-            <span className="text-gradient-brand">Your success.</span>
+            A complete founder intelligence system.{" "}
+            <span className="text-gradient-brand">From idea to traction.</span>
           </h2>
           <p className="font-jakarta text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
-            Each engine is purpose-built to answer the questions that kill startups —
-            before they have a chance to kill yours.
+            Each engine turns messy founder questions into structured decisions, practical next steps, and sharper go-to-market execution.
           </p>
         </AnimatedSection>
 
@@ -266,7 +265,7 @@ const features = [
   { icon: Shield, title: "Security-hardened by design", description: "Rate limiting, input validation, secure API handling. Built like a real product.", color: "#10b981" },
   { icon: Globe, title: "Built for global markets", description: "Region-aware analysis that understands local market dynamics.", color: "#2563eb" },
   { icon: BarChart3, title: "Structured, scored outputs", description: "Not vague AI text. Scored outputs, risk ratings, and actionable recommendations.", color: "#7c3aed" },
-  { icon: Users, title: "Designed for solo founders", description: "Gives you a full team's perspective — market, product, growth, sales.", color: "#f43f5e" },
+  { icon: Users, title: "Designed for solo founders", description: "Gives you a full team's perspective across market, product, growth, and sales.", color: "#f43f5e" },
   { icon: CheckCircle2, title: "Actionable, not theoretical", description: "Every output tells you what to DO next. No consultant fluff.", color: "#059669" },
 ];
 
@@ -343,11 +342,11 @@ export function TestimonialsSection() {
         <AnimatedSection className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-200 bg-amber-50 mb-5">
             <span className="font-jakarta text-xs font-semibold text-amber-700 uppercase tracking-wide">
-              Founder Stories
+              Founder Outcomes
             </span>
           </div>
           <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
-            Founders who shipped faster
+            Built for founders who move globally
           </h2>
         </AnimatedSection>
 
@@ -357,7 +356,7 @@ export function TestimonialsSection() {
               <div className="rounded-2xl border border-black/6 bg-white p-7 space-y-5 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-amber-400 text-sm">★</span>
+                    <Star key={i} size={14} className="text-amber-400 fill-amber-400" />
                   ))}
                 </div>
                 <p className="font-jakarta text-sm text-gray-600 leading-relaxed italic">
@@ -479,7 +478,7 @@ export function PricingSection() {
 
         <AnimatedSection delay={0.2} className="text-center mt-10">
           <p className="font-jakarta text-sm text-gray-400">
-            All plans include 7-day money-back guarantee · Cancel anytime · No hidden fees
+            All plans are billed in USD · Cancel anytime · No hidden fees
           </p>
         </AnimatedSection>
       </div>
@@ -499,8 +498,6 @@ export function CTASection() {
             {/* Gradient background */}
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600" />
             <div className="absolute inset-0 dot-pattern opacity-20" />
-            <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-white/10 blur-3xl -translate-y-1/2 translate-x-1/3" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-teal-400/20 blur-3xl translate-y-1/2 -translate-x-1/4" />
 
             <div className="relative p-12 sm:p-16 text-center">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/30 bg-white/15 mb-6">
@@ -510,11 +507,11 @@ export function CTASection() {
                 </span>
               </div>
               <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-white tracking-tight mb-5">
-                Your AI co-founder is waiting
+                Build with sharper startup intelligence
               </h2>
               <p className="font-jakarta text-lg text-emerald-100 max-w-lg mx-auto mb-10 leading-relaxed">
-                Join thousands of founders who validate faster, ship smarter,
-                and grow with confidence using StartupX AI.
+                Use StartupX AI to validate faster, position clearly, and move
+                from idea to execution with more confidence.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -524,7 +521,7 @@ export function CTASection() {
                     whileTap={{ scale: 0.98 }}
                     className="h-14 px-8 rounded-2xl bg-white text-emerald-700 font-bricolage font-bold text-base shadow-lg shadow-black/8 hover:shadow-xl hover:shadow-black/8 transition-shadow flex items-center gap-2"
                   >
-                    Start Analyzing Free <ArrowRight size={18} />
+                    Start Free <ArrowRight size={18} />
                   </motion.button>
                 </Link>
                 <Link href="/pricing">
@@ -547,4 +544,6 @@ export function CTASection() {
     </section>
   );
 }
+
+
 
