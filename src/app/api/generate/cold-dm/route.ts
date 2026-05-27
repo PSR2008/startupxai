@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const result = await generateColdDM(validation.data);
     const ipHash = await hashIp(ip);
     const sessionId = request.headers.get("x-session-id") || `anon_${Date.now()}`;
-    await saveAnalysis({ sessionId, engineType: "cold-dm", inputData: validation.data as unknown as Record<string, unknown>, outputData: result as unknown as Record<string, unknown>, ipHash });
+    await saveAnalysis({ sessionId, engineType: "cold-dm", inputData: validation.data as unknown as Record<string, unknown>, outputData: result as unknown as Record<string, unknown>, ipHash, userId: usageCheck.userId ?? undefined });
     return NextResponse.json({ success: true, data: result }, { status: 200, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("[ColdDM] Generation failed:", error);

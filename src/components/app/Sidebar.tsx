@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Zap, LayoutDashboard, Lightbulb, Swords, DollarSign,
-  Brain, TrendingUp, Target, MessageSquare, Palette, ArrowLeft, LogOut, UserCircle,
+  Brain, TrendingUp, Target, MessageSquare, Palette, ArrowLeft, LogOut, UserCircle, FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
@@ -14,6 +14,7 @@ const navGroups = [
     label: "Overview",
     items: [
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Reports", href: "/reports", icon: FileText },
     ],
   },
   {
@@ -80,7 +81,7 @@ export default function Sidebar() {
             </p>
             <div className="space-y-0.5">
               {group.items.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || (item.href === "/reports" && pathname.startsWith("/reports/"));
                 const Icon = item.icon;
                 return (
                   <Link

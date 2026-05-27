@@ -2,13 +2,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, Zap, LayoutDashboard, Lightbulb, Swords, DollarSign, Brain, TrendingUp, Target, MessageSquare, Palette, LogOut, UserCircle, Crown } from "lucide-react";
+import { Menu, X, Zap, LayoutDashboard, Lightbulb, Swords, DollarSign, Brain, TrendingUp, Target, MessageSquare, Palette, LogOut, UserCircle, Crown, FileText } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 const routes: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   "/dashboard": { label: "Dashboard", icon: LayoutDashboard, color: "text-gray-600" },
+  "/reports": { label: "Reports", icon: FileText, color: "text-emerald-600" },
   "/idea-engine": { label: "Idea & Market Engine", icon: Lightbulb, color: "text-emerald-600" },
   "/competitor-intelligence": { label: "Competitor Intelligence", icon: Swords, color: "text-amber-600" },
   "/revenue-engine": { label: "Revenue Engine", icon: DollarSign, color: "text-teal-600" },
@@ -27,7 +28,7 @@ export default function AppTopbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const current = routes[pathname];
+  const current = routes[pathname] ?? (pathname.startsWith("/reports/") ? routes["/reports"] : undefined);
 
   const handleLogout = async () => {
     try {

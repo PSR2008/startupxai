@@ -106,7 +106,7 @@ function PaymentPageContent() {
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders },
-        body: JSON.stringify({ plan: planParam, billing }),
+        body: JSON.stringify({ plan: planParam, billing, coupon }),
       });
 
       const orderData = await orderRes.json();

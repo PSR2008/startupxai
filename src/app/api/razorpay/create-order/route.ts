@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
+import { getUserIdFromRequest } from "@/lib/usage-limit";
 
 const prices = {
   founder: {
@@ -10,6 +11,14 @@ const prices = {
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = await getUserIdFromRequest(req);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: "Please sign in before upgrading" },
+        { status: 401 }
+      );
+    }
+
     const keyId = process.env.RAZORPAY_KEY_ID;
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
@@ -26,11 +35,14 @@ export async function POST(req: NextRequest) {
     });
 
     const body = await req.json();
-    const { plan = "founder", billing = "monthly" } = body ?? {};
+    const { plan = "founder", billing = "monthly", coupon = "" } = body ?? {};
 
     const selectedPlan = plan in prices ? (plan as keyof typeof prices) : "founder";
     const selectedBilling = billing === "annual" || billing === "yearly" ? "annual" : "monthly";
-    const amount = prices[selectedPlan][selectedBilling];
+    const baseAmount = prices[selectedPlan][selectedBilling];
+    const couponCode = String(coupon || "").trim().toUpperCase();
+    const discount = couponCode === "FOUNDER20" ? Math.round(baseAmount * 0.2) : 0;
+    const amount = Math.max(baseAmount - discount, 100);
 
     const order = await razorpay.orders.create({
       amount,
@@ -39,6 +51,8 @@ export async function POST(req: NextRequest) {
       notes: {
         plan: selectedPlan,
         billing: selectedBilling,
+        user_id: userId,
+        coupon: discount > 0 ? couponCode : "",
       },
     });
 

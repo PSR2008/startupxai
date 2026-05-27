@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
-import { getSupabaseAdminClient } from "@/lib/supabase";
+import { activateFounderPlan, normalizeFounderBilling } from "@/lib/payment-activation";
 
 async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
   try {
@@ -32,16 +32,6 @@ async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
   } catch {
     return null;
   }
-}
-
-function getExpiryDate(billing: string): string {
-  const expiresAt = new Date();
-  if (billing === "annual" || billing === "yearly") {
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-  } else {
-    expiresAt.setMonth(expiresAt.getMonth() + 1);
-  }
-  return expiresAt.toISOString();
 }
 
 export async function POST(req: NextRequest) {
@@ -87,11 +77,12 @@ export async function POST(req: NextRequest) {
     });
     const order = await razorpay.orders.fetch(razorpay_order_id);
     const orderPlan = order.notes?.plan === "founder" ? "founder" : null;
-    const orderBilling = order.notes?.billing === "annual" || order.notes?.billing === "yearly" ? "yearly" : "monthly";
+    const orderBilling = normalizeFounderBilling(order.notes?.billing);
+    const orderUserId = typeof order.notes?.user_id === "string" ? order.notes.user_id : null;
     const orderAmount = typeof order.amount === "number" ? order.amount : Number(order.amount);
     const orderCurrency = String(order.currency || "USD").toUpperCase();
 
-    if (orderPlan !== "founder" || orderCurrency !== "USD" || ![500, 4900].includes(orderAmount)) {
+    if (orderPlan !== "founder" || orderCurrency !== "USD" || ![500, 4900, 400, 3920].includes(orderAmount)) {
       return NextResponse.json(
         { success: false, message: "Payment order does not match an active plan" },
         { status: 400 }
@@ -99,32 +90,22 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = await getUserIdFromRequest(req);
-    const admin = getSupabaseAdminClient();
-    const normalizedBilling = orderBilling;
-
-    if (userId && admin) {
-      const expiresAt = getExpiryDate(normalizedBilling);
-
-      await admin.from("payments").insert({
-        user_id: userId,
-        plan: "founder",
-        billing_cycle: normalizedBilling,
-        razorpay_order_id,
-        razorpay_payment_id,
-        amount: orderAmount,
-        currency: orderCurrency,
-        status: "paid",
-      });
-
-      await admin.from("user_plans").upsert({
-        user_id: userId,
-        plan: "founder",
-        billing_cycle: normalizedBilling,
-        active: true,
-        expires_at: expiresAt,
-        updated_at: new Date().toISOString(),
-      });
+    if (!userId || !orderUserId || userId !== orderUserId) {
+      return NextResponse.json(
+        { success: false, message: "Payment order does not match this account" },
+        { status: 403 }
+      );
     }
+
+    await activateFounderPlan({
+      userId,
+      billingCycle: orderBilling,
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      amount: orderAmount,
+      currency: orderCurrency,
+      status: "paid",
+    });
 
     return NextResponse.json({
       success: true,

@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
       inputData: input as unknown as Record<string, unknown>,
       outputData: result as unknown as Record<string, unknown>,
       ipHash,
+      userId: usageCheck.userId ?? undefined,
     });
 
     // 6. Return result

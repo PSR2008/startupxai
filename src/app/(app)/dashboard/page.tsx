@@ -9,6 +9,7 @@ import {
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import UsageWidget from "@/components/app/UsageWidget";
 import SubscriptionStatusCard from "@/components/app/SubscriptionStatusCard";
+import RecentReports from "@/components/app/RecentReports";
 
 const engines = [
   { icon: Lightbulb, title: "Idea & Market Engine", description: "Validate idea viability, market demand, and ICP.", href: "/idea-engine", color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.16)", badge: null },
@@ -202,6 +203,10 @@ export default function DashboardPage() {
           );
         })}
       </StaggerContainer>
+
+      <AnimatedSection className="mb-10" delay={0.12}>
+        <RecentReports />
+      </AnimatedSection>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Recommended workflow */}

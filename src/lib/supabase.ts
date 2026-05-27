@@ -75,22 +75,22 @@ export async function saveAnalysis(params: {
   }
 }
 
-export async function getRecentAnalyses(
-  sessionId: string,
-  limit = 10
+export async function getRecentAnalysesByUser(
+  userId: string,
+  limit = 8
 ): Promise<unknown[]> {
   try {
-    const client = getSupabaseClient();
+    const admin = getSupabaseAdminClient();
 
-    if (!client) {
+    if (!admin) {
       console.warn("Supabase client not configured. Returning empty analyses.");
       return [];
     }
 
-    const { data, error } = await client
+    const { data, error } = await admin
       .from("analyses")
-      .select("id, engine_type, created_at")
-      .eq("session_id", sessionId)
+      .select("id, engine_type, input_data, output_data, created_at")
+      .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(limit);
 
@@ -103,5 +103,32 @@ export async function getRecentAnalyses(
   } catch (err) {
     console.error("Unexpected getRecentAnalyses error:", err);
     return [];
+  }
+}
+
+export async function getAnalysisByUser(params: {
+  userId: string;
+  analysisId: string;
+}): Promise<unknown | null> {
+  try {
+    const admin = getSupabaseAdminClient();
+    if (!admin) return null;
+
+    const { data, error } = await admin
+      .from("analyses")
+      .select("id, engine_type, input_data, output_data, created_at")
+      .eq("id", params.analysisId)
+      .eq("user_id", params.userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Failed to fetch analysis:", error.message);
+      return null;
+    }
+
+    return data ?? null;
+  } catch (err) {
+    console.error("Unexpected getAnalysisByUser error:", err);
+    return null;
   }
 }
