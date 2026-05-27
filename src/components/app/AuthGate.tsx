@@ -5,12 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
-const ONBOARDING_OPTIONAL_PATHS = new Set([
-  "/onboarding",
-  "/profile",
-  "/payment",
-]);
-
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -34,18 +28,6 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         await supabase.auth.signOut();
         router.replace("/signin?reason=confirm-email");
         return;
-      }
-
-      if (!ONBOARDING_OPTIONAL_PATHS.has(pathname)) {
-        const res = await fetch("/api/founder-profile", {
-          headers: { Authorization: `Bearer ${session.access_token}` },
-        });
-        const data = await res.json().catch(() => ({}));
-
-        if (res.ok && !data.profile) {
-          router.replace("/onboarding");
-          return;
-        }
       }
 
       if (mounted) setAllowed(true);
