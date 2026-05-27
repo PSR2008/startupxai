@@ -54,7 +54,7 @@ Return ONLY this JSON:
       success: true,
       data: JSON.parse(jsonMatch?.[0] || "{}"),
     });
-  } catch (err) {
+  } catch {
     return NextResponse.json({
       success: false,
       error: "Failed to improve idea",

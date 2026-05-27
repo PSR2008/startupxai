@@ -12,7 +12,7 @@ const config: Config = {
         bricolage: ["var(--font-bricolage)", "system-ui", "sans-serif"],
         jakarta: ["var(--font-jakarta)", "system-ui", "sans-serif"],
         mono: ["var(--font-jetbrains)", "Consolas", "monospace"],
-        // Legacy aliases — keep so old usage still compiles
+        // Legacy aliases - keep so old usage still compiles
         display: ["var(--font-bricolage)", "system-ui", "sans-serif"],
         heading: ["var(--font-bricolage)", "system-ui", "sans-serif"],
         body: ["var(--font-jakarta)", "system-ui", "sans-serif"],
