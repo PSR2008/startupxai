@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Lock, CheckCircle2, Shield, RefreshCw, Zap, ArrowLeft, Sparkles, Star, Globe, BarChart3,
@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import Script from "next/script";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
+import { PLANS, isPaidPlanKey, type PaidPlanKey } from "@/lib/plans";
 
 declare global {
   interface Window {
@@ -26,34 +27,43 @@ declare global {
 
 const plans = {
   founder: {
-    name: "Founder",
-    price: 5,
-    annualPrice: 49,
-    desc: "For founders building seriously",
-    features: [
-      "500 analyses/month",
-      "All 6 intelligence engines",
-      "ColdDM AI",
-      "BrandForge AI",
-      "PDF exports",
-      "Priority processing",
-    ],
+    name: PLANS.founder.label,
+    price: PLANS.founder.monthlyPrice,
+    annualPrice: PLANS.founder.yearlyPrice,
+    desc: "For solo founders validating seriously",
+    features: [`${PLANS.founder.analysesPerMonth} analyses/month`, "All intelligence engines", "PDF exports", "Report history", "Email support"],
+  },
+  growth: {
+    name: PLANS.growth.label,
+    price: PLANS.growth.monthlyPrice,
+    annualPrice: PLANS.growth.yearlyPrice,
+    desc: "For founders iterating weekly",
+    features: [`${PLANS.growth.analysesPerMonth} analyses/month`, "All intelligence engines", "PDF exports", "Shareable reports", "Priority support"],
+  },
+  scale: {
+    name: PLANS.scale.label,
+    price: PLANS.scale.monthlyPrice,
+    annualPrice: PLANS.scale.yearlyPrice,
+    desc: "For teams running more decisions",
+    features: [`${PLANS.scale.analysesPerMonth} analyses/month`, "All intelligence engines", "PDF exports", "Shareable reports", "Priority processing"],
   },
 } as const;
 
 const founderHighlights = [
-  { icon: BarChart3, label: "500 analyses/month", detail: "Enough room for serious iteration" },
+  { icon: BarChart3, label: "Paid usage tiers", detail: "50, 100, or 200 analyses/month" },
   { icon: Globe, label: "USD billing", detail: "Clear international pricing" },
   { icon: Shield, label: "Private dashboard", detail: "Usage and plan tied to your account" },
 ];
 
-type PlanKey = keyof typeof plans;
 type BillingCycle = "monthly" | "annual";
 type PayStatus = "idle" | "loading" | "success" | "error";
 
 function PaymentPageContent() {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const planParam = (searchParams.get("plan") as PlanKey) || "founder";
+  const rawPlan = searchParams.get("plan");
+  const planParam: PaidPlanKey = isPaidPlanKey(rawPlan) ? rawPlan : "founder";
   const plan = plans[planParam] || plans.founder;
 
   const billingParam = searchParams.get("billing");
@@ -64,20 +74,26 @@ function PaymentPageContent() {
   const [email, setEmail] = useState("");
   const [coupon, setCoupon] = useState("");
   const [couponStatus, setCouponStatus] = useState<"idle" | "valid" | "invalid">("idle");
-  const [discount, setDiscount] = useState(0);
   const [status, setStatus] = useState<PayStatus>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
   const price = billing === "annual" ? plan.annualPrice : plan.price;
+  const annualSavings = plan.price * 12 - plan.annualPrice;
+  const discount = couponStatus === "valid" ? Math.round(price * 0.2) : 0;
   const finalPrice = useMemo(() => Math.max(price - discount, 1), [price, discount]);
+
+  const selectPlan = (nextPlan: PaidPlanKey) => {
+    const next = new URLSearchParams(searchParams.toString());
+    next.set("plan", nextPlan);
+    next.set("billing", billing);
+    router.replace(`${pathname}?${next.toString()}`);
+  };
 
   const applyCoupon = () => {
     if (coupon.trim().toUpperCase() === "FOUNDER20") {
       setCouponStatus("valid");
-      setDiscount(Math.round(price * 0.2));
     } else {
       setCouponStatus("invalid");
-      setDiscount(0);
     }
   };
 
@@ -179,7 +195,7 @@ function PaymentPageContent() {
             </div>
             <Link href="/profile">
               <button className="w-full h-12 rounded-xl font-bricolage text-sm font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md shadow-emerald-500/25 hover:shadow-lg hover:shadow-emerald-500/35 transition-all">
-                View Founder status
+                View plan status
               </button>
             </Link>
           </motion.div>
@@ -234,6 +250,36 @@ function PaymentPageContent() {
               {/* Billing toggle */}
               <div>
                 <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide mb-3">
+                  Select Plan
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {(Object.keys(plans) as PaidPlanKey[]).map((key) => {
+                    const option = plans[key];
+                    const active = key === planParam;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => selectPlan(key)}
+                        className={`text-left rounded-xl border p-4 transition-all ${
+                          active
+                            ? "border-emerald-400 bg-emerald-50 shadow-sm shadow-emerald-100"
+                            : "border-black/8 bg-gray-50 hover:border-black/14 hover:bg-white"
+                        }`}
+                      >
+                        <p className={`font-bricolage text-sm font-bold ${active ? "text-emerald-700" : "text-gray-800"}`}>
+                          {option.name}
+                        </p>
+                        <p className="font-jakarta text-xs text-gray-400 mt-1">
+                          ${option.price}/mo · {option.features[0]}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide mb-3">
                   Billing Cycle
                 </p>
                 <div className="flex gap-3">
@@ -249,13 +295,13 @@ function PaymentPageContent() {
                     >
                       {c === "monthly" ? "Monthly" : "Annual"}
                       {c === "annual" && (
-                        <span className="ml-2 text-xs font-bold text-emerald-600">Save $11/year</span>
+                        <span className="ml-2 text-xs font-bold text-emerald-600">Save ${annualSavings}/year</span>
                       )}
                     </button>
                   ))}
                 </div>
                 <p className="font-jakarta text-xs text-gray-400 mt-2">
-                  Annual billing is $49/year. Monthly billing is $5/month. Prices are shown in USD.
+                  {`Annual billing is $${plan.annualPrice}/year. Monthly billing is $${plan.price}/month. Prices are shown in USD.`}
                 </p>
               </div>
 
@@ -365,7 +411,7 @@ function PaymentPageContent() {
             <div className="h-fit sticky top-6 space-y-4">
               <div className="rounded-2xl border border-black/6 bg-white p-7 shadow-sm">
                 <p className="font-bricolage text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">
-                  Founder unlocks
+                    {plan.name} unlocks
                 </p>
 
                 {/* Plan name + stars */}

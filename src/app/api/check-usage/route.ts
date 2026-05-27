@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getUsageSummary } from "@/lib/usage";
+import { PLANS } from "@/lib/plans";
 
 const FREE_USAGE = {
   plan: "free",
   billing_cycle: null,
-  monthly_limit: 15,
+  monthly_limit: PLANS.free.analysesPerMonth,
   analyses_used: 0,
-  analyses_remaining: 15,
+  analyses_remaining: PLANS.free.analysesPerMonth,
   expires_at: null,
 };
 

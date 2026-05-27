@@ -4,6 +4,8 @@ import { PLANS, type PlanKey } from "./plans";
 const MONTHLY_LIMITS: Record<PlanKey, number> = {
   free: PLANS.free.analysesPerMonth,
   founder: PLANS.founder.analysesPerMonth,
+  growth: PLANS.growth.analysesPerMonth,
+  scale: PLANS.scale.analysesPerMonth,
 };
 
 export interface UsageSummary {
@@ -63,7 +65,8 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
       const expired = planRow.expires_at != null && new Date(planRow.expires_at) < new Date();
 
       if (!expired) {
-        effectivePlan = (planRow.plan as PlanKey) ?? "free";
+        const candidatePlan = planRow.plan as PlanKey;
+        effectivePlan = candidatePlan in PLANS ? candidatePlan : "free";
         billingCycle = planRow.billing_cycle ?? null;
         expiresAt = planRow.expires_at ?? null;
       }

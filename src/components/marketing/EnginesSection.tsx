@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import Button from "@/components/ui/Button";
+import { PLANS } from "@/lib/plans";
 
 // ============================================
 // LOGO MARQUEE
@@ -585,21 +586,42 @@ const plans = [
     name: "Starter",
     price: "Free",
     description: "For founders exploring the platform",
-    features: ["15 analyses/month", "All 6 Intelligence Engines", "ColdDM AI", "BrandForge AI", "Community support"],
+    features: [`${PLANS.free.analysesPerMonth} analyses/month`, "All Intelligence Engines", "ColdDM AI", "BrandForge AI", "Community support"],
     cta: "Start Free",
     href: "/signup",
     highlighted: false,
   },
   {
     name: "Founder",
-    price: "$5",
+    price: `$${PLANS.founder.monthlyPrice}`,
     period: "/month",
-    description: "For founders building seriously",
-    features: ["500 analyses/month", "All 6 Intelligence Engines", "ColdDM AI", "BrandForge AI", "Priority AI processing", "PDF report exports", "Email support"],
+    description: "For solo founders validating seriously",
+    features: [`${PLANS.founder.analysesPerMonth} analyses/month`, "All Intelligence Engines", "ColdDM AI", "BrandForge AI", "PDF report exports", "Email support"],
     cta: "Upgrade to Founder",
     href: "/payment?plan=founder&billing=monthly",
     highlighted: true,
+    badge: "Starter upgrade",
+  },
+  {
+    name: "Growth",
+    price: `$${PLANS.growth.monthlyPrice}`,
+    period: "/month",
+    description: "For founders iterating weekly",
+    features: [`${PLANS.growth.analysesPerMonth} analyses/month`, "All Intelligence Engines", "Shareable reports", "PDF report exports", "Priority support"],
+    cta: "Upgrade to Growth",
+    href: "/payment?plan=growth&billing=monthly",
+    highlighted: true,
     badge: "Most Popular",
+  },
+  {
+    name: "Scale",
+    price: `$${PLANS.scale.monthlyPrice}`,
+    period: "/month",
+    description: "For heavier usage and small teams",
+    features: [`${PLANS.scale.analysesPerMonth} analyses/month`, "All Intelligence Engines", "Shareable reports", "PDF report exports", "Priority processing"],
+    cta: "Upgrade to Scale",
+    href: "/payment?plan=scale&billing=monthly",
+    highlighted: false,
   },
 ];
 
@@ -622,7 +644,7 @@ export function PricingSection() {
           </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto" staggerDelay={0.1}>
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 max-w-7xl mx-auto" staggerDelay={0.1}>
           {plans.map((plan) => (
             <StaggerItem key={plan.name}>
               <div

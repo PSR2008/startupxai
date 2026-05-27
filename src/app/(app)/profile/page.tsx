@@ -22,7 +22,7 @@ import {
   Zap,
 } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
-import type { PlanKey } from "@/lib/plans";
+import { PLANS, getPlanLabel, type PlanKey } from "@/lib/plans";
 
 interface ProfileState {
   email: string;
@@ -63,9 +63,9 @@ interface FounderProfile {
 const FREE_USAGE: UsageSummary = {
   plan: "free",
   billing_cycle: null,
-  monthly_limit: 15,
+  monthly_limit: PLANS.free.analysesPerMonth,
   analyses_used: 0,
-  analyses_remaining: 15,
+  analyses_remaining: PLANS.free.analysesPerMonth,
   expires_at: null,
 };
 
@@ -206,7 +206,7 @@ export default function ProfilePage() {
 
   if (!profile) return null;
 
-  const isFounder = usage.plan === "founder";
+  const isPaid = usage.plan !== "free";
   const planExpiry = usage.expires_at ? formatDate(usage.expires_at) : "No expiry";
   const securityIsError = securityStatus === "error" || resendStatus === "error";
 
@@ -296,7 +296,7 @@ export default function ProfilePage() {
                 iconClassName={profile.emailConfirmedAt ? "text-emerald-600" : "text-amber-500"}
               />
               <InfoCard icon={<CalendarDays size={16} />} label="Joined" value={formatDate(profile.createdAt)} />
-              <InfoCard icon={<Crown size={16} />} label="Current plan" value={isFounder ? "Founder" : "Free"} iconClassName={isFounder ? "text-emerald-600" : "text-gray-400"} />
+              <InfoCard icon={<Crown size={16} />} label="Current plan" value={getPlanLabel(usage.plan)} iconClassName={isPaid ? "text-emerald-600" : "text-gray-400"} />
             </div>
           </motion.section>
 
@@ -416,7 +416,7 @@ export default function ProfilePage() {
                 <ArrowRight size={14} className="text-gray-400" />
               </Link>
               <Link href="/payment?plan=founder&billing=monthly" className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 hover:bg-emerald-100 transition-colors">
-                <span className="font-jakarta text-sm text-emerald-700">{isFounder ? "Manage Founder plan" : "Upgrade to Founder"}</span>
+                <span className="font-jakarta text-sm text-emerald-700">{isPaid ? "Manage plan" : "Upgrade to Founder"}</span>
                 <Zap size={14} className="text-emerald-600" />
               </Link>
             </div>
@@ -435,13 +435,13 @@ export default function ProfilePage() {
               <div>
                 <p className="font-bricolage text-sm font-bold text-gray-900">Billing history</p>
                 <p className="font-jakarta text-xs text-gray-400">
-                  {isFounder ? `Founder ${usage.billing_cycle ?? "monthly"} plan renews/expires on ${planExpiry}.` : "No paid plan is active yet."}
+                  {isPaid ? `${getPlanLabel(usage.plan)} ${usage.billing_cycle ?? "monthly"} plan renews/expires on ${planExpiry}.` : "No paid plan is active yet."}
                 </p>
               </div>
             </div>
             <Link href="/payment?plan=founder&billing=monthly" className="h-9 px-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-bricolage text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-100 transition-colors w-fit">
               <Crown size={13} />
-              {isFounder ? "Manage plan" : "Upgrade"}
+              {isPaid ? "Manage plan" : "Upgrade"}
             </Link>
           </div>
 
@@ -449,7 +449,7 @@ export default function ProfilePage() {
             <div className="rounded-xl border border-dashed border-black/10 bg-gray-50 p-5">
               <ReceiptText size={18} className="text-gray-300 mb-3" />
               <p className="font-bricolage text-sm font-bold text-gray-800 mb-1">No payments yet</p>
-              <p className="font-jakarta text-xs text-gray-400">Successful Founder payments will appear here.</p>
+              <p className="font-jakarta text-xs text-gray-400">Successful paid plan payments will appear here.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">

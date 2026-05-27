@@ -1,5 +1,5 @@
 import { getSupabaseAdminClient } from "./supabase";
-import { getPlanLabel, normalizeBillingCycle, type BillingCycle, type PlanKey } from "./plans";
+import { getPlanLabel, isPaidPlanKey, normalizeBillingCycle, type BillingCycle, type PlanKey } from "./plans";
 
 export interface SubscriptionStatus {
   plan: PlanKey;
@@ -32,7 +32,7 @@ export async function getSubscriptionStatus(userId: string): Promise<Subscriptio
       .eq("user_id", userId)
       .maybeSingle();
 
-    if (error || !data || data.plan !== "founder") {
+    if (error || !data || !isPaidPlanKey(data.plan)) {
       return getFreeSubscriptionStatus();
     }
 
@@ -49,8 +49,8 @@ export async function getSubscriptionStatus(userId: string): Promise<Subscriptio
     }
 
     return {
-      plan: "founder",
-      label: getPlanLabel("founder"),
+      plan: data.plan,
+      label: getPlanLabel(data.plan),
       billingCycle: normalizeBillingCycle(data.billing_cycle),
       active,
       expiresAt,

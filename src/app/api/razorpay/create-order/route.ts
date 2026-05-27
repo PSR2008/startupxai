@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { getUserIdFromRequest } from "@/lib/usage-limit";
-
-const prices = {
-  founder: {
-    monthly: 500,
-    annual: 4900,
-  },
-} as const;
+import { getPlanPriceCents, isPaidPlanKey, normalizeBillingCycle } from "@/lib/plans";
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,9 +31,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { plan = "founder", billing = "monthly", coupon = "" } = body ?? {};
 
-    const selectedPlan = plan in prices ? (plan as keyof typeof prices) : "founder";
-    const selectedBilling = billing === "annual" || billing === "yearly" ? "annual" : "monthly";
-    const baseAmount = prices[selectedPlan][selectedBilling];
+    const selectedPlan = isPaidPlanKey(plan) ? plan : "founder";
+    const normalizedBilling = normalizeBillingCycle(billing);
+    const selectedBilling = normalizedBilling === "yearly" ? "annual" : "monthly";
+    const baseAmount = getPlanPriceCents(selectedPlan, normalizedBilling);
     const couponCode = String(coupon || "").trim().toUpperCase();
     const discount = couponCode === "FOUNDER20" ? Math.round(baseAmount * 0.2) : 0;
     const amount = Math.max(baseAmount - discount, 100);

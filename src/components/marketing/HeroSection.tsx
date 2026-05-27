@@ -42,8 +42,8 @@ const floatingCards = [
   {
     icon: Zap,
     label: "Revenue Recommendation",
-    value: "$5/mo or $49/year",
-    sub: "Optimal pricing tiers",
+    value: "$5-$15/mo",
+    sub: "Three paid usage tiers",
     color: "#2563eb",
     bg: "rgba(37,99,235,0.08)",
     border: "rgba(37,99,235,0.20)",

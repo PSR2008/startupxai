@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import crypto from "crypto";
-import { activateFounderPlan, normalizeFounderBilling } from "@/lib/payment-activation";
+import { activatePaidPlan, normalizePaymentBilling } from "@/lib/payment-activation";
+import { getAllowedPaidAmounts, isPaidPlanKey } from "@/lib/plans";
 
 export const runtime = "nodejs";
 
@@ -67,21 +68,22 @@ export async function POST(req: NextRequest) {
     });
 
     const order = await razorpay.orders.fetch(payment.order_id);
-    const orderPlan = order.notes?.plan === "founder" ? "founder" : null;
-    const billingCycle = normalizeFounderBilling(order.notes?.billing);
+    const orderPlan = isPaidPlanKey(order.notes?.plan) ? order.notes.plan : null;
+    const billingCycle = normalizePaymentBilling(order.notes?.billing);
     const userId = typeof order.notes?.user_id === "string" ? order.notes.user_id : null;
     const orderAmount = typeof order.amount === "number" ? order.amount : Number(order.amount);
     const currency = String(order.currency || payment.currency || "USD").toUpperCase();
 
-    if (!userId || orderPlan !== "founder" || currency !== "USD" || ![500, 4900, 400, 3920].includes(orderAmount)) {
+    if (!userId || !orderPlan || currency !== "USD" || !getAllowedPaidAmounts().includes(orderAmount)) {
       return NextResponse.json(
         { success: false, message: "Webhook payment does not match an active plan" },
         { status: 400 }
       );
     }
 
-    await activateFounderPlan({
+    await activatePaidPlan({
       userId,
+      plan: orderPlan,
       billingCycle,
       razorpayOrderId: payment.order_id,
       razorpayPaymentId: payment.id,

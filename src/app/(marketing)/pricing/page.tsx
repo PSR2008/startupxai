@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CheckCircle2, X, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
+import { PLANS } from "@/lib/plans";
 
 export const metadata: Metadata = {
   title: "Pricing - StartupX AI",
@@ -18,7 +19,7 @@ const plans = [
     priceNote: "forever",
     color: "#72845e",
     features: [
-      { text: "15 analyses/month", included: true },
+      { text: `${PLANS.free.analysesPerMonth} analyses/month`, included: true },
       { text: "Idea & Market Engine", included: true },
       { text: "Growth Engine", included: true },
       { text: "ColdDM AI", included: true },
@@ -36,14 +37,14 @@ const plans = [
   },
   {
     name: "Founder",
-    tagline: "For founders building seriously",
-    price: "$5",
+    tagline: "For solo founders validating seriously",
+    price: `$${PLANS.founder.monthlyPrice}`,
     priceNote: "per month",
-    annualNote: "$49 billed annually",
+    annualNote: `$${PLANS.founder.yearlyPrice} billed annually`,
     color: "#72845e",
-    badge: "Most Popular",
+    badge: "Starter upgrade",
     features: [
-      { text: "500 analyses/month", included: true },
+      { text: `${PLANS.founder.analysesPerMonth} analyses/month`, included: true },
       { text: "Idea & Market Engine", included: true },
       { text: "Growth Engine (full)", included: true },
       { text: "ColdDM AI", included: true },
@@ -59,16 +60,57 @@ const plans = [
     href: "/payment?plan=founder&billing=monthly",
     highlighted: true,
   },
+  {
+    name: "Growth",
+    tagline: "For weekly iteration",
+    price: `$${PLANS.growth.monthlyPrice}`,
+    priceNote: "per month",
+    annualNote: `$${PLANS.growth.yearlyPrice} billed annually`,
+    color: "#4a63b5",
+    badge: "Popular",
+    features: [
+      { text: `${PLANS.growth.analysesPerMonth} analyses/month`, included: true },
+      { text: "All intelligence engines", included: true },
+      { text: "ColdDM AI", included: true },
+      { text: "BrandForge AI", included: true },
+      { text: "PDF exports", included: true },
+      { text: "Shareable reports", included: true },
+      { text: "Priority support", included: true },
+    ],
+    cta: "Upgrade to Growth",
+    href: "/payment?plan=growth&billing=monthly",
+    highlighted: false,
+  },
+  {
+    name: "Scale",
+    tagline: "For teams making more decisions",
+    price: `$${PLANS.scale.monthlyPrice}`,
+    priceNote: "per month",
+    annualNote: `$${PLANS.scale.yearlyPrice} billed annually`,
+    color: "#9e724e",
+    features: [
+      { text: `${PLANS.scale.analysesPerMonth} analyses/month`, included: true },
+      { text: "All intelligence engines", included: true },
+      { text: "ColdDM AI", included: true },
+      { text: "BrandForge AI", included: true },
+      { text: "PDF exports", included: true },
+      { text: "Shareable reports", included: true },
+      { text: "Priority processing", included: true },
+    ],
+    cta: "Upgrade to Scale",
+    href: "/payment?plan=scale&billing=monthly",
+    highlighted: false,
+  },
 ];
 
 const faqs = [
   {
     q: "Do I need a credit card to start?",
-    a: "No. The Starter plan is completely free with no credit card required. You only need payment details when upgrading to Founder.",
+    a: "No. The Starter plan is completely free with no credit card required. You only need payment details when upgrading to a paid plan.",
   },
   {
     q: "Is there a free trial?",
-    a: "The free plan is available without a card. Upgrade whenever you need 500 analyses/month.",
+    a: "The free plan is available without a card. Upgrade whenever you need 50, 100, or 200 analyses per month.",
   },
   {
     q: "Can I switch plans at any time?",
@@ -80,11 +122,11 @@ const faqs = [
   },
   {
     q: "Is there a money-back guarantee?",
-    a: "Founder includes a simple 7-day refund window. If StartupX AI is not useful for your workflow, contact support and we will help.",
+    a: "Paid plans include a simple 7-day refund window. If StartupX AI is not useful for your workflow, contact support and we will help.",
   },
   {
     q: "Can I use StartupX AI for client work or agencies?",
-    a: "Founder is designed for solo founders and early teams. For larger agency or reseller arrangements, contact us at support@startupxai.in for custom pricing.",
+    a: "Founder is best for solo validation, Growth is for weekly iteration, and Scale is for teams or heavier usage.",
   },
 ];
 
@@ -111,7 +153,7 @@ export default function PricingPage() {
         </AnimatedSection>
 
         {/* Plans */}
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20 max-w-5xl mx-auto" staggerDelay={0.1}>
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-20 max-w-7xl mx-auto" staggerDelay={0.1}>
           {plans.map((plan) => (
             <StaggerItem key={plan.name}>
               <div

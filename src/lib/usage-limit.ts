@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getUsageSummary } from "./usage";
+import { PLANS } from "./plans";
 
 export interface UsageLimitCheck {
   allowed: boolean;
@@ -53,7 +54,7 @@ export async function checkUsageLimit(req: NextRequest): Promise<UsageLimitCheck
         code: "USAGE_LIMIT_REACHED",
         error:
           usage.plan === "free"
-            ? "You have used all 15 free analyses this month. Upgrade to Founder for 500 analyses/month."
+            ? `You have used all ${PLANS.free.analysesPerMonth} free analyses this month. Upgrade for 50, 100, or 200 analyses/month.`
             : "You have reached your monthly analysis limit.",
         usage,
       },

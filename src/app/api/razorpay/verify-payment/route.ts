@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
-import { activateFounderPlan, normalizeFounderBilling } from "@/lib/payment-activation";
+import { activatePaidPlan, normalizePaymentBilling } from "@/lib/payment-activation";
+import { getAllowedPaidAmounts, isPaidPlanKey } from "@/lib/plans";
 
 async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
   try {
@@ -76,13 +77,13 @@ export async function POST(req: NextRequest) {
       key_secret: secret,
     });
     const order = await razorpay.orders.fetch(razorpay_order_id);
-    const orderPlan = order.notes?.plan === "founder" ? "founder" : null;
-    const orderBilling = normalizeFounderBilling(order.notes?.billing);
+    const orderPlan = isPaidPlanKey(order.notes?.plan) ? order.notes.plan : null;
+    const orderBilling = normalizePaymentBilling(order.notes?.billing);
     const orderUserId = typeof order.notes?.user_id === "string" ? order.notes.user_id : null;
     const orderAmount = typeof order.amount === "number" ? order.amount : Number(order.amount);
     const orderCurrency = String(order.currency || "USD").toUpperCase();
 
-    if (orderPlan !== "founder" || orderCurrency !== "USD" || ![500, 4900, 400, 3920].includes(orderAmount)) {
+    if (!orderPlan || orderCurrency !== "USD" || !getAllowedPaidAmounts().includes(orderAmount)) {
       return NextResponse.json(
         { success: false, message: "Payment order does not match an active plan" },
         { status: 400 }
@@ -97,8 +98,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await activateFounderPlan({
+    await activatePaidPlan({
       userId,
+      plan: orderPlan,
       billingCycle: orderBilling,
       razorpayOrderId: razorpay_order_id,
       razorpayPaymentId: razorpay_payment_id,

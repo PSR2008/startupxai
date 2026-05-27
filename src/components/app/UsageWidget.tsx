@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { AlertCircle, Crown, TrendingUp, Zap } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
-import type { PlanKey } from "@/lib/plans";
+import { PLANS, getPlanLabel, type PlanKey } from "@/lib/plans";
 
 interface UsageSummary {
   plan: PlanKey;
@@ -19,9 +19,9 @@ interface UsageSummary {
 const FREE_DEFAULTS: UsageSummary = {
   plan: "free",
   billing_cycle: null,
-  monthly_limit: 15,
+  monthly_limit: PLANS.free.analysesPerMonth,
   analyses_used: 0,
-  analyses_remaining: 15,
+  analyses_remaining: PLANS.free.analysesPerMonth,
   expires_at: null,
 };
 
@@ -107,7 +107,7 @@ export default function UsageWidget() {
           )}
           <div>
             <div className="flex items-center gap-2">
-              <p className="font-bricolage text-sm font-bold text-gray-900">{isFree ? "Free Plan" : "Founder Plan"}</p>
+              <p className="font-bricolage text-sm font-bold text-gray-900">{isFree ? "Free Plan" : `${getPlanLabel(data.plan)} Plan`}</p>
               {!isFree && (
                 <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-200">
                   <span className="w-1 h-1 rounded-full bg-emerald-500" />
@@ -156,7 +156,7 @@ export default function UsageWidget() {
         <div className="mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200">
           <p className="font-jakarta text-xs text-amber-700 mb-2">You&apos;re approaching your free limit.</p>
           <Link href="/payment?plan=founder&billing=monthly">
-            <button className="font-bricolage text-xs font-bold text-amber-700 hover:text-amber-900 transition-colors">Upgrade to Founder - 500 analyses/month</button>
+            <button className="font-bricolage text-xs font-bold text-amber-700 hover:text-amber-900 transition-colors">Upgrade to Founder - 50 analyses/month</button>
           </Link>
         </div>
       )}
@@ -165,7 +165,7 @@ export default function UsageWidget() {
         <div className="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200">
           <p className="font-jakarta text-xs text-rose-700 mb-2">You&apos;ve used all {data.monthly_limit} free analyses this month.</p>
           <Link href="/payment?plan=founder&billing=monthly">
-            <button className="font-bricolage text-xs font-bold text-rose-700 hover:text-rose-900 transition-colors">Upgrade to Founder - $5/mo, 500 analyses</button>
+            <button className="font-bricolage text-xs font-bold text-rose-700 hover:text-rose-900 transition-colors">Upgrade to Founder - $5/mo, 50 analyses</button>
           </Link>
         </div>
       )}

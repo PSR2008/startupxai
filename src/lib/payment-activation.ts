@@ -1,10 +1,12 @@
 import { getSupabaseAdminClient } from "./supabase";
+import type { PaidPlanKey } from "./plans";
 
-export type FounderBillingCycle = "monthly" | "yearly";
+export type PaymentBillingCycle = "monthly" | "yearly";
 
-export interface FounderPaymentActivation {
+export interface PaymentActivation {
   userId: string;
-  billingCycle: FounderBillingCycle;
+  plan: PaidPlanKey;
+  billingCycle: PaymentBillingCycle;
   razorpayOrderId: string;
   razorpayPaymentId: string;
   amount: number;
@@ -12,11 +14,11 @@ export interface FounderPaymentActivation {
   status?: string;
 }
 
-export function normalizeFounderBilling(value: unknown): FounderBillingCycle {
+export function normalizePaymentBilling(value: unknown): PaymentBillingCycle {
   return value === "annual" || value === "yearly" ? "yearly" : "monthly";
 }
 
-export function getFounderExpiryDate(billing: FounderBillingCycle): string {
+export function getPlanExpiryDate(billing: PaymentBillingCycle): string {
   const expiresAt = new Date();
   if (billing === "yearly") {
     expiresAt.setFullYear(expiresAt.getFullYear() + 1);
@@ -26,13 +28,13 @@ export function getFounderExpiryDate(billing: FounderBillingCycle): string {
   return expiresAt.toISOString();
 }
 
-export async function activateFounderPlan(params: FounderPaymentActivation): Promise<void> {
+export async function activatePaidPlan(params: PaymentActivation): Promise<void> {
   const admin = getSupabaseAdminClient();
   if (!admin) throw new Error("Supabase admin client is not configured");
 
   const normalizedCurrency = params.currency.toUpperCase();
   const paidStatus = params.status ?? "paid";
-  const expiresAt = getFounderExpiryDate(params.billingCycle);
+  const expiresAt = getPlanExpiryDate(params.billingCycle);
 
   const { data: existingPayment } = await admin
     .from("payments")
@@ -43,7 +45,7 @@ export async function activateFounderPlan(params: FounderPaymentActivation): Pro
   if (!existingPayment) {
     const { error: paymentError } = await admin.from("payments").insert({
       user_id: params.userId,
-      plan: "founder",
+      plan: params.plan,
       billing_cycle: params.billingCycle,
       razorpay_order_id: params.razorpayOrderId,
       razorpay_payment_id: params.razorpayPaymentId,
@@ -59,7 +61,7 @@ export async function activateFounderPlan(params: FounderPaymentActivation): Pro
 
   const { error: planError } = await admin.from("user_plans").upsert({
     user_id: params.userId,
-    plan: "founder",
+    plan: params.plan,
     billing_cycle: params.billingCycle,
     active: true,
     expires_at: expiresAt,
