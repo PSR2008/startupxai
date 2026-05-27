@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +18,14 @@ export default function SigninPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
 
+  useEffect(() => {
+    const reason = new URLSearchParams(window.location.search).get("reason");
+    if (reason === "confirm-email") {
+      setErrorMsg("Please confirm your email before opening your account. Check your inbox, then sign in again.");
+      setStatus("error");
+    }
+  }, []);
+
   const validate = () => {
     const errs: { email?: string; password?: string } = {};
     if (!email.trim()) errs.email = "Email is required";
@@ -33,8 +41,16 @@ export default function SigninPage() {
 
     try {
       const supabase = getSupabaseBrowserClient();
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+
+      if (!data.user?.email_confirmed_at) {
+        await supabase.auth.signOut();
+        setErrorMsg("Please confirm your email before signing in. Check your inbox for the confirmation link.");
+        setStatus("error");
+        return;
+      }
+
       router.push("/dashboard");
       router.refresh();
     } catch (err: unknown) {

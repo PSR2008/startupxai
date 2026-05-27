@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle, Sparkles, RefreshCw } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
@@ -18,7 +17,6 @@ function validatePassword(v: string) {
 }
 
 export default function SignupPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -57,9 +55,7 @@ export default function SignupPage() {
       if (error) throw error;
 
       if (data.session) {
-        router.push("/dashboard");
-        router.refresh();
-        return;
+        await supabase.auth.signOut();
       }
 
       setStatus("success");
