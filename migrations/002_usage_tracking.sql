@@ -1,8 +1,8 @@
 -- ================================================================
--- StartupX AI — Phase 2: Usage Tracking Migration
+-- StartupX AI - Phase 2: Usage Tracking Migration
 -- Run AFTER migrations/001_billing_infrastructure.sql
 --
--- Run in: Supabase Dashboard → SQL Editor → Run
+-- Run in: Supabase Dashboard -> SQL Editor -> Run
 -- ================================================================
 
 -- Enable UUID extension (safe to re-run)
@@ -11,7 +11,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ----------------------------------------------------------------
 -- usage_logs
 -- One row per successful engine analysis.
--- No hard blocking — pure tracking for now.
+-- No hard blocking - pure tracking for now.
 -- ----------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS usage_logs (
   id          uuid        PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -38,5 +38,5 @@ CREATE POLICY "users_select_own_usage"
 -- SELECT table_name FROM information_schema.tables
 -- WHERE table_schema = 'public'
 --   AND table_name IN ('user_plans', 'payments', 'usage_logs');
--- → must return 3 rows
+-- -> must return 3 rows
 -- ================================================================

@@ -112,7 +112,7 @@ export function ErrorState({ message = "Something went wrong. Please try again."
         <div className="flex flex-wrap justify-center gap-2">
           <Link href="/payment?plan=founder&billing=monthly">
             <Button size="sm" icon={<Crown size={13} />}>
-              Upgrade Founder
+              Upgrade plan
             </Button>
           </Link>
           <Link href="/profile">

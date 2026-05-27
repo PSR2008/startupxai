@@ -87,7 +87,7 @@ export default function DashboardPage() {
             <Link href="/payment?plan=founder&billing=monthly">
               <button className="h-9 px-3.5 rounded-xl bg-emerald-600 text-white font-bricolage text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-emerald-500/20 hover:bg-emerald-700 transition-colors">
                 <Crown size={13} />
-                Upgrade Founder
+                Upgrade plan
               </button>
             </Link>
             <Link href="/onboarding">
