@@ -43,7 +43,7 @@ export default function SignupPage() {
     try {
       const supabase = getSupabaseBrowserClient();
       const redirectTo =
-        typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
+        typeof window !== "undefined" ? `${window.location.origin}/onboarding` : undefined;
 
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -75,7 +75,7 @@ export default function SignupPage() {
     try {
       const supabase = getSupabaseBrowserClient();
       const redirectTo =
-        typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
+        typeof window !== "undefined" ? `${window.location.origin}/onboarding` : undefined;
 
       const { error } = await supabase.auth.resend({
         type: "signup",

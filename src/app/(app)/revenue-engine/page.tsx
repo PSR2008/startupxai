@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -49,6 +49,30 @@ export default function RevenueEnginePage() {
   const [result, setResult] = useState<RevenueEngineOutput | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    async function loadFounderProfile() {
+      try {
+        const res = await fetch("/api/founder-profile", {
+          headers: await getAuthHeaders(),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.profile) return;
+
+        setForm((prev) => ({
+          ...prev,
+          idea: prev.idea || data.profile.startup_idea || "",
+          description: prev.description || data.profile.product_summary || "",
+          targetAudience: prev.targetAudience || data.profile.target_audience || "",
+          businessModel: prev.businessModel || data.profile.primary_goal || "",
+        }));
+      } catch {
+        // best-effort personalization
+      }
+    }
+
+    loadFounderProfile();
+  }, []);
 
   const validate = () => {
     const e: Partial<FormState> = {};

@@ -30,6 +30,18 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      if (pathname !== "/onboarding") {
+        const res = await fetch("/api/founder-profile", {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok && !data.profile) {
+          router.replace("/onboarding");
+          return;
+        }
+      }
+
       if (mounted) setAllowed(true);
     }
 

@@ -1,4 +1,5 @@
 ﻿"use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -10,6 +11,17 @@ import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/sha
 import UsageWidget from "@/components/app/UsageWidget";
 import SubscriptionStatusCard from "@/components/app/SubscriptionStatusCard";
 import RecentReports from "@/components/app/RecentReports";
+import { getAuthHeaders } from "@/lib/auth-headers-client";
+
+interface FounderProfile {
+  startup_idea: string;
+  product_summary: string;
+  target_audience: string;
+  industry?: string | null;
+  founder_stage?: string | null;
+  region?: string | null;
+  primary_goal?: string | null;
+}
 
 const engines = [
   { icon: Lightbulb, title: "Idea & Market Engine", description: "Validate idea viability, market demand, and ICP.", href: "/idea-engine", color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.16)", badge: null },
@@ -38,6 +50,24 @@ const tips = [
 ];
 
 export default function DashboardPage() {
+  const [profile, setProfile] = useState<FounderProfile | null>(null);
+
+  useEffect(() => {
+    async function loadFounderProfile() {
+      try {
+        const res = await fetch("/api/founder-profile", {
+          headers: await getAuthHeaders(),
+        });
+        const data = await res.json();
+        if (res.ok && data.profile) setProfile(data.profile);
+      } catch {
+        // best-effort personalization
+      }
+    }
+
+    loadFounderProfile();
+  }, []);
+
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto">
 
@@ -45,10 +75,12 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h1 className="font-bricolage text-3xl font-bold text-gray-900 mb-2">
-              Founder Command Center
+              {profile?.startup_idea ? `Command Center for ${profile.startup_idea}` : "Founder Command Center"}
             </h1>
             <p className="font-jakarta text-sm text-gray-500">
-              Pick the decision in front of you and turn it into a structured action plan.
+              {profile?.primary_goal
+                ? `Your current goal: ${profile.primary_goal}. Pick the decision in front of you and turn it into a structured action plan.`
+                : "Pick the decision in front of you and turn it into a structured action plan."}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -56,6 +88,12 @@ export default function DashboardPage() {
               <button className="h-9 px-3.5 rounded-xl bg-emerald-600 text-white font-bricolage text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-emerald-500/20 hover:bg-emerald-700 transition-colors">
                 <Crown size={13} />
                 Upgrade Founder
+              </button>
+            </Link>
+            <Link href="/onboarding">
+              <button className="h-9 px-3.5 rounded-xl border border-black/8 bg-white text-gray-700 font-bricolage text-xs font-bold flex items-center gap-1.5 hover:bg-gray-50 transition-colors">
+                <Sparkles size={13} />
+                Edit context
               </button>
             </Link>
             <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-emerald-200 bg-emerald-50 w-fit">

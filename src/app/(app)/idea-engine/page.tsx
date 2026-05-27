@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Lightbulb,
@@ -79,6 +79,31 @@ export default function IdeaEnginePage() {
   const [improving, setImproving] = useState(false);
   const [improvedIdea, setImprovedIdea] = useState<ImprovedIdeaState | null>(null);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    async function loadFounderProfile() {
+      try {
+        const res = await fetch("/api/founder-profile", {
+          headers: await getAuthHeaders(),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.profile) return;
+
+        setForm((prev) => ({
+          ...prev,
+          idea: prev.idea || data.profile.startup_idea || "",
+          description: prev.description || data.profile.product_summary || "",
+          targetAudience: prev.targetAudience || data.profile.target_audience || "",
+          industry: prev.industry || data.profile.industry || "",
+          region: prev.region || data.profile.region || "",
+        }));
+      } catch {
+        // best-effort personalization
+      }
+    }
+
+    loadFounderProfile();
+  }, []);
 
   const validate = (): boolean => {
     const e: Partial<FormState> = {};
@@ -339,7 +364,7 @@ export default function IdeaEnginePage() {
 
           {status === "success" && result && (
             <p className="font-jakarta text-xs text-gray-400 text-center">
-              Analysis complete · Report generated on the right
+              Analysis complete - Report generated on the right
             </p>
           )}
         </div>
