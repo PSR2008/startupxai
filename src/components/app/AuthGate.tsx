@@ -5,6 +5,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
+const ONBOARDING_OPTIONAL_PATHS = new Set([
+  "/onboarding",
+  "/profile",
+  "/payment",
+]);
+
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -30,7 +36,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (pathname !== "/onboarding") {
+      if (!ONBOARDING_OPTIONAL_PATHS.has(pathname)) {
         const res = await fetch("/api/founder-profile", {
           headers: { Authorization: `Bearer ${session.access_token}` },
         });
