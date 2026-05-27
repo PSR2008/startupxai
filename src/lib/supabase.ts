@@ -89,7 +89,7 @@ export async function getRecentAnalysesByUser(
 
     const { data, error } = await admin
       .from("analyses")
-      .select("id, engine_type, input_data, output_data, created_at")
+      .select("id, engine_type, input_data, output_data, share_token, shared_at, created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -116,7 +116,7 @@ export async function getAnalysisByUser(params: {
 
     const { data, error } = await admin
       .from("analyses")
-      .select("id, engine_type, input_data, output_data, created_at")
+      .select("id, engine_type, input_data, output_data, share_token, shared_at, created_at")
       .eq("id", params.analysisId)
       .eq("user_id", params.userId)
       .maybeSingle();
@@ -129,6 +129,59 @@ export async function getAnalysisByUser(params: {
     return data ?? null;
   } catch (err) {
     console.error("Unexpected getAnalysisByUser error:", err);
+    return null;
+  }
+}
+
+export async function setAnalysisShareToken(params: {
+  userId: string;
+  analysisId: string;
+  shareToken: string | null;
+}): Promise<boolean> {
+  try {
+    const admin = getSupabaseAdminClient();
+    if (!admin) return false;
+
+    const { error } = await admin
+      .from("analyses")
+      .update({
+        share_token: params.shareToken,
+        shared_at: params.shareToken ? new Date().toISOString() : null,
+      })
+      .eq("id", params.analysisId)
+      .eq("user_id", params.userId);
+
+    if (error) {
+      console.error("Failed to update report share token:", error.message);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("Unexpected setAnalysisShareToken error:", err);
+    return false;
+  }
+}
+
+export async function getAnalysisByShareToken(shareToken: string): Promise<unknown | null> {
+  try {
+    const admin = getSupabaseAdminClient();
+    if (!admin) return null;
+
+    const { data, error } = await admin
+      .from("analyses")
+      .select("id, engine_type, input_data, output_data, shared_at, created_at")
+      .eq("share_token", shareToken)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Failed to fetch shared analysis:", error.message);
+      return null;
+    }
+
+    return data ?? null;
+  } catch (err) {
+    console.error("Unexpected getAnalysisByShareToken error:", err);
     return null;
   }
 }

@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   CalendarDays,
+  Compass,
   CreditCard,
   Crown,
   KeyRound,
@@ -49,6 +50,16 @@ interface PaymentRecord {
   razorpay_payment_id: string;
 }
 
+interface FounderProfile {
+  startup_idea: string;
+  product_summary: string;
+  target_audience: string;
+  industry?: string | null;
+  founder_stage?: string | null;
+  region?: string | null;
+  primary_goal?: string | null;
+}
+
 const FREE_USAGE: UsageSummary = {
   plan: "free",
   billing_cycle: null,
@@ -70,6 +81,7 @@ function formatDate(value: string | null) {
 export default function ProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileState | null>(null);
+  const [founderProfile, setFounderProfile] = useState<FounderProfile | null>(null);
   const [usage, setUsage] = useState<UsageSummary>(FREE_USAGE);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [newPassword, setNewPassword] = useState("");
@@ -116,6 +128,17 @@ export default function ProfilePage() {
         if (billingRes.ok) {
           const billingData = await billingRes.json();
           setPayments(billingData.payments ?? []);
+        }
+
+        const founderRes = await fetch("/api/founder-profile", {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (founderRes.ok) {
+          const founderData = await founderRes.json();
+          setFounderProfile(founderData.profile ?? null);
         }
       } finally {
         setLoading(false);
@@ -222,6 +245,45 @@ export default function ProfilePage() {
             <LogOut size={14} />
             Sign out
           </button>
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.03 }}
+        className="mb-5 rounded-2xl border border-black/6 bg-white p-6 shadow-sm"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+              <Compass size={17} className="text-emerald-600" />
+            </div>
+            <div>
+              <p className="font-bricolage text-sm font-bold text-gray-900">Founder context</p>
+              {founderProfile ? (
+                <>
+                  <p className="font-bricolage text-lg font-bold text-gray-900 mt-1">{founderProfile.startup_idea}</p>
+                  <p className="font-jakarta text-sm text-gray-500 mt-1 max-w-2xl">{founderProfile.product_summary}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {[founderProfile.industry, founderProfile.founder_stage, founderProfile.region, founderProfile.primary_goal]
+                      .filter(Boolean)
+                      .map((item) => (
+                        <span key={item} className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-jakarta text-xs text-emerald-700">
+                          {item}
+                        </span>
+                      ))}
+                  </div>
+                </>
+              ) : (
+                <p className="font-jakarta text-sm text-gray-500 mt-1">Founder Setup is not complete yet.</p>
+              )}
+            </div>
+          </div>
+          <Link href="/onboarding" className="h-9 px-3.5 rounded-xl border border-black/8 bg-gray-50 text-gray-700 font-bricolage text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-white transition-colors w-fit">
+            <Sparkles size={13} />
+            {founderProfile ? "Edit setup" : "Complete setup"}
+          </Link>
         </div>
       </motion.div>
 

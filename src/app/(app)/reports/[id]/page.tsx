@@ -1,72 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, CalendarDays, FileText, Loader2, Trash2 } from "lucide-react";
+import { ArrowLeft, Copy, Link2, Loader2, Trash2, X } from "lucide-react";
 import ExportPdfButton from "@/components/ui/ExportPdfButton";
+import ReportRenderer, { type RenderableReport } from "@/components/app/ReportRenderer";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
-interface ReportDetail {
-  id: string;
-  engine_type: string;
-  input_data: Record<string, unknown>;
-  output_data: Record<string, unknown>;
-  created_at: string;
-}
-
-const ENGINE_LABELS: Record<string, string> = {
-  idea: "Idea & Market Engine",
-  competitor: "Competitor Intelligence",
-  revenue: "Revenue Engine",
-  psychology: "User Psychology Engine",
-  growth: "Growth Engine",
-  decision: "Founder Decision Engine",
-  "cold-dm": "ColdDM AI",
-  "brand-forge": "BrandForge AI",
-};
-
-function formatLabel(key: string) {
-  return key
-    .replace(/([A-Z])/g, " $1")
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-function renderValue(value: unknown): ReactNode {
-  if (Array.isArray(value)) {
-    return (
-      <ul className="space-y-2">
-        {value.map((item, index) => (
-          <li key={index} className="rounded-xl border border-black/6 bg-gray-50 p-3">
-            {typeof item === "object" && item !== null ? renderObject(item as Record<string, unknown>) : String(item)}
-          </li>
-        ))}
-      </ul>
-    );
-  }
-
-  if (typeof value === "object" && value !== null) {
-    return renderObject(value as Record<string, unknown>);
-  }
-
-  return <p className="font-jakarta text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{String(value)}</p>;
-}
-
-function renderObject(value: Record<string, unknown>) {
-  return (
-    <div className="space-y-3">
-      {Object.entries(value).map(([key, item]) => (
-        <div key={key}>
-          <p className="font-bricolage text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
-            {formatLabel(key)}
-          </p>
-          {renderValue(item)}
-        </div>
-      ))}
-    </div>
-  );
+interface ReportDetail extends RenderableReport {
+  share_token?: string | null;
+  shared_at?: string | null;
 }
 
 export default function ReportDetailPage() {
@@ -76,6 +20,8 @@ export default function ReportDetailPage() {
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -112,14 +58,10 @@ export default function ReportDetailPage() {
     loadReport();
   }, [params.id, router]);
 
-  const title = useMemo(() => {
-    if (!report) return "Report";
-    const input = report.input_data ?? {};
-    const primary = input.idea ?? input.product ?? input.targetAudience;
-    return typeof primary === "string" && primary.trim()
-      ? `${ENGINE_LABELS[report.engine_type] ?? "Report"} - ${primary.trim()}`
-      : ENGINE_LABELS[report.engine_type] ?? "Saved report";
-  }, [report]);
+  const shareUrl = useMemo(() => {
+    if (!report?.share_token || typeof window === "undefined") return "";
+    return `${window.location.origin}/share/${report.share_token}`;
+  }, [report?.share_token]);
 
   const deleteReport = async () => {
     if (!token || !report) return;
@@ -140,6 +82,45 @@ export default function ReportDetailPage() {
       setError(err instanceof Error ? err.message : "Unable to delete report");
       setDeleting(false);
     }
+  };
+
+  const updateSharing = async (share: boolean) => {
+    if (!token || !report) return;
+    setSharing(true);
+    try {
+      const res = await fetch(`/api/reports/${report.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ share }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || "Unable to update sharing");
+
+      setReport((current) =>
+        current
+          ? {
+              ...current,
+              share_token: data.shareToken,
+              shared_at: data.shareToken ? new Date().toISOString() : null,
+            }
+          : current
+      );
+      setCopied(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to update sharing");
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const copyShareUrl = async () => {
+    if (!shareUrl) return;
+    await navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
   };
 
   if (loading) {
@@ -169,12 +150,40 @@ export default function ReportDetailPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
-      <div className="no-print mb-6 flex items-center justify-between gap-3">
+      <div className="no-print mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-400 hover:text-gray-700 font-jakarta text-sm">
           <ArrowLeft size={14} /> Back to dashboard
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <ExportPdfButton />
+          {report.share_token ? (
+            <>
+              <button
+                onClick={copyShareUrl}
+                className="h-8 px-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 font-bricolage text-xs font-bold hover:bg-emerald-100 transition-colors flex items-center gap-1.5"
+              >
+                <Copy size={13} />
+                {copied ? "Copied" : "Copy link"}
+              </button>
+              <button
+                onClick={() => updateSharing(false)}
+                disabled={sharing}
+                className="h-8 px-3 rounded-lg border border-black/10 bg-white text-gray-600 font-bricolage text-xs font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+              >
+                <X size={13} />
+                Unshare
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => updateSharing(true)}
+              disabled={sharing}
+              className="h-8 px-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 font-bricolage text-xs font-bold hover:bg-emerald-100 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+            >
+              {sharing ? <Loader2 size={13} className="animate-spin" /> : <Link2 size={13} />}
+              Share
+            </button>
+          )}
           <button
             onClick={deleteReport}
             disabled={deleting}
@@ -186,41 +195,7 @@ export default function ReportDetailPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-black/6 bg-white p-7 shadow-sm mb-5">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-            <FileText size={20} className="text-emerald-600" />
-          </div>
-          <div>
-            <p className="font-bricolage text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">
-              {ENGINE_LABELS[report.engine_type] ?? report.engine_type}
-            </p>
-            <h1 className="font-bricolage text-3xl font-bold text-gray-900 mb-2">{title}</h1>
-            <p className="font-jakarta text-sm text-gray-400 flex items-center gap-1.5">
-              <CalendarDays size={13} />
-              {new Date(report.created_at).toLocaleString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              })}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-5">
-        <section className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm h-fit">
-          <h2 className="font-bricolage text-sm font-bold text-gray-900 mb-4">Input</h2>
-          {renderObject(report.input_data)}
-        </section>
-
-        <section className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
-          <h2 className="font-bricolage text-sm font-bold text-gray-900 mb-4">Report Output</h2>
-          {renderObject(report.output_data)}
-        </section>
-      </div>
+      <ReportRenderer report={report} />
     </div>
   );
 }
