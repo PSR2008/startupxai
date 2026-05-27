@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 // ============================================
 // BROWSER-SAFE SUPABASE CLIENT
-// Uses NEXT_PUBLIC_ vars only — safe for client components
+// Uses NEXT_PUBLIC_ vars only - safe for client components
 // ============================================
 
 let _client: SupabaseClient | null = null;
@@ -31,7 +31,7 @@ export function getSupabaseBrowserClient(): SupabaseClient {
   return _client;
 }
 
-// Convenience alias — used in auth pages
+// Convenience alias - used in auth pages
 export const supabaseBrowser = {
   get auth() {
     return getSupabaseBrowserClient().auth;

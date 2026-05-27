@@ -6,6 +6,7 @@ import { Input, Textarea, Select } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import toast from "react-hot-toast";
+import { getAuthHeaders } from "@/lib/auth-headers-client";
 
 const supportChannels = [
   {
@@ -74,11 +75,25 @@ export default function SupportPage() {
     }
     setErrors({});
     setLoading(true);
-    // Simulate submission
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
-    setSubmitted(true);
-    toast.success("Message sent! We'll get back to you shortly.");
+    try {
+      const res = await fetch("/api/support", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(await getAuthHeaders()),
+        },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || "Could not send message");
+
+      setSubmitted(true);
+      toast.success("Message sent! We'll get back to you shortly.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not send message");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

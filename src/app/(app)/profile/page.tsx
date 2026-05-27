@@ -9,8 +9,10 @@ import {
   CalendarDays,
   CreditCard,
   Crown,
+  KeyRound,
   LogOut,
   Mail,
+  RefreshCw,
   ReceiptText,
   ShieldCheck,
   Sparkles,
@@ -70,6 +72,10 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileState | null>(null);
   const [usage, setUsage] = useState<UsageSummary>(FREE_USAGE);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
+  const [newPassword, setNewPassword] = useState("");
+  const [securityStatus, setSecurityStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [securityMessage, setSecurityMessage] = useState("");
+  const [resendStatus, setResendStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -129,6 +135,54 @@ export default function ProfilePage() {
     await supabase.auth.signOut();
     router.push("/signin");
     router.refresh();
+  };
+
+  const handlePasswordChange = async () => {
+    setSecurityMessage("");
+
+    if (newPassword.length < 8) {
+      setSecurityStatus("error");
+      setSecurityMessage("Password must be at least 8 characters.");
+      return;
+    }
+
+    setSecurityStatus("loading");
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+
+      setNewPassword("");
+      setSecurityStatus("success");
+      setSecurityMessage("Password updated successfully.");
+    } catch (err) {
+      setSecurityStatus("error");
+      setSecurityMessage(err instanceof Error ? err.message : "Unable to update password.");
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!profile?.email) return;
+
+    setResendStatus("loading");
+    setSecurityMessage("");
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const redirectTo =
+        typeof window !== "undefined" ? `${window.location.origin}/onboarding` : undefined;
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: profile.email,
+        options: { emailRedirectTo: redirectTo },
+      });
+      if (error) throw error;
+
+      setResendStatus("success");
+      setSecurityMessage("Confirmation email sent.");
+    } catch (err) {
+      setResendStatus("error");
+      setSecurityMessage(err instanceof Error ? err.message : "Unable to resend confirmation email.");
+    }
   };
 
   if (loading) {
@@ -212,9 +266,92 @@ export default function ProfilePage() {
               <p className="font-jakarta text-sm text-gray-800">{isFounder ? "Founder" : "Free"}</p>
             </div>
           </div>
-        </motion.div>
+      </motion.div>
 
-        <motion.div
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.13 }}
+        className="mt-5 rounded-2xl border border-black/6 bg-white p-6 shadow-sm"
+      >
+        <div className="flex items-center gap-2 mb-5">
+          <ShieldCheck size={16} className="text-emerald-600" />
+          <div>
+            <p className="font-bricolage text-sm font-bold text-gray-900">Account security</p>
+            <p className="font-jakarta text-xs text-gray-400">
+              Manage password and email verification from one place.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="rounded-xl border border-black/6 bg-gray-50 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <KeyRound size={15} className="text-gray-500" />
+              <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">Change password</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => {
+                  setNewPassword(e.target.value);
+                  if (securityStatus === "error") setSecurityStatus("idle");
+                }}
+                placeholder="New password"
+                className="h-10 flex-1 rounded-xl border border-black/10 bg-white px-3.5 font-jakarta text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/15 focus:border-emerald-500"
+              />
+              <button
+                onClick={handlePasswordChange}
+                disabled={securityStatus === "loading"}
+                className="h-10 px-4 rounded-xl bg-emerald-600 text-white font-bricolage text-xs font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+              >
+                {securityStatus === "loading" ? "Updating..." : "Update"}
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-black/6 bg-gray-50 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Mail size={15} className="text-gray-500" />
+              <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">Email confirmation</p>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p className="font-jakarta text-sm text-gray-600">
+                {profile.emailConfirmedAt ? "Your email is confirmed." : "Confirmation is still pending."}
+              </p>
+              <button
+                onClick={handleResendConfirmation}
+                disabled={Boolean(profile.emailConfirmedAt) || resendStatus === "loading"}
+                className="h-10 px-4 rounded-xl border border-black/10 bg-white text-gray-700 font-bricolage text-xs font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <RefreshCw size={13} className={resendStatus === "loading" ? "animate-spin" : ""} />
+                Resend
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {securityMessage && (
+          <div
+            className={`mt-4 rounded-xl border px-4 py-3 ${
+              securityStatus === "error" || resendStatus === "error"
+                ? "border-rose-200 bg-rose-50"
+                : "border-emerald-200 bg-emerald-50"
+            }`}
+          >
+            <p
+              className={`font-jakarta text-sm ${
+                securityStatus === "error" || resendStatus === "error" ? "text-rose-700" : "text-emerald-700"
+              }`}
+            >
+              {securityMessage}
+            </p>
+          </div>
+        )}
+      </motion.div>
+
+      <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
