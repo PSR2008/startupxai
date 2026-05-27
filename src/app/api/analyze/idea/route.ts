@@ -8,6 +8,7 @@ import {
 } from "@/lib/rate-limit";
 import { saveAnalysis } from "@/lib/supabase";
 import { hashIp } from "@/lib/utils";
+import { checkUsageLimit } from "@/lib/usage-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -41,6 +42,9 @@ export async function POST(request: NextRequest) {
   }
 
   const input = validation.data;
+
+  const usageCheck = await checkUsageLimit(request);
+  if (!usageCheck.allowed) return usageCheck.response!;
 
   // 4. Run AI analysis
   try {

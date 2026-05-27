@@ -1,13 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { checkUsageLimit } from "@/lib/usage-limit";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    const usageCheck = await checkUsageLimit(req);
+    if (!usageCheck.allowed) return usageCheck.response!;
 
     const prompt = `
 You are a top startup advisor.

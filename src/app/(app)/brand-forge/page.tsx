@@ -11,6 +11,7 @@ import Badge from "@/components/ui/Badge";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { BrandForgeOutput } from "@/types";
 import { logUsageClient } from "@/lib/usage-client";
+import { getAuthHeaders } from "@/lib/auth-headers-client";
 
 const toneOptions = [
   { value: "premium", label: "Premium / Luxury" },
@@ -63,7 +64,7 @@ export default function BrandForgePage() {
     try {
       const res = await fetch("/api/generate/brand-forge", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await getAuthHeaders()) },
         body: JSON.stringify(form),
       });
       const data = await res.json();

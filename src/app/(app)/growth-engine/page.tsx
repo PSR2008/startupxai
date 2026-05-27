@@ -23,6 +23,7 @@ import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { GrowthChannel, GrowthEngineOutput } from "@/types";
 import { cn } from "@/lib/utils";
 import { logUsageClient } from "@/lib/usage-client";
+import { getAuthHeaders } from "@/lib/auth-headers-client";
 
 const budgetOptions = [
   { value: "", label: "Select budget range" },
@@ -88,7 +89,7 @@ export default function GrowthEnginePage() {
     try {
       const res = await fetch("/api/analyze/growth", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await getAuthHeaders()) },
         body: JSON.stringify(form),
       });
       const data = await res.json();

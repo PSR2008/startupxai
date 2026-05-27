@@ -22,6 +22,7 @@ import Badge from "@/components/ui/Badge";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { PsychologyEngineOutput } from "@/types";
 import { logUsageClient } from "@/lib/usage-client";
+import { getAuthHeaders } from "@/lib/auth-headers-client";
 
 interface FormState {
   idea: string;
@@ -64,7 +65,7 @@ export default function PsychologyPage() {
     try {
       const res = await fetch("/api/analyze/psychology", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await getAuthHeaders()) },
         body: JSON.stringify(form),
       });
       const data = await res.json();

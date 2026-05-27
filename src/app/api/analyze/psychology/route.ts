@@ -4,6 +4,7 @@ import { psychologyEngineSchema, validateInput } from "@/lib/validation";
 import { analysisRateLimiter, getRequestIp, rateLimitResponse } from "@/lib/rate-limit";
 import { saveAnalysis } from "@/lib/supabase";
 import { hashIp } from "@/lib/utils";
+import { checkUsageLimit } from "@/lib/usage-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -22,6 +23,9 @@ export async function POST(request: NextRequest) {
   if (!validation.success) {
     return NextResponse.json({ success: false, error: "Validation failed", details: validation.errors }, { status: 422 });
   }
+
+  const usageCheck = await checkUsageLimit(request);
+  if (!usageCheck.allowed) return usageCheck.response!;
 
   try {
     const result = await analyzePsychology(validation.data);

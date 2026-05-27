@@ -26,6 +26,7 @@ import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { IdeaEngineOutput } from "@/types";
 import { getScoreColor } from "@/lib/utils";
 import { logUsageClient } from "@/lib/usage-client";
+import { getAuthHeaders } from "@/lib/auth-headers-client";
 
 const industryOptions = [
   { value: "", label: "Select an industry" },
@@ -115,6 +116,7 @@ export default function IdeaEnginePage() {
         headers: {
           "Content-Type": "application/json",
           "x-session-id": `session_${Date.now()}`,
+          ...(await getAuthHeaders()),
         },
         body: JSON.stringify(form),
       });
@@ -146,6 +148,7 @@ export default function IdeaEnginePage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(await getAuthHeaders()),
         },
         body: JSON.stringify({
           idea: form.idea,

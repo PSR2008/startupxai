@@ -12,6 +12,7 @@ import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { ColdDMOutput, ColdEmailMessage, ColdMessage } from "@/types";
 import { cn } from "@/lib/utils";
 import { logUsageClient } from "@/lib/usage-client";
+import { getAuthHeaders } from "@/lib/auth-headers-client";
 
 const toneOptions = [
   { value: "professional", label: "Professional" },
@@ -75,7 +76,7 @@ export default function ColdDMPage() {
     try {
       const res = await fetch("/api/generate/cold-dm", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await getAuthHeaders()) },
         body: JSON.stringify(form),
       });
       const data = await res.json();
