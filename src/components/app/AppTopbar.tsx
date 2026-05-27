@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, Zap, LayoutDashboard, Lightbulb, Swords, DollarSign, Brain, TrendingUp, Target, MessageSquare, Palette, LogOut, UserCircle } from "lucide-react";
+import { Menu, X, Zap, LayoutDashboard, Lightbulb, Swords, DollarSign, Brain, TrendingUp, Target, MessageSquare, Palette, LogOut, UserCircle, Crown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
@@ -18,6 +18,7 @@ const routes: Record<string, { label: string; icon: React.ElementType; color: st
   "/cold-dm": { label: "ColdDM AI", icon: MessageSquare, color: "text-emerald-600" },
   "/brand-forge": { label: "BrandForge AI", icon: Palette, color: "text-violet-600" },
   "/profile": { label: "Profile", icon: UserCircle, color: "text-emerald-600" },
+  "/payment": { label: "Upgrade Plan", icon: Crown, color: "text-amber-600" },
 };
 
 const mobileNavItems = Object.entries(routes);

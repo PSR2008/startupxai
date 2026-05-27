@@ -60,7 +60,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="hidden lg:flex flex-col w-58 shrink-0 h-screen sticky top-0 border-r border-black/6 bg-white">
+    <aside className="hidden lg:flex flex-col w-60 shrink-0 h-screen sticky top-0 border-r border-black/6 bg-white">
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-5 h-16 border-b border-black/5">
         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/20">

@@ -179,7 +179,7 @@ function PaymentPageContent() {
             </div>
             <Link href="/dashboard">
               <button className="w-full h-12 rounded-xl font-bricolage text-sm font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md shadow-emerald-500/25 hover:shadow-lg hover:shadow-emerald-500/35 transition-all">
-                Go to Dashboard →
+                Go to Dashboard
               </button>
             </Link>
           </motion.div>
@@ -327,7 +327,7 @@ function PaymentPageContent() {
                   </p>
                 )}
                 {couponStatus === "invalid" && (
-                  <p className="font-jakarta text-xs text-rose-500 mt-1.5">✗ Invalid coupon code</p>
+                  <p className="font-jakarta text-xs text-rose-500 mt-1.5">Invalid coupon code</p>
                 )}
               </div>
 
@@ -341,12 +341,12 @@ function PaymentPageContent() {
               <button
                 onClick={handlePay}
                 disabled={status === "loading"}
-                className="w-full h-13 py-3.5 rounded-xl font-bricolage text-base font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/30 active:translate-y-0 shadow-md shadow-emerald-500/20"
+                className="w-full h-12 py-3.5 rounded-xl font-bricolage text-base font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/30 active:translate-y-0 shadow-md shadow-emerald-500/20"
               >
                 {status === "loading" ? (
                   <>
                     <span className="w-4 h-4 border-2 border-black/6 border-t-white rounded-full animate-spin" />
-                    Starting Payment…
+                    Starting payment...
                   </>
                 ) : (
                   <>
@@ -468,7 +468,7 @@ function PaymentPageContent() {
 function PaymentPageFallback() {
   return (
     <div className="min-h-screen p-6 lg:p-10 flex items-center justify-center bg-[#f7f8fc]">
-      <div className="text-gray-400 text-sm font-bricolage">Loading payment page…</div>
+      <div className="text-gray-400 text-sm font-bricolage">Loading payment page...</div>
     </div>
   );
 }
