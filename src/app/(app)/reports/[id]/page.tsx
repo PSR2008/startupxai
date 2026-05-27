@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, CalendarDays, FileText, Loader2 } from "lucide-react";
+import { ArrowLeft, CalendarDays, FileText, Loader2, Trash2 } from "lucide-react";
 import ExportPdfButton from "@/components/ui/ExportPdfButton";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
@@ -73,7 +73,9 @@ export default function ReportDetailPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const [report, setReport] = useState<ReportDetail | null>(null);
+  const [token, setToken] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -88,6 +90,7 @@ export default function ReportDetailPage() {
           router.push("/signin");
           return;
         }
+        setToken(session.access_token);
 
         const res = await fetch(`/api/reports/${params.id}`, {
           headers: { Authorization: `Bearer ${session.access_token}` },
@@ -114,9 +117,30 @@ export default function ReportDetailPage() {
     const input = report.input_data ?? {};
     const primary = input.idea ?? input.product ?? input.targetAudience;
     return typeof primary === "string" && primary.trim()
-      ? primary.trim()
+      ? `${ENGINE_LABELS[report.engine_type] ?? "Report"} - ${primary.trim()}`
       : ENGINE_LABELS[report.engine_type] ?? "Saved report";
   }, [report]);
+
+  const deleteReport = async () => {
+    if (!token || !report) return;
+    const confirmed = window.confirm("Delete this report? This cannot be undone.");
+    if (!confirmed) return;
+
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/reports/${report.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error("Unable to delete report");
+      router.push("/reports");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to delete report");
+      setDeleting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -149,7 +173,17 @@ export default function ReportDetailPage() {
         <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-400 hover:text-gray-700 font-jakarta text-sm">
           <ArrowLeft size={14} /> Back to dashboard
         </Link>
-        <ExportPdfButton />
+        <div className="flex items-center gap-2">
+          <ExportPdfButton />
+          <button
+            onClick={deleteReport}
+            disabled={deleting}
+            className="h-8 px-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 font-bricolage text-xs font-bold hover:bg-rose-100 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+          >
+            {deleting ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+            Delete
+          </button>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-black/6 bg-white p-7 shadow-sm mb-5">

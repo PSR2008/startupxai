@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, FileText, History, Loader2 } from "lucide-react";
+import { ArrowRight, CalendarDays, FileText, History, Loader2, Trash2, Trophy } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 interface ReportSummary {
@@ -10,6 +10,12 @@ interface ReportSummary {
   engine_type: string;
   input_data?: Record<string, unknown>;
   created_at: string;
+}
+
+interface ReportStats {
+  totalReports: number;
+  mostUsedEngine: string | null;
+  lastAnalysisAt: string | null;
 }
 
 const ENGINE_LABELS: Record<string, string> = {
@@ -33,7 +39,7 @@ function getReportTitle(report: ReportSummary): string {
     input.targetAudience;
 
   if (typeof primary === "string" && primary.trim()) {
-    return primary.trim();
+    return `${ENGINE_LABELS[report.engine_type] ?? "Report"} - ${primary.trim()}`;
   }
 
   return ENGINE_LABELS[report.engine_type] ?? "Saved report";
@@ -50,7 +56,15 @@ function formatDate(value: string): string {
 
 export default function RecentReports({ limit = 6 }: { limit?: number }) {
   const [reports, setReports] = useState<ReportSummary[]>([]);
+  const [stats, setStats] = useState<ReportStats>({
+    totalReports: 0,
+    mostUsedEngine: null,
+    lastAnalysisAt: null,
+  });
+  const [token, setToken] = useState("");
   const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [clearing, setClearing] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -63,6 +77,7 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
         } = await supabase.auth.getSession();
 
         if (!session?.access_token) return;
+        setToken(session.access_token);
 
         const res = await fetch(`/api/reports?limit=${limit}`, {
           headers: { Authorization: `Bearer ${session.access_token}` },
@@ -70,7 +85,10 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
 
         if (!res.ok) return;
         const data = await res.json();
-        if (mounted) setReports(data.reports ?? []);
+        if (mounted) {
+          setReports(data.reports ?? []);
+          setStats(data.stats ?? { totalReports: 0, mostUsedEngine: null, lastAnalysisAt: null });
+        }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -82,6 +100,46 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
     };
   }, [limit]);
 
+  const deleteReport = async (id: string) => {
+    if (!token) return;
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/reports/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setReports((items) => items.filter((item) => item.id !== id));
+        setStats((current) => ({
+          ...current,
+          totalReports: Math.max(0, current.totalReports - 1),
+        }));
+      }
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const clearHistory = async () => {
+    if (!token || reports.length === 0) return;
+    const confirmed = window.confirm("Clear all saved reports? This cannot be undone.");
+    if (!confirmed) return;
+
+    setClearing(true);
+    try {
+      const res = await fetch("/api/reports", {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setReports([]);
+        setStats({ totalReports: 0, mostUsedEngine: null, lastAnalysisAt: null });
+      }
+    } finally {
+      setClearing(false);
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm h-full">
       <div className="flex items-center justify-between gap-3 mb-5">
@@ -89,7 +147,15 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
           <History size={15} className="text-emerald-600" />
           <h3 className="font-bricolage text-sm font-bold text-gray-900">Recent Reports</h3>
         </div>
-        <span className="font-jakarta text-[11px] text-gray-400">{reports.length} saved</span>
+        {reports.length > 0 && (
+          <button
+            onClick={clearHistory}
+            disabled={clearing}
+            className="h-8 px-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 font-bricolage text-xs font-bold hover:bg-rose-100 disabled:opacity-50 transition-colors"
+          >
+            {clearing ? "Clearing..." : "Clear history"}
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -106,24 +172,50 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {reports.map((report) => (
-            <Link key={report.id} href={`/reports/${report.id}`}>
-              <div className="group rounded-xl border border-black/6 bg-gray-50 px-4 py-3 hover:bg-white hover:shadow-sm transition-all">
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { icon: FileText, label: "Total reports", value: String(stats.totalReports) },
+              { icon: Trophy, label: "Top engine", value: stats.mostUsedEngine ? ENGINE_LABELS[stats.mostUsedEngine] ?? stats.mostUsedEngine : "Not enough data" },
+              { icon: CalendarDays, label: "Last run", value: stats.lastAnalysisAt ? formatDate(stats.lastAnalysisAt) : "Not yet" },
+            ].map(({ icon: Icon, label, value }) => (
+              <div key={label} className="rounded-xl border border-black/6 bg-gray-50 p-4">
+                <Icon size={14} className="text-emerald-600 mb-2" />
+                <p className="font-bricolage text-[11px] font-bold text-gray-400 uppercase tracking-wide">{label}</p>
+                <p className="font-jakarta text-sm text-gray-800 truncate">{value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-2">
+            {reports.map((report) => (
+              <div key={report.id} className="group rounded-xl border border-black/6 bg-gray-50 px-4 py-3 hover:bg-white hover:shadow-sm transition-all">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  <Link href={`/reports/${report.id}`} className="min-w-0 flex-1">
                     <p className="font-bricolage text-sm font-bold text-gray-900 truncate">
                       {getReportTitle(report)}
                     </p>
                     <p className="font-jakarta text-xs text-gray-400">
-                      {ENGINE_LABELS[report.engine_type] ?? report.engine_type} - {formatDate(report.created_at)}
+                      {formatDate(report.created_at)}
                     </p>
+                  </Link>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => deleteReport(report.id)}
+                      disabled={busyId === report.id}
+                      title="Delete report"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 hover:text-rose-600 hover:bg-rose-50 disabled:opacity-50 transition-colors"
+                    >
+                      {busyId === report.id ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                    </button>
+                    <Link href={`/reports/${report.id}`} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 hover:text-emerald-600 hover:bg-emerald-50 transition-colors">
+                      <ArrowRight size={13} />
+                    </Link>
                   </div>
-                  <ArrowRight size={13} className="text-gray-300 group-hover:text-emerald-600 transition-colors flex-shrink-0 mt-1" />
                 </div>
               </div>
-            </Link>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

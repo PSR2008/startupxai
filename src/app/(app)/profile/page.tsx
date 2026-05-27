@@ -7,9 +7,11 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   CalendarDays,
+  CreditCard,
   Crown,
   LogOut,
   Mail,
+  ReceiptText,
   ShieldCheck,
   Sparkles,
   TrendingUp,
@@ -34,6 +36,17 @@ interface UsageSummary {
   expires_at: string | null;
 }
 
+interface PaymentRecord {
+  id: string;
+  plan: string;
+  billing_cycle: string;
+  amount: number | null;
+  currency: string;
+  status: string;
+  created_at: string;
+  razorpay_payment_id: string;
+}
+
 const FREE_USAGE: UsageSummary = {
   plan: "free",
   billing_cycle: null,
@@ -56,6 +69,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileState | null>(null);
   const [usage, setUsage] = useState<UsageSummary>(FREE_USAGE);
+  const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -85,6 +99,17 @@ export default function ProfilePage() {
 
         if (res.ok) {
           setUsage(await res.json());
+        }
+
+        const billingRes = await fetch("/api/billing-history", {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (billingRes.ok) {
+          const billingData = await billingRes.json();
+          setPayments(billingData.payments ?? []);
         }
       } finally {
         setLoading(false);
@@ -120,6 +145,7 @@ export default function ProfilePage() {
   if (!profile) return null;
 
   const isFounder = usage.plan === "founder";
+  const planExpiry = usage.expires_at ? formatDate(usage.expires_at) : "No expiry";
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
@@ -232,6 +258,68 @@ export default function ProfilePage() {
           </div>
         </motion.div>
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="mt-5 rounded-2xl border border-black/6 bg-white p-6 shadow-sm"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <div className="flex items-center gap-2">
+            <CreditCard size={16} className="text-emerald-600" />
+            <div>
+              <p className="font-bricolage text-sm font-bold text-gray-900">Billing history</p>
+              <p className="font-jakarta text-xs text-gray-400">
+                {isFounder ? `Founder ${usage.billing_cycle ?? "monthly"} plan renews/expires on ${planExpiry}.` : "No paid plan is active yet."}
+              </p>
+            </div>
+          </div>
+          <Link href="/payment?plan=founder&billing=monthly" className="h-9 px-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-bricolage text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-100 transition-colors w-fit">
+            <Crown size={13} />
+            {isFounder ? "Manage plan" : "Upgrade"}
+          </Link>
+        </div>
+
+        {payments.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-black/10 bg-gray-50 p-5">
+            <ReceiptText size={18} className="text-gray-300 mb-3" />
+            <p className="font-bricolage text-sm font-bold text-gray-800 mb-1">No payments yet</p>
+            <p className="font-jakarta text-xs text-gray-400">Successful Founder payments will appear here.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-left">
+              <thead>
+                <tr className="border-b border-black/6">
+                  {["Date", "Plan", "Billing", "Amount", "Status"].map((heading) => (
+                    <th key={heading} className="py-3 font-bricolage text-[11px] font-bold text-gray-400 uppercase tracking-wide">
+                      {heading}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {payments.map((payment) => (
+                  <tr key={payment.id} className="border-b border-black/5 last:border-0">
+                    <td className="py-3 font-jakarta text-sm text-gray-600">{formatDate(payment.created_at)}</td>
+                    <td className="py-3 font-jakarta text-sm text-gray-700 capitalize">{payment.plan}</td>
+                    <td className="py-3 font-jakarta text-sm text-gray-500 capitalize">{payment.billing_cycle}</td>
+                    <td className="py-3 font-bricolage text-sm font-bold text-gray-900">
+                      {payment.currency} {((payment.amount ?? 0) / 100).toFixed(2)}
+                    </td>
+                    <td className="py-3">
+                      <span className="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-jakarta text-[11px] font-bold text-emerald-700 capitalize">
+                        {payment.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </motion.div>
     </div>
   );
 }
