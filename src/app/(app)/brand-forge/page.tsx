@@ -1,14 +1,15 @@
 "use client";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Palette, Sparkles, Type, Volume2, Layers } from "lucide-react";
+
+import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Layers, Palette, Sparkles, SwatchBook, Type, Volume2 } from "lucide-react";
 import EngineHeader from "@/components/app/EngineHeader";
-import { Input, Textarea, Select } from "@/components/ui/FormFields";
+import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import CopyButton from "@/components/ui/CopyButton";
 import Badge from "@/components/ui/Badge";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
-import type { BrandForgeOutput, BrandName } from "@/types";
+import type { BrandForgeOutput } from "@/types";
 import { logUsageClient } from "@/lib/usage-client";
 
 const toneOptions = [
@@ -20,8 +21,21 @@ const toneOptions = [
   { value: "warm", label: "Warm & Human" },
 ];
 
-interface FormState { idea: string; tone: string; industry: string; targetUser: string; vibeKeywords: string; }
-const defaultForm: FormState = { idea: "", tone: "premium", industry: "", targetUser: "", vibeKeywords: "" };
+interface FormState {
+  idea: string;
+  tone: string;
+  industry: string;
+  targetUser: string;
+  vibeKeywords: string;
+}
+
+const defaultForm: FormState = {
+  idea: "",
+  tone: "premium",
+  industry: "",
+  targetUser: "",
+  vibeKeywords: "",
+};
 
 export default function BrandForgePage() {
   const [form, setForm] = useState<FormState>(defaultForm);
@@ -37,55 +51,202 @@ export default function BrandForgePage() {
     if (!form.industry.trim()) e.industry = "Required";
     if (!form.targetUser.trim()) e.targetUser = "Required";
     if (!form.vibeKeywords.trim()) e.vibeKeywords = "Required";
-    setErrors(e); return Object.keys(e).length === 0;
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
   const handleSubmit = async () => {
     if (!validate()) return;
-    setStatus("loading"); setSelectedName(null);
+    setStatus("loading");
+    setSelectedName(null);
+
     try {
-      const res = await fetch("/api/generate/brand-forge", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+      const res = await fetch("/api/generate/brand-forge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error);
-      setResult(data.data); setStatus("success");
+      if (!res.ok || !data.success) throw new Error(data.error || "Brand generation failed");
+      setResult(data.data);
+      setStatus("success");
       logUsageClient("brand-forge");
-    } catch (err) { setErrorMessage(err instanceof Error ? err.message : "Failed"); setStatus("error"); }
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : "Brand generation failed");
+      setStatus("error");
+    }
   };
 
-  const set = (f: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => { setForm((p) => ({ ...p, [f]: e.target.value })); if (errors[f]) setErrors((p) => ({ ...p, [f]: undefined })); };
+  const set = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setForm((p) => ({ ...p, [field]: e.target.value }));
+    if (errors[field]) setErrors((p) => ({ ...p, [field]: undefined }));
+  };
+
+  const brandReport = useMemo(() => {
+    if (!result) return "";
+
+    return [
+      "StartupX AI - Brand Forge Identity Pack",
+      "",
+      `Idea: ${form.idea}`,
+      `Industry: ${form.industry}`,
+      `Target User: ${form.targetUser}`,
+      `Tone: ${form.tone}`,
+      `Vibe Keywords: ${form.vibeKeywords}`,
+      "",
+      "Brand Name Options",
+      ...result.startupNames.map((name) => `- ${name.name}: ${name.vibe}\n  Rationale: ${name.rationale}${name.domain ? `\n  Domain: ${name.domain}` : ""}`),
+      "",
+      "Taglines",
+      ...result.taglines.map((tagline) => `- ${tagline}`),
+      "",
+      "Positioning Lines",
+      ...result.positioningLines.map((line) => `- ${line}`),
+      "",
+      "Tone of Voice",
+      result.toneOfVoice,
+      "",
+      "Brand Personality",
+      ...result.brandPersonality.map((trait) => `- ${trait}`),
+      "",
+      "Color Direction",
+      `Primary: ${result.colorDirection.primary}`,
+      `Secondary: ${result.colorDirection.secondary}`,
+      `Accent: ${result.colorDirection.accent}`,
+      `Mood: ${result.colorDirection.mood}`,
+      `Hex Suggestions: ${result.colorDirection.hexSuggestions.join(", ")}`,
+      "",
+      "Brand Pack Summary",
+      result.brandPackSummary,
+    ]
+      .filter((line) => line !== "")
+      .join("\n");
+  }, [form, result]);
 
   return (
-    <div className="p-6 lg:p-8 max-w-5xl mx-auto">
-      <EngineHeader icon={<Palette size={22} />} title="BrandForge AI" description="Generate startup names, taglines, positioning lines, brand personality, and a color direction. Your brand identity in seconds." badge="Revenue Tool" badgeVariant="cocoa" accentColor="#7c3aed" />
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
+      <EngineHeader
+        icon={<Palette size={22} />}
+        title="BrandForge AI"
+        description="Generate names, taglines, positioning lines, voice, personality, and color direction for a brand-ready startup identity."
+        badge="Creation Tool"
+        badgeVariant="cocoa"
+        accentColor="#7c3aed"
+      />
+
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <ContextCard icon={<Type size={16} />} title="Name system" detail="Options with rationale" tone="amber" />
+        <ContextCard icon={<Sparkles size={16} />} title="Brand voice" detail="Taglines and personality" tone="emerald" />
+        <ContextCard icon={<SwatchBook size={16} />} title="Visual direction" detail="Palette mood and hex ideas" tone="violet" />
+      </div>
+
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-2 space-y-5">
-          <div className="rounded-2xl border border-black/6 bg-gray-50 p-6 space-y-5">
-            <Textarea label="Startup Idea" placeholder="What does your startup do? What problem does it solve?" rows={3} value={form.idea} onChange={set("idea")} error={errors.idea} required charCount maxChars={500} />
+          <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50 space-y-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="font-bricolage text-base font-bold text-gray-900">Brand context</h3>
+                <p className="mt-1 font-jakarta text-xs text-gray-500">Define the market, audience, and emotional feel.</p>
+              </div>
+              <Badge variant="cocoa" size="sm">
+                4 required
+              </Badge>
+            </div>
+
+            <Textarea
+              label="Startup Idea"
+              placeholder="What does your startup do? What problem does it solve?"
+              rows={3}
+              value={form.idea}
+              onChange={set("idea")}
+              error={errors.idea}
+              required
+              charCount
+              maxChars={500}
+            />
             <Select label="Brand Tone" options={toneOptions} value={form.tone} onChange={set("tone")} required />
             <Input label="Industry" placeholder="e.g. Fintech, EdTech, Consumer SaaS" value={form.industry} onChange={set("industry")} error={errors.industry} required />
-            <Textarea label="Target User" placeholder="Who is your ideal customer? Their vibe, job, lifestyle." rows={3} value={form.targetUser} onChange={set("targetUser")} error={errors.targetUser} required />
-            <Input label="Vibe Keywords" placeholder="e.g. bold, minimalist, human, trustworthy, fast, elite" value={form.vibeKeywords} onChange={set("vibeKeywords")} error={errors.vibeKeywords} hint="3–6 words that capture the feel you want" required />
+            <Textarea
+              label="Target User"
+              placeholder="Who is your ideal customer? Their vibe, job, lifestyle."
+              rows={3}
+              value={form.targetUser}
+              onChange={set("targetUser")}
+              error={errors.targetUser}
+              required
+            />
+            <Input
+              label="Vibe Keywords"
+              placeholder="e.g. bold, minimalist, human, trustworthy, fast, elite"
+              value={form.vibeKeywords}
+              onChange={set("vibeKeywords")}
+              error={errors.vibeKeywords}
+              hint="3-6 words that capture the feel you want"
+              required
+            />
           </div>
+
           <Button size="lg" fullWidth onClick={handleSubmit} loading={status === "loading"} icon={<Palette size={15} />} iconPosition="right">
-            {status === "loading" ? "Forging Brand…" : "Generate Brand Identity"}
+            {status === "loading" ? "Forging brand..." : "Generate Brand Identity"}
           </Button>
         </div>
 
         <div className="lg:col-span-3">
           <AnimatePresence mode="wait">
             {status === "idle" && (
-              <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full min-h-64 rounded-2xl border border-dashed border-black/8 p-10 text-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center"><Palette size={20} className="text-amber-600" /></div>
-                <div><p className="font-bricolage text-sm font-semibold text-gray-800 mb-1">Branding ready to forge</p><p className="font-jakarta text-sm text-gray-400 max-w-xs">Fill in your idea and vibe, and get 5 brand name options with a full brand pack.</p></div>
+              <motion.div
+                key="idle"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex min-h-80 flex-col items-center justify-center rounded-2xl border border-dashed border-black/10 bg-white p-10 text-center shadow-sm shadow-gray-200/40"
+              >
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50">
+                  <Palette size={22} className="text-amber-700" />
+                </div>
+                <p className="mt-4 font-bricolage text-base font-bold text-gray-900">Ready to forge the brand</p>
+                <p className="mt-2 max-w-sm font-jakarta text-sm leading-relaxed text-gray-500">
+                  Fill in the context to generate name options, taglines, positioning, voice, personality, and color direction.
+                </p>
+                <div className="mt-5 flex flex-wrap justify-center gap-2">
+                  {["Names", "Voice", "Colors"].map((label) => (
+                    <Badge key={label} variant="cocoa" size="sm">
+                      {label}
+                    </Badge>
+                  ))}
+                </div>
               </motion.div>
             )}
-            {status === "loading" && <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }}><AnalysisLoading engine="brand-forge" /></motion.div>}
-            {status === "error" && <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}><ErrorState message={errorMessage} onRetry={() => setStatus("idle")} /></motion.div>}
+
+            {status === "loading" && (
+              <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <AnalysisLoading engine="brand-forge" />
+              </motion.div>
+            )}
+
+            {status === "error" && (
+              <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <ErrorState message={errorMessage} onRetry={() => setStatus("idle")} />
+              </motion.div>
+            )}
+
             {status === "success" && result && (
               <motion.div key="result" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-                {/* Name options */}
-                <div className="rounded-2xl border border-black/6 bg-gray-50 p-5">
-                  <div className="flex items-center gap-2 mb-4"><Type size={14} className="text-amber-700" /><h3 className="font-bricolage text-sm font-bold text-gray-800">Brand Name Options</h3></div>
+                <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="font-bricolage text-[11px] font-bold uppercase tracking-[0.18em] text-amber-700">Brand identity pack</p>
+                      <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{result.startupNames[0]?.name || "Brand direction"}</h3>
+                    </div>
+                    <CopyButton text={brandReport} showLabel label="Copy pack" />
+                  </div>
+                  <p className="mt-4 font-jakarta text-sm leading-relaxed text-gray-650">{result.brandPackSummary}</p>
+                </div>
+
+                <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Type size={14} className="text-amber-700" />
+                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Brand Name Options</h3>
+                  </div>
                   <div className="space-y-3">
                     {result.startupNames.map((name) => (
                       <motion.div
@@ -93,23 +254,23 @@ export default function BrandForgePage() {
                         initial={{ opacity: 0, x: -12 }}
                         animate={{ opacity: 1, x: 0 }}
                         onClick={() => setSelectedName(selectedName === name.name ? null : name.name)}
-                        className={`rounded-xl border p-4 cursor-pointer transition-all ${selectedName === name.name ? "border-amber-200 bg-amber-50" : "border-black/6 bg-gray-50 hover:border-black/12"}`}
+                        className={`cursor-pointer rounded-xl border p-4 transition-all ${
+                          selectedName === name.name ? "border-amber-300 bg-amber-50 shadow-sm shadow-amber-100" : "border-black/6 bg-gray-50 hover:border-black/12"
+                        }`}
                       >
-                        <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start justify-between gap-3">
                           <div>
-                            <p className="font-bricolage text-lg font-bold text-gray-900">{name.name}</p>
-                            <p className="font-jakarta text-xs text-gray-400 mt-0.5 italic">{name.vibe}</p>
+                            <p className="font-bricolage text-lg font-bold text-gray-950">{name.name}</p>
+                            <p className="mt-0.5 font-jakarta text-xs italic text-gray-500">{name.vibe}</p>
                           </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <CopyButton text={name.name} size="sm" />
-                          </div>
+                          <CopyButton text={name.name} size="sm" />
                         </div>
                         <AnimatePresence>
                           {selectedName === name.name && (
                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                              <div className="mt-3 pt-3 border-t border-black/6 space-y-2">
-                                <p className="font-jakarta text-sm text-gray-600">{name.rationale}</p>
-                                {name.domain && <p className="font-jakarta text-xs text-gray-400">{name.domain}</p>}
+                              <div className="mt-3 space-y-2 border-t border-black/6 pt-3">
+                                <p className="font-jakarta text-sm leading-relaxed text-gray-600">{name.rationale}</p>
+                                {name.domain && <p className="font-jakarta text-xs text-gray-500">{name.domain}</p>}
                               </div>
                             </motion.div>
                           )}
@@ -119,86 +280,107 @@ export default function BrandForgePage() {
                   </div>
                 </div>
 
-                {/* Taglines */}
-                <div className="rounded-2xl border border-black/6 bg-gray-50 p-5">
-                  <div className="flex items-center gap-2 mb-4"><Sparkles size={14} className="text-emerald-600" /><h4 className="font-bricolage text-sm font-bold text-gray-800">Taglines</h4></div>
-                  <div className="space-y-2.5">
-                    {result.taglines.map((tag, i) => (
-                      <div key={i} className="flex items-center justify-between gap-3 p-3 rounded-xl border border-black/5 bg-gray-50">
-                        <p className="font-jakarta text-sm text-gray-500 italic">&ldquo;{tag}&rdquo;</p>
-                        <CopyButton text={tag} size="sm" />
-                      </div>
-                    ))}
+                <CopyList title="Taglines" icon={<Sparkles size={14} />} items={result.taglines} tone="emerald" quote />
+                <CopyList title="Positioning Lines" icon={<Layers size={14} />} items={result.positioningLines} tone="blue" />
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
+                    <div className="mb-3 flex items-center gap-2">
+                      <Volume2 size={13} className="text-amber-700" />
+                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Tone of Voice</h4>
+                    </div>
+                    <p className="font-jakarta text-sm leading-relaxed text-gray-650">{result.toneOfVoice}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
+                    <div className="mb-3 flex items-center gap-2">
+                      <Sparkles size={13} className="text-emerald-600" />
+                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Brand Personality</h4>
+                    </div>
+                    <div className="space-y-2">
+                      {result.brandPersonality.map((trait, index) => (
+                        <Badge key={index} variant="sage" size="md" className="h-auto w-full justify-start whitespace-normal py-1.5 text-left">
+                          {trait}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Positioning lines */}
-                <div className="rounded-2xl border border-black/6 bg-gray-50 p-5">
-                  <div className="flex items-center gap-2 mb-4"><Layers size={14} className="text-blue-600" /><h4 className="font-bricolage text-sm font-bold text-gray-800">Positioning Lines</h4></div>
-                  <div className="space-y-2">
-                    {result.positioningLines.map((line, i) => (
-                      <div key={i} className="flex items-start justify-between gap-3 p-3 rounded-xl border border-black/5 bg-gray-50">
-                        <p className="font-jakarta text-sm text-gray-600">{line}</p>
-                        <CopyButton text={line} size="sm" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Tone of voice & Brand personality */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="rounded-2xl border border-black/6 bg-gray-50 p-5">
-                    <div className="flex items-center gap-2 mb-3"><Volume2 size={13} className="text-amber-700" /><h4 className="font-bricolage text-xs font-bold text-gray-700 uppercase">Tone of Voice</h4></div>
-                    <p className="font-jakarta text-sm text-gray-600 leading-relaxed">{result.toneOfVoice}</p>
-                  </div>
-                  <div className="rounded-2xl border border-black/6 bg-gray-50 p-5">
-                    <div className="flex items-center gap-2 mb-3"><Sparkles size={13} className="text-emerald-600" /><h4 className="font-bricolage text-xs font-bold text-gray-700 uppercase">Brand Personality</h4></div>
-                    <div className="space-y-2">{result.brandPersonality.map((t, i) => <Badge key={i} variant="sage" size="md" className="w-full justify-start whitespace-normal h-auto py-1.5">{t}</Badge>)}</div>
-                  </div>
-                </div>
-
-                {/* Color direction */}
                 {result.colorDirection && (
-                  <div className="rounded-2xl border border-black/6 bg-gray-50 p-5">
-                    <div className="flex items-center gap-2 mb-4"><Palette size={14} className="text-amber-700" /><h4 className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">Color Direction</h4></div>
-                    <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
+                    <div className="mb-4 flex items-center gap-2">
+                      <Palette size={14} className="text-amber-700" />
+                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Color Direction</h4>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                       {[
                         { label: "Primary", value: result.colorDirection.primary },
                         { label: "Secondary", value: result.colorDirection.secondary },
                         { label: "Accent", value: result.colorDirection.accent },
-                      ].map((c) => (
-                        <div key={c.label} className="text-center">
-                          <p className="font-bricolage text-[10px] font-bold text-gray-400 uppercase mb-1.5">{c.label}</p>
-                          <p className="font-jakarta text-xs text-gray-600">{c.value}</p>
+                      ].map((color) => (
+                        <div key={color.label} className="rounded-xl border border-black/6 bg-gray-50 p-3">
+                          <p className="mb-1 font-bricolage text-[10px] font-bold uppercase tracking-wide text-gray-400">{color.label}</p>
+                          <p className="font-jakarta text-xs text-gray-650">{color.value}</p>
                         </div>
                       ))}
                     </div>
-                    <p className="font-jakarta text-xs text-gray-400 mb-3">{result.colorDirection.mood}</p>
+                    <p className="mt-4 font-jakarta text-sm leading-relaxed text-gray-650">{result.colorDirection.mood}</p>
                     {result.colorDirection.hexSuggestions.length > 0 && (
-                      <div className="flex gap-2">
+                      <div className="mt-4 flex flex-wrap gap-3">
                         {result.colorDirection.hexSuggestions.map((hex) => (
-                          <div key={hex} className="flex flex-col items-center gap-1">
-                            <div className="w-8 h-8 rounded-lg border border-black/10 shadow-md" style={{ background: hex }} title={hex} />
-                            <span className="font-mono text-[9px] text-gray-400">{hex}</span>
+                          <div key={hex} className="flex items-center gap-2 rounded-xl border border-black/6 bg-gray-50 p-2">
+                            <div className="h-8 w-8 rounded-lg border border-black/10 shadow-sm" style={{ background: hex }} title={hex} />
+                            <span className="font-mono text-[10px] text-gray-500">{hex}</span>
                           </div>
                         ))}
                       </div>
                     )}
                   </div>
                 )}
-
-                {/* Brand pack summary */}
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2"><Sparkles size={13} className="text-amber-700" /><h4 className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">Brand Pack Summary</h4></div>
-                    <CopyButton text={result.brandPackSummary} showLabel label="Copy brief" />
-                  </div>
-                  <p className="font-jakarta text-sm text-gray-600 leading-relaxed">{result.brandPackSummary}</p>
-                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; title: string; detail: string; tone: "amber" | "emerald" | "violet" }) {
+  const toneClasses = {
+    amber: "border-amber-200 bg-amber-50 text-amber-700",
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    violet: "border-violet-200 bg-violet-50 text-violet-700",
+  };
+
+  return (
+    <div className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
+      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>{icon}</div>
+      <div>
+        <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
+        <p className="mt-0.5 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
+      </div>
+    </div>
+  );
+}
+
+function CopyList({ title, icon, items, tone, quote = false }: { title: string; icon: React.ReactNode; items: string[]; tone: "emerald" | "blue"; quote?: boolean }) {
+  const toneClass = tone === "emerald" ? "text-emerald-600" : "text-blue-600";
+
+  return (
+    <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
+      <div className="mb-4 flex items-center gap-2">
+        <span className={toneClass}>{icon}</span>
+        <h4 className="font-bricolage text-sm font-bold text-gray-900">{title}</h4>
+      </div>
+      <div className="space-y-2.5">
+        {items.map((item, index) => (
+          <div key={index} className="flex items-center justify-between gap-3 rounded-xl border border-black/5 bg-gray-50 p-3">
+            <p className={`font-jakarta text-sm leading-relaxed text-gray-650 ${quote ? "italic" : ""}`}>{quote ? `"${item}"` : item}</p>
+            <CopyButton text={item} size="sm" />
+          </div>
+        ))}
       </div>
     </div>
   );
