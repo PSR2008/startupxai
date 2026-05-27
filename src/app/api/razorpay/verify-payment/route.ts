@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import Razorpay from "razorpay";
 import crypto from "crypto";
 import { getSupabaseAdminClient } from "@/lib/supabase";
 
@@ -50,10 +51,6 @@ export async function POST(req: NextRequest) {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      plan = "founder",
-      billing = "monthly",
-      amount = null,
-      currency = "USD",
     } = body ?? {};
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -64,7 +61,8 @@ export async function POST(req: NextRequest) {
     }
 
     const secret = process.env.RAZORPAY_KEY_SECRET;
-    if (!secret) {
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    if (!secret || !keyId) {
       return NextResponse.json(
         { success: false, message: "Razorpay is not configured" },
         { status: 500 }
@@ -83,11 +81,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const razorpay = new Razorpay({
+      key_id: keyId,
+      key_secret: secret,
+    });
+    const order = await razorpay.orders.fetch(razorpay_order_id);
+    const orderPlan = order.notes?.plan === "founder" ? "founder" : null;
+    const orderBilling = order.notes?.billing === "annual" || order.notes?.billing === "yearly" ? "yearly" : "monthly";
+    const orderAmount = typeof order.amount === "number" ? order.amount : Number(order.amount);
+    const orderCurrency = String(order.currency || "USD").toUpperCase();
+
+    if (orderPlan !== "founder" || orderCurrency !== "USD" || ![500, 4900].includes(orderAmount)) {
+      return NextResponse.json(
+        { success: false, message: "Payment order does not match an active plan" },
+        { status: 400 }
+      );
+    }
+
     const userId = await getUserIdFromRequest(req);
     const admin = getSupabaseAdminClient();
-    const normalizedBilling = billing === "annual" || billing === "yearly" ? "yearly" : "monthly";
+    const normalizedBilling = orderBilling;
 
-    if (userId && admin && plan === "founder") {
+    if (userId && admin) {
       const expiresAt = getExpiryDate(normalizedBilling);
 
       await admin.from("payments").insert({
@@ -96,8 +111,8 @@ export async function POST(req: NextRequest) {
         billing_cycle: normalizedBilling,
         razorpay_order_id,
         razorpay_payment_id,
-        amount,
-        currency,
+        amount: orderAmount,
+        currency: orderCurrency,
         status: "paid",
       });
 
