@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, Crown, RefreshCw } from "lucide-react";
 import Button from "./Button";
 
 export function LoadingSpinner({ size = "md", label }: { size?: "sm" | "md" | "lg"; label?: string }) {
@@ -92,6 +93,38 @@ export function AnalysisLoading({ engine }: { engine: string }) {
 }
 
 export function ErrorState({ message = "Something went wrong. Please try again.", onRetry }: { message?: string; onRetry?: () => void }) {
+  const isUsageLimit = message.includes("free analyses") || message.includes("monthly analysis limit") || message.includes("USAGE_LIMIT_REACHED");
+
+  if (isUsageLimit) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center gap-5 py-16 px-8 text-center"
+      >
+        <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center shadow-sm shadow-amber-100">
+          <Crown size={20} className="text-amber-600" />
+        </div>
+        <div className="space-y-1">
+          <p className="font-bricolage text-sm font-bold text-gray-900">Usage Limit Reached</p>
+          <p className="font-jakarta text-sm text-gray-500 max-w-sm">{message}</p>
+        </div>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Link href="/payment?plan=founder&billing=monthly">
+            <Button size="sm" icon={<Crown size={13} />}>
+              Upgrade Founder
+            </Button>
+          </Link>
+          <Link href="/profile">
+            <Button variant="outline" size="sm">
+              View usage
+            </Button>
+          </Link>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}

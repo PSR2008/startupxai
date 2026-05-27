@@ -19,6 +19,7 @@ import EngineHeader from "@/components/app/EngineHeader";
 import { Input, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
+import ExportPdfButton from "@/components/ui/ExportPdfButton";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { PricingTier, RevenueEngineOutput } from "@/types";
 import { cn } from "@/lib/utils";
@@ -234,9 +235,12 @@ export default function RevenueEnginePage() {
                       <p className="font-bricolage text-[11px] font-bold uppercase tracking-[0.18em] text-teal-700">Revenue report</p>
                       <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{form.idea || "Revenue strategy"}</h3>
                     </div>
-                    <Button variant="outline" size="sm" onClick={copyReport} icon={copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}>
-                      {copied ? "Copied" : "Copy report"}
-                    </Button>
+                    <div className="flex flex-wrap gap-2 no-print">
+                      <ExportPdfButton />
+                      <Button variant="outline" size="sm" onClick={copyReport} icon={copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}>
+                        {copied ? "Copied" : "Copy report"}
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="mt-5 rounded-xl border border-teal-200 bg-teal-50 p-4">

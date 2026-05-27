@@ -22,6 +22,7 @@ import { Input, Textarea, Select } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import ScoreRing from "@/components/ui/ScoreRing";
 import Badge from "@/components/ui/Badge";
+import ExportPdfButton from "@/components/ui/ExportPdfButton";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { IdeaEngineOutput } from "@/types";
 import { getScoreColor } from "@/lib/utils";
@@ -412,13 +413,16 @@ export default function IdeaEnginePage() {
                         {form.idea || "Idea analysis"}
                       </h3>
                     </div>
-                    <button
-                      onClick={copyReport}
-                      className="h-10 px-4 rounded-xl border border-black/8 bg-gray-50 font-bricolage text-xs font-bold text-gray-700 hover:bg-white transition-colors flex items-center gap-2 w-fit"
-                    >
-                      {copied ? <CheckCircle2 size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                      {copied ? "Copied" : "Copy report"}
-                    </button>
+                    <div className="flex flex-wrap gap-2 no-print">
+                      <ExportPdfButton />
+                      <button
+                        onClick={copyReport}
+                        className="h-10 px-4 rounded-xl border border-black/8 bg-gray-50 font-bricolage text-xs font-bold text-gray-700 hover:bg-white transition-colors flex items-center gap-2 w-fit"
+                      >
+                        {copied ? <CheckCircle2 size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                        {copied ? "Copied" : "Copy report"}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr] gap-5 mb-6">

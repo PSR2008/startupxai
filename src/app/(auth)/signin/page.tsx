@@ -117,9 +117,9 @@ export default function SigninPage() {
               <label className="font-bricolage text-xs font-bold text-gray-700 tracking-wide uppercase">
                 Password <span className="text-rose-500">*</span>
               </label>
-              <span className="font-jakarta text-xs text-gray-400 cursor-not-allowed select-none" title="Coming soon">
+              <Link href="/forgot-password" className="font-jakarta text-xs text-emerald-600 hover:text-emerald-700 transition-colors">
                 Forgot password?
-              </span>
+              </Link>
             </div>
             <div className="relative">
               <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />

@@ -8,6 +8,7 @@ import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import CopyButton from "@/components/ui/CopyButton";
 import Badge from "@/components/ui/Badge";
+import ExportPdfButton from "@/components/ui/ExportPdfButton";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { BrandForgeOutput } from "@/types";
 import { logUsageClient } from "@/lib/usage-client";
@@ -238,7 +239,10 @@ export default function BrandForgePage() {
                       <p className="font-bricolage text-[11px] font-bold uppercase tracking-[0.18em] text-amber-700">Brand identity pack</p>
                       <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{result.startupNames[0]?.name || "Brand direction"}</h3>
                     </div>
-                    <CopyButton text={brandReport} showLabel label="Copy pack" />
+                    <div className="flex flex-wrap gap-2 no-print">
+                      <ExportPdfButton />
+                      <CopyButton text={brandReport} showLabel label="Copy pack" />
+                    </div>
                   </div>
                   <p className="mt-4 font-jakarta text-sm leading-relaxed text-gray-650">{result.brandPackSummary}</p>
                 </div>

@@ -71,6 +71,14 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font-bricolage);font-weight:700;line-height:
 @keyframes score-fill{from{stroke-dashoffset:283}to{stroke-dashoffset:var(--score-offset)}}
 .score-ring-progress{animation:score-fill 1.5s cubic-bezier(0.16,1,0.3,1) forwards;animation-delay:0.3s}
 
+@media print{
+  body{background:#fff!important}
+  aside,header,button,a[href="/payment?plan=founder&billing=monthly"],.no-print{display:none!important}
+  main{overflow:visible!important}
+  .shadow-sm,.shadow-md,.shadow-lg,.shadow-xl,.shadow-2xl{box-shadow:none!important}
+  .rounded-2xl,.rounded-xl{break-inside:avoid}
+}
+
 .dot-pattern{background-image:radial-gradient(circle,rgba(0,0,0,0.06) 1px,transparent 1px);background-size:28px 28px}
 .glow-blob{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;z-index:0}
 
@@ -120,4 +128,3 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
 
 .hero-mesh{background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(16,185,129,0.10) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 20%,rgba(124,58,237,0.08) 0%,transparent 55%),radial-gradient(ellipse 70% 60% at 50% 90%,rgba(37,99,235,0.07) 0%,transparent 60%),#f7f8fc}
 
-@media print{.no-print{display:none !important}body{background:white;color:black}}

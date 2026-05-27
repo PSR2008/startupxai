@@ -19,6 +19,7 @@ import EngineHeader from "@/components/app/EngineHeader";
 import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
+import ExportPdfButton from "@/components/ui/ExportPdfButton";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { GrowthChannel, GrowthEngineOutput } from "@/types";
 import { cn } from "@/lib/utils";
@@ -260,9 +261,12 @@ export default function GrowthEnginePage() {
                       <p className="font-bricolage text-[11px] font-bold uppercase tracking-[0.18em] text-blue-700">Growth report</p>
                       <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{form.idea || "Growth strategy"}</h3>
                     </div>
-                    <Button variant="outline" size="sm" onClick={copyReport} icon={copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}>
-                      {copied ? "Copied" : "Copy report"}
-                    </Button>
+                    <div className="flex flex-wrap gap-2 no-print">
+                      <ExportPdfButton />
+                      <Button variant="outline" size="sm" onClick={copyReport} icon={copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}>
+                        {copied ? "Copied" : "Copy report"}
+                      </Button>
+                    </div>
                   </div>
                   <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
                     <MetricTile label="Channels" value={result.channelSuggestions.length} />

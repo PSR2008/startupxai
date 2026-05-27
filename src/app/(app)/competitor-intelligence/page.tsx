@@ -19,6 +19,7 @@ import EngineHeader from "@/components/app/EngineHeader";
 import { Input, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
+import ExportPdfButton from "@/components/ui/ExportPdfButton";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { Competitor, CompetitorEngineOutput } from "@/types";
 import { logUsageClient } from "@/lib/usage-client";
@@ -243,9 +244,12 @@ export default function CompetitorPage() {
                       <p className="font-bricolage text-[11px] font-bold uppercase tracking-[0.18em] text-amber-700">Competitive report</p>
                       <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{form.idea || "Competitor map"}</h3>
                     </div>
-                    <Button variant="outline" size="sm" onClick={copyReport} icon={copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}>
-                      {copied ? "Copied" : "Copy report"}
-                    </Button>
+                    <div className="flex flex-wrap gap-2 no-print">
+                      <ExportPdfButton />
+                      <Button variant="outline" size="sm" onClick={copyReport} icon={copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}>
+                        {copied ? "Copied" : "Copy report"}
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="mt-5 space-y-4">

@@ -8,6 +8,7 @@ import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import CopyButton from "@/components/ui/CopyButton";
 import Badge from "@/components/ui/Badge";
+import ExportPdfButton from "@/components/ui/ExportPdfButton";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { ColdDMOutput, ColdEmailMessage, ColdMessage } from "@/types";
 import { cn } from "@/lib/utils";
@@ -250,7 +251,10 @@ export default function ColdDMPage() {
                       <p className="font-bricolage text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700">Outreach pack</p>
                       <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{form.product || "Cold outreach"}</h3>
                     </div>
-                    <CopyButton text={sequenceText} showLabel label="Copy pack" />
+                    <div className="flex flex-wrap gap-2 no-print">
+                      <ExportPdfButton />
+                      <CopyButton text={sequenceText} showLabel label="Copy pack" />
+                    </div>
                   </div>
                 </div>
 

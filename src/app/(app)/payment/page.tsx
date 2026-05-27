@@ -177,9 +177,9 @@ function PaymentPageContent() {
                 Your payment was received successfully.
               </p>
             </div>
-            <Link href="/dashboard">
+            <Link href="/profile">
               <button className="w-full h-12 rounded-xl font-bricolage text-sm font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md shadow-emerald-500/25 hover:shadow-lg hover:shadow-emerald-500/35 transition-all">
-                Go to Dashboard
+                View Founder status
               </button>
             </Link>
           </motion.div>
