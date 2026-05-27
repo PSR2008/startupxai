@@ -84,7 +84,7 @@ const faqs = [
   },
   {
     q: "Can I use StartupX AI for client work or agencies?",
-    a: "Founder is designed for solo founders and early teams. For larger agency or reseller arrangements, contact us at support@startupxai.com for custom pricing.",
+    a: "Founder is designed for solo founders and early teams. For larger agency or reseller arrangements, contact us at support@startupxai.in for custom pricing.",
   },
 ];
 
@@ -150,7 +150,7 @@ export default function PricingPage() {
                   </div>
                   {"annualNote" in plan && plan.annualNote && (
                     <p className="font-jakarta text-xs text-emerald-600 mt-1">
-                      ðŸ’¡ {plan.annualNote}
+                      {plan.annualNote}
                     </p>
                   )}
                 </div>

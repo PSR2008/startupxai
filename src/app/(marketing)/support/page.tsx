@@ -12,7 +12,7 @@ const supportChannels = [
     icon: Mail,
     title: "Email Support",
     description: "For account issues, billing, and general enquiries.",
-    detail: "support@startupxai.com",
+    detail: "support@startupxai.in",
     color: "#72845e",
     response: "Response within 24h",
   },
@@ -20,7 +20,7 @@ const supportChannels = [
     icon: MessageSquare,
     title: "Live Chat",
     description: "Chat with our team directly inside the app dashboard.",
-    detail: "Available Mon–Fri, 9am–6pm IST",
+    detail: "Available Mon-Fri, 9am-6pm IST",
     color: "#9e724e",
     response: "Response within 2h",
   },
@@ -28,7 +28,7 @@ const supportChannels = [
     icon: BookOpen,
     title: "Documentation",
     description: "Step-by-step guides for every engine and feature.",
-    detail: "docs.startupxai.com",
+    detail: "docs.startupxai.in",
     color: "#4a63b5",
     response: "Always available",
   },
@@ -97,7 +97,7 @@ export default function SupportPage() {
           </h1>
           <p className="font-jakarta text-lg text-gray-500 max-w-xl mx-auto">
             Have a question, found a bug, or want to explore enterprise options?
-            We&apos;re a team of founders too — we respond fast.
+            We&apos;re a team of founders too - we respond fast.
           </p>
         </AnimatedSection>
 
@@ -217,7 +217,7 @@ export default function SupportPage() {
                     iconPosition="right"
                     fullWidth
                   >
-                    {loading ? "Sending…" : "Send Message"}
+                    {loading ? "Sending..." : "Send Message"}
                   </Button>
                 </div>
               )}

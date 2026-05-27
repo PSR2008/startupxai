@@ -219,7 +219,7 @@ export default function SignupPage() {
                 className={[
                   "w-full h-11 pl-10 pr-4 rounded-xl font-jakarta text-sm",
                   "bg-white text-gray-900 placeholder:text-gray-400",
-                  "border-1.5 transition-all duration-150",
+                  "transition-all duration-150",
                   "focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500",
                   fieldErrors.email
                     ? "border-rose-400 focus:ring-rose-500/20 focus:border-rose-500"

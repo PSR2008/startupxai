@@ -187,7 +187,7 @@ export default function SigninPage() {
         {/* Back */}
         <p className="text-center font-jakarta text-xs text-gray-400">
           <Link href="/" className="text-gray-500 hover:text-gray-900 transition-colors">
-            ← Back to home
+            Back to home
           </Link>
         </p>
       </motion.div>

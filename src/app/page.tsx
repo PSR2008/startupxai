@@ -15,7 +15,7 @@ import {
 } from "@/components/marketing/EnginesSection";
 
 export const metadata: Metadata = {
-  title: "StartupX AI — Your AI Co-Founder for Market, Product & Growth",
+  title: "StartupX AI - Your AI Co-Founder for Market, Product & Growth",
   description:
     "The all-in-one AI platform that validates your startup idea, maps competitors, unlocks revenue strategies, decodes user psychology, and accelerates growth. Built for serious founders.",
 };
