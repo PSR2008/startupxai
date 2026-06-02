@@ -28,11 +28,11 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://startupxai.in"),
   title: {
-    default: "StartupX AI - Your AI Co-Founder for Market, Product & Growth",
+    default: "StartupX AI - Founder Intelligence Workspace",
     template: "%s | StartupX AI",
   },
   description:
-    "StartupX AI is the founder operating system powered by AI. Validate ideas, analyze competitors, unlock revenue strategies, decode user psychology, and accelerate growth - all in one intelligent platform.",
+    "StartupX AI helps founders validate ideas, analyze competitors, pressure-test pricing, understand user trust, and turn growth questions into structured next steps.",
   keywords: [
     "startup AI",
     "AI co-founder",
@@ -69,15 +69,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://startupxai.in",
     siteName: "StartupX AI",
-    title: "StartupX AI - Your AI Co-Founder for Market, Product & Growth",
+    title: "StartupX AI - Founder Intelligence Workspace",
     description:
       "The founder intelligence platform that analyzes your market, competitors, revenue model, user psychology, and growth strategy - in minutes.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "StartupX AI" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "StartupX AI - Your AI Co-Founder",
-    description: "Validate ideas. Crush competitors. Unlock revenue. Decode user psychology. Accelerate growth.",
+    title: "StartupX AI - Founder Intelligence Workspace",
+    description: "Validate ideas, map competitors, pressure-test pricing, and turn growth questions into structured next steps.",
     creator: "@startupxai",
     images: ["/og-image.png"],
   },
