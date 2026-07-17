@@ -4,6 +4,7 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import { activatePaidPlan, normalizePaymentBilling } from "@/lib/payment-activation";
 import { getAllowedPaidAmounts, isPaidPlanKey } from "@/lib/plans";
+import { getPaymentCouponDiscountPercent } from "@/lib/payment-coupons";
 
 async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
   try {
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
     const orderAmount = typeof order.amount === "number" ? order.amount : Number(order.amount);
     const orderCurrency = String(order.currency || "USD").toUpperCase();
 
-    if (!orderPlan || orderCurrency !== "USD" || !getAllowedPaidAmounts().includes(orderAmount)) {
+    if (!orderPlan || orderCurrency !== "USD" || !getAllowedPaidAmounts(getPaymentCouponDiscountPercent()).includes(orderAmount)) {
       return NextResponse.json(
         { success: false, message: "Payment order does not match an active plan" },
         { status: 400 }

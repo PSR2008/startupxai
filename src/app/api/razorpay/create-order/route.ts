@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { getUserIdFromRequest } from "@/lib/usage-limit";
 import { getPlanPriceCents, isPaidPlanKey, normalizeBillingCycle } from "@/lib/plans";
+import { getCouponDiscountCents } from "@/lib/payment-coupons";
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,8 +36,7 @@ export async function POST(req: NextRequest) {
     const normalizedBilling = normalizeBillingCycle(billing);
     const selectedBilling = normalizedBilling === "yearly" ? "annual" : "monthly";
     const baseAmount = getPlanPriceCents(selectedPlan, normalizedBilling);
-    const couponCode = String(coupon || "").trim().toUpperCase();
-    const discount = couponCode === "FOUNDER20" ? Math.round(baseAmount * 0.2) : 0;
+    const discount = getCouponDiscountCents(baseAmount, coupon);
     const amount = Math.max(baseAmount - discount, 100);
 
     const order = await razorpay.orders.create({
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         plan: selectedPlan,
         billing: selectedBilling,
         user_id: userId,
-        coupon: discount > 0 ? couponCode : "",
+        coupon: discount > 0 ? "applied" : "",
       },
     });
 

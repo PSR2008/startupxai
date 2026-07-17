@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -73,28 +73,17 @@ function PaymentPageContent() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [coupon, setCoupon] = useState("");
-  const [couponStatus, setCouponStatus] = useState<"idle" | "valid" | "invalid">("idle");
   const [status, setStatus] = useState<PayStatus>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
   const price = billing === "annual" ? plan.annualPrice : plan.price;
   const annualSavings = plan.price * 12 - plan.annualPrice;
-  const discount = couponStatus === "valid" ? Math.round(price * 0.2) : 0;
-  const finalPrice = useMemo(() => Math.max(price - discount, 1), [price, discount]);
 
   const selectPlan = (nextPlan: PaidPlanKey) => {
     const next = new URLSearchParams(searchParams.toString());
     next.set("plan", nextPlan);
     next.set("billing", billing);
     router.replace(`${pathname}?${next.toString()}`);
-  };
-
-  const applyCoupon = () => {
-    if (coupon.trim().toUpperCase() === "FOUNDER20") {
-      setCouponStatus("valid");
-    } else {
-      setCouponStatus("invalid");
-    }
   };
 
   const handlePay = async () => {
@@ -356,24 +345,15 @@ function PaymentPageContent() {
                 <div className="flex gap-2">
                   <input
                     value={coupon}
-                    onChange={(e) => { setCoupon(e.target.value); setCouponStatus("idle"); }}
-                    placeholder="FOUNDER20"
+                    onChange={(e) => setCoupon(e.target.value)}
+                    placeholder="Enter coupon code"
                     className="flex-1 h-11 px-3.5 rounded-xl bg-white text-gray-900 border border-black/10 text-sm font-jakarta placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/15 focus:border-emerald-500 transition-all"
                   />
-                  <button
-                    onClick={applyCoupon}
-                    className="h-11 px-4 rounded-xl border border-black/10 font-bricolage text-xs font-semibold text-gray-600 hover:text-gray-900 hover:border-black/18 hover:bg-gray-50 transition-all"
-                  >
-                    Apply
-                  </button>
                 </div>
-                {couponStatus === "valid" && (
-                  <p className="font-jakarta text-xs text-emerald-600 mt-1.5 flex items-center gap-1">
-                    <CheckCircle2 size={11} /> 20% discount applied!
+                {coupon.trim() && (
+                  <p className="font-jakarta text-xs text-gray-400 mt-1.5">
+                    If valid, your coupon will be applied securely at checkout.
                   </p>
-                )}
-                {couponStatus === "invalid" && (
-                  <p className="font-jakarta text-xs text-rose-500 mt-1.5">Invalid coupon code</p>
                 )}
               </div>
 
@@ -397,7 +377,7 @@ function PaymentPageContent() {
                 ) : (
                   <>
                     <Lock size={15} />
-                    Pay ${finalPrice} with Razorpay
+                    Pay ${price} with Razorpay
                   </>
                 )}
               </button>
@@ -429,7 +409,7 @@ function PaymentPageContent() {
 
                 {/* Price display */}
                 <div className="flex items-end gap-1.5 mb-1">
-                  <span className="font-bricolage text-4xl font-bold text-gray-900">${finalPrice}</span>
+                  <span className="font-bricolage text-4xl font-bold text-gray-900">${price}</span>
                   <span className="font-jakarta text-sm text-gray-400 mb-2">
                     {billing === "annual" ? "/year" : "/month"}
                   </span>
@@ -469,15 +449,9 @@ function PaymentPageContent() {
                     <span className="text-gray-500">Subtotal</span>
                     <span className="text-gray-800">${price}</span>
                   </div>
-                  {discount > 0 && (
-                    <div className="flex justify-between text-emerald-600">
-                      <span>Discount (FOUNDER20)</span>
-                      <span>-${discount}</span>
-                    </div>
-                  )}
                   <div className="flex justify-between font-bricolage font-bold text-base pt-2 border-t border-black/5">
                     <span className="text-gray-700">Total</span>
-                    <span className="text-gray-900">${finalPrice}</span>
+                    <span className="text-gray-900">${price}</span>
                   </div>
                 </div>
               </div>

@@ -50,11 +50,14 @@ export function getPlanPriceCents(plan: PaidPlanKey, billing: BillingCycle): num
   return price * 100;
 }
 
-export function getAllowedPaidAmounts(): number[] {
+export function getAllowedPaidAmounts(discountPercent = 20): number[] {
   const amounts = (["founder", "growth", "scale"] as PaidPlanKey[]).flatMap((plan) =>
     (["monthly", "yearly"] as BillingCycle[]).flatMap((billing) => {
       const base = getPlanPriceCents(plan, billing);
-      return [base, Math.max(Math.round(base * 0.8), 100)];
+      const discounted = discountPercent > 0 && discountPercent < 100
+        ? Math.max(Math.round(base * ((100 - discountPercent) / 100)), 100)
+        : base;
+      return [base, discounted];
     })
   );
   return Array.from(new Set(amounts));
