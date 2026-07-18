@@ -586,7 +586,7 @@ const plans = [
     name: "Starter",
     price: "Free",
     description: "For founders exploring the platform",
-    features: [`${PLANS.free.analysesPerMonth} analyses/month`, "All Intelligence Engines", "ColdDM AI", "BrandForge AI", "Community support"],
+    features: [`${PLANS.free.analysesPerMonth} analyses/month`, "Idea & Market Engine", "Competitor Intelligence", "2 ColdDM generations", "2 BrandForge generations"],
     cta: "Start Free",
     href: "/signup",
     highlighted: false,
@@ -596,7 +596,7 @@ const plans = [
     price: `$${PLANS.founder.monthlyPrice}`,
     period: "/month",
     description: "For solo founders validating seriously",
-    features: [`${PLANS.founder.analysesPerMonth} analyses/month`, "All Intelligence Engines", "ColdDM AI", "BrandForge AI", "PDF report exports", "Email support"],
+    features: [`${PLANS.founder.analysesPerMonth} analyses/month`, "All Intelligence Engines", "25 ColdDM generations", "25 BrandForge generations", "PDF exports", "Saved history"],
     cta: "Upgrade to Founder",
     href: "/payment?plan=founder&billing=monthly",
     highlighted: true,
@@ -607,7 +607,7 @@ const plans = [
     price: `$${PLANS.growth.monthlyPrice}`,
     period: "/month",
     description: "For founders iterating weekly",
-    features: [`${PLANS.growth.analysesPerMonth} analyses/month`, "All Intelligence Engines", "Shareable reports", "PDF report exports", "Priority support"],
+    features: [`${PLANS.growth.analysesPerMonth} analyses/month`, "All Intelligence Engines", "100 ColdDM generations", "100 BrandForge generations", "Shareable reports", "3 workspaces"],
     cta: "Upgrade to Growth",
     href: "/payment?plan=growth&billing=monthly",
     highlighted: true,
@@ -618,7 +618,7 @@ const plans = [
     price: `$${PLANS.scale.monthlyPrice}`,
     period: "/month",
     description: "For heavier usage and small teams",
-    features: [`${PLANS.scale.analysesPerMonth} analyses/month`, "All Intelligence Engines", "Shareable reports", "PDF report exports", "Priority processing"],
+    features: [`${PLANS.scale.analysesPerMonth} analyses/month`, "All Intelligence Engines", "300 ColdDM generations", "300 BrandForge generations", "Team-ready workspaces", "Priority processing"],
     cta: "Upgrade to Scale",
     href: "/payment?plan=scale&billing=monthly",
     highlighted: false,
@@ -640,7 +640,7 @@ export function PricingSection() {
             <span className="text-gradient-brand">not consultants</span>
           </h2>
           <p className="font-jakarta text-lg text-gray-500 max-w-lg mx-auto">
-            One platform. All six engines. The intelligence you need at a fraction of what agencies charge.
+            Start free with the core engines. Upgrade when you need higher usage, exports, sharing, and the full intelligence stack.
           </p>
         </AnimatedSection>
 
@@ -694,7 +694,7 @@ export function PricingSection() {
 
         <AnimatedSection delay={0.2} className="text-center mt-10">
           <p className="font-jakarta text-sm text-gray-400">
-            All plans are billed in USD · Cancel anytime · No hidden fees
+            All plans are billed in USD · Upgrade, downgrade, or cancel anytime · No hidden fees
           </p>
         </AnimatedSection>
       </div>

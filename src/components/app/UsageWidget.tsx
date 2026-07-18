@@ -13,6 +13,15 @@ interface UsageSummary {
   monthly_limit: number;
   analyses_used: number;
   analyses_remaining: number;
+  cold_dm_limit: number;
+  cold_dm_used: number;
+  cold_dm_remaining: number;
+  brand_forge_limit: number;
+  brand_forge_used: number;
+  brand_forge_remaining: number;
+  workspace_limit: number;
+  workspaces_used: number;
+  workspaces_remaining: number;
   expires_at: string | null;
 }
 
@@ -22,6 +31,15 @@ const FREE_DEFAULTS: UsageSummary = {
   monthly_limit: PLANS.free.analysesPerMonth,
   analyses_used: 0,
   analyses_remaining: PLANS.free.analysesPerMonth,
+  cold_dm_limit: 2,
+  cold_dm_used: 0,
+  cold_dm_remaining: 2,
+  brand_forge_limit: 2,
+  brand_forge_used: 0,
+  brand_forge_remaining: 2,
+  workspace_limit: 1,
+  workspaces_used: 0,
+  workspaces_remaining: 1,
   expires_at: null,
 };
 
@@ -75,6 +93,11 @@ export default function UsageWidget() {
   const nearLimit = pct >= 80;
   const atLimit = pct >= 100;
   const cycleLabel = data.billing_cycle === "yearly" ? "Annual" : data.billing_cycle === "monthly" ? "Monthly" : null;
+  const secondaryUsage = [
+    { label: "ColdDM", used: data.cold_dm_used, limit: data.cold_dm_limit },
+    { label: "BrandForge", used: data.brand_forge_used, limit: data.brand_forge_limit },
+    { label: "Workspaces", used: data.workspaces_used, limit: data.workspace_limit },
+  ];
 
   const expiryLabel = data.expires_at
     ? new Date(data.expires_at).toLocaleDateString("en-IN", {
@@ -107,7 +130,7 @@ export default function UsageWidget() {
           )}
           <div>
             <div className="flex items-center gap-2">
-              <p className="font-bricolage text-sm font-bold text-gray-900">{isFree ? "Free Plan" : `${getPlanLabel(data.plan)} Plan`}</p>
+              <p className="font-bricolage text-sm font-bold text-gray-900">{isFree ? "Starter Plan" : `${getPlanLabel(data.plan)} Plan`}</p>
               {!isFree && (
                 <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-200">
                   <span className="w-1 h-1 rounded-full bg-emerald-500" />
@@ -150,6 +173,17 @@ export default function UsageWidget() {
             </p>
           )}
         </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 mt-4">
+        {secondaryUsage.map((item) => (
+          <div key={item.label} className="rounded-xl border border-black/6 bg-gray-50 px-3 py-2.5">
+            <p className="font-bricolage text-[10px] font-bold text-gray-400 uppercase tracking-wide truncate">{item.label}</p>
+            <p className="font-jakarta text-xs text-gray-700 mt-1">
+              <span className="font-bricolage font-bold text-gray-900">{item.used}</span> / {item.limit}
+            </p>
+          </div>
+        ))}
       </div>
 
       {isFree && nearLimit && !atLimit && (

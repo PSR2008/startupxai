@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { checkUsageLimit } from "@/lib/usage-limit";
+import {
+  checkAnalysisAccess,
+  limitReachedAfterWorkResponse,
+  recordAnalysisUsage,
+} from "@/lib/usage-limit";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -9,7 +13,7 @@ const client = new Anthropic({
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const usageCheck = await checkUsageLimit(req);
+    const usageCheck = await checkAnalysisAccess(req, "idea");
     if (!usageCheck.allowed) return usageCheck.response!;
 
     const prompt = `
@@ -53,9 +57,24 @@ Return ONLY this JSON:
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
 
+    const parsed = JSON.parse(jsonMatch?.[0] || "{}");
+    const recorded = await recordAnalysisUsage(
+      usageCheck.userId!,
+      "idea",
+      usageCheck.entitlements.monthlyAnalyses
+    );
+    if (!recorded.inserted) {
+      return limitReachedAfterWorkResponse({
+        feature: "monthly_analyses",
+        currentUsage: recorded.currentUsage,
+        limit: recorded.limit,
+        plan: usageCheck.plan,
+      });
+    }
+
     return NextResponse.json({
       success: true,
-      data: JSON.parse(jsonMatch?.[0] || "{}"),
+      data: parsed,
     });
   } catch {
     return NextResponse.json({

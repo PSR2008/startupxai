@@ -36,6 +36,15 @@ interface UsageSummary {
   monthly_limit: number;
   analyses_used: number;
   analyses_remaining: number;
+  cold_dm_limit: number;
+  cold_dm_used: number;
+  cold_dm_remaining: number;
+  brand_forge_limit: number;
+  brand_forge_used: number;
+  brand_forge_remaining: number;
+  workspace_limit: number;
+  workspaces_used: number;
+  workspaces_remaining: number;
   expires_at: string | null;
 }
 
@@ -66,6 +75,15 @@ const FREE_USAGE: UsageSummary = {
   monthly_limit: PLANS.free.analysesPerMonth,
   analyses_used: 0,
   analyses_remaining: PLANS.free.analysesPerMonth,
+  cold_dm_limit: 2,
+  cold_dm_used: 0,
+  cold_dm_remaining: 2,
+  brand_forge_limit: 2,
+  brand_forge_used: 0,
+  brand_forge_remaining: 2,
+  workspace_limit: 1,
+  workspaces_used: 0,
+  workspaces_remaining: 1,
   expires_at: null,
 };
 
@@ -137,6 +155,12 @@ export default function ProfilePage() {
     () => Math.min(100, Math.round((usage.analyses_used / usage.monthly_limit) * 100)),
     [usage.analyses_used, usage.monthly_limit]
   );
+  const usageRows = [
+    { label: "Analyses", used: usage.analyses_used, limit: usage.monthly_limit, remaining: usage.analyses_remaining },
+    { label: "ColdDM", used: usage.cold_dm_used, limit: usage.cold_dm_limit, remaining: usage.cold_dm_remaining },
+    { label: "BrandForge", used: usage.brand_forge_used, limit: usage.brand_forge_limit, remaining: usage.brand_forge_remaining },
+    { label: "Workspaces", used: usage.workspaces_used, limit: usage.workspace_limit, remaining: usage.workspaces_remaining },
+  ];
 
   const handleLogout = async () => {
     const supabase = getSupabaseBrowserClient();
@@ -398,6 +422,17 @@ export default function ProfilePage() {
             <p className="font-jakarta text-xs text-gray-400">
               {usage.analyses_remaining} analyses remaining this month.
             </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
+              {usageRows.slice(1).map((row) => (
+                <div key={row.label} className="rounded-xl border border-black/6 bg-gray-50 px-4 py-3">
+                  <p className="font-bricolage text-xs font-bold text-gray-500 uppercase tracking-wide">{row.label}</p>
+                  <p className="font-jakarta text-sm text-gray-700 mt-1">
+                    <span className="font-bricolage font-bold text-gray-900">{row.used}</span> / {row.limit}
+                    <span className="text-gray-400"> · {row.remaining} left</span>
+                  </p>
+                </div>
+              ))}
+            </div>
           </motion.section>
 
           <motion.section

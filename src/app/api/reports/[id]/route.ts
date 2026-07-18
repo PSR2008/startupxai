@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { deleteAnalysisByUser, getAnalysisByUser, setAnalysisShareToken } from "@/lib/supabase";
-import { getUserIdFromRequest } from "@/lib/usage-limit";
+import { getPlanEntitlements } from "@/lib/plans";
+import { getEffectivePlan, logUsage } from "@/lib/usage";
+import { featureNotAvailableResponse, getUserIdFromRequest } from "@/lib/usage-limit";
 import crypto from "crypto";
 
 export async function GET(
@@ -13,6 +15,15 @@ export async function GET(
       { success: false, error: "Authentication required" },
       { status: 401 }
     );
+  }
+
+  const { plan } = await getEffectivePlan(userId);
+  const entitlements = getPlanEntitlements(plan);
+  if (!entitlements.canSaveHistory) {
+    return featureNotAvailableResponse({
+      feature: "analysis_history",
+      plan,
+    });
   }
 
   const { id } = await context.params;
@@ -39,6 +50,15 @@ export async function DELETE(
     );
   }
 
+  const { plan } = await getEffectivePlan(userId);
+  const entitlements = getPlanEntitlements(plan);
+  if (!entitlements.canSaveHistory) {
+    return featureNotAvailableResponse({
+      feature: "analysis_history",
+      plan,
+    });
+  }
+
   const { id } = await context.params;
   const deleted = await deleteAnalysisByUser({ userId, analysisId: id });
   if (!deleted) {
@@ -63,6 +83,15 @@ export async function PATCH(
     );
   }
 
+  const { plan } = await getEffectivePlan(userId);
+  const entitlements = getPlanEntitlements(plan);
+  if (!entitlements.canShareReports) {
+    return featureNotAvailableResponse({
+      feature: "shareable_reports",
+      plan,
+    });
+  }
+
   const { id } = await context.params;
   const body = await req.json().catch(() => ({}));
   const shouldShare = body?.share !== false;
@@ -74,6 +103,10 @@ export async function PATCH(
       { success: false, error: "Unable to update report sharing" },
       { status: 500 }
     );
+  }
+
+  if (shouldShare) {
+    await logUsage(userId, "share-report", "share_report");
   }
 
   return NextResponse.json({

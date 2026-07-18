@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { clearAnalysesByUser, getRecentAnalysesByUser, getReportStatsByUser } from "@/lib/supabase";
-import { getUserIdFromRequest } from "@/lib/usage-limit";
+import { getPlanEntitlements } from "@/lib/plans";
+import { getEffectivePlan } from "@/lib/usage";
+import { featureNotAvailableResponse, getUserIdFromRequest } from "@/lib/usage-limit";
 
 export async function GET(req: NextRequest) {
   const userId = await getUserIdFromRequest(req);
@@ -9,6 +11,15 @@ export async function GET(req: NextRequest) {
       { success: false, error: "Authentication required" },
       { status: 401 }
     );
+  }
+
+  const { plan } = await getEffectivePlan(userId);
+  const entitlements = getPlanEntitlements(plan);
+  if (!entitlements.canSaveHistory) {
+    return featureNotAvailableResponse({
+      feature: "analysis_history",
+      plan,
+    });
   }
 
   const limitParam = Number(req.nextUrl.searchParams.get("limit") ?? 8);
@@ -26,6 +37,15 @@ export async function DELETE(req: NextRequest) {
       { success: false, error: "Authentication required" },
       { status: 401 }
     );
+  }
+
+  const { plan } = await getEffectivePlan(userId);
+  const entitlements = getPlanEntitlements(plan);
+  if (!entitlements.canSaveHistory) {
+    return featureNotAvailableResponse({
+      feature: "analysis_history",
+      plan,
+    });
   }
 
   const deleted = await clearAnalysesByUser(userId);

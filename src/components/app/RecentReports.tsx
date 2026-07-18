@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CalendarDays, FileText, History, Loader2, Trash2, Trophy } from "lucide-react";
+import { ArrowRight, CalendarDays, FileText, History, Loader2, Lock, Trash2, Trophy } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 interface ReportSummary {
@@ -65,6 +65,7 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [clearing, setClearing] = useState(false);
+  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -83,8 +84,11 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
           headers: { Authorization: `Bearer ${session.access_token}` },
         });
 
-        if (!res.ok) return;
         const data = await res.json();
+        if (!res.ok) {
+          if (data?.error === "FEATURE_NOT_AVAILABLE") setLocked(true);
+          return;
+        }
         if (mounted) {
           setReports(data.reports ?? []);
           setStats(data.stats ?? { totalReports: 0, mostUsedEngine: null, lastAnalysisAt: null });
@@ -162,6 +166,19 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
         <div className="flex items-center gap-2 py-8 text-gray-400 font-jakarta text-sm">
           <Loader2 size={15} className="animate-spin" />
           Loading reports...
+        </div>
+      ) : locked ? (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+          <Lock size={18} className="text-amber-600 mb-3" />
+          <p className="font-bricolage text-sm font-bold text-amber-900 mb-1">Saved history starts on Founder</p>
+          <p className="font-jakarta text-xs text-amber-700 leading-relaxed mb-3">
+            Starter lets you explore the core engines. Upgrade to save reports, export PDFs, and use every intelligence engine.
+          </p>
+          <Link href="/payment?plan=founder&billing=monthly">
+            <button className="h-9 px-3.5 rounded-xl bg-amber-600 text-white font-bricolage text-xs font-bold hover:bg-amber-700 transition-colors">
+              Upgrade to Founder
+            </button>
+          </Link>
         </div>
       ) : reports.length === 0 ? (
         <div className="rounded-xl border border-dashed border-black/10 bg-gray-50 p-5">

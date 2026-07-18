@@ -8,7 +8,7 @@ import {
 } from "@/lib/rate-limit";
 import { saveAnalysis } from "@/lib/supabase";
 import { hashIp } from "@/lib/utils";
-import { checkUsageLimit } from "@/lib/usage-limit";
+import { checkAnalysisAccess, limitReachedAfterWorkResponse, recordAnalysisUsage } from "@/lib/usage-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -43,25 +43,36 @@ export async function POST(request: NextRequest) {
 
   const input = validation.data;
 
-  const usageCheck = await checkUsageLimit(request);
+  const usageCheck = await checkAnalysisAccess(request, "idea");
   if (!usageCheck.allowed) return usageCheck.response!;
 
   // 4. Run AI analysis
   try {
     const result = await analyzeIdea(input);
+    const recorded = await recordAnalysisUsage(usageCheck.userId!, "idea", usageCheck.entitlements.monthlyAnalyses);
+    if (!recorded.inserted) {
+      return limitReachedAfterWorkResponse({
+        feature: "monthly_analyses",
+        currentUsage: recorded.currentUsage,
+        limit: recorded.limit,
+        plan: usageCheck.plan,
+      });
+    }
 
     // 5. Persist to DB (non-blocking)
     const ipHash = await hashIp(ip);
     const sessionId =
       request.headers.get("x-session-id") || `anon_${Date.now()}`;
-    await saveAnalysis({
-      sessionId,
-      engineType: "idea",
-      inputData: input as unknown as Record<string, unknown>,
-      outputData: result as unknown as Record<string, unknown>,
-      ipHash,
-      userId: usageCheck.userId ?? undefined,
-    });
+    if (usageCheck.entitlements.canSaveHistory) {
+      await saveAnalysis({
+        sessionId,
+        engineType: "idea",
+        inputData: input as unknown as Record<string, unknown>,
+        outputData: result as unknown as Record<string, unknown>,
+        ipHash,
+        userId: usageCheck.userId ?? undefined,
+      });
+    }
 
     // 6. Return result
     return NextResponse.json(

@@ -1,40 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { getUsageSummary } from "@/lib/usage";
-import { PLANS } from "@/lib/plans";
+import { getPlanEntitlements } from "@/lib/plans";
+import { getUserIdFromRequest } from "@/lib/usage-limit";
 
+const starterEntitlements = getPlanEntitlements("free");
 const FREE_USAGE = {
   plan: "free",
   billing_cycle: null,
-  monthly_limit: PLANS.free.analysesPerMonth,
+  monthly_limit: starterEntitlements.monthlyAnalyses,
   analyses_used: 0,
-  analyses_remaining: PLANS.free.analysesPerMonth,
+  analyses_remaining: starterEntitlements.monthlyAnalyses,
+  cold_dm_limit: starterEntitlements.coldDmMonthlyLimit,
+  cold_dm_used: 0,
+  cold_dm_remaining: starterEntitlements.coldDmMonthlyLimit,
+  brand_forge_limit: starterEntitlements.brandForgeMonthlyLimit,
+  brand_forge_used: 0,
+  brand_forge_remaining: starterEntitlements.brandForgeMonthlyLimit,
+  workspace_limit: starterEntitlements.startupWorkspaceLimit,
+  workspaces_used: 0,
+  workspaces_remaining: starterEntitlements.startupWorkspaceLimit,
   expires_at: null,
 };
-
-async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
-  try {
-    const authHeader = req.headers.get("authorization") ?? "";
-    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-    if (!token) return null;
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        global: { headers: { Authorization: `Bearer ${token}` } },
-        auth: { persistSession: false },
-      },
-    );
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    return user?.id ?? null;
-  } catch {
-    return null;
-  }
-}
 
 export async function GET(req: NextRequest) {
   try {

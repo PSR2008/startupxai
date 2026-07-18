@@ -4,7 +4,7 @@ import { decisionEngineSchema, validateInput } from "@/lib/validation";
 import { analysisRateLimiter, getRequestIp, rateLimitResponse } from "@/lib/rate-limit";
 import { saveAnalysis } from "@/lib/supabase";
 import { hashIp } from "@/lib/utils";
-import { checkUsageLimit } from "@/lib/usage-limit";
+import { checkAnalysisAccess, limitReachedAfterWorkResponse, recordAnalysisUsage } from "@/lib/usage-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -24,14 +24,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: "Validation failed", details: validation.errors }, { status: 422 });
   }
 
-  const usageCheck = await checkUsageLimit(request);
+  const usageCheck = await checkAnalysisAccess(request, "decision");
   if (!usageCheck.allowed) return usageCheck.response!;
 
   try {
     const result = await analyzeDecision(validation.data);
+    const recorded = await recordAnalysisUsage(usageCheck.userId!, "decision", usageCheck.entitlements.monthlyAnalyses);
+    if (!recorded.inserted) {
+      return limitReachedAfterWorkResponse({ feature: "monthly_analyses", currentUsage: recorded.currentUsage, limit: recorded.limit, plan: usageCheck.plan });
+    }
     const ipHash = await hashIp(ip);
     const sessionId = request.headers.get("x-session-id") || `anon_${Date.now()}`;
-    await saveAnalysis({ sessionId, engineType: "decision", inputData: validation.data as unknown as Record<string, unknown>, outputData: result as unknown as Record<string, unknown>, ipHash, userId: usageCheck.userId ?? undefined });
+    if (usageCheck.entitlements.canSaveHistory) {
+      await saveAnalysis({ sessionId, engineType: "decision", inputData: validation.data as unknown as Record<string, unknown>, outputData: result as unknown as Record<string, unknown>, ipHash, userId: usageCheck.userId ?? undefined });
+    }
     return NextResponse.json({ success: true, data: result }, { status: 200, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("[DecisionEngine] Analysis failed:", error);

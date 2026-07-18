@@ -1,16 +1,45 @@
 "use client";
 
+import { useState } from "react";
 import { FileDown } from "lucide-react";
 import Button from "./Button";
+import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 export default function ExportPdfButton({ label = "Export PDF" }: { label?: string }) {
-  const handleExport = () => {
-    window.print();
+  const [loading, setLoading] = useState(false);
+
+  const handleExport = async () => {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const headers: Record<string, string> = {};
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+
+      const res = await fetch("/api/export-pdf", {
+        method: "POST",
+        headers,
+      });
+
+      if (res.ok) {
+        window.print();
+        return;
+      }
+
+      window.location.href = "/payment?plan=founder&billing=monthly";
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Button variant="outline" size="sm" onClick={handleExport} icon={<FileDown size={14} />}>
-      {label}
+      {loading ? "Checking..." : label}
     </Button>
   );
 }

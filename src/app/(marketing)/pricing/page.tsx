@@ -21,17 +21,16 @@ const plans = [
     features: [
       { text: `${PLANS.free.analysesPerMonth} analyses/month`, included: true },
       { text: "Idea & Market Engine", included: true },
-      { text: "Growth Engine", included: true },
-      { text: "ColdDM AI", included: true },
-      { text: "BrandForge AI", included: true },
       { text: "Competitor Intelligence", included: true },
-      { text: "Revenue Engine", included: true },
-      { text: "User Psychology Engine", included: true },
-      { text: "Founder Decision Engine", included: true },
+      { text: "2 ColdDM AI generations/month", included: true },
+      { text: "2 BrandForge AI generations/month", included: true },
+      { text: "One startup workspace", included: true },
+      { text: "Explore the core engines before upgrading", included: true },
+      { text: "Premium intelligence engines", included: false },
       { text: "PDF exports", included: false },
-      { text: "Priority processing", included: false },
+      { text: "Shareable reports", included: false },
     ],
-    cta: "Get Started Free",
+    cta: "Start Free",
     href: "/signup",
     highlighted: false,
   },
@@ -45,16 +44,14 @@ const plans = [
     badge: "Starter upgrade",
     features: [
       { text: `${PLANS.founder.analysesPerMonth} analyses/month`, included: true },
-      { text: "Idea & Market Engine", included: true },
-      { text: "Growth Engine (full)", included: true },
-      { text: "ColdDM AI", included: true },
-      { text: "BrandForge AI", included: true },
-      { text: "Competitor Intelligence", included: true },
-      { text: "Revenue Engine", included: true },
-      { text: "User Psychology Engine", included: true },
-      { text: "Founder Decision Engine", included: true },
+      { text: "All intelligence engines", included: true },
+      { text: "25 ColdDM AI generations/month", included: true },
+      { text: "25 BrandForge AI generations/month", included: true },
       { text: "PDF exports", included: true },
-      { text: "Priority processing", included: true },
+      { text: "Saved analysis history", included: true },
+      { text: "One startup workspace", included: true },
+      { text: "Email support", included: true },
+      { text: "Shareable reports", included: false },
     ],
     cta: "Upgrade to Founder",
     href: "/payment?plan=founder&billing=monthly",
@@ -67,14 +64,16 @@ const plans = [
     priceNote: "per month",
     annualNote: `$${PLANS.growth.yearlyPrice} billed annually`,
     color: "#4a63b5",
-    badge: "Popular",
+    badge: "Most Popular",
     features: [
       { text: `${PLANS.growth.analysesPerMonth} analyses/month`, included: true },
       { text: "All intelligence engines", included: true },
-      { text: "ColdDM AI", included: true },
-      { text: "BrandForge AI", included: true },
+      { text: "100 ColdDM AI generations/month", included: true },
+      { text: "100 BrandForge AI generations/month", included: true },
       { text: "PDF exports", included: true },
       { text: "Shareable reports", included: true },
+      { text: "Saved analysis history", included: true },
+      { text: "Up to 3 startup workspaces", included: true },
       { text: "Priority support", included: true },
     ],
     cta: "Upgrade to Growth",
@@ -91,10 +90,13 @@ const plans = [
     features: [
       { text: `${PLANS.scale.analysesPerMonth} analyses/month`, included: true },
       { text: "All intelligence engines", included: true },
-      { text: "ColdDM AI", included: true },
-      { text: "BrandForge AI", included: true },
+      { text: "300 ColdDM AI generations/month", included: true },
+      { text: "300 BrandForge AI generations/month", included: true },
       { text: "PDF exports", included: true },
       { text: "Shareable reports", included: true },
+      { text: "Saved analysis history", included: true },
+      { text: "Up to 10 startup workspaces", included: true },
+      { text: "Team-ready workspaces", included: true },
       { text: "Priority processing", included: true },
     ],
     cta: "Upgrade to Scale",
@@ -110,7 +112,7 @@ const faqs = [
   },
   {
     q: "Is there a free trial?",
-    a: "The free plan is available without a card. Upgrade whenever you need 50, 100, or 200 analyses per month.",
+    a: "The Starter plan is available without a card. Upgrade whenever you need 50, 150, or 400 analyses per month.",
   },
   {
     q: "Can I switch plans at any time?",
@@ -147,8 +149,8 @@ export default function PricingPage() {
             <span className="text-gradient-sage">not consultants</span>
           </h1>
           <p className="font-jakarta text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
-            One platform. Six intelligence engines. Real-time results. At a fraction
-            of what a single advisor would cost.
+            Start with the core engines, then upgrade when you need the full
+            intelligence stack, exports, and higher monthly usage.
           </p>
         </AnimatedSection>
 
@@ -231,6 +233,12 @@ export default function PricingPage() {
             </StaggerItem>
           ))}
         </StaggerContainer>
+
+        <AnimatedSection delay={0.15} className="text-center -mt-10 mb-20">
+          <p className="font-jakarta text-sm text-gray-400">
+            All prices are in USD. Upgrade, downgrade, or cancel anytime.
+          </p>
+        </AnimatedSection>
 
         {/* FAQ */}
         <AnimatedSection className="max-w-3xl mx-auto">

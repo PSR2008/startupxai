@@ -18,7 +18,7 @@ interface SubStatus {
 
 const FREE_DEFAULTS: SubStatus = {
   plan: "free",
-  label: "Free",
+  label: "Starter",
   billingCycle: null,
   active: false,
   expiresAt: null,
@@ -89,7 +89,7 @@ export default function SubscriptionStatusCard() {
       <div className="flex items-center gap-2.5 mb-5">
         <motion.div animate={isPaid && data.active ? { scale: [1, 1.2, 1] } : {}} transition={{ repeat: Infinity, duration: 2 }} className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${isPaid && data.active ? "bg-emerald-500" : "bg-gray-300"}`} />
         <p className={`font-bricolage text-lg font-bold ${isPaid && data.active ? "text-gray-900" : "text-gray-500"}`}>
-          {isFree ? "Free Plan" : data.isExpired ? "Expired" : data.active ? "Active" : "Inactive"}
+          {isFree ? "Starter Plan" : data.isExpired ? "Expired" : data.active ? "Active" : "Inactive"}
         </p>
       </div>
 

@@ -6,6 +6,7 @@ import {
   Lightbulb, Swords, DollarSign, Brain, TrendingUp,
   Target, MessageSquare, Palette, ArrowRight, Zap,
   BarChart3, Users, TrendingDown, Sparkles, Crown, ShieldCheck,
+  Lock,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import UsageWidget from "@/components/app/UsageWidget";
@@ -21,6 +22,10 @@ interface FounderProfile {
   founder_stage?: string | null;
   region?: string | null;
   primary_goal?: string | null;
+}
+
+interface UsageSummary {
+  plan: "free" | "founder" | "growth" | "scale";
 }
 
 const engines = [
@@ -51,22 +56,36 @@ const tips = [
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<FounderProfile | null>(null);
+  const [usage, setUsage] = useState<UsageSummary>({ plan: "free" });
 
   useEffect(() => {
-    async function loadFounderProfile() {
+    async function loadDashboardState() {
       try {
-        const res = await fetch("/api/founder-profile", {
-          headers: await getAuthHeaders(),
-        });
-        const data = await res.json();
-        if (res.ok && data.profile) setProfile(data.profile);
+        const headers = await getAuthHeaders();
+        const [profileRes, usageRes] = await Promise.all([
+          fetch("/api/founder-profile", { headers }),
+          fetch("/api/check-usage", { headers }),
+        ]);
+
+        const profileData = await profileRes.json();
+        if (profileRes.ok && profileData.profile) setProfile(profileData.profile);
+
+        const usageData = await usageRes.json();
+        if (usageRes.ok && usageData.plan) setUsage({ plan: usageData.plan });
       } catch {
         // best-effort personalization
       }
     }
 
-    loadFounderProfile();
+    loadDashboardState();
   }, []);
+
+  const premiumStarterLocks = new Set([
+    "/revenue-engine",
+    "/user-psychology",
+    "/growth-engine",
+    "/founder-decision",
+  ]);
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto">
@@ -199,13 +218,15 @@ export default function DashboardPage() {
       <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10" staggerDelay={0.05}>
         {engines.map((engine) => {
           const Icon = engine.icon;
+          const locked = usage.plan === "free" && premiumStarterLocks.has(engine.href);
+          const href = locked ? "/payment?plan=founder&billing=monthly" : engine.href;
           return (
             <StaggerItem key={engine.href}>
-              <Link href={engine.href}>
+              <Link href={href}>
                 <motion.div
                   whileHover={{ y: -3, scale: 1.01 }}
                   transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="group rounded-2xl border bg-white p-5 hover:shadow-md transition-all duration-200 cursor-pointer h-full flex flex-col gap-3"
+                  className={`group rounded-2xl border bg-white p-5 hover:shadow-md transition-all duration-200 cursor-pointer h-full flex flex-col gap-3 ${locked ? "opacity-85" : ""}`}
                   style={{ borderColor: engine.border }}
                 >
                   <div className="flex items-start justify-between">
@@ -215,7 +236,12 @@ export default function DashboardPage() {
                     >
                       <Icon size={16} style={{ color: engine.color }} />
                     </div>
-                    {engine.badge && (
+                    {locked ? (
+                      <span className="inline-flex items-center gap-1 font-jakarta text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                        <Lock size={9} />
+                        Founder
+                      </span>
+                    ) : engine.badge && (
                       <span className="font-jakarta text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
                         {engine.badge}
                       </span>
@@ -233,7 +259,7 @@ export default function DashboardPage() {
                     className="flex items-center gap-1 font-bricolage text-xs font-semibold group-hover:gap-2 transition-all"
                     style={{ color: engine.color }}
                   >
-                    Run <ArrowRight size={11} />
+                    {locked ? "Upgrade" : "Run"} <ArrowRight size={11} />
                   </div>
                 </motion.div>
               </Link>

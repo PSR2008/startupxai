@@ -195,7 +195,7 @@ export default function SignupPage() {
           <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-3.5 flex items-start gap-3">
             <Sparkles size={15} className="text-emerald-600 flex-shrink-0 mt-0.5" />
             <p className="font-jakarta text-xs text-emerald-700 leading-relaxed">
-              <strong className="font-semibold">Free to start</strong> - Get access to 6 strategy engines, ColdDM AI, and BrandForge AI instantly.
+              <strong className="font-semibold">Free to start</strong> — Explore the core engines with 5 monthly analyses, plus 2 ColdDM and BrandForge generations.
             </p>
           </div>
 
