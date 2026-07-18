@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { AlertTriangle, Crown, RefreshCw } from "lucide-react";
+import { AlertTriangle, Crown, Lock, RefreshCw } from "lucide-react";
 import Button from "./Button";
 
 export function LoadingSpinner({ size = "md", label }: { size?: "sm" | "md" | "lg"; label?: string }) {
@@ -93,7 +93,18 @@ export function AnalysisLoading({ engine }: { engine: string }) {
 }
 
 export function ErrorState({ message = "Something went wrong. Please try again.", onRetry }: { message?: string; onRetry?: () => void }) {
-  const isUsageLimit = message.includes("free analyses") || message.includes("monthly analysis limit") || message.includes("USAGE_LIMIT_REACHED");
+  const isUsageLimit =
+    message.includes("PLAN_LIMIT_REACHED") ||
+    message.includes("monthly analysis limit") ||
+    message.includes("used all") ||
+    message.includes("remaining this month") ||
+    message.includes("free analyses");
+  const isPlanLocked =
+    message.includes("FEATURE_NOT_AVAILABLE") ||
+    message.includes("available on Founder") ||
+    message.includes("available on Growth") ||
+    message.includes("not available on your current plan");
+  const isAuth = message.includes("AUTHENTICATION_REQUIRED") || message.includes("sign in");
 
   if (isUsageLimit) {
     return (
@@ -120,6 +131,36 @@ export function ErrorState({ message = "Something went wrong. Please try again."
               View usage
             </Button>
           </Link>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (isPlanLocked || isAuth) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center gap-5 py-16 px-8 text-center"
+      >
+        <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center shadow-sm shadow-amber-100">
+          {isAuth ? <Lock size={20} className="text-amber-600" /> : <Crown size={20} className="text-amber-600" />}
+        </div>
+        <div className="space-y-1">
+          <p className="font-bricolage text-sm font-bold text-gray-900">{isAuth ? "Sign In Required" : "Upgrade Required"}</p>
+          <p className="font-jakarta text-sm text-gray-500 max-w-sm">{message}</p>
+        </div>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Link href={isAuth ? "/signin" : "/payment?plan=founder&billing=monthly"}>
+            <Button size="sm" icon={isAuth ? <Lock size={13} /> : <Crown size={13} />}>
+              {isAuth ? "Sign in" : "Upgrade plan"}
+            </Button>
+          </Link>
+          {onRetry && (
+            <Button variant="outline" size="sm" onClick={onRetry} icon={<RefreshCw size={13} />}>
+              Try again
+            </Button>
+          )}
         </div>
       </motion.div>
     );

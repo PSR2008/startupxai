@@ -56,7 +56,9 @@ function unauthenticatedAccess(): FeatureAccess {
     entitlements: getPlanEntitlements("free"),
     response: NextResponse.json(
       {
-        error: "AUTHENTICATION_REQUIRED",
+        success: false,
+        code: "AUTHENTICATION_REQUIRED",
+        error: "Please sign in to use StartupX AI.",
         message: "Please sign in to use StartupX AI.",
       },
       { status: 401 }
@@ -76,9 +78,20 @@ function limitResponse(params: {
     params.plan === "growth" ? "scale" :
     null;
 
+  const planLabel = params.plan === "free" ? "Starter" : params.plan;
+  const featureLabel =
+    params.feature === "monthly_analyses" ? "analyses" :
+    params.feature === "cold-dm" ? "ColdDM generations" :
+    params.feature === "brand-forge" ? "BrandForge generations" :
+    params.feature;
+  const message = `You have used all ${params.limit} ${planLabel} ${featureLabel} for this month.`;
+
   return NextResponse.json(
     {
-      error: "PLAN_LIMIT_REACHED",
+      success: false,
+      code: "PLAN_LIMIT_REACHED",
+      error: message,
+      message,
       feature: params.feature,
       currentUsage: params.currentUsage,
       limit: params.limit,
@@ -101,9 +114,23 @@ function featureUnavailableResponse(params: {
     params.plan === "scale" ? null :
     "founder";
 
+  const message =
+    params.feature === "engine_access"
+      ? "This intelligence engine is available on Founder and higher plans."
+      : params.feature === "shareable_reports"
+      ? "Shareable reports are available on Growth and Scale plans."
+      : params.feature === "analysis_history"
+      ? "Saved analysis history is available on Founder and higher plans."
+      : params.feature === "pdf_export"
+      ? "PDF exports are available on Founder and higher plans."
+      : "This feature is not available on your current plan.";
+
   return NextResponse.json(
     {
-      error: "FEATURE_NOT_AVAILABLE",
+      success: false,
+      code: "FEATURE_NOT_AVAILABLE",
+      error: message,
+      message,
       feature: params.feature,
       engine: params.engine,
       plan: params.plan,

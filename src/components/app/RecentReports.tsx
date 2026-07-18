@@ -86,7 +86,9 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
 
         const data = await res.json();
         if (!res.ok) {
-          if (data?.error === "FEATURE_NOT_AVAILABLE") setLocked(true);
+          if (data?.code === "FEATURE_NOT_AVAILABLE" || data?.error === "FEATURE_NOT_AVAILABLE") {
+            setLocked(true);
+          }
           return;
         }
         if (mounted) {
