@@ -245,6 +245,20 @@ export async function analyzeRevenue(input: {
   targetAudience: string;
   currentPricing?: string;
   businessModel?: string;
+  productType?: string;
+  geography?: string;
+  expectedCustomerWillingnessToPay?: string;
+  estimatedCac?: string;
+  grossMarginPercent?: string;
+  competitorPricing?: string;
+  freeTierAvailability?: string;
+  expectedFreeToPaidConversion?: string;
+  usagePattern?: string;
+  customerFrequency?: string;
+  costAssumptions?: string;
+  targetMonthlyRevenue?: string;
+  customerVolumeAssumption?: string;
+  variableCostPerCustomer?: string;
 }): Promise<RevenueEngineOutput> {
   const client = getClient();
 
@@ -257,6 +271,22 @@ DESCRIPTION: ${input.description}
 TARGET AUDIENCE: ${input.targetAudience}
 ${input.currentPricing ? `CURRENT PRICING: ${input.currentPricing}` : ""}
 ${input.businessModel ? `BUSINESS MODEL: ${input.businessModel}` : ""}
+${input.productType ? `PRODUCT TYPE: ${input.productType}` : ""}
+${input.geography ? `GEOGRAPHY: ${input.geography}` : ""}
+${input.expectedCustomerWillingnessToPay ? `EXPECTED WILLINGNESS TO PAY: ${input.expectedCustomerWillingnessToPay}` : ""}
+${input.estimatedCac ? `ESTIMATED CAC: ${input.estimatedCac}` : ""}
+${input.grossMarginPercent ? `GROSS MARGIN PERCENT: ${input.grossMarginPercent}` : ""}
+${input.competitorPricing ? `COMPETITOR PRICING: ${input.competitorPricing}` : ""}
+${input.freeTierAvailability ? `FREE TIER AVAILABILITY: ${input.freeTierAvailability}` : ""}
+${input.expectedFreeToPaidConversion ? `EXPECTED FREE-TO-PAID CONVERSION: ${input.expectedFreeToPaidConversion}` : ""}
+${input.usagePattern ? `USAGE PATTERN: ${input.usagePattern}` : ""}
+${input.customerFrequency ? `CUSTOMER FREQUENCY: ${input.customerFrequency}` : ""}
+${input.costAssumptions ? `COST ASSUMPTIONS: ${input.costAssumptions}` : ""}
+${input.targetMonthlyRevenue ? `TARGET MONTHLY REVENUE: ${input.targetMonthlyRevenue}` : ""}
+${input.customerVolumeAssumption ? `CUSTOMER VOLUME ASSUMPTION: ${input.customerVolumeAssumption}` : ""}
+${input.variableCostPerCustomer ? `VARIABLE COST PER CUSTOMER: ${input.variableCostPerCustomer}` : ""}
+
+Use the numeric context above when present, but do not invent exact calculations. Deterministic calculations are added separately by the app.
 
 Respond ONLY with a valid JSON object. No markdown, no preamble:
 

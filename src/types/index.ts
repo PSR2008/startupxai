@@ -26,6 +26,20 @@ export interface RevenueEngineInput {
   targetAudience: string;
   currentPricing?: string;
   businessModel?: string;
+  productType?: string;
+  geography?: string;
+  expectedCustomerWillingnessToPay?: string;
+  estimatedCac?: string;
+  grossMarginPercent?: string;
+  competitorPricing?: string;
+  freeTierAvailability?: string;
+  expectedFreeToPaidConversion?: string;
+  usagePattern?: string;
+  customerFrequency?: string;
+  costAssumptions?: string;
+  targetMonthlyRevenue?: string;
+  customerVolumeAssumption?: string;
+  variableCostPerCustomer?: string;
 }
 
 export interface PsychologyEngineInput {
@@ -108,11 +122,29 @@ export interface Competitor {
 export interface RevenueEngineOutput {
   pricingSuggestions: PricingTier[];
   monetizationModels: MonetizationModel[];
+  pricingScenarios?: PricingScenario[];
+  deterministicMetrics?: PricingDeterministicMetrics;
   psychologicalPricingTips: string[];
   revenueLeaks: string[];
   conversionBlockers: string[];
   upsellOpportunities: string[];
   revenueVerdict: string;
+}
+
+export interface PricingScenario {
+  label: "Conservative" | "Base" | "Aggressive";
+  price: number;
+  payingCustomers: number;
+  monthlyRevenue: number;
+  grossProfit: number | null;
+  cacPaybackMonths: number | null;
+}
+
+export interface PricingDeterministicMetrics {
+  assumptionsUsed: string[];
+  customersRequiredForTargetRevenue: number | null;
+  freemiumPayingCustomers: number | null;
+  warnings: string[];
 }
 
 export interface PricingTier {

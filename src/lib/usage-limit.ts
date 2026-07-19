@@ -111,6 +111,8 @@ function featureUnavailableResponse(params: {
     params.feature === "shareable_reports" ? "growth" :
     params.feature === "analysis_history" ? "founder" :
     params.feature === "pdf_export" ? "founder" :
+    params.feature === "investor_memo" ? "founder" :
+    params.feature === "slide_ready_summary" ? "founder" :
     params.plan === "scale" ? null :
     "founder";
 
@@ -123,6 +125,10 @@ function featureUnavailableResponse(params: {
       ? "Saved analysis history is available on Founder and higher plans."
       : params.feature === "pdf_export"
       ? "PDF exports are available on Founder and higher plans."
+      : params.feature === "investor_memo"
+      ? "Investor memos are available on Founder and higher plans."
+      : params.feature === "slide_ready_summary"
+      ? "Slide-ready summaries are available on Founder and higher plans."
       : "This feature is not available on your current plan.";
 
   return NextResponse.json(

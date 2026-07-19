@@ -49,6 +49,8 @@ export interface PlanEntitlements {
   coldDmMonthlyLimit: number;
   brandForgeMonthlyLimit: number;
   canExportPdf: boolean;
+  canGenerateInvestorMemo: boolean;
+  canGenerateSlideSummary: boolean;
   canShareReports: boolean;
   canSaveHistory: boolean;
   canCompareAnalyses: boolean;
@@ -66,6 +68,8 @@ export const PLAN_ENTITLEMENTS: Record<PlanKey, PlanEntitlements> = {
     coldDmMonthlyLimit: 2,
     brandForgeMonthlyLimit: 2,
     canExportPdf: false,
+    canGenerateInvestorMemo: false,
+    canGenerateSlideSummary: false,
     canShareReports: false,
     canSaveHistory: false,
     canCompareAnalyses: false,
@@ -81,6 +85,8 @@ export const PLAN_ENTITLEMENTS: Record<PlanKey, PlanEntitlements> = {
     coldDmMonthlyLimit: 25,
     brandForgeMonthlyLimit: 25,
     canExportPdf: true,
+    canGenerateInvestorMemo: true,
+    canGenerateSlideSummary: true,
     canShareReports: false,
     canSaveHistory: true,
     canCompareAnalyses: false,
@@ -96,6 +102,8 @@ export const PLAN_ENTITLEMENTS: Record<PlanKey, PlanEntitlements> = {
     coldDmMonthlyLimit: 100,
     brandForgeMonthlyLimit: 100,
     canExportPdf: true,
+    canGenerateInvestorMemo: true,
+    canGenerateSlideSummary: true,
     canShareReports: true,
     canSaveHistory: true,
     canCompareAnalyses: false,
@@ -111,6 +119,8 @@ export const PLAN_ENTITLEMENTS: Record<PlanKey, PlanEntitlements> = {
     coldDmMonthlyLimit: 300,
     brandForgeMonthlyLimit: 300,
     canExportPdf: true,
+    canGenerateInvestorMemo: true,
+    canGenerateSlideSummary: true,
     canShareReports: true,
     canSaveHistory: true,
     canCompareAnalyses: false,

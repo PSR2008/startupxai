@@ -32,6 +32,20 @@ interface FormState {
   targetAudience: string;
   currentPricing: string;
   businessModel: string;
+  productType: string;
+  geography: string;
+  expectedCustomerWillingnessToPay: string;
+  estimatedCac: string;
+  grossMarginPercent: string;
+  competitorPricing: string;
+  freeTierAvailability: string;
+  expectedFreeToPaidConversion: string;
+  usagePattern: string;
+  customerFrequency: string;
+  costAssumptions: string;
+  targetMonthlyRevenue: string;
+  customerVolumeAssumption: string;
+  variableCostPerCustomer: string;
 }
 
 const defaultForm: FormState = {
@@ -40,6 +54,20 @@ const defaultForm: FormState = {
   targetAudience: "",
   currentPricing: "",
   businessModel: "",
+  productType: "",
+  geography: "",
+  expectedCustomerWillingnessToPay: "",
+  estimatedCac: "",
+  grossMarginPercent: "",
+  competitorPricing: "",
+  freeTierAvailability: "",
+  expectedFreeToPaidConversion: "",
+  usagePattern: "",
+  customerFrequency: "",
+  costAssumptions: "",
+  targetMonthlyRevenue: "",
+  customerVolumeAssumption: "",
+  variableCostPerCustomer: "",
 };
 
 export default function RevenueEnginePage() {
@@ -110,6 +138,8 @@ export default function RevenueEnginePage() {
     if (errors[field]) setErrors((p) => ({ ...p, [field]: undefined }));
   };
 
+  const deterministicMetrics = result?.deterministicMetrics;
+
   const copyReport = async () => {
     if (!result) return;
 
@@ -129,6 +159,13 @@ export default function RevenueEnginePage() {
         (tier) =>
           `- ${tier.name}: ${tier.price} / ${tier.billingCycle}\n  Segment: ${tier.targetSegment}\n  Features: ${tier.features.join(", ")}${tier.recommended ? "\n  Recommended: yes" : ""}`,
       ),
+      "",
+      "Deterministic Pricing Scenarios",
+      ...(result.pricingScenarios ?? []).map(
+        (scenario) =>
+          `- ${scenario.label}: $${scenario.price}/mo x ${scenario.payingCustomers} customers = $${scenario.monthlyRevenue}/mo${scenario.grossProfit != null ? `, gross profit $${scenario.grossProfit}` : ""}${scenario.cacPaybackMonths != null ? `, CAC payback ${scenario.cacPaybackMonths} months` : ""}`,
+      ),
+      ...(result.deterministicMetrics?.assumptionsUsed?.length ? ["", "Assumptions Used", ...result.deterministicMetrics.assumptionsUsed.map((item) => `- ${item}`)] : []),
       "",
       "Revenue Leaks",
       ...result.revenueLeaks.map((leak) => `- ${leak}`),
@@ -206,6 +243,24 @@ export default function RevenueEnginePage() {
             />
             <Input label="Current Pricing" placeholder="e.g. $29/mo flat, or none yet" value={form.currentPricing} onChange={set("currentPricing")} hint="Optional - leave blank if none" />
             <Input label="Business Model" placeholder="e.g. Subscription SaaS, marketplace, per-seat" value={form.businessModel} onChange={set("businessModel")} hint="Optional" />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Input label="Product Type" placeholder="SaaS, mobile app, marketplace" value={form.productType} onChange={set("productType")} />
+              <Input label="Geography" placeholder="India, US, global, tier-2 cities" value={form.geography} onChange={set("geography")} />
+              <Input label="Willingness to Pay" placeholder="e.g. $19/mo or 499/month" value={form.expectedCustomerWillingnessToPay} onChange={set("expectedCustomerWillingnessToPay")} />
+              <Input label="Estimated CAC" placeholder="e.g. $12 per customer" value={form.estimatedCac} onChange={set("estimatedCac")} />
+              <Input label="Gross Margin %" placeholder="e.g. 82" value={form.grossMarginPercent} onChange={set("grossMarginPercent")} />
+              <Input label="Target MRR" placeholder="e.g. 10000" value={form.targetMonthlyRevenue} onChange={set("targetMonthlyRevenue")} />
+              <Input label="Customer Volume" placeholder="e.g. 500 monthly users" value={form.customerVolumeAssumption} onChange={set("customerVolumeAssumption")} />
+              <Input label="Free-to-Paid %" placeholder="e.g. 6" value={form.expectedFreeToPaidConversion} onChange={set("expectedFreeToPaidConversion")} />
+              <Input label="Variable Cost / Customer" placeholder="e.g. $2.50" value={form.variableCostPerCustomer} onChange={set("variableCostPerCustomer")} />
+              <Input label="Free Tier" placeholder="None, limited free tier, trial" value={form.freeTierAvailability} onChange={set("freeTierAvailability")} />
+            </div>
+            <Textarea label="Competitor Pricing" placeholder="Known competitor plans, ranges, or screenshots summarized." rows={3} value={form.competitorPricing} onChange={set("competitorPricing")} />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Input label="Usage Pattern" placeholder="Daily, weekly, project-based" value={form.usagePattern} onChange={set("usagePattern")} />
+              <Input label="Customer Frequency" placeholder="One-time, monthly, recurring" value={form.customerFrequency} onChange={set("customerFrequency")} />
+            </div>
+            <Textarea label="Cost Assumptions" placeholder="API costs, hosting, manual work, support load, payment fees." rows={3} value={form.costAssumptions} onChange={set("costAssumptions")} />
           </div>
 
           <Button size="lg" fullWidth onClick={handleSubmit} loading={status === "loading"} icon={<DollarSign size={15} />} iconPosition="right">
@@ -275,6 +330,62 @@ export default function RevenueEnginePage() {
                     <p className="font-jakarta text-sm leading-relaxed text-gray-650">{result.revenueVerdict}</p>
                   </div>
                 </div>
+
+                {((result.pricingScenarios?.length ?? 0) > 0 || deterministicMetrics?.assumptionsUsed.length || deterministicMetrics?.warnings.length) && (
+                  <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <div>
+                        <h3 className="font-bricolage text-sm font-bold text-gray-900">Scenario math</h3>
+                        <p className="mt-1 font-jakarta text-xs text-gray-500">Calculated from your numeric inputs, separate from the AI narrative.</p>
+                      </div>
+                      <Badge variant="forest" size="sm">Deterministic</Badge>
+                    </div>
+
+                    {(result.pricingScenarios?.length ?? 0) > 0 && (
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        {result.pricingScenarios?.map((scenario) => (
+                          <div key={scenario.label} className="rounded-xl border border-teal-100 bg-teal-50/60 p-4">
+                            <p className="font-bricolage text-xs font-bold uppercase tracking-wide text-teal-800">{scenario.label}</p>
+                            <p className="mt-2 font-bricolage text-2xl font-bold text-gray-950">${scenario.monthlyRevenue.toLocaleString()}/mo</p>
+                            <p className="mt-1 font-jakarta text-xs text-gray-500">${scenario.price.toLocaleString()} x {scenario.payingCustomers.toLocaleString()} customers</p>
+                            {scenario.grossProfit != null && <p className="mt-2 font-jakarta text-xs text-gray-600">Gross profit: ${scenario.grossProfit.toLocaleString()}</p>}
+                            {scenario.cacPaybackMonths != null && <p className="font-jakarta text-xs text-gray-600">CAC payback: {scenario.cacPaybackMonths} months</p>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      {deterministicMetrics?.customersRequiredForTargetRevenue != null && (
+                        <div className="rounded-xl border border-black/6 bg-gray-50 p-3">
+                          <p className="font-bricolage text-xs font-bold text-gray-700">Customers for target MRR</p>
+                          <p className="mt-1 font-jakarta text-sm text-gray-900">{deterministicMetrics.customersRequiredForTargetRevenue.toLocaleString()} paying customers</p>
+                        </div>
+                      )}
+                      {deterministicMetrics?.freemiumPayingCustomers != null && (
+                        <div className="rounded-xl border border-black/6 bg-gray-50 p-3">
+                          <p className="font-bricolage text-xs font-bold text-gray-700">Freemium conversion estimate</p>
+                          <p className="mt-1 font-jakarta text-sm text-gray-900">{deterministicMetrics.freemiumPayingCustomers.toLocaleString()} paying customers</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {!!deterministicMetrics?.assumptionsUsed.length && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {deterministicMetrics.assumptionsUsed.map((item) => (
+                          <Badge key={item} variant="midnight" size="sm">{item}</Badge>
+                        ))}
+                      </div>
+                    )}
+                    {!!deterministicMetrics?.warnings.length && (
+                      <div className="mt-4 space-y-2">
+                        {deterministicMetrics.warnings.map((warning) => (
+                          <div key={warning} className="rounded-xl border border-amber-200 bg-amber-50 p-3 font-jakarta text-xs text-amber-900">{warning}</div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {result.pricingSuggestions.length > 0 && (
                   <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50">

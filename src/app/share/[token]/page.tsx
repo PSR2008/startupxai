@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, Loader2, Zap } from "lucide-react";
-import ReportRenderer, { type RenderableReport } from "@/components/app/ReportRenderer";
+import ReportRenderer, { GeneratedReportRenderer, type RenderableReport } from "@/components/app/ReportRenderer";
+import type { GeneratedReport } from "@/lib/reporting";
 
 export default function SharedReportPage() {
   const params = useParams<{ token: string }>();
-  const [report, setReport] = useState<RenderableReport | null>(null);
+  const [report, setReport] = useState<RenderableReport | GeneratedReport | null>(null);
+  const [reportKind, setReportKind] = useState<"analysis" | "generated_report">("analysis");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -19,6 +21,7 @@ export default function SharedReportPage() {
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.error || "Shared report not found");
         setReport(data.report);
+        setReportKind(data.reportKind === "generated_report" ? "generated_report" : "analysis");
       } catch (err) {
         setError(err instanceof Error ? err.message : "Shared report not found");
       } finally {
@@ -64,7 +67,12 @@ export default function SharedReportPage() {
           </div>
         )}
 
-        {!loading && report && <ReportRenderer report={report} />}
+        {!loading && report && reportKind === "generated_report" && (
+          <GeneratedReportRenderer report={report as GeneratedReport} />
+        )}
+        {!loading && report && reportKind === "analysis" && (
+          <ReportRenderer report={report as RenderableReport} />
+        )}
       </main>
     </div>
   );

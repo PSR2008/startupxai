@@ -52,6 +52,20 @@ export const revenueEngineSchema = z.object({
   targetAudience: nonEmptyString(500, "Target audience"),
   currentPricing: optionalString(500),
   businessModel: optionalString(300),
+  productType: optionalString(200),
+  geography: optionalString(200),
+  expectedCustomerWillingnessToPay: optionalString(100),
+  estimatedCac: optionalString(100),
+  grossMarginPercent: optionalString(100),
+  competitorPricing: optionalString(1000),
+  freeTierAvailability: optionalString(300),
+  expectedFreeToPaidConversion: optionalString(100),
+  usagePattern: optionalString(500),
+  customerFrequency: optionalString(300),
+  costAssumptions: optionalString(500),
+  targetMonthlyRevenue: optionalString(100),
+  customerVolumeAssumption: optionalString(100),
+  variableCostPerCustomer: optionalString(100),
 });
 
 // --- User Psychology Engine Schema ---

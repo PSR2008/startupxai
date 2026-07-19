@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { CalendarDays, FileText } from "lucide-react";
+import type { FounderReportContent, GeneratedReport } from "@/lib/reporting";
 
 export interface RenderableReport {
   id: string;
@@ -53,6 +54,27 @@ function renderValue(value: unknown): ReactNode {
   }
 
   return <p className="font-jakarta text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{String(value)}</p>;
+}
+
+function renderGeneratedSection(section: FounderReportContent["sections"][number]) {
+  return (
+    <section key={section.title} className="break-inside-avoid rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
+      <h2 className="font-bricolage text-base font-bold text-gray-900 mb-2">{section.title}</h2>
+      {section.body && (
+        <p className="font-jakarta text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{section.body}</p>
+      )}
+      {section.items && section.items.length > 0 && (
+        <ul className="mt-3 space-y-2">
+          {section.items.map((item, index) => (
+            <li key={index} className="flex gap-2 rounded-xl border border-emerald-100 bg-emerald-50/60 p-3 font-jakarta text-sm text-gray-650 leading-relaxed">
+              <span className="font-bricolage text-xs font-bold text-emerald-700">{String(index + 1).padStart(2, "0")}</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
 }
 
 function renderObject(value: Record<string, unknown>) {
@@ -109,5 +131,80 @@ export default function ReportRenderer({ report }: { report: RenderableReport })
         </section>
       </div>
     </>
+  );
+}
+
+export function GeneratedReportRenderer({ report }: { report: GeneratedReport }) {
+  const content = report.content;
+  const isMemo = content.reportType === "investor_memo";
+  const isSlides = content.reportType === "slide_summary";
+
+  return (
+    <article className="report-document space-y-5">
+      <section className="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-8 shadow-sm break-inside-avoid">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
+          <div>
+            <p className="font-bricolage text-xs font-bold text-emerald-700 uppercase tracking-widest mb-2">
+              StartupX AI
+            </p>
+            <h1 className="font-bricolage text-3xl sm:text-4xl font-bold text-gray-950 tracking-tight">
+              {content.title}
+            </h1>
+            <p className="font-jakarta text-sm text-gray-500 mt-3 max-w-2xl">{content.subtitle}</p>
+          </div>
+          <div className="rounded-2xl border border-white/70 bg-white/80 px-4 py-3 text-right">
+            <p className="font-bricolage text-[10px] font-bold text-gray-400 uppercase tracking-wide">Generated</p>
+            <p className="font-jakarta text-xs text-gray-600">
+              {new Date(content.generatedAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-3 break-inside-avoid">
+        {[
+          ["Startup", content.startup.name],
+          ["Audience", content.startup.targetAudience || "Not provided"],
+          ["Market", [content.startup.industry, content.startup.region].filter(Boolean).join(" / ") || "Not provided"],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
+            <p className="font-bricolage text-[10px] font-bold text-gray-400 uppercase tracking-wide">{label}</p>
+            <p className="font-jakarta text-sm text-gray-800 mt-1">{value}</p>
+          </div>
+        ))}
+      </section>
+
+      {content.startup.summary && (
+        <section className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm break-inside-avoid">
+          <h2 className="font-bricolage text-base font-bold text-gray-900 mb-2">One-Line Concept Summary</h2>
+          <p className="font-jakarta text-sm text-gray-600 leading-relaxed">{content.startup.summary}</p>
+        </section>
+      )}
+
+      <div className={isMemo ? "space-y-3 memo-layout" : isSlides ? "grid grid-cols-1 md:grid-cols-2 gap-4" : "space-y-4"}>
+        {content.sections.map(renderGeneratedSection)}
+      </div>
+
+      {content.nextActions.length > 0 && (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm break-inside-avoid">
+          <h2 className="font-bricolage text-base font-bold text-emerald-900 mb-3">Recommended Next Seven Actions</h2>
+          <ol className="space-y-2">
+            {content.nextActions.map((action, index) => (
+              <li key={index} className="font-jakarta text-sm text-emerald-800 leading-relaxed">
+                {index + 1}. {action}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      <section className="rounded-2xl border border-black/6 bg-gray-50 p-4 break-inside-avoid">
+        <p className="font-jakarta text-xs text-gray-500 leading-relaxed">{content.disclaimer}</p>
+      </section>
+    </article>
   );
 }

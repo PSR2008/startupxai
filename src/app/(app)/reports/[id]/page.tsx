@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Copy, Link2, Loader2, Trash2, X } from "lucide-react";
+import { ArrowLeft, Copy, FileText, Layout, Link2, Loader2, Newspaper, Trash2, X } from "lucide-react";
 import ExportPdfButton from "@/components/ui/ExportPdfButton";
-import ReportRenderer, { type RenderableReport } from "@/components/app/ReportRenderer";
+import ReportRenderer, { GeneratedReportRenderer, type RenderableReport } from "@/components/app/ReportRenderer";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
+import type { GeneratedReport, ReportOutputType, ShareExpiryOption } from "@/lib/reporting";
 
 interface ReportDetail extends RenderableReport {
   share_token?: string | null;
@@ -17,12 +18,16 @@ export default function ReportDetailPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const [report, setReport] = useState<ReportDetail | null>(null);
+  const [generatedReport, setGeneratedReport] = useState<GeneratedReport | null>(null);
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [generating, setGenerating] = useState<ReportOutputType | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
+  const [shareUrl, setShareUrl] = useState("");
+  const [expiresIn, setExpiresIn] = useState<ShareExpiryOption>("none");
 
   useEffect(() => {
     async function loadReport() {
@@ -58,10 +63,11 @@ export default function ReportDetailPage() {
     loadReport();
   }, [params.id, router]);
 
-  const shareUrl = useMemo(() => {
+  const legacyShareUrl = useMemo(() => {
     if (!report?.share_token || typeof window === "undefined") return "";
     return `${window.location.origin}/share/${report.share_token}`;
   }, [report?.share_token]);
+  const activeShareUrl = shareUrl || legacyShareUrl;
 
   const deleteReport = async () => {
     if (!token || !report) return;
@@ -84,30 +90,26 @@ export default function ReportDetailPage() {
     }
   };
 
-  const updateSharing = async (share: boolean) => {
+  const updateSharing = async (share: boolean, target: "analysis" | "generated_report" = generatedReport ? "generated_report" : "analysis") => {
     if (!token || !report) return;
     setSharing(true);
     try {
-      const res = await fetch(`/api/reports/${report.id}`, {
+      const endpoint =
+        target === "generated_report" && generatedReport
+          ? `/api/generated-reports/${generatedReport.id}/share`
+          : `/api/reports/${report.id}`;
+      const res = await fetch(endpoint, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ share }),
+        body: JSON.stringify({ share, expiresIn }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || "Unable to update sharing");
 
-      setReport((current) =>
-        current
-          ? {
-              ...current,
-              share_token: data.shareToken,
-              shared_at: data.shareToken ? new Date().toISOString() : null,
-            }
-          : current
-      );
+      setShareUrl(data.shareUrl && typeof window !== "undefined" ? `${window.location.origin}${data.shareUrl}` : "");
       setCopied(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to update sharing");
@@ -117,10 +119,35 @@ export default function ReportDetailPage() {
   };
 
   const copyShareUrl = async () => {
-    if (!shareUrl) return;
-    await navigator.clipboard.writeText(shareUrl);
+    if (!activeShareUrl) return;
+    await navigator.clipboard.writeText(activeShareUrl);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
+  };
+
+  const generateReport = async (reportType: ReportOutputType) => {
+    if (!token || !report) return;
+    setGenerating(reportType);
+    setError("");
+    try {
+      const res = await fetch(`/api/reports/${report.id}/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ reportType }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || "Your report could not be generated. Please try again.");
+      setGeneratedReport(data.report);
+      setShareUrl("");
+      setCopied(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Your report could not be generated. Please try again.");
+    } finally {
+      setGenerating(null);
+    }
   };
 
   if (loading) {
@@ -155,8 +182,11 @@ export default function ReportDetailPage() {
           <ArrowLeft size={14} /> Back to dashboard
         </Link>
         <div className="flex flex-wrap items-center gap-2">
-          <ExportPdfButton />
-          {report.share_token ? (
+          <ExportPdfButton
+            reportId={generatedReport?.id ?? report.id}
+            reportKind={generatedReport ? "generated_report" : "analysis"}
+          />
+          {activeShareUrl ? (
             <>
               <button
                 onClick={copyShareUrl}
@@ -195,7 +225,59 @@ export default function ReportDetailPage() {
         </div>
       </div>
 
-      <ReportRenderer report={report} />
+      <div className="no-print mb-5 rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <p className="font-bricolage text-sm font-bold text-gray-900">Founder report outputs</p>
+            <p className="font-jakarta text-xs text-gray-500 mt-1">
+              Turn this saved analysis into a polished founder document, investor memo, or slide-ready summary.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { type: "detailed" as const, label: "Detailed report", icon: FileText },
+              { type: "investor_memo" as const, label: "Investor memo", icon: Newspaper },
+              { type: "slide_summary" as const, label: "Slide summary", icon: Layout },
+            ].map(({ type, label, icon: Icon }) => (
+              <button
+                key={type}
+                onClick={() => generateReport(type)}
+                disabled={Boolean(generating)}
+                className="h-9 px-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-bricolage text-xs font-bold hover:bg-emerald-100 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+              >
+                {generating === type ? <Loader2 size={13} className="animate-spin" /> : <Icon size={13} />}
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="font-jakarta text-xs text-gray-400">Share expiry</span>
+          {[
+            ["none", "No expiry"],
+            ["7d", "7 days"],
+            ["30d", "30 days"],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              onClick={() => setExpiresIn(value as ShareExpiryOption)}
+              className={`h-7 px-2.5 rounded-lg border font-bricolage text-[11px] font-bold transition-colors ${
+                expiresIn === value
+                  ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                  : "border-black/8 bg-gray-50 text-gray-500 hover:bg-white"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {generatedReport ? (
+        <GeneratedReportRenderer report={generatedReport} />
+      ) : (
+        <ReportRenderer report={report} />
+      )}
     </div>
   );
 }

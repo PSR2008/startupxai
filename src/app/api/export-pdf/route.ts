@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPlanEntitlements } from "@/lib/plans";
 import { getEffectivePlan, logUsage } from "@/lib/usage";
 import { featureNotAvailableResponse, getUserIdFromRequest } from "@/lib/usage-limit";
+import { trackProductEvent } from "@/lib/analytics";
+import { getAnalysisForOwner, getGeneratedReportForOwner } from "@/lib/reporting";
 
 export async function POST(req: NextRequest) {
   const userId = await getUserIdFromRequest(req);
@@ -25,7 +27,29 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  const body = await req.json().catch(() => ({}));
+  const reportId = typeof body?.reportId === "string" ? body.reportId : "";
+  const reportKind = body?.reportKind === "generated_report" ? "generated_report" : "analysis";
+
+  if (reportId) {
+    const owned =
+      reportKind === "generated_report"
+        ? await getGeneratedReportForOwner(userId, reportId)
+        : await getAnalysisForOwner(userId, reportId);
+
+    if (!owned) {
+      return NextResponse.json(
+        { success: false, error: "Report not found" },
+        { status: 404 }
+      );
+    }
+  }
+
   await logUsage(userId, "pdf-export", "pdf_export");
+  await trackProductEvent("pdf_downloaded", {
+    userId,
+    properties: { report_kind: reportKind },
+  });
   return NextResponse.json({ success: true });
 }
 

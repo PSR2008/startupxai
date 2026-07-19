@@ -31,21 +31,21 @@ const plans = {
     price: PLANS.founder.monthlyPrice,
     annualPrice: PLANS.founder.yearlyPrice,
     desc: "For solo founders validating seriously",
-    features: [`${PLANS.founder.analysesPerMonth} analyses/month`, "All intelligence engines", "25 ColdDM generations", "25 BrandForge generations", "PDF exports", "Saved analysis history", "Email support"],
+    features: [`${PLANS.founder.analysesPerMonth} analyses/month`, "All intelligence engines", "25 ColdDM generations", "25 BrandForge generations", "Investor memo + slide summary", "PDF exports", "Saved analysis history", "Email support"],
   },
   growth: {
     name: PLANS.growth.label,
     price: PLANS.growth.monthlyPrice,
     annualPrice: PLANS.growth.yearlyPrice,
     desc: "For founders iterating regularly",
-    features: [`${PLANS.growth.analysesPerMonth} analyses/month`, "All intelligence engines", "100 ColdDM generations", "100 BrandForge generations", "PDF exports", "Shareable reports", "Up to 3 workspaces", "Priority support"],
+    features: [`${PLANS.growth.analysesPerMonth} analyses/month`, "All intelligence engines", "100 ColdDM generations", "100 BrandForge generations", "Investor memo + slide summary", "PDF exports", "Shareable reports", "Up to 3 workspaces", "Priority support"],
   },
   scale: {
     name: PLANS.scale.label,
     price: PLANS.scale.monthlyPrice,
     annualPrice: PLANS.scale.yearlyPrice,
     desc: "For teams running more decisions",
-    features: [`${PLANS.scale.analysesPerMonth} analyses/month`, "All intelligence engines", "300 ColdDM generations", "300 BrandForge generations", "PDF exports", "Shareable reports", "Team-ready workspaces", "Priority processing"],
+    features: [`${PLANS.scale.analysesPerMonth} analyses/month`, "All intelligence engines", "300 ColdDM generations", "300 BrandForge generations", "Investor memo + slide summary", "PDF exports", "Shareable reports", "Team-ready workspaces", "Priority processing"],
   },
 } as const;
 
