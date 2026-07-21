@@ -36,12 +36,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       primary: [
-        "bg-gradient-to-br from-emerald-500 to-emerald-600",
+        "bg-emerald-700",
         "text-white",
-        "shadow-md shadow-emerald-500/25",
-        "hover:shadow-lg hover:shadow-emerald-500/35 hover:-translate-y-0.5",
+        "shadow-sm",
+        "hover:bg-emerald-800 hover:-translate-y-0.5",
         "active:translate-y-0 active:shadow-sm",
-        "border border-emerald-600/20",
+        "border border-emerald-900/10",
       ].join(" "),
 
       secondary: [
@@ -66,10 +66,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ].join(" "),
 
       danger: [
-        "bg-gradient-to-br from-rose-500 to-rose-600",
+        "bg-rose-600",
         "text-white border border-rose-600/20",
-        "shadow-md shadow-rose-500/20",
-        "hover:shadow-lg hover:shadow-rose-500/30 hover:-translate-y-0.5",
+        "shadow-sm",
+        "hover:bg-rose-700 hover:-translate-y-0.5",
         "active:translate-y-0",
       ].join(" "),
     };
@@ -95,13 +95,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         {...(props as React.ComponentProps<typeof motion.button>)}
       >
-        {variant === "primary" && (
-          <span
-            className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity pointer-events-none"
-            aria-hidden
-          />
-        )}
-
         {loading ? (
           <Loader2 className="animate-spin" size={size === "sm" ? 14 : 16} />
         ) : (

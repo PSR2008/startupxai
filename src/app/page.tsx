@@ -17,7 +17,7 @@ import {
 export const metadata: Metadata = {
   title: "StartupX AI - Founder Intelligence Workspace",
   description:
-    "Validate startup ideas, map competitors, pressure-test pricing, understand user trust, and turn growth questions into practical next steps.",
+    "Assess assumptions, collect evidence, track experiments, and decide what to build next with a structured founder workspace.",
 };
 
 export default function LandingPage() {

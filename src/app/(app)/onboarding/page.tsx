@@ -183,7 +183,7 @@ export default function OnboardingPage() {
         >
           <Input
             label="Startup idea"
-            placeholder="e.g. AI hiring assistant for remote software teams"
+            placeholder="e.g. Hiring workflow assistant for remote software teams"
             value={form.startup_idea}
             onChange={setField("startup_idea")}
             error={errors.startup_idea}

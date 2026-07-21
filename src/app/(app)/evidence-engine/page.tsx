@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Activity, ArrowRight, BarChart3, ClipboardList, Database, FlaskConical, Link2, SearchCheck, ShieldCheck } from "lucide-react";
+import { Activity, ArrowRight, BarChart3, ClipboardList, Clock3, Database, FlaskConical, Link2, NotebookPen, SearchCheck, ShieldCheck } from "lucide-react";
 import EngineHeader from "@/components/app/EngineHeader";
 import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
@@ -135,7 +135,7 @@ export default function EvidenceEnginePage() {
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-5">
         <div className="lg:col-span-2 space-y-5">
-          <section className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm space-y-5">
+          <section className="rounded-xl border border-black/6 bg-white p-6 shadow-sm space-y-5">
             <div>
               <h3 className="font-bricolage text-base font-bold text-gray-900">Evidence project</h3>
               <p className="mt-1 font-jakarta text-xs text-gray-500">Create one durable project for evidence, scores, assumptions, and experiments.</p>
@@ -154,6 +154,18 @@ export default function EvidenceEnginePage() {
             <Input label="Website" type="url" placeholder="https://example.com" value={form.websiteUrl} onChange={set("websiteUrl")} leftIcon={<Link2 size={14} />} />
           </section>
 
+          <section className="rounded-xl border border-black/6 bg-[#fbfaf7] p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+              <NotebookPen size={15} className="text-emerald-700" />
+              <h3 className="font-bricolage text-sm font-bold text-gray-900">Manual evidence entry</h3>
+            </div>
+            <div className="space-y-3">
+              <ManualEntry title="Add a source" detail="Paste a customer quote, public URL, support message, or research note after the assessment runs." />
+              <ManualEntry title="Record interview" detail="Capture who was interviewed, what changed, and which assumption it supports or contradicts." />
+              <ManualEntry title="Log experiment" detail="Record the metric, sample size, pass threshold, result, and decision impact." />
+            </div>
+          </section>
+
           <Button size="lg" fullWidth onClick={submit} loading={status === "loading"} icon={<ArrowRight size={16} />} iconPosition="right">
             {status === "loading" ? "Building evidence project..." : "Run Evidence Assessment"}
           </Button>
@@ -162,12 +174,17 @@ export default function EvidenceEnginePage() {
         <div className="lg:col-span-3">
           <AnimatePresence mode="wait">
             {status === "idle" && (
-              <motion.section key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-2xl border border-dashed border-black/10 bg-white p-10 text-center shadow-sm">
+              <motion.section key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl border border-dashed border-black/10 bg-white p-10 text-center shadow-sm">
                 <SearchCheck size={30} className="mx-auto text-emerald-600" />
                 <h3 className="mt-4 font-bricolage text-lg font-bold text-gray-900">Ready for structured assessment</h3>
                 <p className="mx-auto mt-2 max-w-md font-jakarta text-sm leading-relaxed text-gray-500">
                   This workflow will not invent source links, market size, search volume, or competitor facts. Unavailable evidence stays visibly unavailable.
                 </p>
+                <div className="mx-auto mt-6 grid max-w-xl grid-cols-1 gap-3 text-left sm:grid-cols-3">
+                  <EmptyHint title="What belongs here" detail="Founder context, source links, interview notes, and known assumptions." />
+                  <EmptyHint title="Why it matters" detail="Weak evidence lowers confidence and shows what still needs research." />
+                  <EmptyHint title="Next action" detail="Run the first assessment, then add sources and experiment results." />
+                </div>
               </motion.section>
             )}
 
@@ -176,7 +193,7 @@ export default function EvidenceEnginePage() {
 
             {status === "success" && result && activeScore && (
               <motion.div key="result" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-                <section className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
+                <section className="rounded-xl border border-black/6 bg-white p-6 shadow-sm">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="font-bricolage text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Evidence project</p>
@@ -187,7 +204,7 @@ export default function EvidenceEnginePage() {
                         <Badge variant="neutral" size="sm">{result.project.scoreVersion}</Badge>
                       </div>
                     </div>
-                    <div className="max-w-xs rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-center">
+                    <div className="max-w-xs rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-center">
                       <p className="font-bricolage text-[10px] font-bold uppercase tracking-wide text-emerald-700">Evidence Score</p>
                       <p className="font-bricolage text-4xl font-bold text-emerald-800">{result.project.overallScore}</p>
                       <p className="mt-2 font-jakarta text-[11px] leading-relaxed text-emerald-900">{EVIDENCE_SCORE_DISCLAIMER}</p>
@@ -212,7 +229,23 @@ export default function EvidenceEnginePage() {
 
                 <ScorePanel score={activeScore} />
 
-                <section className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
+                <section id="assumptions" className="rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+                  <div className="mb-4 flex items-center gap-2">
+                    <ClipboardList size={14} className="text-amber-700" />
+                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Claim-to-evidence map</h3>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    {activeScore.assumptions.map((assumption) => (
+                      <div key={assumption} className="rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
+                        <p className="font-bricolage text-xs font-bold text-gray-900">Assumption</p>
+                        <p className="mt-1 font-jakarta text-sm leading-relaxed text-gray-600">{assumption}</p>
+                        <p className="mt-3 font-jakarta text-xs text-amber-700">Link this to customer research or an experiment result before raising confidence.</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="rounded-xl border border-black/6 bg-white p-5 shadow-sm">
                   <div className="mb-4 flex items-center gap-2">
                     <Database size={14} className="text-emerald-600" />
                     <h3 className="font-bricolage text-sm font-bold text-gray-900">Evidence collected</h3>
@@ -222,7 +255,7 @@ export default function EvidenceEnginePage() {
                   </div>
                 </section>
 
-                <section className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
+                <section className="rounded-xl border border-black/6 bg-white p-5 shadow-sm">
                   <div className="mb-4 flex items-center gap-2">
                     <Activity size={14} className="text-blue-600" />
                     <h3 className="font-bricolage text-sm font-bold text-gray-900">Provider status</h3>
@@ -232,14 +265,14 @@ export default function EvidenceEnginePage() {
                   </div>
                 </section>
 
-                <section className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
+                <section id="experiments" className="rounded-xl border border-black/6 bg-white p-5 shadow-sm">
                   <div className="mb-4 flex items-center gap-2">
                     <FlaskConical size={14} className="text-violet-600" />
                     <h3 className="font-bricolage text-sm font-bold text-gray-900">Recommended next validation actions</h3>
                   </div>
                   <div className="space-y-3">
                     {result.suggestedExperiments.map((experiment) => (
-                      <div key={experiment.hypothesis} className="rounded-xl border border-black/6 bg-gray-50 p-4">
+                      <div key={experiment.hypothesis} className="rounded-lg border border-black/6 bg-gray-50 p-4">
                         <div className="mb-2 flex items-center justify-between gap-3">
                           <p className="font-bricolage text-sm font-bold text-gray-900">{experiment.experimentType}</p>
                           <Badge variant="violet" size="sm">{experiment.status}</Badge>
@@ -260,6 +293,18 @@ export default function EvidenceEnginePage() {
                         {result.limitations.map((item) => <li key={item} className="font-jakarta text-xs leading-relaxed text-amber-800">{item}</li>)}
                       </ul>
                     </div>
+                  </div>
+                </section>
+
+                <section className="rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Clock3 size={14} className="text-gray-600" />
+                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Project timeline</h3>
+                  </div>
+                  <div className="space-y-3">
+                    <TimelineRow title="Assessment created" detail={`${result.evidenceItems.length} evidence item(s) collected and ${result.scores.length} score category summaries prepared.`} />
+                    <TimelineRow title="Evidence gaps identified" detail={`${activeScore.components.filter((component) => component.evidenceKind === "unavailable").length} missing weighted input(s) remain for the selected score.`} />
+                    <TimelineRow title="Next experiment drafted" detail={result.suggestedExperiments[0]?.hypothesis || "Add an experiment result after you run the first validation action."} />
                   </div>
                 </section>
               </motion.div>
@@ -309,6 +354,33 @@ function ScorePanel({ score }: { score: CategoryScore }) {
         <MethodologyDrawer score={score} />
       </div>
     </section>
+  );
+}
+
+function ManualEntry({ title, detail }: { title: string; detail: string }) {
+  return (
+    <div className="rounded-lg border border-black/6 bg-white p-3">
+      <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
+      <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
+    </div>
+  );
+}
+
+function EmptyHint({ title, detail }: { title: string; detail: string }) {
+  return (
+    <div className="rounded-lg border border-black/6 bg-[#fbfaf7] p-3">
+      <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
+      <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
+    </div>
+  );
+}
+
+function TimelineRow({ title, detail }: { title: string; detail: string }) {
+  return (
+    <div className="relative rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
+      <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
+      <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
+    </div>
   );
 }
 

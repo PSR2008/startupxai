@@ -293,7 +293,7 @@ export default function IdeaEnginePage() {
 
             <Input
               label="Startup Idea"
-              placeholder="e.g. AI-powered hiring platform for remote teams"
+              placeholder="e.g. Hiring workflow assistant for remote software teams"
               value={form.idea}
               onChange={setField("idea")}
               error={errors.idea}

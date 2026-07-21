@@ -20,14 +20,15 @@ export function LoadingSpinner({ size = "md", label }: { size?: "sm" | "md" | "l
 }
 
 const engineMessages: Record<string, string[]> = {
-  idea: ["Evaluating market signals...", "Scoring idea clarity...", "Detecting hidden risks...", "Identifying opportunities..."],
-  competitor: ["Mapping the competitive landscape...", "Analyzing competitor weaknesses...", "Finding positioning gaps...", "Building your battle plan..."],
-  revenue: ["Modeling monetization options...", "Crafting pricing tiers...", "Detecting revenue leaks...", "Optimizing conversion strategy..."],
-  psychology: ["Profiling your target users...", "Scoring trust & credibility...", "Identifying friction points...", "Auditing first impressions..."],
-  growth: ["Plotting your first 10 customers...", "Selecting highest-impact channels...", "Crafting outreach strategies...", "Building your launch playbook..."],
-  decision: ["Processing founder context...", "Ranking strategic priorities...", "Calculating confidence score...", "Finalizing your action brief..."],
-  "cold-dm": ["Writing your outreach messages...", "Optimizing copy for conversions...", "Generating variants...", "Crafting follow-up sequences..."],
-  "brand-forge": ["Brainstorming brand names...", "Crafting your positioning...", "Defining brand personality...", "Assembling your brand pack..."],
+  idea: ["Reviewing assumptions...", "Checking clarity signals...", "Listing risks...", "Preparing findings..."],
+  competitor: ["Mapping competitors...", "Reviewing positioning...", "Listing gaps...", "Preparing comparison..."],
+  revenue: ["Reviewing monetization options...", "Preparing pricing structure...", "Listing conversion risks...", "Preparing findings..."],
+  psychology: ["Reviewing trust signals...", "Checking friction points...", "Auditing first impressions...", "Preparing recommendations..."],
+  growth: ["Reviewing acquisition context...", "Selecting testable channels...", "Preparing outreach steps...", "Building launch sequence..."],
+  decision: ["Reviewing founder context...", "Ranking priorities...", "Checking confidence...", "Preparing action brief..."],
+  "cold-dm": ["Drafting outreach...", "Preparing variants...", "Checking tone...", "Preparing follow-ups..."],
+  "brand-forge": ["Drafting name options...", "Preparing positioning...", "Defining voice...", "Assembling brand pack..."],
+  evidence: ["Reviewing evidence...", "Checking missing sources...", "Calculating score components...", "Preparing next actions..."],
 };
 
 export function AnalysisLoading({ engine }: { engine: string }) {
@@ -39,18 +40,8 @@ export function AnalysisLoading({ engine }: { engine: string }) {
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center gap-8 py-20 px-8"
     >
-      {/* Animated rings */}
       <div className="relative flex items-center justify-center">
-        {[0, 1, 2].map((i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full border border-emerald-300/40"
-            style={{ width: 48 + i * 36, height: 48 + i * 36 }}
-            animate={{ scale: [1, 1.04, 1], opacity: [0.5, 0.2, 0.5] }}
-            transition={{ duration: 2, delay: i * 0.3, repeat: Infinity, ease: "easeInOut" }}
-          />
-        ))}
-        <div className="relative w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shadow-sm shadow-emerald-100">
+        <div className="relative w-12 h-12 rounded-xl bg-white border border-black/8 flex items-center justify-center shadow-sm">
           <svg width="20" height="20" viewBox="0 0 32 32" fill="none" className="animate-spin" style={{ animationDuration: "1s" }}>
             <circle cx="16" cy="16" r="12" stroke="rgba(16,185,129,0.2)" strokeWidth="3" />
             <path d="M16 4 A12 12 0 0 1 28 16" stroke="#10b981" strokeWidth="3" strokeLinecap="round" />
@@ -80,9 +71,9 @@ export function AnalysisLoading({ engine }: { engine: string }) {
       </div>
 
       {/* Progress bar */}
-      <div className="w-48 h-1 bg-gray-100 rounded-full overflow-hidden">
+      <div className="w-48 h-1 bg-gray-100 rounded-full overflow-hidden" aria-hidden>
         <motion.div
-          className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
+          className="h-full bg-emerald-700 rounded-full"
           initial={{ width: "0%" }}
           animate={{ width: "90%" }}
           transition={{ duration: 18, ease: "easeOut" }}

@@ -1,17 +1,24 @@
-﻿"use client";
-import { useEffect, useState } from "react";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import {
-  Lightbulb, Swords, DollarSign, Brain, TrendingUp,
-  Target, MessageSquare, Palette, ArrowRight, Zap,
-  BarChart3, Users, TrendingDown, ClipboardList, Crown, ShieldCheck,
-  Lock, SearchCheck,
+  ArrowRight,
+  ClipboardList,
+  FileText,
+  FlaskConical,
+  Lightbulb,
+  MessageSquare,
+  SearchCheck,
+  Settings,
+  ShieldCheck,
+  Target,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import UsageWidget from "@/components/app/UsageWidget";
 import SubscriptionStatusCard from "@/components/app/SubscriptionStatusCard";
 import RecentReports from "@/components/app/RecentReports";
+import Badge from "@/components/ui/Badge";
 import { getAuthHeaders } from "@/lib/auth-headers-client";
 
 interface FounderProfile {
@@ -28,32 +35,18 @@ interface UsageSummary {
   plan: "free" | "founder" | "growth" | "scale";
 }
 
-const engines = [
-  { icon: SearchCheck, title: "Evidence Engine", description: "Create an evidence-backed assessment project with transparent scores.", href: "/evidence-engine", color: "#059669", bg: "rgba(5,150,105,0.08)", border: "rgba(5,150,105,0.16)", badge: "PRIMARY" },
-  { icon: Lightbulb, title: "Idea & Market Engine", description: "Assess idea clarity, target customer, and demand assumptions.", href: "/idea-engine", color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.16)", badge: null },
-  { icon: Swords, title: "Competitor Intelligence", description: "Map competitors, find weaknesses, exploit gaps.", href: "/competitor-intelligence", color: "#f59e0b", bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.16)", badge: null },
-  { icon: DollarSign, title: "Revenue Engine", description: "Pricing strategy, conversion blockers, monetization.", href: "/revenue-engine", color: "#059669", bg: "rgba(5,150,105,0.08)", border: "rgba(5,150,105,0.16)", badge: null },
-  { icon: Brain, title: "User Psychology Engine", description: "Trust score, UX roast, friction points, fixes.", href: "/user-psychology", color: "#f43f5e", bg: "rgba(244,63,94,0.08)", border: "rgba(244,63,94,0.16)", badge: null },
-  { icon: TrendingUp, title: "Growth Engine", description: "First 10 customers, channels, outreach direction.", href: "/growth-engine", color: "#2563eb", bg: "rgba(37,99,235,0.08)", border: "rgba(37,99,235,0.16)", badge: null },
-  { icon: Target, title: "Founder Decision Engine", description: "Priorities, strategy, confidence score, action brief.", href: "/founder-decision", color: "#7c3aed", bg: "rgba(124,58,237,0.08)", border: "rgba(124,58,237,0.16)", badge: null },
-  { icon: MessageSquare, title: "ColdDM", description: "Draft WhatsApp, LinkedIn, and email outreach.", href: "/cold-dm", color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.16)", badge: "HOT" },
-  { icon: Palette, title: "BrandForge", description: "Names, taglines, positioning, brand personality.", href: "/brand-forge", color: "#7c3aed", bg: "rgba(124,58,237,0.08)", border: "rgba(124,58,237,0.16)", badge: "NEW" },
+const primaryActions = [
+  { title: "Review evidence", description: "Open the core assessment workspace.", href: "/evidence-engine", icon: SearchCheck, tone: "emerald" as const },
+  { title: "Assess assumptions", description: "Pressure-test idea, ICP, and demand logic.", href: "/idea-engine", icon: Lightbulb, tone: "blue" as const },
+  { title: "Track an experiment", description: "Turn missing evidence into a measurable test.", href: "/evidence-engine#experiments", icon: FlaskConical, tone: "amber" as const },
+  { title: "Review findings", description: "Open saved reports and decision history.", href: "/reports", icon: FileText, tone: "neutral" as const },
 ];
 
-const stats = [
-  { label: "Evidence Workflow", value: "1", icon: SearchCheck, color: "#059669", sub: "Assessment project" },
-  { label: "Assessment Tools", value: "6", icon: BarChart3, color: "#10b981", sub: "Full founder stack" },
-  { label: "Revenue Tools", value: "2", icon: Zap, color: "#f59e0b", sub: "Outreach + Branding" },
-  { label: "Assessment Flow", value: "~15s", icon: TrendingUp, color: "#2563eb", sub: "Structured review" },
-  { label: "Score Components", value: "48+", icon: Users, color: "#7c3aed", sub: "Signals per run" },
-];
-
-const tips = [
-  "Start with the Evidence Engine to assess your core assumptions first.",
-  "Run the Competitor Intelligence Engine before finalizing your positioning.",
-  "Use ColdDM after the Growth Engine for aligned outreach messaging.",
-  "The Founder Decision Engine works best with context from all other engines.",
-  "BrandForge is strongest after you have evidence for your ICP.",
+const secondaryTools = [
+  { title: "Competitors", href: "/competitor-intelligence", icon: Target },
+  { title: "Decisions", href: "/founder-decision", icon: ClipboardList },
+  { title: "Outreach", href: "/cold-dm", icon: MessageSquare },
+  { title: "Settings", href: "/profile", icon: Settings },
 ];
 
 export default function DashboardPage() {
@@ -75,278 +68,213 @@ export default function DashboardPage() {
         const usageData = await usageRes.json();
         if (usageRes.ok && usageData.plan) setUsage({ plan: usageData.plan });
       } catch {
-        // best-effort personalization
+        // best-effort dashboard context
       }
     }
 
     loadDashboardState();
   }, []);
 
-  const premiumStarterLocks = new Set([
-    "/revenue-engine",
-    "/user-psychology",
-    "/growth-engine",
-    "/founder-decision",
-  ]);
+  const setupItems = useMemo(() => [
+    { label: "Startup context", complete: Boolean(profile?.startup_idea && profile?.product_summary) },
+    { label: "Target customer", complete: Boolean(profile?.target_audience) },
+    { label: "Region and stage", complete: Boolean(profile?.region || profile?.founder_stage) },
+    { label: "Evidence project", complete: false },
+  ], [profile]);
+
+  const setupComplete = setupItems.filter((item) => item.complete).length;
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
-
-      <AnimatedSection className="mb-10">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <div className="mx-auto max-w-7xl p-5 lg:p-8">
+      <AnimatedSection className="mb-6">
+        <div className="flex flex-col gap-4 border-b border-black/6 pb-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="font-bricolage text-3xl font-bold text-gray-900 mb-2">
-              {profile?.startup_idea ? `Command Center for ${profile.startup_idea}` : "Founder Command Center"}
+            <div className="mb-3 flex items-center gap-2">
+              <Badge variant="emerald" size="sm" dot>Founder operating system</Badge>
+              <Badge variant={usage.plan === "free" ? "neutral" : "blue"} size="sm">{usage.plan} plan</Badge>
+            </div>
+            <h1 className="font-bricolage text-3xl font-bold tracking-tight text-gray-950">
+              {profile?.startup_idea ? profile.startup_idea : "Evidence workspace"}
             </h1>
-            <p className="font-jakarta text-sm text-gray-500">
-              {profile?.primary_goal
-                ? `Your current goal: ${profile.primary_goal}. Review the evidence before you build.`
-                : "Assess your startup or SaaS assumptions using visible evidence before you build."}
+            <p className="mt-2 max-w-2xl font-jakarta text-sm leading-relaxed text-gray-600">
+              {profile?.product_summary || "Set up your startup context, then start an evidence assessment before committing more build time."}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link href="/payment?plan=founder&billing=monthly">
-              <button className="h-9 px-3.5 rounded-xl bg-emerald-600 text-white font-bricolage text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-emerald-500/20 hover:bg-emerald-700 transition-colors">
-                <Crown size={13} />
-                Upgrade plan
+          <div className="flex flex-wrap gap-2">
+            <Link href="/evidence-engine">
+              <button className="focus-ring inline-flex h-10 items-center gap-2 rounded-xl bg-emerald-700 px-4 font-bricolage text-xs font-bold text-white shadow-sm hover:bg-emerald-800">
+                Start assessment <ArrowRight size={13} />
               </button>
             </Link>
             <Link href="/onboarding">
-              <button className="h-9 px-3.5 rounded-xl border border-black/8 bg-white text-gray-700 font-bricolage text-xs font-bold flex items-center gap-1.5 hover:bg-gray-50 transition-colors">
-                <ClipboardList size={13} />
-                Edit context
+              <button className="focus-ring inline-flex h-10 items-center gap-2 rounded-xl border border-black/10 bg-white px-4 font-bricolage text-xs font-bold text-gray-700 hover:bg-gray-50">
+                Update context
               </button>
             </Link>
-            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-emerald-200 bg-emerald-50 w-fit">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-jakarta text-xs font-semibold text-emerald-700">Assessment tools ready</span>
-            </div>
           </div>
         </div>
       </AnimatedSection>
 
-      <StaggerContainer className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6" staggerDelay={0.06}>
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <StaggerItem key={stat.label}>
-              <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between mb-3">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ background: `${stat.color}12`, border: `1px solid ${stat.color}22` }}
-                  >
-                    <Icon size={14} style={{ color: stat.color }} />
-                  </div>
-                </div>
-                <p className="font-bricolage text-3xl font-bold mb-0.5" style={{ color: stat.color }}>
-                  {stat.value}
-                </p>
-                <p className="font-bricolage text-xs font-bold text-gray-800">{stat.label}</p>
-                <p className="font-jakarta text-xs text-gray-400 mt-0.5">{stat.sub}</p>
+      <StaggerContainer className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_0.65fr]" staggerDelay={0.05}>
+        <StaggerItem>
+          <section className="rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <p className="font-bricolage text-sm font-bold text-gray-900">Current project</p>
+                <p className="font-jakarta text-xs text-gray-500">Your active founder context and next evidence step.</p>
               </div>
-            </StaggerItem>
-          );
-        })}
-      </StaggerContainer>
-
-      <AnimatedSection className="mb-10" delay={0.08}>
-        <div className="flex items-center gap-2 mb-3">
-          <Zap size={14} className="text-emerald-500" />
-          <h2 className="font-bricolage text-xs font-bold text-gray-500 uppercase tracking-widest">
-            Your Plan & Usage
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <UsageWidget />
-          <SubscriptionStatusCard />
-        </div>
-      </AnimatedSection>
-
-      <AnimatedSection className="mb-10" delay={0.1}>
-        <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-5">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <ShieldCheck size={15} className="text-emerald-500" />
-                <h2 className="font-bricolage text-sm font-bold text-gray-900">Recommended next moves</h2>
-              </div>
-              <p className="font-jakarta text-sm text-gray-500">
-                Not sure where to start? Choose the workflow that matches today&apos;s founder decision.
+              <SearchCheck size={18} className="text-emerald-700" />
+            </div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <ProjectField label="Audience" value={profile?.target_audience} fallback="No target customer recorded" />
+              <ProjectField label="Market" value={profile?.region || profile?.industry} fallback="No market context recorded" />
+              <ProjectField label="Stage" value={profile?.founder_stage} fallback="No stage recorded" />
+            </div>
+            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+              <p className="font-bricolage text-xs font-bold text-amber-900">Next recommended action</p>
+              <p className="mt-1 font-jakarta text-sm leading-relaxed text-amber-800">
+                {profile ? "Create or update the Evidence Score, then add customer research before treating the assessment as reliable." : "Complete founder setup so evidence, reports, and recommendations have the right context."}
               </p>
             </div>
-            <Link href="/evidence-engine">
-              <button className="h-10 px-4 rounded-xl border border-black/8 font-bricolage text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-1.5">
-                Start Evidence Engine <ArrowRight size={13} />
-              </button>
+          </section>
+        </StaggerItem>
+
+        <StaggerItem>
+          <section className="h-full rounded-xl border border-black/6 bg-[#10201b] p-5 text-white shadow-sm">
+            <div className="mb-5 flex items-center justify-between">
+              <p className="font-bricolage text-sm font-bold">Workspace health</p>
+              <ShieldCheck size={17} className="text-emerald-300" />
+            </div>
+            <div className="mb-4 flex items-end gap-2">
+              <span className="font-bricolage text-4xl font-bold">{setupComplete}</span>
+              <span className="pb-1 font-jakarta text-sm text-white/55">/ {setupItems.length} ready</span>
+            </div>
+            <div className="space-y-2">
+              {setupItems.map((item) => (
+                <div key={item.label} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                  <span className="font-jakarta text-xs text-white/75">{item.label}</span>
+                  <span className={`h-2 w-2 rounded-full ${item.complete ? "bg-emerald-300" : "bg-amber-300"}`} />
+                </div>
+              ))}
+            </div>
+          </section>
+        </StaggerItem>
+      </StaggerContainer>
+
+      <AnimatedSection className="mb-6" delay={0.08}>
+        <section className="rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-bricolage text-sm font-bold text-gray-900">Quick actions</p>
+              <p className="font-jakarta text-xs text-gray-500">Move from uncertainty to recorded evidence.</p>
+            </div>
+            <Link href="/evidence-engine" className="font-bricolage text-xs font-bold text-emerald-700 hover:text-emerald-800">
+              Open Evidence Engine
             </Link>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {[
-              { title: "Create evidence project", description: "Score the idea using evidence, confidence, and uncertainty.", href: "/evidence-engine", icon: SearchCheck, color: "#059669" },
-              { title: "Find your positioning gap", description: "Use this before writing copy, choosing a niche, or launching ads.", href: "/competitor-intelligence", icon: Swords, color: "#f59e0b" },
-              { title: "Prepare outreach", description: "Turn your offer into WhatsApp, LinkedIn, and email messages.", href: "/cold-dm", icon: MessageSquare, color: "#10b981" },
-            ].map((item) => {
-              const Icon = item.icon;
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {primaryActions.map((action) => {
+              const Icon = action.icon;
               return (
-                <Link key={item.href} href={item.href}>
-                  <motion.div
-                    whileHover={{ y: -2 }}
-                    className="h-full rounded-xl border border-black/6 bg-gray-50 p-4 hover:bg-white hover:shadow-sm transition-all"
-                  >
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style={{ background: `${item.color}12`, border: `1px solid ${item.color}22` }}>
-                      <Icon size={14} style={{ color: item.color }} />
-                    </div>
-                    <p className="font-bricolage text-sm font-bold text-gray-900 mb-1">{item.title}</p>
-                    <p className="font-jakarta text-xs text-gray-500 leading-relaxed">{item.description}</p>
-                  </motion.div>
+                <Link key={action.href} href={action.href} className="group rounded-lg border border-black/6 bg-[#fbfaf7] p-4 transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-sm focus-ring">
+                  <div className="mb-3 flex items-center justify-between">
+                    <Icon size={16} className="text-gray-700" />
+                    <Badge variant={action.tone} size="sm">Open</Badge>
+                  </div>
+                  <p className="font-bricolage text-sm font-bold text-gray-900">{action.title}</p>
+                  <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{action.description}</p>
                 </Link>
               );
             })}
           </div>
-        </div>
+        </section>
       </AnimatedSection>
 
-      <AnimatedSection className="mb-3">
-        <div className="flex items-center gap-2">
-          <ClipboardList size={14} className="text-emerald-500" />
-          <h2 className="font-bricolage text-xs font-bold text-gray-500 uppercase tracking-widest">
-            Assessment Tools
-          </h2>
-        </div>
-      </AnimatedSection>
-
-      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10" staggerDelay={0.05}>
-        {engines.map((engine) => {
-          const Icon = engine.icon;
-          const locked = usage.plan === "free" && premiumStarterLocks.has(engine.href);
-          const href = locked ? "/payment?plan=founder&billing=monthly" : engine.href;
-          return (
-            <StaggerItem key={engine.href}>
-              <Link href={href}>
-                <motion.div
-                  whileHover={{ y: -3, scale: 1.01 }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className={`group rounded-2xl border bg-white p-5 hover:shadow-md transition-all duration-200 cursor-pointer h-full flex flex-col gap-3 ${locked ? "opacity-85" : ""}`}
-                  style={{ borderColor: engine.border }}
-                >
-                  <div className="flex items-start justify-between">
-                    <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center"
-                      style={{ background: engine.bg, border: `1px solid ${engine.border}` }}
-                    >
-                      <Icon size={16} style={{ color: engine.color }} />
-                    </div>
-                    {locked ? (
-                      <span className="inline-flex items-center gap-1 font-jakarta text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                        <Lock size={9} />
-                        Founder
-                      </span>
-                    ) : engine.badge && (
-                      <span className="font-jakarta text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
-                        {engine.badge}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bricolage text-sm font-bold text-gray-900 mb-1.5 group-hover:text-black transition-colors">
-                      {engine.title}
-                    </h3>
-                    <p className="font-jakarta text-xs text-gray-500 leading-relaxed">
-                      {engine.description}
-                    </p>
-                  </div>
-                  <div
-                    className="flex items-center gap-1 font-bricolage text-xs font-semibold group-hover:gap-2 transition-all"
-                    style={{ color: engine.color }}
-                  >
-                    {locked ? "Upgrade" : "Run"} <ArrowRight size={11} />
-                  </div>
-                </motion.div>
-              </Link>
-            </StaggerItem>
-          );
-        })}
-      </StaggerContainer>
-
-      <AnimatedSection className="mb-10" delay={0.12}>
-        <RecentReports />
-      </AnimatedSection>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Recommended workflow */}
-        <AnimatedSection className="lg:col-span-2" delay={0.1}>
-          <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-5">
-              <TrendingDown size={15} className="text-emerald-500" />
-              <h3 className="font-bricolage text-sm font-bold text-gray-900">
-                Recommended Founder Workflow
-              </h3>
+      <div className="mb-6 grid grid-cols-1 gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+        <AnimatedSection delay={0.1}>
+          <section className="h-full rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+              <FlaskConical size={15} className="text-amber-600" />
+              <p className="font-bricolage text-sm font-bold text-gray-900">Experiments in progress</p>
             </div>
-            <div className="space-y-2">
-              {[
-                { step: "01", label: "Evidence Engine", desc: "Create the evidence-backed project", href: "/evidence-engine", color: "#059669" },
-                { step: "02", label: "Idea & Market Engine", desc: "Deepen demand and ICP assessment", href: "/idea-engine", color: "#10b981" },
-                { step: "03", label: "Competitor Intelligence", desc: "Know your battlefield", href: "/competitor-intelligence", color: "#f59e0b" },
-                { step: "04", label: "Revenue Engine", desc: "Set the right price", href: "/revenue-engine", color: "#059669" },
-                { step: "05", label: "Growth Engine", desc: "Get your first customers", href: "/growth-engine", color: "#2563eb" },
-                { step: "06", label: "Founder Decision Engine", desc: "Final strategic clarity", href: "/founder-decision", color: "#7c3aed" },
-              ].map((item, i) => (
-                <Link key={item.step} href={item.href}>
-                  <motion.div
-                    initial={{ opacity: 0, x: -12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 + i * 0.05 }}
-                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group"
-                  >
-                    <span
-                      className="font-mono text-xs font-bold w-6 flex-shrink-0"
-                      style={{ color: item.color }}
-                    >
-                      {item.step}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bricolage text-sm font-semibold text-gray-900 group-hover:text-black transition-colors">
-                        {item.label}
-                      </p>
-                      <p className="font-jakarta text-xs text-gray-400">{item.desc}</p>
-                    </div>
-                    <ArrowRight size={13} className="text-gray-300 group-hover:text-gray-500 transition-colors flex-shrink-0" />
-                  </motion.div>
-                </Link>
-              ))}
-            </div>
-          </div>
+            <EmptyPanel
+              title="No experiments recorded yet."
+              description="Track an interview batch, landing-page test, pricing test, survey, or support-message review before raising confidence."
+              href="/evidence-engine#experiments"
+              action="Track an experiment"
+            />
+          </section>
         </AnimatedSection>
 
-        {/* Pro tips */}
-        <AnimatedSection delay={0.15}>
-          <div className="rounded-2xl border border-black/6 bg-white p-6 h-full shadow-sm">
-            <div className="flex items-center gap-2 mb-5">
-              <Zap size={15} className="text-amber-500" />
-              <h3 className="font-bricolage text-sm font-bold text-gray-900">Founder Tips</h3>
+        <AnimatedSection delay={0.12}>
+          <section className="h-full rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+              <ClipboardList size={15} className="text-blue-700" />
+              <p className="font-bricolage text-sm font-bold text-gray-900">Open assumptions</p>
             </div>
-            <div className="space-y-4">
-              {tips.map((tip, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 + i * 0.07 }}
-                  className="flex gap-3"
-                >
-                  <span className="w-5 h-5 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="font-bricolage text-[9px] font-bold text-amber-600">{i + 1}</span>
-                  </span>
-                  <p className="font-jakarta text-xs text-gray-500 leading-relaxed">{tip}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
+            {profile?.primary_goal ? (
+              <div className="rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
+                <p className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-500">Founder goal</p>
+                <p className="mt-1 font-jakarta text-sm leading-relaxed text-gray-700">{profile.primary_goal}</p>
+                <p className="mt-3 font-jakarta text-xs leading-relaxed text-gray-500">
+                  Convert this into a testable assumption in the Evidence Engine so it can be tied to sources or experiment results.
+                </p>
+              </div>
+            ) : (
+              <EmptyPanel
+                title="No assumptions recorded yet."
+                description="Add the riskiest beliefs behind your idea so the workspace can show what is still unproven."
+                href="/onboarding"
+                action="Add assumptions"
+              />
+            )}
+          </section>
         </AnimatedSection>
       </div>
+
+      <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <UsageWidget />
+        <SubscriptionStatusCard />
+      </div>
+
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {secondaryTools.map((tool) => {
+          const Icon = tool.icon;
+          return (
+            <Link key={tool.href} href={tool.href} className="focus-ring rounded-lg border border-black/6 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+              <Icon size={15} className="mb-3 text-gray-600" />
+              <p className="font-bricolage text-sm font-bold text-gray-900">{tool.title}</p>
+            </Link>
+          );
+        })}
+      </div>
+
+      <AnimatedSection delay={0.14}>
+        <RecentReports />
+      </AnimatedSection>
     </div>
   );
 }
 
+function ProjectField({ label, value, fallback }: { label: string; value?: string | null; fallback: string }) {
+  return (
+    <div className="rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
+      <p className="font-bricolage text-[10px] font-bold uppercase tracking-wide text-gray-500">{label}</p>
+      <p className={`mt-1 font-jakarta text-sm leading-relaxed ${value ? "text-gray-800" : "text-gray-400"}`}>
+        {value || fallback}
+      </p>
+    </div>
+  );
+}
+
+function EmptyPanel({ title, description, href, action }: { title: string; description: string; href: string; action: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-black/12 bg-[#fbfaf7] p-5">
+      <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
+      <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-500">{description}</p>
+      <Link href={href} className="mt-4 inline-flex items-center gap-1.5 font-bricolage text-xs font-bold text-emerald-700 hover:text-emerald-800">
+        {action} <ArrowRight size={12} />
+      </Link>
+    </div>
+  );
+}

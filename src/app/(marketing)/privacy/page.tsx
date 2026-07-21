@@ -15,7 +15,7 @@ If you create an account, we collect your email address and any profile informat
   },
   {
     title: "2. How We Use Your Information",
-    content: `Your input data is used solely to generate AI-powered analysis results using our intelligence engines. We do not sell, rent, or share your startup ideas with third parties.
+    content: `Your input data is used solely to generate assessment results inside your workspace. We do not sell, rent, or share your startup ideas with third parties.
 
 Analysis inputs are processed by Anthropic's Claude API under their data processing agreement. We retain anonymized usage logs for product improvement and security monitoring.`,
   },

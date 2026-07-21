@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   Lightbulb, Swords, DollarSign, Brain, TrendingUp,
   Target, MessageSquare, Palette, ArrowRight, CheckCircle2,
-  Shield, Zap, Globe, BarChart3, Users, SearchCheck, Star, FileText, Lock, Scale,
+  Shield, Zap, Globe, BarChart3, Users, SearchCheck, FileText, Lock, Scale,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import Button from "@/components/ui/Button";
@@ -262,12 +262,12 @@ export function EnginesSection() {
 // FEATURES SECTION
 // ============================================
 const features = [
-  { icon: Zap, title: "Results in under 30 seconds", description: "No waiting, no queues. Get founder-grade intelligence instantly.", color: "#f59e0b" },
+  { icon: SearchCheck, title: "Evidence collection", description: "Separate sources, founder notes, assumptions, and generated assessments before making decisions.", color: "#059669" },
   { icon: Shield, title: "Security-hardened by design", description: "Rate limiting, input validation, secure API handling. Built like a real product.", color: "#10b981" },
-  { icon: Globe, title: "Built for global markets", description: "Region-aware analysis that understands local market dynamics.", color: "#2563eb" },
-  { icon: BarChart3, title: "Structured, scored outputs", description: "Not vague AI text. Scored outputs, risk ratings, and actionable recommendations.", color: "#7c3aed" },
-  { icon: Users, title: "Designed for solo founders", description: "Gives you a full team's perspective across market, product, growth, and sales.", color: "#f43f5e" },
-  { icon: CheckCircle2, title: "Actionable, not theoretical", description: "Every output tells you what to DO next. No consultant fluff.", color: "#059669" },
+  { icon: Globe, title: "Regional context", description: "Assess market and customer context without treating broad market claims as proof.", color: "#2563eb" },
+  { icon: BarChart3, title: "Score transparency", description: "Review components, confidence, missing evidence, and what would improve each Evidence Score.", color: "#1f3a5f" },
+  { icon: Users, title: "Founder workspace", description: "Keep assumptions, notes, reports, and next actions in one calm operating view.", color: "#be6a2f" },
+  { icon: CheckCircle2, title: "Decision history", description: "Record what changed and keep a trail of why the next experiment matters.", color: "#059669" },
 ];
 
 export function FeaturesSection() {
@@ -277,16 +277,14 @@ export function FeaturesSection() {
         <AnimatedSection className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-violet-200 bg-violet-50 mb-5">
             <span className="font-jakarta text-xs font-semibold text-violet-700 uppercase tracking-wide">
-              Why StartupX AI
+              Product depth
             </span>
           </div>
           <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-5">
-            Not your average{" "}
-            <span className="text-gradient-violet">AI tool</span>
+            A workspace for the messy middle between idea and evidence
           </h2>
           <p className="font-jakarta text-lg text-gray-500 max-w-xl mx-auto">
-            Built with the same rigor you&apos;d expect from a senior founding team,
-            not a weekend side project.
+            The interface is built for reviewing evidence, naming uncertainty, and deciding what to test next.
           </p>
         </AnimatedSection>
 
@@ -321,7 +319,7 @@ const workflow = [
   {
     icon: FileText,
     title: "Share the startup context",
-    description: "Add your idea, audience, market, current page, or offer. Each engine asks only for the context it needs.",
+    description: "Add your idea, audience, market, current page, or offer. Each workflow asks only for the context it needs.",
   },
   {
     icon: SearchCheck,
@@ -337,7 +335,7 @@ const workflow = [
 
 export function HowItWorksSection() {
   return (
-    <section className="py-24 px-5 bg-[#f7f8fc]">
+    <section id="workflow" className="py-24 px-5 bg-[#f7f8fc]">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 mb-5">
@@ -387,7 +385,7 @@ const comparisonRows = [
   ["Market, revenue, growth, brand, and outreach in one place", true, false, false],
   ["Useful for rapid iteration", true, false, true],
   ["Affordable for early founders", true, false, true],
-  ["Available instantly", true, false, true],
+  ["Clear limits and missing evidence", true, false, false],
 ];
 
 export function ComparisonSection() {
@@ -407,7 +405,7 @@ export function ComparisonSection() {
             Built for the gap between prompts and consultants
           </h2>
           <p className="font-jakarta text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            Get structured startup thinking without waiting weeks or paying advisor-level retainers.
+            Get structured startup thinking with clearer limits, evidence gaps, and next actions.
           </p>
         </AnimatedSection>
 
@@ -449,7 +447,7 @@ const trustItems = [
   {
     icon: Lock,
     title: "Private founder workspace",
-    description: "Your startup inputs are used to generate your own analysis, not displayed publicly on the product.",
+    description: "Your startup inputs are used for your own workspace and reports, not displayed publicly on the product.",
   },
   {
     icon: Shield,
@@ -464,7 +462,7 @@ const trustItems = [
   {
     icon: BarChart3,
     title: "Transparent usage",
-    description: "Your dashboard shows monthly analysis usage, remaining quota, and subscription state.",
+    description: "Your dashboard shows monthly usage, remaining quota, and subscription state.",
   },
 ];
 
@@ -509,24 +507,39 @@ export function TrustSection() {
 }
 
 // ============================================
-// TESTIMONIALS SECTION
+// METHODOLOGY SECTION
 // ============================================
-const testimonials = [
+const methodologyItems = [
   {
-    quote: "The assessment helped me separate real evidence from assumptions and choose the next customer research step with more discipline.",
-    name: "Aditya Sharma", role: "Founder, Taskly", initials: "AS", color: "#10b981",
+    title: "Evidence is labeled by source type",
+    detail: "Verified public evidence, founder-provided evidence, customer research, experiment results, assumptions, and generated assessments are shown separately.",
   },
   {
-    quote: "The competitor workflow made our positioning gaps easier to see and gave the team a clearer research agenda before launch.",
-    name: "Priya Menon", role: "Founder, FinanceAI", initials: "PM", color: "#7c3aed",
+    title: "Scores expose their inputs",
+    detail: "Evidence Scores show components, confidence, missing evidence, evidence quality, and what would improve the score.",
   },
   {
-    quote: "ColdDM helped us turn the evidence review into clearer outreach variants we could test with a small founder-led campaign.",
-    name: "Marcus Chen", role: "Founder, LeadFlow", initials: "MC", color: "#2563eb",
+    title: "Weak evidence lowers confidence",
+    detail: "The product shows insufficient evidence states instead of turning missing data into precise conclusions.",
   },
   {
-    quote: "The user psychology review highlighted weak proof and confusing copy, which made our next landing-page experiment much easier to plan.",
-    name: "Fatima Al-Rashid", role: "Co-Founder, EdTech.io", initials: "FA", color: "#f59e0b",
+    title: "Findings remain decision support",
+    detail: "StartupX AI does not prove demand or guarantee outcomes. It helps founders decide what evidence to collect next.",
+  },
+];
+
+const faqItems = [
+  {
+    q: "Does StartupX AI prove my startup will work?",
+    a: "No. It organizes the evidence currently available and shows what is still unproven so you can decide what to test next.",
+  },
+  {
+    q: "Can I add my own evidence?",
+    a: "Yes. The Evidence Engine is structured around sources, interview notes, assumptions, and experiment results.",
+  },
+  {
+    q: "What happens when evidence is weak?",
+    a: "The score shows lower confidence, missing evidence, and recommended validation actions instead of a falsely precise conclusion.",
   },
 ];
 
@@ -537,42 +550,46 @@ export function TestimonialsSection() {
         <AnimatedSection className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-200 bg-amber-50 mb-5">
             <span className="font-jakarta text-xs font-semibold text-amber-700 uppercase tracking-wide">
-              Founder Outcomes
+              Methodology
             </span>
           </div>
-          <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
-            Built for founders who move globally
+          <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+            Honest about what is known and unknown
           </h2>
+          <p className="mx-auto max-w-2xl font-jakarta text-lg leading-relaxed text-gray-500">
+            The system is designed to make uncertainty visible, not hide it behind confident language.
+          </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-5" staggerDelay={0.1}>
-          {testimonials.map((t) => (
-            <StaggerItem key={t.name}>
-              <div className="rounded-2xl border border-black/6 bg-white p-7 space-y-5 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={14} className="text-amber-400 fill-amber-400" />
-                  ))}
+        <StaggerContainer className="grid grid-cols-1 gap-5 md:grid-cols-2" staggerDelay={0.08}>
+          {methodologyItems.map((item) => (
+            <StaggerItem key={item.title}>
+              <div className="h-full rounded-xl border border-black/6 bg-white p-6 shadow-sm">
+                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50">
+                  <CheckCircle2 size={16} className="text-emerald-700" />
                 </div>
-                <p className="font-jakarta text-sm text-gray-600 leading-relaxed italic">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-                <div className="flex items-center gap-3 pt-1 border-t border-black/5">
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center font-bricolage text-xs font-bold text-white flex-shrink-0"
-                    style={{ background: t.color }}
-                  >
-                    {t.initials}
-                  </div>
-                  <div>
-                    <p className="font-bricolage text-sm font-bold text-gray-900">{t.name}</p>
-                    <p className="font-jakarta text-xs text-gray-400">{t.role}</p>
-                  </div>
-                </div>
+                <p className="font-bricolage text-sm font-bold text-gray-900">{item.title}</p>
+                <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-500">{item.detail}</p>
               </div>
             </StaggerItem>
           ))}
         </StaggerContainer>
+
+        <AnimatedSection delay={0.12} className="mt-10">
+          <div className="rounded-xl border border-black/6 bg-white p-6 shadow-sm">
+            <p className="mb-4 font-bricolage text-sm font-bold text-gray-900">FAQ</p>
+            <div className="divide-y divide-black/6">
+              {faqItems.map((item) => (
+                <details key={item.q} className="group py-4 first:pt-0 last:pb-0">
+                  <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-800">
+                    {item.q}
+                  </summary>
+                  <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-500">{item.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </AnimatedSection>
       </div>
     </section>
   );
@@ -719,25 +736,24 @@ export function CTASection() {
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/30 bg-white/15 mb-6">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 <span className="font-jakarta text-xs font-semibold text-white uppercase tracking-wide">
-                  Ready to build smarter?
+                  Ready to review the evidence?
                 </span>
               </div>
               <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-white tracking-tight mb-5">
-                Build with sharper startup intelligence
+                Start with the assumptions that matter most
               </h2>
               <p className="font-jakarta text-lg text-emerald-100 max-w-lg mx-auto mb-10 leading-relaxed">
-                Use StartupX AI to validate faster, position clearly, and move
-                from idea to execution with more confidence.
+                Use StartupX AI to review evidence, record what is still unproven, and decide what to test next.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/signup">
+                <Link href="/signup?next=/evidence-engine">
                   <motion.button
                     whileHover={{ scale: 1.02, y: -1 }}
                     whileTap={{ scale: 0.98 }}
                     className="h-14 px-8 rounded-2xl bg-white text-emerald-700 font-bricolage font-bold text-base shadow-lg shadow-black/8 hover:shadow-xl hover:shadow-black/8 transition-shadow flex items-center gap-2"
                   >
-                    Start Free <ArrowRight size={18} />
+                    Start an assessment <ArrowRight size={18} />
                   </motion.button>
                 </Link>
                 <Link href="/pricing">
@@ -751,7 +767,7 @@ export function CTASection() {
                 </Link>
               </div>
               <p className="mt-6 font-jakarta text-sm text-emerald-200">
-                Free to start · No credit card required · Results in 30 seconds
+                Free to start · No credit card required · Evidence-first workflow
               </p>
             </div>
           </div>

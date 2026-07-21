@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import {
   Zap, LayoutDashboard, Lightbulb, Swords, DollarSign,
   Brain, TrendingUp, Target, MessageSquare, Palette, ArrowLeft, LogOut, UserCircle, FileText, Compass,
-  Activity, SearchCheck,
+  Activity, SearchCheck, FlaskConical, Settings, ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
@@ -14,21 +14,23 @@ const navGroups = [
   {
     label: "Overview",
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { label: "Evidence Engine", href: "/evidence-engine", icon: SearchCheck, color: "text-emerald-600", badge: "PRIMARY" },
+      { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Evidence", href: "/evidence-engine", icon: SearchCheck, color: "text-emerald-600", badge: "CORE" },
+      { label: "Assumptions", href: "/evidence-engine#assumptions", icon: ClipboardList, color: "text-amber-600" },
+      { label: "Experiments", href: "/evidence-engine#experiments", icon: FlaskConical, color: "text-blue-600" },
+      { label: "Competitors", href: "/competitor-intelligence", icon: Swords, color: "text-amber-600" },
+      { label: "Decisions", href: "/founder-decision", icon: Target, color: "text-violet-600" },
       { label: "Reports", href: "/reports", icon: FileText },
-      { label: "Founder Setup", href: "/onboarding", icon: Compass, color: "text-emerald-600" },
+      { label: "Settings", href: "/profile", icon: Settings, color: "text-emerald-600" },
     ],
   },
   {
-    label: "Assessment Tools",
+    label: "Specialist Tools",
     items: [
       { label: "Idea & Market", href: "/idea-engine", icon: Lightbulb, color: "text-emerald-600" },
-      { label: "Competitor Intel", href: "/competitor-intelligence", icon: Swords, color: "text-amber-600" },
       { label: "Revenue Engine", href: "/revenue-engine", icon: DollarSign, color: "text-teal-600" },
       { label: "User Psychology", href: "/user-psychology", icon: Brain, color: "text-rose-500" },
       { label: "Growth Engine", href: "/growth-engine", icon: TrendingUp, color: "text-blue-600" },
-      { label: "Founder Decision", href: "/founder-decision", icon: Target, color: "text-violet-600" },
     ],
   },
   {
@@ -41,6 +43,7 @@ const navGroups = [
   {
     label: "Account",
     items: [
+      { label: "Founder Setup", href: "/onboarding", icon: Compass, color: "text-emerald-600" },
       { label: "Profile", href: "/profile", icon: UserCircle, color: "text-emerald-600" },
       { label: "Diagnostics", href: "/internal", icon: Activity, color: "text-blue-600" },
       { label: "Upgrade Plan", href: "/payment", icon: Zap, color: "text-amber-600" },
