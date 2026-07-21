@@ -17,6 +17,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const isHomeHero = pathname === "/" && !scrolled;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -51,7 +52,7 @@ export default function Navbar() {
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-shadow">
                 <Zap size={15} className="text-white" strokeWidth={2.5} />
               </div>
-              <span className="font-bricolage text-base font-bold text-gray-900 tracking-tight">
+              <span className={cn("font-bricolage text-base font-bold tracking-normal", isHomeHero ? "text-white" : "text-gray-900")}>
                 StartupX{" "}
                 <span className="text-gradient-brand">AI</span>
               </span>
@@ -66,8 +67,8 @@ export default function Navbar() {
                   className={cn(
                     "px-4 py-2 rounded-xl font-jakarta text-sm font-medium transition-all duration-150",
                     pathname === link.href
-                      ? "text-gray-900 bg-black/6"
-                      : "text-gray-500 hover:text-gray-900 hover:bg-black/4"
+                      ? isHomeHero ? "text-white bg-white/10" : "text-gray-900 bg-black/6"
+                      : isHomeHero ? "text-slate-300 hover:text-white hover:bg-white/10" : "text-gray-500 hover:text-gray-900 hover:bg-black/4"
                   )}
                 >
                   {link.label}
@@ -79,7 +80,10 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-3">
               <Link
                 href="/signin"
-                className="font-jakarta text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                className={cn(
+                  "font-jakarta text-sm font-medium transition-colors",
+                  isHomeHero ? "text-slate-300 hover:text-white" : "text-gray-500 hover:text-gray-900"
+                )}
               >
                 Sign In
               </Link>
@@ -93,7 +97,10 @@ export default function Navbar() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-black/6 transition-all"
+              className={cn(
+                "md:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all",
+                isHomeHero ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-gray-500 hover:text-gray-900 hover:bg-black/6"
+              )}
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X size={18} /> : <Menu size={18} />}
