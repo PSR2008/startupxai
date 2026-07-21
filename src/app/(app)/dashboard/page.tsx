@@ -6,7 +6,7 @@ import {
   Lightbulb, Swords, DollarSign, Brain, TrendingUp,
   Target, MessageSquare, Palette, ArrowRight, Zap,
   BarChart3, Users, TrendingDown, Sparkles, Crown, ShieldCheck,
-  Lock,
+  Lock, SearchCheck,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import UsageWidget from "@/components/app/UsageWidget";
@@ -29,6 +29,7 @@ interface UsageSummary {
 }
 
 const engines = [
+  { icon: SearchCheck, title: "Evidence Engine", description: "Create an evidence-backed validation project with transparent scores.", href: "/evidence-engine", color: "#059669", bg: "rgba(5,150,105,0.08)", border: "rgba(5,150,105,0.16)", badge: "NEW" },
   { icon: Lightbulb, title: "Idea & Market Engine", description: "Validate idea viability, market demand, and ICP.", href: "/idea-engine", color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.16)", badge: null },
   { icon: Swords, title: "Competitor Intelligence", description: "Map competitors, find weaknesses, exploit gaps.", href: "/competitor-intelligence", color: "#f59e0b", bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.16)", badge: null },
   { icon: DollarSign, title: "Revenue Engine", description: "Pricing strategy, conversion blockers, monetization.", href: "/revenue-engine", color: "#059669", bg: "rgba(5,150,105,0.08)", border: "rgba(5,150,105,0.16)", badge: null },
@@ -40,6 +41,7 @@ const engines = [
 ];
 
 const stats = [
+  { label: "Validation Workflow", value: "1", icon: SearchCheck, color: "#059669", sub: "Evidence-backed project" },
   { label: "Intelligence Engines", value: "6", icon: BarChart3, color: "#10b981", sub: "Full founder stack" },
   { label: "Revenue Tools", value: "2", icon: Zap, color: "#f59e0b", sub: "Outreach + Branding" },
   { label: "Avg. Analysis Time", value: "~15s", icon: TrendingUp, color: "#2563eb", sub: "Powered by Claude" },
@@ -98,8 +100,8 @@ export default function DashboardPage() {
             </h1>
             <p className="font-jakarta text-sm text-gray-500">
               {profile?.primary_goal
-                ? `Your current goal: ${profile.primary_goal}. Pick the decision in front of you and turn it into a structured action plan.`
-                : "Pick the decision in front of you and turn it into a structured action plan."}
+                ? `Your current goal: ${profile.primary_goal}. Validate the evidence before you build.`
+                : "Validate your startup or SaaS idea using visible evidence before you build."}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -123,7 +125,7 @@ export default function DashboardPage() {
         </div>
       </AnimatedSection>
 
-      <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" staggerDelay={0.06}>
+      <StaggerContainer className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6" staggerDelay={0.06}>
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -173,16 +175,16 @@ export default function DashboardPage() {
                 Not sure where to start? Choose the workflow that matches today&apos;s founder decision.
               </p>
             </div>
-            <Link href="/idea-engine">
+            <Link href="/evidence-engine">
               <button className="h-10 px-4 rounded-xl border border-black/8 font-bricolage text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-1.5">
-                Start with validation <ArrowRight size={13} />
+                Start Evidence Engine <ArrowRight size={13} />
               </button>
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
-              { title: "Validate a new idea", description: "Test demand, ICP, assumptions, and market clarity.", href: "/idea-engine", icon: Lightbulb, color: "#10b981" },
+              { title: "Create validation project", description: "Score the idea using evidence, confidence, and uncertainty.", href: "/evidence-engine", icon: SearchCheck, color: "#059669" },
               { title: "Find your positioning gap", description: "Use this before writing copy, choosing a niche, or launching ads.", href: "/competitor-intelligence", icon: Swords, color: "#f59e0b" },
               { title: "Prepare outreach", description: "Turn your offer into WhatsApp, LinkedIn, and email messages.", href: "/cold-dm", icon: MessageSquare, color: "#10b981" },
             ].map((item) => {
@@ -284,10 +286,10 @@ export default function DashboardPage() {
             </div>
             <div className="space-y-2">
               {[
-                { step: "01", label: "Idea & Market Engine", desc: "Validate before everything", href: "/idea-engine", color: "#10b981" },
-                { step: "02", label: "Competitor Intelligence", desc: "Know your battlefield", href: "/competitor-intelligence", color: "#f59e0b" },
-                { step: "03", label: "Revenue Engine", desc: "Set the right price", href: "/revenue-engine", color: "#059669" },
-                { step: "04", label: "User Psychology Engine", desc: "Fix trust before launch", href: "/user-psychology", color: "#f43f5e" },
+                { step: "01", label: "Evidence Engine", desc: "Create the evidence-backed project", href: "/evidence-engine", color: "#059669" },
+                { step: "02", label: "Idea & Market Engine", desc: "Deepen demand and ICP analysis", href: "/idea-engine", color: "#10b981" },
+                { step: "03", label: "Competitor Intelligence", desc: "Know your battlefield", href: "/competitor-intelligence", color: "#f59e0b" },
+                { step: "04", label: "Revenue Engine", desc: "Set the right price", href: "/revenue-engine", color: "#059669" },
                 { step: "05", label: "Growth Engine", desc: "Get your first customers", href: "/growth-engine", color: "#2563eb" },
                 { step: "06", label: "Founder Decision Engine", desc: "Final strategic clarity", href: "/founder-decision", color: "#7c3aed" },
               ].map((item, i) => (

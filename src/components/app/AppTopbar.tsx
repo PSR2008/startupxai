@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, Zap, LayoutDashboard, Lightbulb, Swords, DollarSign, Brain, TrendingUp, Target, MessageSquare, Palette, LogOut, UserCircle, Crown, FileText, Compass, Activity } from "lucide-react";
+import { Menu, X, Zap, LayoutDashboard, Lightbulb, Swords, DollarSign, Brain, TrendingUp, Target, MessageSquare, Palette, LogOut, UserCircle, Crown, FileText, Compass, Activity, SearchCheck } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
@@ -11,6 +11,7 @@ const routes: Record<string, { label: string; icon: React.ElementType; color: st
   "/dashboard": { label: "Dashboard", icon: LayoutDashboard, color: "text-gray-600" },
   "/onboarding": { label: "Founder Setup", icon: Compass, color: "text-emerald-600" },
   "/reports": { label: "Reports", icon: FileText, color: "text-emerald-600" },
+  "/evidence-engine": { label: "Evidence Engine", icon: SearchCheck, color: "text-emerald-600" },
   "/idea-engine": { label: "Idea & Market Engine", icon: Lightbulb, color: "text-emerald-600" },
   "/competitor-intelligence": { label: "Competitor Intelligence", icon: Swords, color: "text-amber-600" },
   "/revenue-engine": { label: "Revenue Engine", icon: DollarSign, color: "text-teal-600" },

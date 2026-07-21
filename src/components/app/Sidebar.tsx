@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import {
   Zap, LayoutDashboard, Lightbulb, Swords, DollarSign,
   Brain, TrendingUp, Target, MessageSquare, Palette, ArrowLeft, LogOut, UserCircle, FileText, Compass,
-  Activity,
+  Activity, SearchCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
@@ -16,6 +16,7 @@ const navGroups = [
     items: [
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { label: "Reports", href: "/reports", icon: FileText },
+      { label: "Evidence Engine", href: "/evidence-engine", icon: SearchCheck, color: "text-emerald-600", badge: "NEW" },
       { label: "Founder Setup", href: "/onboarding", icon: Compass, color: "text-emerald-600" },
     ],
   },

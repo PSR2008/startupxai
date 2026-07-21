@@ -101,6 +101,22 @@ export const decisionEngineSchema = z.object({
   resources: optionalString(500),
 });
 
+// --- StartupX AI Evidence Engine Schema ---
+export const evidenceEngineSchema = z.object({
+  startupName: nonEmptyString(120, "Startup name"),
+  ideaDescription: nonEmptyString(1500, "Idea description"),
+  targetCustomer: nonEmptyString(700, "Target customer"),
+  targetGeography: nonEmptyString(200, "Target geography"),
+  businessModel: nonEmptyString(400, "Business model"),
+  industry: nonEmptyString(200, "Industry"),
+  developmentStage: z.enum(["idea", "prototype", "mvp", "launched", "revenue", "scaling"], {
+    errorMap: () => ({ message: "Select a valid development stage" }),
+  }),
+  knownCompetitors: optionalString(1200),
+  mainAssumptions: optionalString(1200),
+  websiteUrl: urlField,
+});
+
 // --- ColdDM AI Schema ---
 export const coldDMSchema = z.object({
   product: nonEmptyString(500, "Product/service"),
@@ -144,6 +160,7 @@ export type RevenueEngineInput = z.infer<typeof revenueEngineSchema>;
 export type PsychologyEngineInput = z.infer<typeof psychologyEngineSchema>;
 export type GrowthEngineInput = z.infer<typeof growthEngineSchema>;
 export type DecisionEngineInput = z.infer<typeof decisionEngineSchema>;
+export type EvidenceEngineInput = z.infer<typeof evidenceEngineSchema>;
 export type ColdDMInput = z.infer<typeof coldDMSchema>;
 export type BrandForgeInput = z.infer<typeof brandForgeSchema>;
 export type ContactFormInput = z.infer<typeof contactFormSchema>;
