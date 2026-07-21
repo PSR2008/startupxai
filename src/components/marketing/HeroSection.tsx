@@ -38,25 +38,38 @@ export default function HeroSection() {
   return (
     <section
       ref={containerRef}
-      className="hero-stage relative min-h-[94svh] overflow-hidden border-b border-white/10 bg-[#070909] pt-24 pb-14"
+      className="hero-stage relative min-h-[94svh] overflow-hidden border-b border-white/10 pt-24 pb-14"
     >
-      <div className="absolute inset-0 hero-stage-grid opacity-45" />
       <div className="absolute inset-0 hero-vignette" />
-      <div className="hero-spotlight hero-spotlight-emerald" />
-      <div className="hero-spotlight hero-spotlight-amber" />
-      <div className="hero-spotlight hero-spotlight-white" />
       <div className="hero-floor-glow" />
 
       <motion.div
         style={{ y, opacity }}
-        className="container-custom relative grid min-h-[calc(94svh-9rem)] grid-cols-1 items-center gap-11 lg:grid-cols-[0.84fr_1.16fr] lg:gap-12"
+        className="container-custom relative flex min-h-[calc(94svh-9rem)] items-center"
       >
-        <div className="max-w-2xl pt-2 lg:pt-0">
+        <div className="hero-reference-frame relative w-full overflow-hidden rounded-[22px] border border-white/12 bg-[#090a0f] px-5 pb-7 pt-16 shadow-2xl sm:px-8 sm:pb-9 lg:px-12 lg:pb-12">
+          <div className="absolute inset-0 hero-stage-grid opacity-80" />
+          <div className="absolute inset-0 hero-frame-shine" />
+          <div className="hero-spotlight hero-spotlight-emerald" />
+          <div className="hero-spotlight hero-spotlight-white" />
+
+          <div className="absolute left-5 right-5 top-4 z-10 flex items-center justify-between border-b border-white/[0.06] pb-4 text-[10px] uppercase text-slate-400 sm:left-8 sm:right-8 lg:left-12 lg:right-12">
+            <span className="font-bricolage font-bold tracking-[0.34em] text-white">StartupX</span>
+            <div className="hidden items-center gap-7 font-jakarta font-semibold tracking-[0.22em] md:flex">
+              <span>Evidence</span>
+              <span>Scores</span>
+              <span>Experiments</span>
+            </div>
+            <span className="rounded-md border border-white/10 px-2 py-1 font-jakarta tracking-[0.18em]">Workspace</span>
+          </div>
+
+          <div className="relative z-10 grid min-h-[34rem] grid-cols-1 items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+            <div className="max-w-xl pt-4 lg:pt-8">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12, duration: 0.45 }}
-            className="mb-7 inline-flex items-center gap-2 rounded-lg border border-white/12 bg-white/[0.07] px-3 py-1.5 shadow-sm shadow-black/20 backdrop-blur-md"
+            className="mb-6 inline-flex items-center gap-2 rounded-md border border-white/12 bg-white/[0.06] px-3 py-1.5 shadow-sm shadow-black/20 backdrop-blur-md"
           >
             <ShieldCheck size={13} className="text-emerald-300" />
             <span className="font-jakarta text-xs font-semibold text-slate-200">
@@ -68,7 +81,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.22, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-6 font-bricolage text-5xl font-bold leading-[1.02] tracking-normal text-white sm:text-6xl lg:text-7xl"
+            className="mb-6 font-bricolage text-5xl font-bold leading-[0.98] tracking-normal text-white sm:text-6xl lg:text-[5.5rem]"
           >
             Build decisions on evidence, not optimism.
           </motion.h1>
@@ -107,51 +120,51 @@ export default function HeroSection() {
             className="grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3"
           >
             {workflowItems.map(({ icon: Icon, label, detail }) => (
-              <div key={label} className="rounded-xl border border-white/10 bg-white/[0.06] p-4 shadow-sm shadow-black/25 backdrop-blur-md">
+              <div key={label} className="rounded-lg border border-white/10 bg-white/[0.045] p-4 shadow-sm shadow-black/25 backdrop-blur-md">
                 <Icon size={15} className="mb-3 text-emerald-200" />
                 <p className="font-bricolage text-xs font-bold text-white">{label}</p>
                 <p className="mt-1 font-jakarta text-xs leading-relaxed text-slate-400">{detail}</p>
               </div>
             ))}
           </motion.div>
-        </div>
+            </div>
 
         <motion.div
           initial={{ opacity: 0, y: 26, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.42, duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-          className="hero-product-wrap relative lg:-mt-10"
+          className="hero-product-wrap relative lg:-mt-6"
         >
           <div className="hero-product-ambient" />
-          <div className="hero-product-panel overflow-hidden rounded-xl border border-white/18 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-black/6 bg-[#fbfaf7] px-5 py-4">
+          <div className="hero-product-panel overflow-hidden rounded-xl border border-white/14 bg-[#0d0f15] shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/[0.07] bg-white/[0.035] px-5 py-4">
               <div>
-                <p className="font-bricolage text-sm font-bold text-gray-900">Evidence workspace</p>
-                <p className="font-jakarta text-xs text-gray-500">SaaS pricing assessment</p>
+                <p className="font-bricolage text-sm font-bold text-white">Evidence workspace</p>
+                <p className="font-jakarta text-xs text-slate-400">SaaS pricing assessment</p>
               </div>
-              <Badge variant="emerald" size="sm" dot>Updated 4 min ago</Badge>
+              <Badge variant="emerald" size="sm" dot className="border-emerald-400/30 bg-emerald-400/10 text-emerald-200">Updated 4 min ago</Badge>
             </div>
 
-            <div className="grid grid-cols-1 bg-white lg:grid-cols-[0.9fr_1.1fr]">
-              <div className="border-b border-black/6 p-5 lg:border-b-0 lg:border-r">
+            <div className="grid grid-cols-1 bg-[#0d0f15] lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="border-b border-white/[0.07] p-5 lg:border-b-0 lg:border-r lg:border-white/[0.07]">
                 <div className="mb-4 flex items-end justify-between">
                   <div>
-                    <p className="font-bricolage text-[11px] font-bold uppercase tracking-wide text-gray-500">Evidence Score</p>
-                    <p className="mt-1 font-bricolage text-5xl font-bold text-gray-950">62</p>
+                    <p className="font-bricolage text-[11px] font-bold uppercase tracking-wide text-slate-500">Evidence Score</p>
+                    <p className="mt-1 font-bricolage text-5xl font-bold text-white">62</p>
                   </div>
-                  <Badge variant="amber" size="sm">Medium confidence</Badge>
+                  <Badge variant="amber" size="sm" className="border-amber-300/30 bg-amber-300/10 text-amber-200">Medium confidence</Badge>
                 </div>
                 <div className="space-y-2">
                   {evidenceRows.map((row) => (
-                    <div key={row.label} className="flex items-center justify-between rounded-lg border border-black/6 bg-gray-50 px-3 py-2">
-                      <span className="font-jakarta text-xs text-gray-600">{row.label}</span>
+                    <div key={row.label} className="flex items-center justify-between rounded-lg border border-white/[0.08] bg-white/[0.045] px-3 py-2">
+                      <span className="font-jakarta text-xs text-slate-300">{row.label}</span>
                       <Badge variant={row.tone} size="sm">{row.count}</Badge>
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                  <p className="font-bricolage text-xs font-bold text-amber-900">What is still unproven</p>
-                  <p className="mt-1 font-jakarta text-xs leading-relaxed text-amber-800">
+                <div className="mt-4 rounded-lg border border-amber-300/20 bg-amber-300/[0.08] p-3">
+                  <p className="font-bricolage text-xs font-bold text-amber-100">What is still unproven</p>
+                  <p className="mt-1 font-jakarta text-xs leading-relaxed text-amber-200/80">
                     Buyer urgency and willingness to pay need customer research.
                   </p>
                 </div>
@@ -159,30 +172,30 @@ export default function HeroSection() {
 
               <div className="p-5">
                 <div className="mb-4 flex items-center justify-between">
-                  <p className="font-bricolage text-sm font-bold text-gray-900">Decision history</p>
-                  <TimerReset size={15} className="text-gray-500" />
+                  <p className="font-bricolage text-sm font-bold text-white">Decision history</p>
+                  <TimerReset size={15} className="text-slate-500" />
                 </div>
                 <div className="space-y-3">
                   {decisionRows.map((row, index) => (
-                    <div key={row.title} className="relative rounded-lg border border-black/6 bg-[#fbfaf7] p-3">
+                    <div key={row.title} className="relative rounded-lg border border-white/[0.08] bg-white/[0.045] p-3">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-bricolage text-xs font-bold text-gray-900">{row.title}</p>
-                          <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{row.detail}</p>
+                          <p className="font-bricolage text-xs font-bold text-white">{row.title}</p>
+                          <p className="mt-1 font-jakarta text-xs leading-relaxed text-slate-400">{row.detail}</p>
                         </div>
-                        <span className="rounded-md border border-black/8 bg-white px-2 py-0.5 font-jakarta text-[10px] font-semibold text-gray-600">
+                        <span className="rounded-md border border-white/10 bg-black/20 px-2 py-0.5 font-jakarta text-[10px] font-semibold text-slate-300">
                           {row.status}
                         </span>
                       </div>
-                      {index < decisionRows.length - 1 && <div className="absolute -bottom-3 left-5 h-3 w-px bg-black/10" />}
+                      {index < decisionRows.length - 1 && <div className="absolute -bottom-3 left-5 h-3 w-px bg-white/10" />}
                     </div>
                   ))}
                 </div>
-                <details className="mt-4 rounded-lg border border-black/6 bg-white p-3">
-                  <summary className="cursor-pointer list-none font-bricolage text-xs font-bold text-gray-700">
+                <details className="mt-4 rounded-lg border border-white/[0.08] bg-white/[0.035] p-3">
+                  <summary className="cursor-pointer list-none font-bricolage text-xs font-bold text-slate-200">
                     Methodology preview
                   </summary>
-                  <p className="mt-2 font-jakarta text-xs leading-relaxed text-gray-500">
+                  <p className="mt-2 font-jakarta text-xs leading-relaxed text-slate-400">
                     Scores combine weighted components, source reliability, missing evidence, and confidence. Generated findings are labeled separately from verified evidence.
                   </p>
                 </details>
@@ -196,6 +209,8 @@ export default function HeroSection() {
             <span className="inline-flex items-center gap-1"><FileText size={12} /> Reports saved to workspace</span>
           </div>
         </motion.div>
+          </div>
+        </div>
       </motion.div>
     </section>
   );
