@@ -1,5 +1,6 @@
 import { AlertTriangle, Database, ExternalLink, Info, ShieldCheck } from "lucide-react";
 import Badge from "@/components/ui/Badge";
+import { classifyEvidenceItem } from "@/lib/evidence-display";
 import type { CategoryScore, EvidenceConfidence, EvidenceItem, ProviderRunStatus, ScoreComponent } from "@/lib/evidence-types";
 
 export function ConfidenceBadge({ confidence }: { confidence: EvidenceConfidence }) {
@@ -9,7 +10,7 @@ export function ConfidenceBadge({ confidence }: { confidence: EvidenceConfidence
 
 export function SourceBadge({ item }: { item: EvidenceItem }) {
   const variant = item.verifiedStatus === "verified" ? "emerald" : item.verifiedStatus === "user_provided" ? "blue" : "neutral";
-  return <Badge variant={variant} size="sm">{item.verifiedStatus.replace("_", " ")}</Badge>;
+  return <Badge variant={variant} size="sm">{classifyEvidenceItem(item)}</Badge>;
 }
 
 export function ProviderStatus({ run }: { run: ProviderRunStatus }) {
@@ -31,7 +32,7 @@ export function EvidenceCard({ item }: { item: EvidenceItem }) {
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <p className="font-bricolage text-sm font-bold text-gray-900">{item.title}</p>
-          <p className="mt-1 font-jakarta text-xs text-gray-400">{item.sourceName} - {item.sourceType}</p>
+          <p className="mt-1 font-jakarta text-xs text-gray-400">{item.sourceName} - {classifyEvidenceItem(item)}</p>
         </div>
         <SourceBadge item={item} />
       </div>
@@ -69,7 +70,7 @@ export function ScoreBreakdown({ score }: { score: CategoryScore }) {
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="font-bricolage text-xs font-bold text-gray-800">{component.componentName}</p>
-              <p className="mt-1 font-jakarta text-[11px] text-gray-400">{component.evidenceKind.replace("_", " ")} - weight {component.weight}</p>
+              <p className="mt-1 font-jakarta text-[11px] text-gray-400">{component.evidenceKind.replace("_", " ")} signal - weight {component.weight}</p>
             </div>
             <p className="font-bricolage text-sm font-bold text-gray-900">{component.normalizedValue}/100</p>
           </div>
@@ -99,18 +100,18 @@ export function MethodologyDrawer({ score }: { score: CategoryScore }) {
 
 export function ValidationDecisionPanel({ overallScore, confidence }: { overallScore: number; confidence: EvidenceConfidence }) {
   const recommendation =
-    overallScore >= 70 ? "Proceed with a limited validation test" :
-    overallScore >= 50 ? "Validate further before building" :
-    "Pause build work and validate the riskiest assumptions";
+    overallScore >= 70 ? "Proceed with a limited evidence test" :
+    overallScore >= 50 ? "Assess further before building" :
+    "Pause build work and test the riskiest assumptions";
   return (
     <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
       <div className="flex items-start gap-3">
         {overallScore >= 50 ? <ShieldCheck size={18} className="mt-1 text-emerald-700" /> : <AlertTriangle size={18} className="mt-1 text-amber-700" />}
         <div>
-          <p className="font-bricolage text-xs font-bold uppercase tracking-wide text-emerald-800">Transparent decision</p>
+          <p className="font-bricolage text-xs font-bold uppercase tracking-wide text-emerald-800">Evidence assessment</p>
           <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{recommendation}</h3>
           <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-600">
-            Current evidence supports this recommendation with {confidence} confidence. Treat it as a validation decision, not a prediction of startup success.
+            Current evidence supports this recommendation with {confidence} confidence. Treat it as an assessment, not a prediction of business outcomes.
           </p>
         </div>
       </div>

@@ -25,8 +25,8 @@ const ENGINE_LABELS: Record<string, string> = {
   psychology: "User Psychology",
   growth: "Growth Engine",
   decision: "Founder Decision",
-  "cold-dm": "ColdDM AI",
-  "brand-forge": "BrandForge AI",
+  "cold-dm": "ColdDM",
+  "brand-forge": "BrandForge",
 };
 
 function getReportTitle(report: ReportSummary): string {

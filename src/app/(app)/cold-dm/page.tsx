@@ -151,7 +151,7 @@ export default function ColdDMPage() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto">
       <EngineHeader
         icon={<MessageSquare size={22} />}
-        title="ColdDM AI"
+        title="ColdDM"
         description="Generate reply-focused outreach for WhatsApp, LinkedIn, and email with variants, follow-ups, and CTA options."
         badge="Revenue Tool"
         badgeVariant="sage"

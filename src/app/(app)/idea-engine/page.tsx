@@ -10,7 +10,6 @@ import {
   Compass,
   TrendingUp,
   ShieldAlert,
-  Sparkles,
   ArrowRight,
   Copy,
   CheckCircle2,
@@ -473,7 +472,7 @@ export default function IdeaEnginePage() {
                     <div className="flex items-start gap-3">
                       <CheckCircle2 size={16} className="text-emerald-600 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-bricolage text-sm font-bold text-emerald-800 mb-1">AI verdict</p>
+                        <p className="font-bricolage text-sm font-bold text-emerald-800 mb-1">Assessment finding</p>
                         <p className="font-jakarta text-sm text-emerald-700 leading-relaxed">{verdict}</p>
                       </div>
                     </div>
@@ -482,7 +481,7 @@ export default function IdeaEnginePage() {
 
                 <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
                   <div className="flex items-center gap-2 mb-3">
-                    <Sparkles size={15} className="text-gray-600" />
+                    <Copy size={15} className="text-gray-600" />
                     <h3 className="font-bricolage text-sm font-bold text-gray-900">Executive Summary</h3>
                   </div>
 
@@ -503,17 +502,17 @@ export default function IdeaEnginePage() {
                       onClick={handleImproveIdea}
                       className="bg-gradient-to-r from-cocoa-600 to-orange-500 hover:from-cocoa-500 hover:to-orange-400"
                       loading={improving}
-                      icon={improving ? <RefreshCw size={16} /> : <Sparkles size={16} />}
+                      icon={improving ? <RefreshCw size={16} /> : <Lightbulb size={16} />}
                       iconPosition="right"
                     >
-                      {improving ? "Refining your idea..." : "Refine positioning with AI"}
+                      {improving ? "Refining positioning..." : "Refine positioning"}
                     </Button>
                   </div>
 
                   {improvedIdea && (
                     <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-6 space-y-4">
                       <div className="flex items-center gap-2">
-                        <Sparkles size={15} className="text-amber-700" />
+                        <Lightbulb size={15} className="text-amber-700" />
                         <h3 className="font-bricolage text-sm font-bold text-gray-800">
                           Improved Idea
                         </h3>
@@ -600,7 +599,7 @@ export default function IdeaEnginePage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <ResultList
-                    icon={<Sparkles size={14} className="text-amber-700" />}
+                    icon={<Lightbulb size={14} className="text-amber-700" />}
                     title="Differentiation Angles"
                     items={result.differentiationSuggestions}
                     chipVariant="cocoa"

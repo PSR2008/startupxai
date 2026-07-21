@@ -15,13 +15,13 @@ const navGroups = [
     label: "Overview",
     items: [
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Evidence Engine", href: "/evidence-engine", icon: SearchCheck, color: "text-emerald-600", badge: "PRIMARY" },
       { label: "Reports", href: "/reports", icon: FileText },
-      { label: "Evidence Engine", href: "/evidence-engine", icon: SearchCheck, color: "text-emerald-600", badge: "NEW" },
       { label: "Founder Setup", href: "/onboarding", icon: Compass, color: "text-emerald-600" },
     ],
   },
   {
-    label: "Intelligence Engines",
+    label: "Assessment Tools",
     items: [
       { label: "Idea & Market", href: "/idea-engine", icon: Lightbulb, color: "text-emerald-600" },
       { label: "Competitor Intel", href: "/competitor-intelligence", icon: Swords, color: "text-amber-600" },
@@ -34,8 +34,8 @@ const navGroups = [
   {
     label: "Revenue Tools",
     items: [
-      { label: "ColdDM AI", href: "/cold-dm", icon: MessageSquare, color: "text-emerald-600", badge: "HOT" },
-      { label: "BrandForge AI", href: "/brand-forge", icon: Palette, color: "text-violet-600", badge: "NEW" },
+      { label: "ColdDM", href: "/cold-dm", icon: MessageSquare, color: "text-emerald-600", badge: "HOT" },
+      { label: "BrandForge", href: "/brand-forge", icon: Palette, color: "text-violet-600", badge: "NEW" },
     ],
   },
   {

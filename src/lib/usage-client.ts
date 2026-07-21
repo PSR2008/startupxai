@@ -20,8 +20,8 @@
  *   "psychology"  → User Psychology Engine
  *   "growth"      → Growth Engine
  *   "decision"    → Founder Decision Engine
- *   "brand-forge" → BrandForge AI
- *   "cold-dm"     → ColdDM AI
+ *   "brand-forge" → BrandForge
+ *   "cold-dm"     → ColdDM
  *   "improve-idea"→ Improve Idea
  *
  * Design:

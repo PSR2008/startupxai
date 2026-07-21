@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import {
   Lightbulb, Swords, DollarSign, Brain, TrendingUp,
   Target, MessageSquare, Palette, ArrowRight, Zap,
-  BarChart3, Users, TrendingDown, Sparkles, Crown, ShieldCheck,
+  BarChart3, Users, TrendingDown, ClipboardList, Crown, ShieldCheck,
   Lock, SearchCheck,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
@@ -29,31 +29,31 @@ interface UsageSummary {
 }
 
 const engines = [
-  { icon: SearchCheck, title: "Evidence Engine", description: "Create an evidence-backed validation project with transparent scores.", href: "/evidence-engine", color: "#059669", bg: "rgba(5,150,105,0.08)", border: "rgba(5,150,105,0.16)", badge: "NEW" },
-  { icon: Lightbulb, title: "Idea & Market Engine", description: "Validate idea viability, market demand, and ICP.", href: "/idea-engine", color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.16)", badge: null },
+  { icon: SearchCheck, title: "Evidence Engine", description: "Create an evidence-backed assessment project with transparent scores.", href: "/evidence-engine", color: "#059669", bg: "rgba(5,150,105,0.08)", border: "rgba(5,150,105,0.16)", badge: "PRIMARY" },
+  { icon: Lightbulb, title: "Idea & Market Engine", description: "Assess idea clarity, target customer, and demand assumptions.", href: "/idea-engine", color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.16)", badge: null },
   { icon: Swords, title: "Competitor Intelligence", description: "Map competitors, find weaknesses, exploit gaps.", href: "/competitor-intelligence", color: "#f59e0b", bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.16)", badge: null },
   { icon: DollarSign, title: "Revenue Engine", description: "Pricing strategy, conversion blockers, monetization.", href: "/revenue-engine", color: "#059669", bg: "rgba(5,150,105,0.08)", border: "rgba(5,150,105,0.16)", badge: null },
   { icon: Brain, title: "User Psychology Engine", description: "Trust score, UX roast, friction points, fixes.", href: "/user-psychology", color: "#f43f5e", bg: "rgba(244,63,94,0.08)", border: "rgba(244,63,94,0.16)", badge: null },
   { icon: TrendingUp, title: "Growth Engine", description: "First 10 customers, channels, outreach direction.", href: "/growth-engine", color: "#2563eb", bg: "rgba(37,99,235,0.08)", border: "rgba(37,99,235,0.16)", badge: null },
   { icon: Target, title: "Founder Decision Engine", description: "Priorities, strategy, confidence score, action brief.", href: "/founder-decision", color: "#7c3aed", bg: "rgba(124,58,237,0.08)", border: "rgba(124,58,237,0.16)", badge: null },
-  { icon: MessageSquare, title: "ColdDM AI", description: "Generate WhatsApp, LinkedIn, and email outreach.", href: "/cold-dm", color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.16)", badge: "HOT" },
-  { icon: Palette, title: "BrandForge AI", description: "Names, taglines, positioning, brand personality.", href: "/brand-forge", color: "#7c3aed", bg: "rgba(124,58,237,0.08)", border: "rgba(124,58,237,0.16)", badge: "NEW" },
+  { icon: MessageSquare, title: "ColdDM", description: "Draft WhatsApp, LinkedIn, and email outreach.", href: "/cold-dm", color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.16)", badge: "HOT" },
+  { icon: Palette, title: "BrandForge", description: "Names, taglines, positioning, brand personality.", href: "/brand-forge", color: "#7c3aed", bg: "rgba(124,58,237,0.08)", border: "rgba(124,58,237,0.16)", badge: "NEW" },
 ];
 
 const stats = [
-  { label: "Validation Workflow", value: "1", icon: SearchCheck, color: "#059669", sub: "Evidence-backed project" },
-  { label: "Intelligence Engines", value: "6", icon: BarChart3, color: "#10b981", sub: "Full founder stack" },
+  { label: "Evidence Workflow", value: "1", icon: SearchCheck, color: "#059669", sub: "Assessment project" },
+  { label: "Assessment Tools", value: "6", icon: BarChart3, color: "#10b981", sub: "Full founder stack" },
   { label: "Revenue Tools", value: "2", icon: Zap, color: "#f59e0b", sub: "Outreach + Branding" },
-  { label: "Avg. Analysis Time", value: "~15s", icon: TrendingUp, color: "#2563eb", sub: "Powered by Claude" },
-  { label: "Analysis Categories", value: "48+", icon: Users, color: "#7c3aed", sub: "Data points per run" },
+  { label: "Assessment Flow", value: "~15s", icon: TrendingUp, color: "#2563eb", sub: "Structured review" },
+  { label: "Score Components", value: "48+", icon: Users, color: "#7c3aed", sub: "Signals per run" },
 ];
 
 const tips = [
-  "Start with the Idea & Market Engine to validate your core assumptions first.",
+  "Start with the Evidence Engine to assess your core assumptions first.",
   "Run the Competitor Intelligence Engine before finalizing your positioning.",
-  "Use ColdDM AI after the Growth Engine for aligned outreach messaging.",
+  "Use ColdDM after the Growth Engine for aligned outreach messaging.",
   "The Founder Decision Engine works best with context from all other engines.",
-  "BrandForge AI is most powerful when you've already validated your ICP.",
+  "BrandForge is strongest after you have evidence for your ICP.",
 ];
 
 export default function DashboardPage() {
@@ -100,8 +100,8 @@ export default function DashboardPage() {
             </h1>
             <p className="font-jakarta text-sm text-gray-500">
               {profile?.primary_goal
-                ? `Your current goal: ${profile.primary_goal}. Validate the evidence before you build.`
-                : "Validate your startup or SaaS idea using visible evidence before you build."}
+                ? `Your current goal: ${profile.primary_goal}. Review the evidence before you build.`
+                : "Assess your startup or SaaS assumptions using visible evidence before you build."}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -113,13 +113,13 @@ export default function DashboardPage() {
             </Link>
             <Link href="/onboarding">
               <button className="h-9 px-3.5 rounded-xl border border-black/8 bg-white text-gray-700 font-bricolage text-xs font-bold flex items-center gap-1.5 hover:bg-gray-50 transition-colors">
-                <Sparkles size={13} />
+                <ClipboardList size={13} />
                 Edit context
               </button>
             </Link>
             <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-emerald-200 bg-emerald-50 w-fit">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-jakarta text-xs font-semibold text-emerald-700">AI Engines Online</span>
+              <span className="font-jakarta text-xs font-semibold text-emerald-700">Assessment tools ready</span>
             </div>
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
-              { title: "Create validation project", description: "Score the idea using evidence, confidence, and uncertainty.", href: "/evidence-engine", icon: SearchCheck, color: "#059669" },
+              { title: "Create evidence project", description: "Score the idea using evidence, confidence, and uncertainty.", href: "/evidence-engine", icon: SearchCheck, color: "#059669" },
               { title: "Find your positioning gap", description: "Use this before writing copy, choosing a niche, or launching ads.", href: "/competitor-intelligence", icon: Swords, color: "#f59e0b" },
               { title: "Prepare outreach", description: "Turn your offer into WhatsApp, LinkedIn, and email messages.", href: "/cold-dm", icon: MessageSquare, color: "#10b981" },
             ].map((item) => {
@@ -210,9 +210,9 @@ export default function DashboardPage() {
 
       <AnimatedSection className="mb-3">
         <div className="flex items-center gap-2">
-          <Sparkles size={14} className="text-emerald-500" />
+          <ClipboardList size={14} className="text-emerald-500" />
           <h2 className="font-bricolage text-xs font-bold text-gray-500 uppercase tracking-widest">
-            Intelligence Engines
+            Assessment Tools
           </h2>
         </div>
       </AnimatedSection>
@@ -287,7 +287,7 @@ export default function DashboardPage() {
             <div className="space-y-2">
               {[
                 { step: "01", label: "Evidence Engine", desc: "Create the evidence-backed project", href: "/evidence-engine", color: "#059669" },
-                { step: "02", label: "Idea & Market Engine", desc: "Deepen demand and ICP analysis", href: "/idea-engine", color: "#10b981" },
+                { step: "02", label: "Idea & Market Engine", desc: "Deepen demand and ICP assessment", href: "/idea-engine", color: "#10b981" },
                 { step: "03", label: "Competitor Intelligence", desc: "Know your battlefield", href: "/competitor-intelligence", color: "#f59e0b" },
                 { step: "04", label: "Revenue Engine", desc: "Set the right price", href: "/revenue-engine", color: "#059669" },
                 { step: "05", label: "Growth Engine", desc: "Get your first customers", href: "/growth-engine", color: "#2563eb" },

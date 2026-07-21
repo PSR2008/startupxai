@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  Lock, CheckCircle2, Shield, RefreshCw, Zap, ArrowLeft, Sparkles, Star, Globe, BarChart3,
+  Lock, CheckCircle2, Shield, RefreshCw, Zap, ArrowLeft, Star, Globe, BarChart3,
 } from "lucide-react";
 import Link from "next/link";
 import Script from "next/script";
@@ -416,7 +416,7 @@ function PaymentPageContent() {
                 </div>
                 {billing === "annual" && (
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 mb-4">
-                    <Sparkles size={10} className="text-emerald-600" />
+                    <CheckCircle2 size={10} className="text-emerald-600" />
                     <p className="font-jakarta text-xs font-semibold text-emerald-700">
                       Save ${plan.price * 12 - plan.annualPrice}/year
                     </p>

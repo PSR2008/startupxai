@@ -33,7 +33,7 @@ const stageOptions = [
 
 const goalOptions = [
   { value: "", label: "Select primary goal" },
-  { value: "validate", label: "Validate the idea" },
+  { value: "validate", label: "Assess assumptions" },
   { value: "position", label: "Improve positioning" },
   { value: "revenue", label: "Find pricing and revenue model" },
   { value: "growth", label: "Get first customers" },
@@ -168,9 +168,9 @@ export default function OnboardingPage() {
             Founder setup
           </span>
         </div>
-        <h1 className="font-bricolage text-3xl font-bold text-gray-900 mb-2">Personalize StartupX AI</h1>
+        <h1 className="font-bricolage text-3xl font-bold text-gray-900 mb-2">Set up your evidence workspace</h1>
         <p className="font-jakarta text-sm text-gray-500 max-w-2xl">
-          Tell us what you are building once. We will prefill engines and tune the dashboard around your startup context.
+          Tell us what you are building once. We will prefill assessment tools and tune the dashboard around your startup context.
         </p>
       </motion.div>
 
@@ -229,8 +229,8 @@ export default function OnboardingPage() {
 
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="space-y-4">
           {[
-            { icon: Lightbulb, title: "Prefilled engines", text: "Idea, Revenue, and Growth start with your context." },
-            { icon: Target, title: "Sharper output", text: "Better baseline context means less generic reports." },
+            { icon: Lightbulb, title: "Prefilled assessment tools", text: "Evidence, Idea, Revenue, and Growth start with your context." },
+            { icon: Target, title: "Clearer findings", text: "Better baseline context means more specific reports." },
             { icon: Globe, title: "Market awareness", text: "Region and stage help shape practical next moves." },
             { icon: Zap, title: "Reusable setup", text: "Update this later from onboarding whenever your idea changes." },
           ].map(({ icon: Icon, title, text }) => (
@@ -243,7 +243,7 @@ export default function OnboardingPage() {
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
             <CheckCircle2 size={17} className="text-emerald-700 mb-3" />
             <p className="font-jakarta text-xs text-emerald-700 leading-relaxed">
-              You can still edit every engine input before running analysis.
+              You can still edit every workflow input before reviewing findings.
             </p>
           </div>
         </motion.div>

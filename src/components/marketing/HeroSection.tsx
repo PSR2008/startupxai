@@ -7,20 +7,20 @@ import { ArrowRight, BarChart3, CheckCircle2, FileText, ShieldCheck, Target, Tre
 import Button from "@/components/ui/Button";
 
 const operatingMetrics = [
-  { label: "Idea clarity", value: "91", color: "#2563eb" },
-  { label: "Market signal", value: "87", color: "#059669" },
+  { label: "Evidence score", value: "91", color: "#2563eb" },
+  { label: "Evidence quality", value: "87", color: "#059669" },
   { label: "Trust risk", value: "64", color: "#d97706" },
   { label: "Go-to-market", value: "78", color: "#7c3aed" },
 ];
 
 const decisionRows = [
-  { title: "Validate demand", status: "High signal", detail: "Narrow ICP with clear budget pain" },
-  { title: "Fix positioning", status: "Needs work", detail: "Landing page lacks proof and urgency" },
-  { title: "Launch motion", status: "Ready", detail: "Start with founder-led LinkedIn outreach" },
+  { title: "Assess demand", status: "Evidence needed", detail: "Narrow ICP with clear budget pain" },
+  { title: "Review positioning", status: "Needs evidence", detail: "Landing page lacks proof and urgency" },
+  { title: "Plan outreach", status: "Ready to test", detail: "Start with founder-led LinkedIn outreach" },
 ];
 
 const workflowItems = [
-  { icon: Target, label: "Market validation", detail: "Demand, ICP, assumptions" },
+  { icon: Target, label: "Evidence assessment", detail: "Demand, ICP, assumptions" },
   { icon: BarChart3, label: "Revenue strategy", detail: "Pricing, leaks, conversion" },
   { icon: FileText, label: "Execution output", detail: "Reports, next steps, exports" },
 ];
@@ -74,7 +74,7 @@ export default function HeroSection() {
             transition={{ delay: 0.38, duration: 0.55 }}
             className="mb-9 max-w-xl font-jakarta text-lg leading-relaxed text-gray-600"
           >
-            StartupX AI turns your idea, market, competitors, pricing, user trust, and growth questions into scored reports and practical next moves.
+            StartupX AI helps founders assess assumptions, review evidence, compare competitors, pressure-test pricing, and plan next validation actions.
           </motion.p>
 
           <motion.div
@@ -83,9 +83,9 @@ export default function HeroSection() {
             transition={{ delay: 0.5, duration: 0.5 }}
             className="mb-8 flex flex-col gap-3 sm:flex-row"
           >
-            <Link href="/signup">
+            <Link href="/signup?next=/evidence-engine">
               <Button size="xl" icon={<ArrowRight size={18} />} iconPosition="right">
-                Start free
+                Start evidence assessment
               </Button>
             </Link>
             <Link href="/pricing">
@@ -120,12 +120,12 @@ export default function HeroSection() {
           <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-2xl shadow-black/10">
             <div className="flex items-center justify-between border-b border-black/6 bg-white px-5 py-4">
               <div>
-                <p className="font-bricolage text-sm font-bold text-gray-900">Decision brief</p>
-                <p className="font-jakarta text-xs text-gray-400">SaaS pricing page audit</p>
+                <p className="font-bricolage text-sm font-bold text-gray-900">Evidence brief</p>
+                <p className="font-jakarta text-xs text-gray-400">SaaS pricing evidence review</p>
               </div>
               <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                <span className="font-jakarta text-[11px] font-semibold text-emerald-700">Live analysis</span>
+                <span className="font-jakarta text-[11px] font-semibold text-emerald-700">Evidence review</span>
               </div>
             </div>
 

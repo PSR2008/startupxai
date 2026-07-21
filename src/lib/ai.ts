@@ -408,7 +408,7 @@ export async function analyzeGrowth(input: {
 }): Promise<GrowthEngineOutput> {
   const client = getClient();
 
-  const prompt = `You are a legendary growth strategist who has helped 100+ startups acquire their first 1,000 customers with lean budgets.
+  const prompt = `You are a disciplined growth strategist who designs lean, measurable first-customer experiments.
 
 Create a precise growth strategy for this startup:
 
@@ -558,7 +558,7 @@ export async function generateColdDM(input: {
 
   const prompt = `You are a world-class B2B sales copywriter and outreach specialist. You write cold messages that actually get responses — not spam.
 
-Generate high-converting outreach messages:
+Draft outreach messages for testing:
 
 PRODUCT/SERVICE: ${input.product}
 TARGET AUDIENCE: ${input.targetAudience}

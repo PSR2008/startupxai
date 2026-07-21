@@ -8,7 +8,7 @@ A premium, production-grade SaaS platform that acts as a founder intelligence op
 
 ## ✨ Features
 
-### 6 Intelligence Engines
+### Assessment Tools
 | Engine | Purpose |
 |--------|---------|
 | **Idea & Market Engine** | Validate viability, score demand, uncover ICP & risks |
@@ -19,8 +19,9 @@ A premium, production-grade SaaS platform that acts as a founder intelligence op
 | **Founder Decision Engine** | Priorities, confidence score, strategic brief |
 
 ### 2 Revenue Tools
-- **ColdDM AI** — WhatsApp, LinkedIn, email outreach with 3 variants + follow-ups
-- **BrandForge AI** — Names, taglines, positioning, brand personality, color direction
+- **Evidence Engine** — Evidence Score, source labels, missing evidence, confidence, and next validation actions
+- **ColdDM** — WhatsApp, LinkedIn, email outreach with 3 variants + follow-ups
+- **BrandForge** — Names, taglines, positioning, brand personality, color direction
 
 ### Infrastructure
 - Rate limiting (LRU cache — production: swap for Upstash Redis)

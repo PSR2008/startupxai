@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Zap, ChevronRight, Sparkles } from "lucide-react";
+import { Menu, X, Zap, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 
 const navLinks = [
   { label: "Features", href: "/#features" },
-  { label: "Engines", href: "/#engines" },
+  { label: "Assessment tools", href: "/#engines" },
   { label: "Pricing", href: "/pricing" },
 ];
 
@@ -83,9 +83,9 @@ export default function Navbar() {
               >
                 Sign In
               </Link>
-              <Link href="/signup">
+              <Link href="/signup?next=/evidence-engine">
                 <Button size="sm" icon={<ChevronRight size={14} />} iconPosition="right">
-                  Get Started
+                  Start assessment
                 </Button>
               </Link>
             </div>
@@ -159,9 +159,9 @@ export default function Navbar() {
               </div>
 
               <div className="p-5 border-t border-black/5 space-y-3">
-                <Link href="/signup" onClick={() => setMobileOpen(false)}>
-                  <Button fullWidth icon={<Sparkles size={14} />}>
-                    Get Started - Free
+                <Link href="/signup?next=/evidence-engine" onClick={() => setMobileOpen(false)}>
+                  <Button fullWidth icon={<ChevronRight size={14} />}>
+                    Start assessment
                   </Button>
                 </Link>
                 <Link

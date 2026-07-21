@@ -10,6 +10,7 @@ import Badge from "@/components/ui/Badge";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import { ConfidenceBadge, DataFreshnessBadge, EvidenceCard, MethodologyDrawer, ProviderStatus, ValidationDecisionPanel } from "@/components/app/EvidenceUI";
 import { getAuthHeaders } from "@/lib/auth-headers-client";
+import { EVIDENCE_SCORE_DISCLAIMER, getScoreEvidenceMetrics } from "@/lib/evidence-display";
 import type { CategoryScore, EvidenceEngineInput, ValidationProjectResult } from "@/lib/evidence-types";
 
 type FormState = EvidenceEngineInput;
@@ -110,8 +111,8 @@ export default function EvidenceEnginePage() {
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">
       <EngineHeader
         icon={<SearchCheck size={22} />}
-        title="StartupX AI Evidence Engine"
-        description="Validate your startup or SaaS idea using visible evidence, confidence levels, transparent score weights, and explicit uncertainty before you build."
+        title="Evidence Engine"
+        description="Assess your startup or SaaS assumptions using visible evidence, confidence levels, transparent score weights, and explicit uncertainty before you build."
         badge="Evidence-backed workflow"
         badgeVariant="forest"
         accentColor="#059669"
@@ -120,8 +121,8 @@ export default function EvidenceEnginePage() {
       <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-4">
         {[
           { icon: Database, title: "Evidence first", detail: "Claims, verified sources, and unavailable data are separated." },
-          { icon: BarChart3, title: "Weighted scores", detail: "Every score has a methodology drawer." },
-          { icon: FlaskConical, title: "Experiments", detail: "Weak assumptions become practical validation tests." },
+          { icon: BarChart3, title: "Transparent scores", detail: "Every Evidence Score shows components, confidence, and missing inputs." },
+          { icon: FlaskConical, title: "Experiments", detail: "Weak assumptions become practical tests." },
           { icon: ShieldCheck, title: "No fake sources", detail: "Missing provider data is shown as unavailable." },
         ].map(({ icon: Icon, title, detail }) => (
           <div key={title} className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
@@ -136,7 +137,7 @@ export default function EvidenceEnginePage() {
         <div className="lg:col-span-2 space-y-5">
           <section className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm space-y-5">
             <div>
-              <h3 className="font-bricolage text-base font-bold text-gray-900">Validation project</h3>
+              <h3 className="font-bricolage text-base font-bold text-gray-900">Evidence project</h3>
               <p className="mt-1 font-jakarta text-xs text-gray-500">Create one durable project for evidence, scores, assumptions, and experiments.</p>
             </div>
             <Input label="Startup name" value={form.startupName} onChange={set("startupName")} error={errors.startupName} required />
@@ -154,7 +155,7 @@ export default function EvidenceEnginePage() {
           </section>
 
           <Button size="lg" fullWidth onClick={submit} loading={status === "loading"} icon={<ArrowRight size={16} />} iconPosition="right">
-            {status === "loading" ? "Building evidence project..." : "Run Evidence Validation"}
+            {status === "loading" ? "Building evidence project..." : "Run Evidence Assessment"}
           </Button>
         </div>
 
@@ -163,7 +164,7 @@ export default function EvidenceEnginePage() {
             {status === "idle" && (
               <motion.section key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-2xl border border-dashed border-black/10 bg-white p-10 text-center shadow-sm">
                 <SearchCheck size={30} className="mx-auto text-emerald-600" />
-                <h3 className="mt-4 font-bricolage text-lg font-bold text-gray-900">Ready for evidence-backed validation</h3>
+                <h3 className="mt-4 font-bricolage text-lg font-bold text-gray-900">Ready for structured assessment</h3>
                 <p className="mx-auto mt-2 max-w-md font-jakarta text-sm leading-relaxed text-gray-500">
                   This workflow will not invent source links, market size, search volume, or competitor facts. Unavailable evidence stays visibly unavailable.
                 </p>
@@ -178,7 +179,7 @@ export default function EvidenceEnginePage() {
                 <section className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="font-bricolage text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Validation project</p>
+                      <p className="font-bricolage text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Evidence project</p>
                       <h2 className="mt-1 font-bricolage text-2xl font-bold text-gray-950">{result.project.startupName}</h2>
                       <div className="mt-3 flex flex-wrap gap-2">
                         <ConfidenceBadge confidence={result.project.confidence} />
@@ -186,9 +187,10 @@ export default function EvidenceEnginePage() {
                         <Badge variant="neutral" size="sm">{result.project.scoreVersion}</Badge>
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-center">
-                      <p className="font-bricolage text-[10px] font-bold uppercase tracking-wide text-emerald-700">Overall</p>
+                    <div className="max-w-xs rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-center">
+                      <p className="font-bricolage text-[10px] font-bold uppercase tracking-wide text-emerald-700">Evidence Score</p>
                       <p className="font-bricolage text-4xl font-bold text-emerald-800">{result.project.overallScore}</p>
+                      <p className="mt-2 font-jakarta text-[11px] leading-relaxed text-emerald-900">{EVIDENCE_SCORE_DISCLAIMER}</p>
                     </div>
                   </div>
                 </section>
@@ -233,7 +235,7 @@ export default function EvidenceEnginePage() {
                 <section className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
                   <div className="mb-4 flex items-center gap-2">
                     <FlaskConical size={14} className="text-violet-600" />
-                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Suggested validation experiments</h3>
+                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Recommended next validation actions</h3>
                   </div>
                   <div className="space-y-3">
                     {result.suggestedExperiments.map((experiment) => (
@@ -270,29 +272,52 @@ export default function EvidenceEnginePage() {
 }
 
 function ScorePanel({ score }: { score: CategoryScore }) {
+  const metrics = getScoreEvidenceMetrics(score);
   return (
     <section className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-bricolage text-lg font-bold text-gray-950">{score.label}</h3>
+            <h3 className="font-bricolage text-lg font-bold text-gray-950">{score.label} Evidence Score</h3>
             <ConfidenceBadge confidence={score.confidence} />
+            {metrics.insufficientEvidence && <Badge variant="amber" size="sm">Insufficient evidence</Badge>}
           </div>
           <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-600">{score.conclusion}</p>
         </div>
-        <p className="font-bricolage text-4xl font-bold text-emerald-700">{score.score}</p>
+        <div className="sm:max-w-xs sm:text-right">
+          <p className="font-bricolage text-4xl font-bold text-emerald-700">{score.score}</p>
+          <p className="mt-2 font-jakarta text-[11px] leading-relaxed text-gray-500">{EVIDENCE_SCORE_DISCLAIMER}</p>
+        </div>
+      </div>
+      <div className="mb-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <MetricBlock label="Evidence count" value={String(metrics.evidenceCount)} />
+        <MetricBlock label="Evidence quality" value={metrics.evidenceQuality} />
+        <MetricBlock label="Missing evidence" value={String(metrics.missingEvidence.length)} />
+        <MetricBlock label="Confidence level" value={metrics.confidenceLevel} />
       </div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <TextBlock title="Supporting evidence" items={score.supportingEvidence} />
         <TextBlock title="Opposing evidence" items={score.opposingEvidence.length ? score.opposingEvidence : ["No opposing evidence captured yet."]} />
         <TextBlock title="Assumptions" items={score.assumptions} />
-        <TextBlock title="Recommended next action" items={[score.recommendedNextAction]} />
+        <TextBlock title="Missing evidence" items={metrics.missingEvidence.length ? metrics.missingEvidence : ["No missing weighted inputs for this score."]} />
+        <TextBlock title="How the score was calculated" items={[metrics.calculationSummary]} />
+        <TextBlock title="What would improve the score" items={[metrics.improvementAction]} />
+        <TextBlock title="Recommended next validation actions" items={[score.recommendedNextAction]} />
       </div>
       <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 font-jakarta text-xs leading-relaxed text-amber-900">{score.uncertainty}</p>
       <div className="mt-4">
         <MethodologyDrawer score={score} />
       </div>
     </section>
+  );
+}
+
+function MetricBlock({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-black/6 bg-gray-50 p-3">
+      <p className="font-bricolage text-[10px] font-bold uppercase tracking-wide text-gray-500">{label}</p>
+      <p className="mt-1 font-bricolage text-sm font-bold capitalize text-gray-900">{value}</p>
+    </div>
   );
 }
 

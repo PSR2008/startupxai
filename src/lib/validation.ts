@@ -117,7 +117,7 @@ export const evidenceEngineSchema = z.object({
   websiteUrl: urlField,
 });
 
-// --- ColdDM AI Schema ---
+// --- ColdDM Schema ---
 export const coldDMSchema = z.object({
   product: nonEmptyString(500, "Product/service"),
   targetAudience: nonEmptyString(500, "Target audience"),
@@ -131,7 +131,7 @@ export const coldDMSchema = z.object({
   personalization: optionalString(500),
 });
 
-// --- BrandForge AI Schema ---
+// --- BrandForge Schema ---
 export const brandForgeSchema = z.object({
   idea: nonEmptyString(500, "Startup idea"),
   tone: z.enum(["premium", "playful", "bold", "minimal", "technical", "warm"], {

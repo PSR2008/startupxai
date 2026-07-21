@@ -11,7 +11,6 @@ import {
   Frown,
   MousePointerClick,
   ShieldCheck,
-  Sparkles,
   Zap,
 } from "lucide-react";
 import EngineHeader from "@/components/app/EngineHeader";
@@ -143,7 +142,7 @@ export default function PsychologyPage() {
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <ContextCard icon={<ShieldCheck size={16} />} title="Trust signals" detail="What makes users believe" tone="rose" />
         <ContextCard icon={<MousePointerClick size={16} />} title="UX friction" detail="What blocks action" tone="blue" />
-        <ContextCard icon={<Sparkles size={16} />} title="Copy clarity" detail="What makes the value click" tone="pink" />
+        <ContextCard icon={<Copy size={16} />} title="Copy clarity" detail="What makes the value click" tone="pink" />
       </div>
 
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8">

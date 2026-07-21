@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle, Sparkles, RefreshCw } from "lucide-react";
+import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -193,7 +193,7 @@ export default function SignupPage() {
         <div className="rounded-2xl border border-black/8 bg-white p-8 space-y-5 shadow-lg shadow-black/5">
           {/* Perks banner */}
           <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-3.5 flex items-start gap-3">
-            <Sparkles size={15} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+            <CheckCircle2 size={15} className="text-emerald-600 flex-shrink-0 mt-0.5" />
             <p className="font-jakarta text-xs text-emerald-700 leading-relaxed">
               <strong className="font-semibold">Free to start</strong> — Explore the core engines with 5 monthly analyses, plus 2 ColdDM and BrandForge generations.
             </p>

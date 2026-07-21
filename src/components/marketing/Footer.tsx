@@ -3,6 +3,7 @@ import { Zap, Twitter, Linkedin, Github } from "lucide-react";
 
 const footerLinks = {
   Product: [
+    { label: "Evidence Engine", href: "/evidence-engine" },
     { label: "Idea Engine", href: "/idea-engine" },
     { label: "Competitor Intelligence", href: "/competitor-intelligence" },
     { label: "Revenue Engine", href: "/revenue-engine" },
@@ -11,8 +12,8 @@ const footerLinks = {
     { label: "Founder Decision", href: "/founder-decision" },
   ],
   Tools: [
-    { label: "ColdDM AI", href: "/cold-dm" },
-    { label: "BrandForge AI", href: "/brand-forge" },
+    { label: "ColdDM", href: "/cold-dm" },
+    { label: "BrandForge", href: "/brand-forge" },
     { label: "Dashboard", href: "/dashboard" },
     { label: "Pricing", href: "/pricing" },
   ],
@@ -45,7 +46,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="font-jakarta text-sm text-gray-500 leading-relaxed max-w-48 mb-5">
-              The founder intelligence platform. Build smarter, ship faster.
+              Evidence-backed assessment workflows for early founder decisions.
             </p>
             <div className="flex gap-2">
               {[

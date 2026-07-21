@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   Lightbulb, Swords, DollarSign, Brain, TrendingUp,
   Target, MessageSquare, Palette, ArrowRight, CheckCircle2,
-  Shield, Zap, Globe, BarChart3, Users, Sparkles, Star, FileText, Lock, Scale,
+  Shield, Zap, Globe, BarChart3, Users, SearchCheck, Star, FileText, Lock, Scale,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import Button from "@/components/ui/Button";
@@ -14,7 +14,7 @@ import { PLANS } from "@/lib/plans";
 // LOGO MARQUEE
 // ============================================
 const logos = [
-  "Validation", "Positioning", "Pricing", "Growth",
+  "Evidence", "Positioning", "Pricing", "Growth",
   "Outreach", "Branding", "Psychology", "Competition",
   "Launch", "Retention", "Revenue", "Strategy",
 ];
@@ -52,17 +52,17 @@ const engines = [
   {
     icon: Lightbulb,
     title: "Idea & Market Engine",
-    description: "Score your idea's viability. Detect hidden risks, assumptions, and opportunities before you waste a single week building the wrong thing.",
+    description: "Assess your idea's assumptions. Detect risks, missing evidence, and opportunities before investing weeks in the wrong workflow.",
     href: "/idea-engine",
     color: "#10b981",
     bg: "rgba(16,185,129,0.06)",
     border: "rgba(16,185,129,0.16)",
-    outputs: ["Market Demand Score", "Risk Factors", "ICP Suggestions", "Differentiation"],
+    outputs: ["Evidence Score", "Risk Factors", "ICP Suggestions", "Differentiation"],
   },
   {
     icon: Swords,
     title: "Competitor Intelligence",
-    description: "Map every competitor, find their weaknesses, and discover white-space opportunities they're completely ignoring.",
+    description: "Map competitors, review their positioning, and identify whitespace to investigate with better evidence.",
     href: "/competitor-intelligence",
     color: "#f59e0b",
     bg: "rgba(245,158,11,0.06)",
@@ -72,7 +72,7 @@ const engines = [
   {
     icon: DollarSign,
     title: "Revenue Engine",
-    description: "Build a monetization strategy that converts. Get pricing tiers, conversion blockers, and psychological pricing recommendations.",
+    description: "Pressure-test monetization strategy with pricing tiers, conversion blockers, and recommended pricing experiments.",
     href: "/revenue-engine",
     color: "#059669",
     bg: "rgba(5,150,105,0.06)",
@@ -82,7 +82,7 @@ const engines = [
   {
     icon: Brain,
     title: "User Psychology Engine",
-    description: "Brutal audit of your trust, UX, and copy. Understand exactly why users do not buy - and what to fix first.",
+    description: "Review trust, UX, and copy. Identify likely friction points, weak proof, and what to fix first.",
     href: "/user-psychology",
     color: "#f43f5e",
     bg: "rgba(244,63,94,0.06)",
@@ -92,7 +92,7 @@ const engines = [
   {
     icon: TrendingUp,
     title: "Growth Engine",
-    description: "Get your first 10 customers. Tactical channel recommendations, outreach direction, and a step-by-step launch playbook.",
+    description: "Plan first-customer experiments with channel recommendations, outreach direction, and a step-by-step launch playbook.",
     href: "/growth-engine",
     color: "#2563eb",
     bg: "rgba(37,99,235,0.06)",
@@ -102,7 +102,7 @@ const engines = [
   {
     icon: Target,
     title: "Founder Decision Engine",
-    description: "Executive-level strategic guidance. Top priorities, what not to build, fastest path to traction, and a confidence score.",
+    description: "Prioritize founder decisions with top risks, what not to build, traction paths to test, and a confidence score.",
     href: "/founder-decision",
     color: "#7c3aed",
     bg: "rgba(124,58,237,0.06)",
@@ -114,16 +114,16 @@ const engines = [
 const revenueTools = [
   {
     icon: MessageSquare,
-    title: "ColdDM AI",
-    description: "Generate high-converting outreach messages for WhatsApp, LinkedIn, and email. Short, medium, long variants with follow-ups included.",
+    title: "ColdDM",
+    description: "Draft outreach messages for WhatsApp, LinkedIn, and email. Short, medium, long variants with follow-ups included.",
     href: "/cold-dm",
     color: "#10b981",
     badge: "HOT",
   },
   {
     icon: Palette,
-    title: "BrandForge AI",
-    description: "Generate startup names, taglines, positioning lines, brand personality, and a color direction in seconds.",
+    title: "BrandForge",
+    description: "Draft startup names, taglines, positioning lines, brand personality, and a color direction.",
     href: "/brand-forge",
     color: "#7c3aed",
     badge: "NEW",
@@ -136,17 +136,17 @@ export function EnginesSection() {
       <div className="container-custom">
         <AnimatedSection className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 mb-5">
-            <Sparkles size={12} className="text-emerald-500" />
+            <SearchCheck size={12} className="text-emerald-500" />
             <span className="font-jakarta text-xs font-semibold text-emerald-700 uppercase tracking-wide">
-              The Intelligence Stack
+              Evidence Workflow
             </span>
           </div>
           <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-5">
-            A complete founder intelligence system.{" "}
-            <span className="text-gradient-brand">From idea to traction.</span>
+            A complete founder assessment system.{" "}
+            <span className="text-gradient-brand">From assumptions to evidence.</span>
           </h2>
           <p className="font-jakarta text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
-            Each engine turns messy founder questions into structured decisions, practical next steps, and sharper go-to-market execution.
+            Each workflow turns messy founder questions into structured findings, evidence gaps, and practical next validation actions.
           </p>
         </AnimatedSection>
 
@@ -201,7 +201,7 @@ export function EnginesSection() {
                         className="flex items-center gap-1.5 font-bricolage text-sm font-semibold group-hover:gap-2.5 transition-all"
                         style={{ color: engine.color }}
                       >
-                        Run analysis
+                        Review findings
                         <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
                       </div>
                     </div>
@@ -324,14 +324,14 @@ const workflow = [
     description: "Add your idea, audience, market, current page, or offer. Each engine asks only for the context it needs.",
   },
   {
-    icon: Sparkles,
-    title: "Run focused intelligence engines",
-    description: "Choose the engine for the decision in front of you: market, competitors, revenue, psychology, growth, decision, outreach, or brand.",
+    icon: SearchCheck,
+    title: "Run focused assessment tools",
+    description: "Choose the workflow for the decision in front of you: evidence, market, competitors, revenue, psychology, growth, outreach, or brand.",
   },
   {
     icon: CheckCircle2,
-    title: "Act on scored recommendations",
-    description: "Get structured scores, risks, action steps, and messaging you can use immediately instead of another generic AI chat.",
+    title: "Review findings and gaps",
+    description: "Get structured scores, risks, action steps, and messaging with clear limits instead of another blank chat.",
   },
 ];
 
@@ -347,10 +347,10 @@ export function HowItWorksSection() {
             </span>
           </div>
           <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-4">
-            From uncertainty to execution in minutes
+            From uncertainty to structured next steps
           </h2>
           <p className="font-jakarta text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            StartupX AI is designed around founder decisions, not blank prompts.
+            StartupX AI is designed around founder decisions, evidence review, and repeatable workflows.
           </p>
         </AnimatedSection>
 
@@ -391,7 +391,7 @@ const comparisonRows = [
 ];
 
 export function ComparisonSection() {
-  const columns = ["StartupX AI", "Consultants", "Generic AI chat"];
+  const columns = ["StartupX AI", "Consultants", "Blank chat"];
 
   return (
     <section className="py-24 px-5 bg-white">
@@ -513,19 +513,19 @@ export function TrustSection() {
 // ============================================
 const testimonials = [
   {
-    quote: "I ran my SaaS idea through StartupX AI in 15 minutes. It found 3 competitor weaknesses I missed and gave me a pricing strategy that doubled my trial conversion.",
+    quote: "The assessment helped me separate real evidence from assumptions and choose the next customer research step with more discipline.",
     name: "Aditya Sharma", role: "Founder, Taskly", initials: "AS", color: "#10b981",
   },
   {
-    quote: "The Competitor Intelligence engine is genuinely impressive. It found positioning gaps my $2,000/month consultant missed. This is the co-founder I couldn't afford.",
+    quote: "The competitor workflow made our positioning gaps easier to see and gave the team a clearer research agenda before launch.",
     name: "Priya Menon", role: "Founder, FinanceAI", initials: "PM", color: "#7c3aed",
   },
   {
-    quote: "ColdDM AI alone is worth the subscription. I sent 40 LinkedIn messages, got 12 replies, and closed 3 pilot customers in week one.",
+    quote: "ColdDM helped us turn the evidence review into clearer outreach variants we could test with a small founder-led campaign.",
     name: "Marcus Chen", role: "Founder, LeadFlow", initials: "MC", color: "#2563eb",
   },
   {
-    quote: "The User Psychology Engine gave us a brutal but accurate roast of our landing page. We implemented 4 recommendations and our bounce rate dropped 32%.",
+    quote: "The user psychology review highlighted weak proof and confusing copy, which made our next landing-page experiment much easier to plan.",
     name: "Fatima Al-Rashid", role: "Co-Founder, EdTech.io", initials: "FA", color: "#f59e0b",
   },
 ];
@@ -595,8 +595,8 @@ const plans = [
     name: "Founder",
     price: `$${PLANS.founder.monthlyPrice}`,
     period: "/month",
-    description: "For solo founders validating seriously",
-    features: [`${PLANS.founder.analysesPerMonth} analyses/month`, "All Intelligence Engines", "25 ColdDM generations", "25 BrandForge generations", "Investor memo + slide summary", "PDF exports", "Saved history"],
+    description: "For solo founders assessing assumptions seriously",
+    features: [`${PLANS.founder.analysesPerMonth} analyses/month`, "All assessment tools", "25 ColdDM generations", "25 BrandForge generations", "Investor memo + slide summary", "PDF exports", "Saved history"],
     cta: "Upgrade to Founder",
     href: "/payment?plan=founder&billing=monthly",
     highlighted: true,
@@ -607,7 +607,7 @@ const plans = [
     price: `$${PLANS.growth.monthlyPrice}`,
     period: "/month",
     description: "For founders iterating weekly",
-    features: [`${PLANS.growth.analysesPerMonth} analyses/month`, "All Intelligence Engines", "100 ColdDM generations", "100 BrandForge generations", "Investor memo + slide summary", "Shareable reports", "3 workspaces"],
+    features: [`${PLANS.growth.analysesPerMonth} analyses/month`, "All assessment tools", "100 ColdDM generations", "100 BrandForge generations", "Investor memo + slide summary", "Shareable reports", "3 workspaces"],
     cta: "Upgrade to Growth",
     href: "/payment?plan=growth&billing=monthly",
     highlighted: true,
@@ -618,7 +618,7 @@ const plans = [
     price: `$${PLANS.scale.monthlyPrice}`,
     period: "/month",
     description: "For heavier usage and small teams",
-    features: [`${PLANS.scale.analysesPerMonth} analyses/month`, "All Intelligence Engines", "300 ColdDM generations", "300 BrandForge generations", "Investor memo + slide summary", "Team-ready workspaces", "Priority processing"],
+    features: [`${PLANS.scale.analysesPerMonth} analyses/month`, "All assessment tools", "300 ColdDM generations", "300 BrandForge generations", "Investor memo + slide summary", "Team-ready workspaces", "Priority processing"],
     cta: "Upgrade to Scale",
     href: "/payment?plan=scale&billing=monthly",
     highlighted: false,
@@ -640,7 +640,7 @@ export function PricingSection() {
             <span className="text-gradient-brand">not consultants</span>
           </h2>
           <p className="font-jakarta text-lg text-gray-500 max-w-lg mx-auto">
-            Start free with the core engines. Upgrade when you need higher usage, exports, sharing, and the full intelligence stack.
+            Start free with the core workflows. Upgrade when you need higher usage, exports, sharing, and the full assessment stack.
           </p>
         </AnimatedSection>
 

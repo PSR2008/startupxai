@@ -67,7 +67,7 @@ function refs(evidence: EvidenceItem[], category: EvidenceCategory) {
 
 function supporting(evidence: EvidenceItem[], category: EvidenceCategory): string[] {
   const items = evidence.filter((item) => item.evidenceCategory === category && item.direction !== "contradicts");
-  return items.length ? items.map((item) => item.summary).slice(0, 4) : ["Insufficient public evidence found."];
+  return items.length ? items.map((item) => item.summary).slice(0, 4) : ["Insufficient evidence"];
 }
 
 function opposing(evidence: EvidenceItem[], category: EvidenceCategory): string[] {
@@ -76,8 +76,8 @@ function opposing(evidence: EvidenceItem[], category: EvidenceCategory): string[
 
 function scoreConclusion(score: number, label: string, confidence: EvidenceConfidence): string {
   if (score >= 70) return `${label} looks relatively strong, but confidence is ${confidence} because the score only uses currently available evidence.`;
-  if (score >= 45) return `${label} is plausible but not yet proven; the next step should increase evidence quality.`;
-  return `${label} is weakly supported by current evidence. Treat this as a validation gap, not a final verdict.`;
+  if (score >= 45) return `${label} has partial support from current evidence. The next step should increase evidence quality before treating it as reliable.`;
+  return `Insufficient evidence. Current evidence is too weak to support a precise conclusion for ${label}.`;
 }
 
 export function calculateEvidenceScores(input: EvidenceEngineInput, evidence: EvidenceItem[]): CategoryScore[] {
@@ -200,7 +200,7 @@ export function calculateEvidenceScores(input: EvidenceEngineInput, evidence: Ev
         component("Contradictory evidence coverage", 0, 0.1, "unavailable", { reason: "No opposing source provider configured" }),
       ],
       nextAction: "Add at least five independent source links or experiment results before making a build decision.",
-      assumptions: ["Evidence quality matters more than a high AI-generated score."],
+      assumptions: ["Evidence quality matters more than generated assessment text."],
     },
   ];
 
@@ -252,7 +252,7 @@ export function suggestExperiments(input: EvidenceEngineInput, scores: CategoryS
         ? "customer interviews"
         : "landing-page test",
     hypothesis: `${input.targetCustomer} will show measurable interest in ${input.startupName} if the core assumption behind ${score.label.toLowerCase()} is true.`,
-    assumptionTested: score.assumptions[0] ?? `Validate ${score.label.toLowerCase()}.`,
+    assumptionTested: score.assumptions[0] ?? `Assess ${score.label.toLowerCase()}.`,
     targetAudience: input.targetCustomer,
     steps: [
       "Define one measurable pass/fail metric before starting.",

@@ -213,7 +213,7 @@ export function buildFounderReportContent(
     sections,
     nextActions,
     disclaimer:
-      "StartupX AI provides decision-support analysis based on user inputs and AI-generated reasoning. It is not guaranteed business, financial, legal, or investment advice. Validate assumptions with real customers and current market data.",
+      "StartupX AI provides decision-support analysis based on user inputs, generated reasoning, and any evidence available in the workflow. It is not business, financial, legal, or investment advice. Assess assumptions with real customers and current market data.",
   };
 }
 

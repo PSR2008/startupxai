@@ -8,7 +8,7 @@ import { PLANS } from "@/lib/plans";
 export const metadata: Metadata = {
   title: "Pricing - StartupX AI",
   description:
-    "Simple, transparent pricing for founders. Start free, upgrade when you need the full intelligence stack.",
+    "Simple, transparent pricing for founders. Start free, upgrade when you need the full assessment stack.",
 };
 
 const plans = [
@@ -22,8 +22,8 @@ const plans = [
       { text: `${PLANS.free.analysesPerMonth} analyses/month`, included: true },
       { text: "Idea & Market Engine", included: true },
       { text: "Competitor Intelligence", included: true },
-      { text: "2 ColdDM AI generations/month", included: true },
-      { text: "2 BrandForge AI generations/month", included: true },
+      { text: "2 ColdDM generations/month", included: true },
+      { text: "2 BrandForge generations/month", included: true },
       { text: "One startup workspace", included: true },
       { text: "Explore the core engines before upgrading", included: true },
       { text: "Premium intelligence engines", included: false },
@@ -37,7 +37,7 @@ const plans = [
   },
   {
     name: "Founder",
-    tagline: "For solo founders validating seriously",
+    tagline: "For solo founders assessing assumptions seriously",
     price: `$${PLANS.founder.monthlyPrice}`,
     priceNote: "per month",
     annualNote: `$${PLANS.founder.yearlyPrice} billed annually`,
@@ -45,9 +45,9 @@ const plans = [
     badge: "Starter upgrade",
     features: [
       { text: `${PLANS.founder.analysesPerMonth} analyses/month`, included: true },
-      { text: "All intelligence engines", included: true },
-      { text: "25 ColdDM AI generations/month", included: true },
-      { text: "25 BrandForge AI generations/month", included: true },
+      { text: "All assessment tools", included: true },
+      { text: "25 ColdDM generations/month", included: true },
+      { text: "25 BrandForge generations/month", included: true },
       { text: "PDF exports", included: true },
       { text: "Investor memo + slide-ready summary", included: true },
       { text: "Saved analysis history", included: true },
@@ -69,9 +69,9 @@ const plans = [
     badge: "Most Popular",
     features: [
       { text: `${PLANS.growth.analysesPerMonth} analyses/month`, included: true },
-      { text: "All intelligence engines", included: true },
-      { text: "100 ColdDM AI generations/month", included: true },
-      { text: "100 BrandForge AI generations/month", included: true },
+      { text: "All assessment tools", included: true },
+      { text: "100 ColdDM generations/month", included: true },
+      { text: "100 BrandForge generations/month", included: true },
       { text: "PDF exports", included: true },
       { text: "Investor memo + slide-ready summary", included: true },
       { text: "Shareable reports", included: true },
@@ -92,9 +92,9 @@ const plans = [
     color: "#9e724e",
     features: [
       { text: `${PLANS.scale.analysesPerMonth} analyses/month`, included: true },
-      { text: "All intelligence engines", included: true },
-      { text: "300 ColdDM AI generations/month", included: true },
-      { text: "300 BrandForge AI generations/month", included: true },
+      { text: "All assessment tools", included: true },
+      { text: "300 ColdDM generations/month", included: true },
+      { text: "300 BrandForge generations/month", included: true },
       { text: "PDF exports", included: true },
       { text: "Investor memo + slide-ready summary", included: true },
       { text: "Shareable reports", included: true },
@@ -123,8 +123,8 @@ const faqs = [
     a: "Yes. You can upgrade, downgrade, or cancel at any time. Upgrades take effect immediately. Downgrades take effect at the end of your billing cycle.",
   },
   {
-    q: "What AI model powers the engines?",
-    a: "All six intelligence engines and generation tools are powered by Claude, Anthropic's leading AI model, chosen for its nuanced strategic reasoning and long-context understanding.",
+    q: "How are assessments generated?",
+    a: "StartupX AI combines founder inputs, available evidence, score components, and structured reasoning. Generated findings are decision support, not verified market proof.",
   },
   {
     q: "Is there a money-back guarantee?",
@@ -132,7 +132,7 @@ const faqs = [
   },
   {
     q: "Can I use StartupX AI for client work or agencies?",
-    a: "Founder is best for solo validation, Growth is for weekly iteration, and Scale is for teams or heavier usage.",
+    a: "Founder is best for solo assessment, Growth is for weekly iteration, and Scale is for teams or heavier usage.",
   },
 ];
 
@@ -154,7 +154,7 @@ export default function PricingPage() {
           </h1>
           <p className="font-jakarta text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
             Start with the core engines, then upgrade when you need the full
-            intelligence stack, exports, and higher monthly usage.
+            assessment stack, exports, and higher monthly usage.
           </p>
         </AnimatedSection>
 

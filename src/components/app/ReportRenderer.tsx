@@ -17,8 +17,8 @@ export const ENGINE_LABELS: Record<string, string> = {
   psychology: "User Psychology Engine",
   growth: "Growth Engine",
   decision: "Founder Decision Engine",
-  "cold-dm": "ColdDM AI",
-  "brand-forge": "BrandForge AI",
+  "cold-dm": "ColdDM",
+  "brand-forge": "BrandForge",
 };
 
 export function getReportTitle(report: RenderableReport): string {

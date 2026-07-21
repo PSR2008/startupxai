@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Layers, Palette, Sparkles, SwatchBook, Type, Volume2 } from "lucide-react";
+import { Layers, Palette, SwatchBook, Type, Volume2 } from "lucide-react";
 import EngineHeader from "@/components/app/EngineHeader";
 import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
@@ -129,7 +129,7 @@ export default function BrandForgePage() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto">
       <EngineHeader
         icon={<Palette size={22} />}
-        title="BrandForge AI"
+        title="BrandForge"
         description="Generate names, taglines, positioning lines, voice, personality, and color direction for a brand-ready startup identity."
         badge="Creation Tool"
         badgeVariant="cocoa"
@@ -138,7 +138,7 @@ export default function BrandForgePage() {
 
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <ContextCard icon={<Type size={16} />} title="Name system" detail="Options with rationale" tone="amber" />
-        <ContextCard icon={<Sparkles size={16} />} title="Brand voice" detail="Taglines and personality" tone="emerald" />
+        <ContextCard icon={<Volume2 size={16} />} title="Brand voice" detail="Taglines and personality" tone="emerald" />
         <ContextCard icon={<SwatchBook size={16} />} title="Visual direction" detail="Palette mood and hex ideas" tone="violet" />
       </div>
 
@@ -285,7 +285,7 @@ export default function BrandForgePage() {
                   </div>
                 </div>
 
-                <CopyList title="Taglines" icon={<Sparkles size={14} />} items={result.taglines} tone="emerald" quote />
+                <CopyList title="Taglines" icon={<Type size={14} />} items={result.taglines} tone="emerald" quote />
                 <CopyList title="Positioning Lines" icon={<Layers size={14} />} items={result.positioningLines} tone="blue" />
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -299,7 +299,7 @@ export default function BrandForgePage() {
 
                   <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                     <div className="mb-3 flex items-center gap-2">
-                      <Sparkles size={13} className="text-emerald-600" />
+                      <Volume2 size={13} className="text-emerald-600" />
                       <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Brand Personality</h4>
                     </div>
                     <div className="space-y-2">

@@ -16,7 +16,6 @@ import {
   RefreshCw,
   ReceiptText,
   ShieldCheck,
-  Sparkles,
   TrendingUp,
   UserCircle,
   Zap,
@@ -288,7 +287,7 @@ export default function ProfilePage() {
               </div>
             </div>
             <Link href="/onboarding" className="h-9 px-3.5 rounded-xl border border-black/8 bg-gray-50 text-gray-700 font-bricolage text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-white transition-colors w-fit flex-shrink-0">
-              <Sparkles size={13} />
+              <Compass size={13} />
               {founderProfile ? "Edit setup" : "Complete setup"}
             </Link>
           </div>
@@ -442,7 +441,7 @@ export default function ProfilePage() {
             className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm"
           >
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles size={15} className="text-amber-500" />
+              <Zap size={15} className="text-amber-500" />
               <p className="font-bricolage text-sm font-bold text-gray-900">Quick actions</p>
             </div>
             <div className="space-y-2">

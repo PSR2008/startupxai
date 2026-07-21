@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import test from "node:test";
+import { EVIDENCE_SCORE_DISCLAIMER, classifyEvidenceItem, getScoreEvidenceMetrics } from "../src/lib/evidence-display";
 import { calculateEvidenceScores, overallValidationScore, suggestExperiments } from "../src/lib/evidence-scoring";
 import type { EvidenceEngineInput, EvidenceItem } from "../src/lib/evidence-types";
 import { normalizeHttpUrl } from "../src/lib/safe-url";
@@ -57,6 +60,33 @@ test("calculateEvidenceScores returns transparent category scores", () => {
   assert.ok(scores.some((score) => score.components.some((component) => component.evidenceKind === "unavailable")));
 });
 
+test("evidence items are classified with product-facing evidence labels", () => {
+  assert.equal(classifyEvidenceItem(evidence[0]), "Verified public evidence");
+  assert.equal(classifyEvidenceItem(evidence[1]), "Founder-provided evidence");
+  assert.equal(classifyEvidenceItem({ ...evidence[1], sourceType: "customer interview" }), "Customer research");
+  assert.equal(classifyEvidenceItem({ ...evidence[1], sourceType: "experiment result" }), "Experiment result");
+  assert.equal(classifyEvidenceItem({ ...evidence[1], title: "Assumption: budget exists", sourceType: "founder assumption" }), "Assumption");
+  assert.equal(classifyEvidenceItem({ ...evidence[1], verifiedStatus: "inferred", sourceType: "model assessment" }), "Generated assessment");
+});
+
+test("low-evidence scores expose insufficient-evidence states", () => {
+  const sparseScores = calculateEvidenceScores({ ...input, knownCompetitors: "", mainAssumptions: "", websiteUrl: "" }, []);
+  assert.ok(sparseScores.some((score) => score.conclusion.startsWith("Insufficient evidence.")));
+  assert.ok(sparseScores.some((score) => getScoreEvidenceMetrics(score).insufficientEvidence));
+});
+
+test("score display metadata includes disclaimer and transparency fields", () => {
+  const [score] = calculateEvidenceScores(input, evidence);
+  const metrics = getScoreEvidenceMetrics(score);
+  assert.match(EVIDENCE_SCORE_DISCLAIMER, /does not prove market demand or guarantee business success/);
+  assert.ok(metrics.evidenceCount >= 1);
+  assert.match(metrics.evidenceQuality, /^(Strong|Moderate|Low|Insufficient)$/);
+  assert.ok(Array.isArray(metrics.missingEvidence));
+  assert.match(metrics.confidenceLevel, /^(low|medium|high)$/);
+  assert.ok(metrics.calculationSummary.includes("Calculated with"));
+  assert.ok(metrics.improvementAction.length > 0);
+});
+
 test("overallValidationScore is bounded and confidence is explicit", () => {
   const overall = overallValidationScore(calculateEvidenceScores(input, evidence));
   assert.ok(overall.score >= 0 && overall.score <= 100);
@@ -74,4 +104,30 @@ test("normalizeHttpUrl rejects unsafe protocols", () => {
   assert.equal(normalizeHttpUrl("file:///etc/passwd"), null);
   assert.equal(normalizeHttpUrl("javascript:alert(1)"), null);
   assert.equal(normalizeHttpUrl("https://startupxai.in")?.hostname, "startupxai.in");
+});
+
+test("main visible surfaces avoid deprecated validation and AI-first terminology", () => {
+  const root = join(process.cwd());
+  const surfaces = [
+    "src/app/(app)/evidence-engine/page.tsx",
+    "src/components/app/EvidenceUI.tsx",
+    "src/app/(app)/dashboard/page.tsx",
+    "src/components/marketing/HeroSection.tsx",
+    "src/components/marketing/Navbar.tsx",
+  ];
+  const banned = [
+    "Validation Score",
+    "AI Validation",
+    "Validate your idea",
+    "AI-generated insight",
+    "Instant validation",
+    "AI is thinking",
+  ];
+
+  for (const file of surfaces) {
+    const source = readFileSync(join(root, file), "utf8");
+    for (const phrase of banned) {
+      assert.equal(source.includes(phrase), false, `${file} still contains "${phrase}"`);
+    }
+  }
 });
