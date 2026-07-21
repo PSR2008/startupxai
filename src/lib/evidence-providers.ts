@@ -147,7 +147,7 @@ async function fetchMetadataEvidence(urlValue: string, category: EvidenceItem["e
       method: "GET",
       redirect: "manual",
       signal: controller.signal,
-      headers: { "User-Agent": "StartupXAI-EvidenceBot/1.0" },
+      headers: { "User-Agent": "StartupXAI-EvidenceEngine/1.0" },
     });
     if (!response.ok) return null;
     const contentType = response.headers.get("content-type") ?? "";
