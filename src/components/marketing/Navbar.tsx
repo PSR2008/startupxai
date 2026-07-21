@@ -42,7 +42,7 @@ export default function Navbar() {
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
           scrolled
             ? "bg-white/90 backdrop-blur-xl border-b border-black/6 shadow-sm shadow-black/8"
-            : "bg-transparent"
+            : "bg-[#0b0f14]/72 backdrop-blur-xl border-b border-white/[0.06]"
         )}
       >
         <div className="container-custom">
