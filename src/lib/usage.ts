@@ -1,14 +1,18 @@
 import { getSupabaseAdminClient } from "./supabase";
 import {
-  getGenerationLimit,
   getPlanEntitlements,
-  PLANS,
   type GenerationFeature,
   type PlanKey,
 } from "./plans";
+import { getUserEntitlements, type UserRole } from "./entitlements";
 
 export interface UsageSummary {
   plan: PlanKey;
+  active_plan: PlanKey;
+  effective_plan: PlanKey;
+  role: UserRole;
+  internal_access: boolean;
+  paid_subscription_active: boolean;
   billing_cycle: string | null;
   monthly_limit: number;
   analyses_used: number;
@@ -60,37 +64,27 @@ export async function logUsage(
 
 export async function getEffectivePlan(userId: string): Promise<{
   plan: PlanKey;
+  active_plan: PlanKey;
+  internal_access: boolean;
+  paid_subscription_active: boolean;
+  role: UserRole;
   billing_cycle: string | null;
   expires_at: string | null;
 }> {
   try {
-    const admin = getSupabaseAdminClient();
-    if (!admin) return { plan: "free", billing_cycle: null, expires_at: null };
-
-    const { data: planRow } = await admin
-      .from("user_plans")
-      .select("plan, billing_cycle, active, expires_at")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (!planRow || !planRow.active) {
-      return { plan: "free", billing_cycle: null, expires_at: planRow?.expires_at ?? null };
-    }
-
-    const expired = planRow.expires_at != null && new Date(planRow.expires_at) < new Date();
-    if (expired) {
-      return { plan: "free", billing_cycle: null, expires_at: planRow.expires_at ?? null };
-    }
-
-    const candidatePlan = planRow.plan as PlanKey;
+    const entitlements = await getUserEntitlements(userId);
     return {
-      plan: candidatePlan in PLANS ? candidatePlan : "free",
-      billing_cycle: planRow.billing_cycle ?? null,
-      expires_at: planRow.expires_at ?? null,
+      plan: entitlements.effectivePlan,
+      active_plan: entitlements.activePlan,
+      internal_access: entitlements.internalAccess,
+      paid_subscription_active: entitlements.paidSubscriptionActive,
+      role: entitlements.role,
+      billing_cycle: entitlements.billingCycle,
+      expires_at: entitlements.expiresAt,
     };
   } catch (err) {
     console.error("[getEffectivePlan] unexpected error:", err);
-    return { plan: "free", billing_cycle: null, expires_at: null };
+    return { plan: "free", active_plan: "free", internal_access: false, paid_subscription_active: false, role: "user", billing_cycle: null, expires_at: null };
   }
 }
 
@@ -135,19 +129,22 @@ export async function getFeatureUsage(userId: string, feature: "analysis" | Gene
   currentUsage: number;
   limit: number;
 }> {
-  const { plan } = await getEffectivePlan(userId);
+  const userEntitlements = await getUserEntitlements(userId);
+  const plan = userEntitlements.effectivePlan;
   if (feature === "analysis") {
     return {
       plan,
       currentUsage: await countMonthlyUsage(userId, "analysis"),
-      limit: getPlanEntitlements(plan).monthlyAnalyses,
+      limit: userEntitlements.usageLimits.monthlyAnalyses,
     };
   }
 
   return {
     plan,
     currentUsage: await countMonthlyUsage(userId, "generation", feature),
-    limit: getGenerationLimit(plan, feature),
+    limit: feature === "cold-dm"
+      ? userEntitlements.usageLimits.coldDmMonthlyLimit
+      : userEntitlements.usageLimits.brandForgeMonthlyLimit,
   };
 }
 
@@ -205,6 +202,11 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
   const starterEntitlements = getPlanEntitlements("free");
   const FREE_DEFAULTS: UsageSummary = {
     plan: "free",
+    active_plan: "free",
+    effective_plan: "free",
+    role: "user",
+    internal_access: false,
+    paid_subscription_active: false,
     billing_cycle: null,
     monthly_limit: starterEntitlements.monthlyAnalyses,
     analyses_used: 0,
@@ -225,9 +227,9 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
     const admin = getSupabaseAdminClient();
     if (!admin) return FREE_DEFAULTS;
 
-    const { plan: effectivePlan, billing_cycle: billingCycle, expires_at: expiresAt } =
-      await getEffectivePlan(userId);
-    const entitlements = getPlanEntitlements(effectivePlan);
+    const userEntitlements = await getUserEntitlements(userId);
+    const effectivePlan = userEntitlements.effectivePlan;
+    const entitlements = userEntitlements.usageLimits;
     const used = await countMonthlyUsage(userId, "analysis");
     const coldDmUsed = await countMonthlyUsage(userId, "generation", "cold-dm");
     const brandForgeUsed = await countMonthlyUsage(userId, "generation", "brand-forge");
@@ -238,7 +240,12 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
 
     return {
       plan: effectivePlan,
-      billing_cycle: billingCycle,
+      active_plan: userEntitlements.activePlan,
+      effective_plan: effectivePlan,
+      role: userEntitlements.role,
+      internal_access: userEntitlements.internalAccess,
+      paid_subscription_active: userEntitlements.paidSubscriptionActive,
+      billing_cycle: userEntitlements.billingCycle,
       monthly_limit: entitlements.monthlyAnalyses,
       analyses_used: used,
       analyses_remaining: Math.max(0, entitlements.monthlyAnalyses - used),
@@ -251,7 +258,7 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
       workspace_limit: entitlements.startupWorkspaceLimit,
       workspaces_used: workspaceCount ?? 0,
       workspaces_remaining: Math.max(0, entitlements.startupWorkspaceLimit - (workspaceCount ?? 0)),
-      expires_at: expiresAt,
+      expires_at: userEntitlements.expiresAt,
     };
   } catch (err) {
     console.error("[getUsageSummary] unexpected error:", err);

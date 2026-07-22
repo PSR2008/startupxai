@@ -2,19 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import {
   canUseEngine,
-  getGenerationLimit,
   getPlanEntitlements,
   type EngineId,
   type GenerationFeature,
   type PlanEntitlements,
   type PlanKey,
 } from "./plans";
-import { getEffectivePlan, getFeatureUsage, recordUsageIfWithinLimit } from "./usage";
+import { getFeatureUsage, recordUsageIfWithinLimit } from "./usage";
+import { getUserEntitlements, type UserRole } from "./entitlements";
 
 export interface FeatureAccess {
   allowed: boolean;
   userId: string | null;
   plan: PlanKey;
+  activePlan: PlanKey;
+  role: UserRole;
+  internalAccess: boolean;
+  paidSubscriptionActive: boolean;
   entitlements: PlanEntitlements;
   response?: NextResponse;
 }
@@ -53,6 +57,10 @@ function unauthenticatedAccess(): FeatureAccess {
     allowed: false,
     userId: null,
     plan: "free",
+    activePlan: "free",
+    role: "user",
+    internalAccess: false,
+    paidSubscriptionActive: false,
     entitlements: getPlanEntitlements("free"),
     response: NextResponse.json(
       {
@@ -150,19 +158,24 @@ export async function checkAnalysisAccess(req: NextRequest, engine: EngineId): P
   const userId = await getUserIdFromRequest(req);
   if (!userId) return unauthenticatedAccess();
 
-  const planInfo = await getEffectivePlan(userId);
-  const entitlements = getPlanEntitlements(planInfo.plan);
+  const userEntitlements = await getUserEntitlements(userId);
+  const plan = userEntitlements.effectivePlan;
+  const entitlements = userEntitlements.enabledFeatures;
 
-  if (!canUseEngine(planInfo.plan, engine)) {
+  if (!canUseEngine(plan, engine)) {
     return {
       allowed: false,
       userId,
-      plan: planInfo.plan,
+      plan,
+      activePlan: userEntitlements.activePlan,
+      role: userEntitlements.role,
+      internalAccess: userEntitlements.internalAccess,
+      paidSubscriptionActive: userEntitlements.paidSubscriptionActive,
       entitlements,
       response: featureUnavailableResponse({
         feature: "engine_access",
         engine,
-        plan: planInfo.plan,
+        plan,
       }),
     };
   }
@@ -172,18 +185,31 @@ export async function checkAnalysisAccess(req: NextRequest, engine: EngineId): P
     return {
       allowed: false,
       userId,
-      plan: planInfo.plan,
+      plan,
+      activePlan: userEntitlements.activePlan,
+      role: userEntitlements.role,
+      internalAccess: userEntitlements.internalAccess,
+      paidSubscriptionActive: userEntitlements.paidSubscriptionActive,
       entitlements,
       response: limitResponse({
         feature: "monthly_analyses",
         currentUsage: usage.currentUsage,
         limit: usage.limit,
-        plan: planInfo.plan,
+        plan,
       }),
     };
   }
 
-  return { allowed: true, userId, plan: planInfo.plan, entitlements };
+  return {
+    allowed: true,
+    userId,
+    plan,
+    activePlan: userEntitlements.activePlan,
+    role: userEntitlements.role,
+    internalAccess: userEntitlements.internalAccess,
+    paidSubscriptionActive: userEntitlements.paidSubscriptionActive,
+    entitlements,
+  };
 }
 
 export async function checkGenerationAccess(
@@ -193,26 +219,40 @@ export async function checkGenerationAccess(
   const userId = await getUserIdFromRequest(req);
   if (!userId) return unauthenticatedAccess();
 
-  const planInfo = await getEffectivePlan(userId);
-  const entitlements = getPlanEntitlements(planInfo.plan);
+  const userEntitlements = await getUserEntitlements(userId);
+  const plan = userEntitlements.effectivePlan;
+  const entitlements = userEntitlements.enabledFeatures;
   const usage = await getFeatureUsage(userId, feature);
 
   if (usage.currentUsage >= usage.limit) {
     return {
       allowed: false,
       userId,
-      plan: planInfo.plan,
+      plan,
+      activePlan: userEntitlements.activePlan,
+      role: userEntitlements.role,
+      internalAccess: userEntitlements.internalAccess,
+      paidSubscriptionActive: userEntitlements.paidSubscriptionActive,
       entitlements,
       response: limitResponse({
         feature,
         currentUsage: usage.currentUsage,
         limit: usage.limit,
-        plan: planInfo.plan,
+        plan,
       }),
     };
   }
 
-  return { allowed: true, userId, plan: planInfo.plan, entitlements };
+  return {
+    allowed: true,
+    userId,
+    plan,
+    activePlan: userEntitlements.activePlan,
+    role: userEntitlements.role,
+    internalAccess: userEntitlements.internalAccess,
+    paidSubscriptionActive: userEntitlements.paidSubscriptionActive,
+    entitlements,
+  };
 }
 
 export async function recordAnalysisUsage(userId: string, engine: EngineId, limit: number) {
@@ -222,13 +262,16 @@ export async function recordAnalysisUsage(userId: string, engine: EngineId, limi
 export async function recordGenerationUsage(
   userId: string,
   feature: GenerationFeature,
-  plan: PlanKey
+  _plan: PlanKey
 ) {
+  const entitlements = await getUserEntitlements(userId);
   return recordUsageIfWithinLimit({
     userId,
     feature,
     engineName: feature,
-    limit: getGenerationLimit(plan, feature),
+    limit: feature === "cold-dm"
+      ? entitlements.usageLimits.coldDmMonthlyLimit
+      : entitlements.usageLimits.brandForgeMonthlyLimit,
   });
 }
 

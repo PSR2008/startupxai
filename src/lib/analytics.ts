@@ -1,4 +1,5 @@
 import { getSupabaseAdminClient } from "./supabase";
+import { getUserEntitlements } from "./entitlements";
 
 export type ProductEventName =
   | "analysis_started"
@@ -36,11 +37,17 @@ export async function trackProductEvent(
   try {
     const admin = getSupabaseAdminClient();
     if (!admin) return;
+    const entitlementContext = params.userId ? await getUserEntitlements(params.userId) : null;
 
     const { error } = await admin.from("product_events").insert({
       user_id: params.userId ?? null,
       event_name: eventName,
-      properties: params.properties ?? {},
+      properties: {
+        ...(params.properties ?? {}),
+        ...(entitlementContext
+          ? { internal_user: entitlementContext.internalAccess, role: entitlementContext.role }
+          : {}),
+      },
     });
 
     if (error) {

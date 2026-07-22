@@ -6,6 +6,11 @@ import { getUserIdFromRequest } from "@/lib/usage-limit";
 const starterEntitlements = getPlanEntitlements("free");
 const FREE_USAGE = {
   plan: "free",
+  active_plan: "free",
+  effective_plan: "free",
+  role: "user",
+  internal_access: false,
+  paid_subscription_active: false,
   billing_cycle: null,
   monthly_limit: starterEntitlements.monthlyAnalyses,
   analyses_used: 0,

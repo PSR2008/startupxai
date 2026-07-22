@@ -31,6 +31,11 @@ interface ProfileState {
 
 interface UsageSummary {
   plan: PlanKey;
+  active_plan: PlanKey;
+  effective_plan: PlanKey;
+  role: "user" | "internal" | "admin";
+  internal_access: boolean;
+  paid_subscription_active: boolean;
   billing_cycle: string | null;
   monthly_limit: number;
   analyses_used: number;
@@ -70,6 +75,11 @@ interface FounderProfile {
 
 const FREE_USAGE: UsageSummary = {
   plan: "free",
+  active_plan: "free",
+  effective_plan: "free",
+  role: "user",
+  internal_access: false,
+  paid_subscription_active: false,
   billing_cycle: null,
   monthly_limit: PLANS.free.analysesPerMonth,
   analyses_used: 0,
@@ -229,7 +239,8 @@ export default function ProfilePage() {
 
   if (!profile) return null;
 
-  const isPaid = usage.plan !== "free";
+  const isPaid = usage.paid_subscription_active;
+  const hasInternalAccess = usage.internal_access;
   const planExpiry = usage.expires_at ? formatDate(usage.expires_at) : "No expiry";
   const securityIsError = securityStatus === "error" || resendStatus === "error";
 
@@ -319,7 +330,10 @@ export default function ProfilePage() {
                 iconClassName={profile.emailConfirmedAt ? "text-emerald-600" : "text-amber-500"}
               />
               <InfoCard icon={<CalendarDays size={16} />} label="Joined" value={formatDate(profile.createdAt)} />
-              <InfoCard icon={<Crown size={16} />} label="Current plan" value={getPlanLabel(usage.plan)} iconClassName={isPaid ? "text-emerald-600" : "text-gray-400"} />
+              <InfoCard icon={<Crown size={16} />} label="Current plan" value={isPaid ? getPlanLabel(usage.active_plan) : getPlanLabel("free")} iconClassName={isPaid ? "text-emerald-600" : "text-gray-400"} />
+              {hasInternalAccess && (
+                <InfoCard icon={<ShieldCheck size={16} />} label="Private access" value="Internal access" iconClassName="text-emerald-600" />
+              )}
             </div>
           </motion.section>
 
@@ -450,7 +464,7 @@ export default function ProfilePage() {
                 <ArrowRight size={14} className="text-gray-400" />
               </Link>
               <Link href="/payment?plan=founder&billing=monthly" className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 hover:bg-emerald-100 transition-colors">
-                <span className="font-jakarta text-sm text-emerald-700">{isPaid ? "Manage plan" : "Upgrade to Founder"}</span>
+                <span className="font-jakarta text-sm text-emerald-700">{isPaid ? "Manage plan" : hasInternalAccess ? "Internal access" : "Upgrade to Founder"}</span>
                 <Zap size={14} className="text-emerald-600" />
               </Link>
             </div>
@@ -469,7 +483,7 @@ export default function ProfilePage() {
               <div>
                 <p className="font-bricolage text-sm font-bold text-gray-900">Billing history</p>
                 <p className="font-jakarta text-xs text-gray-400">
-                  {isPaid ? `${getPlanLabel(usage.plan)} ${usage.billing_cycle ?? "monthly"} plan renews/expires on ${planExpiry}.` : "No paid plan is active yet."}
+                  {isPaid ? `${getPlanLabel(usage.active_plan)} ${usage.billing_cycle ?? "monthly"} plan renews/expires on ${planExpiry}.` : "No paid plan is active yet."}
                 </p>
               </div>
             </div>
