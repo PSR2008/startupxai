@@ -38,7 +38,7 @@ export default function HeroSection() {
   return (
     <section
       ref={containerRef}
-      className="hero-stage relative min-h-[94svh] overflow-hidden border-b border-white/10 pt-22 pb-12 sm:pt-24 sm:pb-14"
+      className="hero-stage relative min-h-[94svh] overflow-hidden border-b border-white/10 pt-[5.5rem] pb-12 sm:pt-24 sm:pb-14"
     >
       <div className="absolute inset-0 hero-vignette" />
       <div className="hero-floor-glow" />
@@ -82,7 +82,7 @@ export default function HeroSection() {
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.22, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-                className="mb-6 max-w-[11.9ch] text-balance font-bricolage text-[clamp(3.1rem,7.2vw,5.05rem)] font-bold leading-[0.98] tracking-normal text-white lg:text-[clamp(4.05rem,5.45vw,5.1rem)]"
+                className="mb-7 max-w-[11.9ch] text-balance font-bricolage text-[clamp(3.1rem,7.2vw,5.05rem)] font-bold leading-[0.98] tracking-normal text-white sm:mb-8 lg:text-[clamp(4.05rem,5.45vw,5.1rem)]"
               >
                 Build decisions on evidence, not optimism.
               </motion.h1>
@@ -100,7 +100,7 @@ export default function HeroSection() {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.46, duration: 0.5 }}
-                className="mb-8 flex flex-col gap-3 sm:flex-row"
+                className="mb-10 flex flex-col gap-3 sm:flex-row"
               >
                 <Link href="/signup?next=/evidence-engine">
                   <Button size="xl" icon={<ArrowRight size={18} />} iconPosition="right" className="shadow-xl shadow-emerald-950/40">
@@ -108,7 +108,7 @@ export default function HeroSection() {
                   </Button>
                 </Link>
                 <Link href="/#workflow">
-                  <Button variant="outline" size="xl" className="border-white/14 bg-white/[0.06] text-white backdrop-blur-md hover:border-white/24 hover:bg-white/[0.1]">
+                  <Button variant="outline" size="xl" className="border-white/10 bg-white/[0.035] text-slate-100 backdrop-blur-md hover:border-white/18 hover:bg-white/[0.075]">
                     See how it works
                   </Button>
                 </Link>
@@ -121,8 +121,8 @@ export default function HeroSection() {
                 className="grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3"
               >
                 {workflowItems.map(({ icon: Icon, label, detail }) => (
-                  <div key={label} className="rounded-lg border border-white/10 bg-white/[0.045] p-4 shadow-sm shadow-black/25 backdrop-blur-md">
-                    <Icon size={15} className="mb-3 text-emerald-200" />
+                  <div key={label} className="rounded-lg border border-white/10 bg-white/[0.045] p-3.5 shadow-sm shadow-black/25 backdrop-blur-md">
+                    <Icon size={15} className="mb-2.5 text-emerald-200" />
                     <p className="font-bricolage text-xs font-bold text-white">{label}</p>
                     <p className="mt-1 font-jakarta text-xs leading-relaxed text-slate-400">{detail}</p>
                   </div>
@@ -134,7 +134,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 26, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: 0.42, duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-              className="hero-product-wrap relative lg:-mt-14"
+              className="hero-product-wrap relative w-full justify-self-end lg:-mt-16 lg:w-[96%] lg:translate-x-5 xl:translate-x-8"
             >
               <div className="hero-product-ambient" />
               <div className="hero-product-panel overflow-hidden rounded-xl border border-white/18 bg-[#0d0f15] shadow-2xl">
