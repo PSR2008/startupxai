@@ -1,27 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({
+const bodyFont = IBM_Plex_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  variable: "--font-jakarta",
+  variable: "--font-body",
   display: "swap",
 });
 
-const bricolage = Bricolage_Grotesque({
+const displayFont = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-bricolage",
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
   display: "swap",
 });
 
-const jetbrains = JetBrains_Mono({
+const monoFont = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains",
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -102,7 +102,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${jakarta.variable} ${bricolage.variable} ${jetbrains.variable}`} suppressHydrationWarning>
+      <body className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable}`} suppressHydrationWarning>
         {children}
         <Toaster
           position="top-right"
@@ -111,7 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               background: "#ffffff",
               color: "#0f1117",
               border: "1px solid rgba(0,0,0,0.08)",
-              fontFamily: "var(--font-jakarta)",
+              fontFamily: "var(--font-body)",
               fontSize: "0.875rem",
               borderRadius: "12px",
               padding: "12px 16px",

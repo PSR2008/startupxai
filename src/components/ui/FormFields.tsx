@@ -18,7 +18,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={inputId} className="font-bricolage text-xs font-bold text-gray-700 tracking-wide uppercase">
+          <label htmlFor={inputId} className="font-jakarta text-sm font-semibold text-gray-700">
             {label}
             {props.required && <span className="text-rose-500 ml-1">*</span>}
           </label>
@@ -76,7 +76,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className="flex flex-col gap-1.5">
         {label && (
           <div className="flex items-center justify-between">
-            <label htmlFor={inputId} className="font-bricolage text-xs font-bold text-gray-700 tracking-wide uppercase">
+            <label htmlFor={inputId} className="font-jakarta text-sm font-semibold text-gray-700">
               {label}
               {props.required && <span className="text-rose-500 ml-1">*</span>}
             </label>
@@ -131,7 +131,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={inputId} className="font-bricolage text-xs font-bold text-gray-700 tracking-wide uppercase">
+          <label htmlFor={inputId} className="font-jakarta text-sm font-semibold text-gray-700">
             {label}
             {props.required && <span className="text-rose-500 ml-1">*</span>}
           </label>

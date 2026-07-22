@@ -145,7 +145,7 @@ export default function SignupPage() {
             <button
               onClick={handleResend}
               disabled={resendStatus === "loading"}
-              className="inline-flex items-center gap-2 rounded-xl border border-black/8 bg-white px-4 py-2.5 font-bricolage text-xs font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-black/8 bg-white px-4 py-2.5 font-jakarta text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
             >
               <RefreshCw size={13} className={resendStatus === "loading" ? "animate-spin" : ""} />
               Resend confirmation email
@@ -201,7 +201,7 @@ export default function SignupPage() {
 
           {/* Email */}
           <div className="space-y-1.5">
-            <label className="font-bricolage text-xs font-bold text-gray-700 tracking-wide uppercase">
+            <label className="font-jakarta text-sm font-semibold text-gray-700">
               Email address <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
@@ -237,7 +237,7 @@ export default function SignupPage() {
 
           {/* Password */}
           <div className="space-y-1.5">
-            <label className="font-bricolage text-xs font-bold text-gray-700 tracking-wide uppercase">
+            <label className="font-jakarta text-sm font-semibold text-gray-700">
               Password <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
@@ -290,7 +290,7 @@ export default function SignupPage() {
             onClick={handleSignup}
             disabled={status === "loading"}
             className={[
-              "w-full h-11 rounded-xl font-bricolage text-sm font-bold text-white",
+              "w-full h-11 rounded-xl font-jakarta text-sm font-semibold text-white",
               "bg-gradient-to-br from-emerald-500 to-emerald-600",
               "shadow-md shadow-emerald-500/25",
               "transition-all duration-200",

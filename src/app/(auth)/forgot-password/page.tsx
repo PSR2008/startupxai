@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
           ) : (
             <>
               <div className="space-y-1.5">
-                <label className="font-bricolage text-xs font-bold text-gray-700 tracking-wide uppercase">
+                <label className="font-jakarta text-sm font-semibold text-gray-700">
                   Email address <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
               <button
                 onClick={handleSubmit}
                 disabled={status === "loading"}
-                className="w-full h-11 rounded-xl font-bricolage text-sm font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md shadow-emerald-500/25 transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/35 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2"
+                className="w-full h-11 rounded-xl font-jakarta text-sm font-semibold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md shadow-emerald-500/25 transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/35 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2"
               >
                 {status === "loading" ? "Sending reset link..." : "Send reset link"}
               </button>

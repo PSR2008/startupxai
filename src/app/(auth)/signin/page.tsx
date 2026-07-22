@@ -101,7 +101,7 @@ export default function SigninPage() {
         <div className="rounded-2xl border border-black/8 bg-white p-8 space-y-5 shadow-lg shadow-black/5">
           {/* Email */}
           <div className="space-y-1.5">
-            <label className="font-bricolage text-xs font-bold text-gray-700 tracking-wide uppercase">
+            <label className="font-jakarta text-sm font-semibold text-gray-700">
               Email address <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
@@ -130,7 +130,7 @@ export default function SigninPage() {
           {/* Password */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="font-bricolage text-xs font-bold text-gray-700 tracking-wide uppercase">
+              <label className="font-jakarta text-sm font-semibold text-gray-700">
                 Password <span className="text-rose-500">*</span>
               </label>
               <Link href="/forgot-password" className="font-jakarta text-xs text-emerald-600 hover:text-emerald-700 transition-colors">
@@ -187,7 +187,7 @@ export default function SigninPage() {
           <button
             onClick={handleSignin}
             disabled={status === "loading"}
-            className="w-full h-11 rounded-xl font-bricolage text-sm font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md shadow-emerald-500/25 transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/35 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2"
+            className="w-full h-11 rounded-xl font-jakarta text-sm font-semibold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md shadow-emerald-500/25 transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/35 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2"
           >
             {status === "loading" ? (
               <>

@@ -34,7 +34,7 @@ export default function CopyButton({ text, className, size = "sm", label = "Copy
       onClick={handleCopy}
       className={cn(
         "inline-flex items-center gap-1.5 transition-all duration-200",
-        "rounded-lg border font-bricolage text-xs font-semibold",
+        "rounded-lg border font-jakarta text-xs font-semibold",
         copied
           ? "border-emerald-200 bg-emerald-50 text-emerald-600"
           : "border-black/8 bg-gray-50 text-gray-500 hover:bg-white hover:text-gray-800 hover:border-black/14 hover:shadow-sm",
