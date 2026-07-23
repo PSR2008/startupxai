@@ -8,12 +8,13 @@ import { ArrowRight, BarChart3, ClipboardList, SearchCheck, ShieldCheck } from "
 import Button from "@/components/ui/Button";
 
 const workflowItems = [
-  { icon: SearchCheck, label: "Evidence", detail: "Sources and signals" },
-  { icon: BarChart3, label: "Assumptions", detail: "Mapped to claims" },
-  { icon: ClipboardList, label: "Decisions", detail: "Next test recorded" },
+  { icon: SearchCheck, label: "Collect evidence", detail: "Sources, interviews, and signals" },
+  { icon: BarChart3, label: "Challenge assumptions", detail: "Connect claims to proof and contradictions" },
+  { icon: ClipboardList, label: "Run the next test", detail: "Track experiments and record decisions" },
 ];
 
-const sceneLabels = ["Assumptions", "Evidence", "Experiments", "Decisions"];
+const sceneLabels = ["Source", "Claim", "Experiment", "Decision"];
+const evidenceSummary = ["3 supporting sources", "2 contradictions", "Confidence: medium"];
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -58,9 +59,12 @@ export default function HeroSection() {
 
           <div className="absolute left-5 right-5 top-4 z-10 flex items-center justify-between border-b border-white/[0.06] pb-4 text-[10px] text-slate-400 sm:left-8 sm:right-8 lg:left-12 lg:right-12">
             <span className="font-bricolage font-bold tracking-[0.28em] text-white">StartupX</span>
-            <div className="hidden items-center gap-7 font-jakarta font-semibold text-slate-500 md:flex">
+            <div className="hidden items-center gap-3 font-mono text-[9px] font-medium text-slate-400 md:flex">
               {sceneLabels.map((label) => (
-                <span key={label}>{label}</span>
+                <span key={label} className="inline-flex items-center gap-3">
+                  {label}
+                  {label !== "Decision" && <span className="h-px w-5 bg-emerald-300/35" />}
+                </span>
               ))}
             </div>
             <span className="hidden rounded-md border border-white/10 px-2 py-1 font-jakarta text-slate-300 sm:inline-flex">Evidence Core</span>
@@ -120,11 +124,21 @@ export default function HeroSection() {
                   <span>Evidence</span>
                 </div>
                 <div className="hero-decision-platform">
-                  <span>Decision path</span>
+                  <span>Decision</span>
                 </div>
                 <div className="hero-path hero-path-a" />
                 <div className="hero-path hero-path-b" />
                 <div className="hero-path hero-path-c" />
+                <div className="hero-workflow-label hero-workflow-source">Source</div>
+                <div className="hero-workflow-label hero-workflow-claim">Claim</div>
+                <div className="hero-workflow-label hero-workflow-experiment">Experiment</div>
+                <div className="hero-workflow-label hero-workflow-decision">Decision</div>
+                <div className="hero-scene-caption">From assumption to decision</div>
+                <div className="hero-evidence-summary">
+                  {evidenceSummary.map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
+                </div>
 
                 <div className="hero-evidence-core">
                   <div className="hero-core-shadow" />
@@ -147,10 +161,10 @@ export default function HeroSection() {
                   <span>Source</span>
                 </div>
                 <div className="hero-step-block hero-step-two">
-                  <span>Test</span>
+                  <span>Experiment</span>
                 </div>
                 <div className="hero-step-block hero-step-three">
-                  <span>Confidence</span>
+                  <span>Claim</span>
                 </div>
               </div>
             </motion.div>
