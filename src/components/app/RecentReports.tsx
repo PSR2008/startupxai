@@ -147,7 +147,7 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
   };
 
   return (
-    <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm h-full">
+    <div className="surface-panel h-full p-6">
       <div className="flex items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-2">
           <History size={15} className="text-emerald-600" />
@@ -157,7 +157,7 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
           <button
             onClick={clearHistory}
             disabled={clearing}
-            className="h-8 px-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 font-bricolage text-xs font-bold hover:bg-rose-100 disabled:opacity-50 transition-colors"
+            className="h-8 rounded-lg border border-rose-200 bg-rose-50 px-3 font-jakarta text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-100 disabled:opacity-50"
           >
             {clearing ? "Clearing..." : "Clear history"}
           </button>
@@ -170,20 +170,20 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
           Loading reports...
         </div>
       ) : locked ? (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
           <Lock size={18} className="text-amber-600 mb-3" />
           <p className="font-bricolage text-sm font-bold text-amber-900 mb-1">Saved history starts on Founder</p>
           <p className="font-jakarta text-xs text-amber-700 leading-relaxed mb-3">
             Starter lets you explore the core engines. Upgrade to save reports, export PDFs, and use every intelligence engine.
           </p>
           <Link href="/payment?plan=founder&billing=monthly">
-            <button className="h-9 px-3.5 rounded-xl bg-amber-600 text-white font-bricolage text-xs font-bold hover:bg-amber-700 transition-colors">
+            <button className="h-9 rounded-lg bg-amber-700 px-3.5 font-jakarta text-xs font-semibold text-white transition-colors hover:bg-amber-800">
               Upgrade to Founder
             </button>
           </Link>
         </div>
       ) : reports.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-black/10 bg-gray-50 p-5">
+        <div className="rounded-lg border border-dashed border-black/10 bg-[#f8f6f0] p-5">
           <FileText size={18} className="text-gray-300 mb-3" />
           <p className="font-bricolage text-sm font-bold text-gray-800 mb-1">No reports yet</p>
           <p className="font-jakarta text-xs text-gray-400 leading-relaxed">
@@ -198,9 +198,9 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
               { icon: Trophy, label: "Top engine", value: stats.mostUsedEngine ? ENGINE_LABELS[stats.mostUsedEngine] ?? stats.mostUsedEngine : "Not enough data" },
               { icon: CalendarDays, label: "Last run", value: stats.lastAnalysisAt ? formatDate(stats.lastAnalysisAt) : "Not yet" },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="rounded-xl border border-black/6 bg-gray-50 p-4">
+              <div key={label} className="surface-inset p-4">
                 <Icon size={14} className="text-emerald-600 mb-2" />
-                <p className="font-bricolage text-[11px] font-bold text-gray-400 uppercase tracking-wide">{label}</p>
+                <p className="metadata-text">{label}</p>
                 <p className="font-jakarta text-sm text-gray-800 truncate">{value}</p>
               </div>
             ))}
@@ -208,7 +208,7 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
 
           <div className="space-y-2">
             {reports.map((report) => (
-              <div key={report.id} className="group rounded-xl border border-black/6 bg-gray-50 px-4 py-3 hover:bg-white hover:shadow-sm transition-all">
+              <div key={report.id} className="group rounded-lg border border-black/8 bg-[#f8f6f0] px-4 py-3 transition-all hover:bg-white hover:shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <Link href={`/reports/${report.id}`} className="min-w-0 flex-1">
                     <p className="font-bricolage text-sm font-bold text-gray-900 truncate">
@@ -223,11 +223,11 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
                       onClick={() => deleteReport(report.id)}
                       disabled={busyId === report.id}
                       title="Delete report"
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 hover:text-rose-600 hover:bg-rose-50 disabled:opacity-50 transition-colors"
+                      className="focus-ring flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
                     >
                       {busyId === report.id ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
                     </button>
-                    <Link href={`/reports/${report.id}`} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 hover:text-emerald-600 hover:bg-emerald-50 transition-colors">
+                    <Link href={`/reports/${report.id}`} className="focus-ring flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-emerald-50 hover:text-emerald-700">
                       <ArrowRight size={13} />
                     </Link>
                   </div>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#f7f8fc] flex flex-col">
+    <div className="min-h-screen bg-[var(--color-bg-primary)] flex flex-col">
       {/* Subtle mesh background */}
       <div className="fixed inset-0 pointer-events-none hero-mesh opacity-60" />
       <div className="fixed inset-0 pointer-events-none dot-pattern opacity-30" />

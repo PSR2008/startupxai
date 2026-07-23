@@ -41,7 +41,7 @@ function renderValue(value: unknown): ReactNode {
     return (
       <ul className="space-y-2">
         {value.map((item, index) => (
-          <li key={index} className="rounded-xl border border-black/6 bg-gray-50 p-3">
+          <li key={index} className="surface-inset p-3">
             {typeof item === "object" && item !== null ? renderObject(item as Record<string, unknown>) : String(item)}
           </li>
         ))}
@@ -53,21 +53,21 @@ function renderValue(value: unknown): ReactNode {
     return renderObject(value as Record<string, unknown>);
   }
 
-  return <p className="font-jakarta text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{String(value)}</p>;
+  return <p className="break-words font-jakarta text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{String(value)}</p>;
 }
 
 function renderGeneratedSection(section: FounderReportContent["sections"][number]) {
   return (
-    <section key={section.title} className="break-inside-avoid rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
-      <h2 className="font-bricolage text-base font-bold text-gray-900 mb-2">{section.title}</h2>
+    <section key={section.title} className="surface-panel break-inside-avoid p-5">
+      <h2 className="font-bricolage text-base font-bold text-gray-950 mb-2">{section.title}</h2>
       {section.body && (
         <p className="font-jakarta text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{section.body}</p>
       )}
       {section.items && section.items.length > 0 && (
         <ul className="mt-3 space-y-2">
           {section.items.map((item, index) => (
-            <li key={index} className="flex gap-2 rounded-xl border border-emerald-100 bg-emerald-50/60 p-3 font-jakarta text-sm text-gray-650 leading-relaxed">
-              <span className="font-bricolage text-xs font-bold text-emerald-700">{String(index + 1).padStart(2, "0")}</span>
+            <li key={index} className="flex gap-2 rounded-lg border border-emerald-100 bg-emerald-50/60 p-3 font-jakarta text-sm text-gray-650 leading-relaxed">
+              <span className="font-mono text-xs font-semibold text-emerald-700">{String(index + 1).padStart(2, "0")}</span>
               <span>{item}</span>
             </li>
           ))}
@@ -82,7 +82,7 @@ function renderObject(value: Record<string, unknown>) {
     <div className="space-y-3">
       {Object.entries(value).map(([key, item]) => (
         <div key={key}>
-          <p className="font-bricolage text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
+          <p className="mb-1 font-jakarta text-xs font-semibold text-gray-500">
             {formatLabel(key)}
           </p>
           {renderValue(item)}
@@ -95,17 +95,19 @@ function renderObject(value: Record<string, unknown>) {
 export default function ReportRenderer({ report }: { report: RenderableReport }) {
   return (
     <>
-      <div className="rounded-2xl border border-black/6 bg-white p-7 shadow-sm mb-5">
+      <div className="surface-panel mb-5 overflow-hidden p-0">
+        <div className="h-1 bg-gradient-to-r from-emerald-700 via-emerald-500 to-amber-400" />
+        <div className="p-6 sm:p-7">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
             <FileText size={20} className="text-emerald-600" />
           </div>
           <div>
-            <p className="font-bricolage text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">
+            <p className="mb-1 font-jakarta text-xs font-semibold text-emerald-700">
               {ENGINE_LABELS[report.engine_type] ?? report.engine_type}
             </p>
-            <h1 className="font-bricolage text-3xl font-bold text-gray-900 mb-2">{getReportTitle(report)}</h1>
-            <p className="font-jakarta text-sm text-gray-400 flex items-center gap-1.5">
+            <h1 className="font-bricolage text-2xl sm:text-3xl font-bold text-gray-950 mb-2">{getReportTitle(report)}</h1>
+            <p className="font-jakarta text-sm text-gray-500 flex items-center gap-1.5">
               <CalendarDays size={13} />
               {new Date(report.created_at).toLocaleString("en-US", {
                 month: "short",
@@ -117,16 +119,17 @@ export default function ReportRenderer({ report }: { report: RenderableReport })
             </p>
           </div>
         </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-5">
-        <section className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm h-fit">
-          <h2 className="font-bricolage text-sm font-bold text-gray-900 mb-4">Input</h2>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)]">
+        <section className="surface-panel h-fit p-5">
+          <h2 className="font-bricolage text-sm font-bold text-gray-950 mb-4">Input</h2>
           {renderObject(report.input_data)}
         </section>
 
-        <section className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
-          <h2 className="font-bricolage text-sm font-bold text-gray-900 mb-4">Report Output</h2>
+        <section className="surface-panel min-w-0 p-5">
+          <h2 className="font-bricolage text-sm font-bold text-gray-950 mb-4">Report Output</h2>
           {renderObject(report.output_data)}
         </section>
       </div>
@@ -141,10 +144,12 @@ export function GeneratedReportRenderer({ report }: { report: GeneratedReport })
 
   return (
     <article className="report-document space-y-5">
-      <section className="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-8 shadow-sm break-inside-avoid">
+      <section className="break-inside-avoid overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white shadow-sm">
+        <div className="h-1 bg-gradient-to-r from-emerald-700 via-emerald-500 to-amber-400" />
+        <div className="p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
           <div>
-            <p className="font-bricolage text-xs font-bold text-emerald-700 uppercase tracking-widest mb-2">
+            <p className="mb-2 font-jakarta text-xs font-semibold text-emerald-700">
               StartupX AI
             </p>
             <h1 className="font-bricolage text-3xl sm:text-4xl font-bold text-gray-950 tracking-tight">
@@ -152,8 +157,8 @@ export function GeneratedReportRenderer({ report }: { report: GeneratedReport })
             </h1>
             <p className="font-jakarta text-sm text-gray-500 mt-3 max-w-2xl">{content.subtitle}</p>
           </div>
-          <div className="rounded-2xl border border-white/70 bg-white/80 px-4 py-3 text-right">
-            <p className="font-bricolage text-[10px] font-bold text-gray-400 uppercase tracking-wide">Generated</p>
+          <div className="rounded-lg border border-white/70 bg-white/80 px-4 py-3 text-right">
+            <p className="metadata-text">Generated</p>
             <p className="font-jakarta text-xs text-gray-600">
               {new Date(content.generatedAt).toLocaleDateString("en-US", {
                 month: "short",
@@ -163,6 +168,7 @@ export function GeneratedReportRenderer({ report }: { report: GeneratedReport })
             </p>
           </div>
         </div>
+        </div>
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-3 break-inside-avoid">
@@ -171,15 +177,15 @@ export function GeneratedReportRenderer({ report }: { report: GeneratedReport })
           ["Audience", content.startup.targetAudience || "Not provided"],
           ["Market", [content.startup.industry, content.startup.region].filter(Boolean).join(" / ") || "Not provided"],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
-            <p className="font-bricolage text-[10px] font-bold text-gray-400 uppercase tracking-wide">{label}</p>
+          <div key={label} className="surface-panel p-4">
+            <p className="metadata-text">{label}</p>
             <p className="font-jakarta text-sm text-gray-800 mt-1">{value}</p>
           </div>
         ))}
       </section>
 
       {content.startup.summary && (
-        <section className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm break-inside-avoid">
+        <section className="surface-panel break-inside-avoid p-5">
           <h2 className="font-bricolage text-base font-bold text-gray-900 mb-2">One-Line Concept Summary</h2>
           <p className="font-jakarta text-sm text-gray-600 leading-relaxed">{content.startup.summary}</p>
         </section>
@@ -190,7 +196,7 @@ export function GeneratedReportRenderer({ report }: { report: GeneratedReport })
       </div>
 
       {content.nextActions.length > 0 && (
-        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm break-inside-avoid">
+        <section className="break-inside-avoid rounded-xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
           <h2 className="font-bricolage text-base font-bold text-emerald-900 mb-3">Recommended Next Seven Actions</h2>
           <ol className="space-y-2">
             {content.nextActions.map((action, index) => (
@@ -202,7 +208,7 @@ export function GeneratedReportRenderer({ report }: { report: GeneratedReport })
         </section>
       )}
 
-      <section className="rounded-2xl border border-black/6 bg-gray-50 p-4 break-inside-avoid">
+      <section className="surface-inset break-inside-avoid p-4">
         <p className="font-jakarta text-xs text-gray-500 leading-relaxed">{content.disclaimer}</p>
       </section>
     </article>

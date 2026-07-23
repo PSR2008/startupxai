@@ -72,7 +72,7 @@ export default function UsageWidget() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm animate-pulse">
+      <div className="surface-panel p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="h-3 bg-gray-100 rounded-full w-24" />
           <div className="h-5 bg-gray-100 rounded-full w-16" />
@@ -116,7 +116,7 @@ export default function UsageWidget() {
     : "from-emerald-400 to-emerald-500";
 
   return (
-    <div className={`rounded-2xl border bg-white p-6 shadow-sm ${isFree ? "border-black/6" : "border-emerald-200/60"}`}>
+    <div className={`rounded-xl border bg-[#fffefa] p-6 shadow-sm ${isFree ? "border-black/8" : "border-emerald-200/70"}`}>
       <div className="flex items-start justify-between gap-4 mb-5">
         <div className="flex items-center gap-2.5">
           {isFree ? (
@@ -132,9 +132,9 @@ export default function UsageWidget() {
             <div className="flex items-center gap-2">
               <p className="font-bricolage text-sm font-bold text-gray-900">{isFree ? "Starter Plan" : `${getPlanLabel(data.plan)} Plan`}</p>
               {!isFree && (
-                <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-200">
+                <span className="flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-100 px-1.5 py-0.5">
                   <span className="w-1 h-1 rounded-full bg-emerald-500" />
-                  <span className="font-bricolage text-[9px] font-bold text-emerald-700 uppercase tracking-wide">Active</span>
+                  <span className="font-mono text-[9px] font-semibold text-emerald-700">Active</span>
                 </span>
               )}
             </div>
@@ -144,7 +144,7 @@ export default function UsageWidget() {
 
         {isFree && (
           <Link href="/payment?plan=founder&billing=monthly">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-bricolage text-xs font-bold shadow-sm shadow-emerald-500/20 hover:shadow-md hover:shadow-emerald-500/30 transition-all whitespace-nowrap">
+            <button className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-emerald-700 px-3 py-1.5 font-jakarta text-xs font-semibold text-white shadow-sm shadow-emerald-900/15 transition-all hover:bg-emerald-800 hover:shadow-md">
               <Zap size={10} />
               Upgrade
             </button>
@@ -177,8 +177,8 @@ export default function UsageWidget() {
 
       <div className="grid grid-cols-3 gap-2 mt-4">
         {secondaryUsage.map((item) => (
-          <div key={item.label} className="rounded-xl border border-black/6 bg-gray-50 px-3 py-2.5">
-            <p className="font-bricolage text-[10px] font-bold text-gray-400 uppercase tracking-wide truncate">{item.label}</p>
+          <div key={item.label} className="surface-inset px-3 py-2.5">
+            <p className="metadata-text truncate">{item.label}</p>
             <p className="font-jakarta text-xs text-gray-700 mt-1">
               <span className="font-bricolage font-bold text-gray-900">{item.used}</span> / {item.limit}
             </p>
@@ -187,7 +187,7 @@ export default function UsageWidget() {
       </div>
 
       {isFree && nearLimit && !atLimit && (
-        <div className="mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200">
+        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="font-jakarta text-xs text-amber-700 mb-2">You&apos;re approaching your free limit.</p>
           <Link href="/payment?plan=founder&billing=monthly">
             <button className="font-bricolage text-xs font-bold text-amber-700 hover:text-amber-900 transition-colors">Upgrade to Founder - 50 analyses/month</button>
@@ -196,7 +196,7 @@ export default function UsageWidget() {
       )}
 
       {isFree && atLimit && (
-        <div className="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200">
+        <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-3">
           <p className="font-jakarta text-xs text-rose-700 mb-2">You&apos;ve used all {data.monthly_limit} free analyses this month.</p>
           <Link href="/payment?plan=founder&billing=monthly">
             <button className="font-bricolage text-xs font-bold text-rose-700 hover:text-rose-900 transition-colors">Upgrade to Founder - $5/mo, 50 analyses</button>

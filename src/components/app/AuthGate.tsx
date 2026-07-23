@@ -41,8 +41,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
   if (!allowed) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f8fc]">
-        <div className="flex items-center gap-2 rounded-2xl border border-black/6 bg-white px-5 py-4 shadow-sm">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg-primary)]">
+        <div className="surface-panel flex items-center gap-2 px-5 py-4">
           <Loader2 size={16} className="animate-spin text-emerald-600" />
           <span className="font-jakarta text-sm text-gray-500">Checking account...</span>
         </div>

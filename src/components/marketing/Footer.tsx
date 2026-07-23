@@ -31,7 +31,7 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="border-t border-black/6 bg-white">
+    <footer className="border-t border-black/8 bg-[#fffefa]">
       <div className="container-custom py-16">
         {/* Top */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-14">
@@ -68,7 +68,7 @@ export default function Footer() {
           {/* Links */}
           {Object.entries(footerLinks).map(([section, links]) => (
             <div key={section}>
-              <p className="font-bricolage text-xs font-bold text-gray-900 uppercase tracking-wider mb-4">
+              <p className="mb-4 font-jakarta text-xs font-semibold text-gray-700">
                 {section}
               </p>
               <ul className="space-y-2.5">
@@ -93,7 +93,7 @@ export default function Footer() {
             © {new Date().getFullYear()} StartupX AI. All rights reserved.
           </p>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-200 bg-emerald-50">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <span className="font-jakarta text-xs font-semibold text-emerald-700">
               All systems operational
             </span>

@@ -39,15 +39,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         "bg-emerald-700",
         "text-white",
         "shadow-sm",
-        "hover:bg-emerald-800 hover:-translate-y-0.5",
+        "hover:bg-emerald-800 hover:-translate-y-px hover:shadow-md hover:shadow-emerald-900/10",
         "active:translate-y-0 active:shadow-sm",
         "border border-emerald-900/10",
       ].join(" "),
 
       secondary: [
-        "bg-gray-100 border border-gray-200",
-        "text-gray-800",
-        "hover:bg-gray-200 hover:border-gray-300 hover:-translate-y-0.5",
+        "bg-[#f8f6f0] border border-black/10",
+        "text-gray-800 shadow-xs",
+        "hover:bg-white hover:border-black/15 hover:-translate-y-px",
         "active:translate-y-0",
       ].join(" "),
 
@@ -59,9 +59,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ].join(" "),
 
       outline: [
-        "bg-transparent border border-black/12",
+        "bg-white/50 border border-black/12",
         "text-gray-800",
-        "hover:bg-black/4 hover:border-black/20 hover:-translate-y-0.5",
+        "hover:bg-white hover:border-black/20 hover:-translate-y-px",
         "active:translate-y-0",
       ].join(" "),
 
@@ -69,16 +69,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         "bg-rose-600",
         "text-white border border-rose-600/20",
         "shadow-sm",
-        "hover:bg-rose-700 hover:-translate-y-0.5",
+        "hover:bg-rose-700 hover:-translate-y-px",
         "active:translate-y-0",
       ].join(" "),
     };
 
     const sizes = {
-      sm: "h-8 px-3 text-xs rounded-lg gap-1.5",
-      md: "h-10 px-4 text-sm rounded-xl gap-2",
-      lg: "h-12 px-6 text-sm rounded-xl gap-2",
-      xl: "h-14 px-8 text-base rounded-2xl gap-3",
+      sm: "h-8 px-3 text-xs rounded-md gap-1.5",
+      md: "h-10 px-4 text-sm rounded-lg gap-2",
+      lg: "h-11 px-5 text-sm rounded-lg gap-2",
+      xl: "h-[52px] px-7 text-base rounded-xl gap-3",
     };
 
     return (

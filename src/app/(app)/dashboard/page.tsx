@@ -102,12 +102,12 @@ export default function DashboardPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/evidence-engine">
-              <button className="focus-ring inline-flex h-10 items-center gap-2 rounded-xl bg-emerald-700 px-4 font-bricolage text-xs font-bold text-white shadow-sm hover:bg-emerald-800">
+              <button className="focus-ring inline-flex h-10 items-center gap-2 rounded-lg bg-emerald-700 px-4 font-jakarta text-xs font-semibold text-white shadow-sm hover:bg-emerald-800">
                 Start assessment <ArrowRight size={13} />
               </button>
             </Link>
             <Link href="/onboarding">
-              <button className="focus-ring inline-flex h-10 items-center gap-2 rounded-xl border border-black/10 bg-white px-4 font-bricolage text-xs font-bold text-gray-700 hover:bg-gray-50">
+              <button className="focus-ring inline-flex h-10 items-center gap-2 rounded-lg border border-black/10 bg-white px-4 font-jakarta text-xs font-semibold text-gray-700 hover:bg-gray-50">
                 Update context
               </button>
             </Link>
@@ -117,7 +117,7 @@ export default function DashboardPage() {
 
       <StaggerContainer className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_0.65fr]" staggerDelay={0.05}>
         <StaggerItem>
-          <section className="rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+          <section className="surface-panel p-5">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <p className="font-bricolage text-sm font-bold text-gray-900">Current project</p>
@@ -140,7 +140,7 @@ export default function DashboardPage() {
         </StaggerItem>
 
         <StaggerItem>
-          <section className="h-full rounded-xl border border-black/6 bg-[#10201b] p-5 text-white shadow-sm">
+          <section className="h-full rounded-xl border border-emerald-200/10 bg-[#10201b] p-5 text-white shadow-sm">
             <div className="mb-5 flex items-center justify-between">
               <p className="font-bricolage text-sm font-bold">Workspace health</p>
               <ShieldCheck size={17} className="text-emerald-300" />
@@ -162,7 +162,7 @@ export default function DashboardPage() {
       </StaggerContainer>
 
       <AnimatedSection className="mb-6" delay={0.08}>
-        <section className="rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+        <section className="surface-panel p-5">
           <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-bricolage text-sm font-bold text-gray-900">Quick actions</p>
@@ -181,7 +181,7 @@ export default function DashboardPage() {
                     <Icon size={16} className="text-gray-700" />
                     <Badge variant={action.tone} size="sm">Open</Badge>
                   </div>
-                  <p className="font-bricolage text-sm font-bold text-gray-900">{action.title}</p>
+                  <p className="font-bricolage text-sm font-bold text-gray-950">{action.title}</p>
                   <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{action.description}</p>
                 </Link>
               );
@@ -192,7 +192,7 @@ export default function DashboardPage() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 xl:grid-cols-[0.9fr_1.1fr]">
         <AnimatedSection delay={0.1}>
-          <section className="h-full rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+          <section className="surface-panel h-full p-5">
             <div className="mb-4 flex items-center gap-2">
               <FlaskConical size={15} className="text-amber-600" />
               <p className="font-bricolage text-sm font-bold text-gray-900">Experiments in progress</p>
@@ -207,7 +207,7 @@ export default function DashboardPage() {
         </AnimatedSection>
 
         <AnimatedSection delay={0.12}>
-          <section className="h-full rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+          <section className="surface-panel h-full p-5">
             <div className="mb-4 flex items-center gap-2">
               <ClipboardList size={15} className="text-blue-700" />
               <p className="font-bricolage text-sm font-bold text-gray-900">Open assumptions</p>
@@ -241,7 +241,7 @@ export default function DashboardPage() {
         {secondaryTools.map((tool) => {
           const Icon = tool.icon;
           return (
-            <Link key={tool.href} href={tool.href} className="focus-ring rounded-lg border border-black/6 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+            <Link key={tool.href} href={tool.href} className="surface-panel focus-ring p-4 transition-all hover:-translate-y-px hover:shadow-md">
               <Icon size={15} className="mb-3 text-gray-600" />
               <p className="font-bricolage text-sm font-bold text-gray-900">{tool.title}</p>
             </Link>
@@ -258,8 +258,8 @@ export default function DashboardPage() {
 
 function ProjectField({ label, value, fallback }: { label: string; value?: string | null; fallback: string }) {
   return (
-    <div className="rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
-      <p className="font-bricolage text-[10px] font-bold uppercase tracking-wide text-gray-500">{label}</p>
+    <div className="surface-inset p-4">
+      <p className="metadata-text">{label}</p>
       <p className={`mt-1 font-jakarta text-sm leading-relaxed ${value ? "text-gray-800" : "text-gray-400"}`}>
         {value || fallback}
       </p>
@@ -269,7 +269,7 @@ function ProjectField({ label, value, fallback }: { label: string; value?: strin
 
 function EmptyPanel({ title, description, href, action }: { title: string; description: string; href: string; action: string }) {
   return (
-    <div className="rounded-lg border border-dashed border-black/12 bg-[#fbfaf7] p-5">
+    <div className="rounded-lg border border-dashed border-black/12 bg-[#f8f6f0] p-5">
       <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
       <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-500">{description}</p>
       <Link href={href} className="mt-4 inline-flex items-center gap-1.5 font-bricolage text-xs font-bold text-emerald-700 hover:text-emerald-800">

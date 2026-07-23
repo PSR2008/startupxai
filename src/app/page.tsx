@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#f7f8fc] overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--color-bg-primary)] overflow-x-hidden">
       <Navbar />
       <HeroSection />
       <LogoMarquee />

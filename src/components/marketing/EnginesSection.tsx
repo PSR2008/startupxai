@@ -21,9 +21,9 @@ const logos = [
 
 export function LogoMarquee() {
   return (
-    <section className="py-14 border-y border-black/5 bg-white">
+    <section className="border-y border-black/8 bg-[#fffefa] py-14">
       <div className="container-custom mb-6">
-        <p className="text-center font-jakarta text-xs font-semibold text-gray-400 uppercase tracking-widest">
+        <p className="text-center font-jakarta text-xs font-semibold text-gray-500">
           Strategy areas covered
         </p>
       </div>
@@ -32,9 +32,9 @@ export function LogoMarquee() {
           {[...logos, ...logos].map((logo, i) => (
             <div
               key={`${logo}-${i}`}
-              className="inline-flex items-center justify-center px-7 py-2 mx-3 rounded-xl border border-black/6 bg-gray-50"
+              className="mx-3 inline-flex items-center justify-center rounded-lg border border-black/8 bg-[#f8f6f0] px-7 py-2"
             >
-              <span className="font-bricolage text-sm font-semibold text-gray-400 whitespace-nowrap">
+              <span className="whitespace-nowrap font-jakarta text-sm font-semibold text-gray-500">
                 {logo}
               </span>
             </div>
@@ -132,12 +132,12 @@ const revenueTools = [
 
 export function EnginesSection() {
   return (
-    <section id="engines" className="py-24 px-5 bg-[#f7f8fc]">
+    <section id="engines" className="editorial-section bg-[var(--color-bg-primary)] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 mb-5">
             <SearchCheck size={12} className="text-emerald-500" />
-            <span className="font-jakarta text-xs font-semibold text-emerald-700 uppercase tracking-wide">
+            <span className="font-jakarta text-xs font-semibold text-emerald-700">
               Evidence Workflow
             </span>
           </div>
@@ -162,11 +162,11 @@ export function EnginesSection() {
                 >
                   <Link href={engine.href} className="block h-full">
                     <div
-                      className="h-full rounded-2xl border p-6 flex flex-col gap-4 transition-all duration-200 hover:shadow-lg cursor-pointer group bg-white"
+                      className="group flex h-full cursor-pointer flex-col gap-4 rounded-xl border bg-[#fffefa] p-6 shadow-sm transition-all duration-200 hover:-translate-y-px hover:shadow-md"
                       style={{ borderColor: engine.border }}
                     >
                       <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                        className="flex h-10 w-10 items-center justify-center rounded-lg"
                         style={{ background: engine.bg, border: `1px solid ${engine.border}` }}
                       >
                         <Icon size={18} style={{ color: engine.color }} />
@@ -185,7 +185,7 @@ export function EnginesSection() {
                         {engine.outputs.map((output) => (
                           <span
                             key={output}
-                            className="font-jakarta text-[10px] font-semibold px-2 py-0.5 rounded-full border"
+                            className="rounded-md border px-2 py-0.5 font-jakarta text-[10px] font-semibold"
                             style={{
                               color: engine.color,
                               borderColor: `${engine.color}30`,
@@ -198,7 +198,7 @@ export function EnginesSection() {
                       </div>
 
                       <div
-                        className="flex items-center gap-1.5 font-bricolage text-sm font-semibold group-hover:gap-2.5 transition-all"
+                        className="flex items-center gap-1.5 font-jakarta text-sm font-semibold transition-all group-hover:gap-2.5"
                         style={{ color: engine.color }}
                       >
                         Review findings
@@ -214,7 +214,7 @@ export function EnginesSection() {
 
         <AnimatedSection delay={0.1}>
           <div className="separator mb-10" />
-          <p className="font-bricolage text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-8">
+          <p className="mb-8 text-center font-jakarta text-xs font-semibold text-gray-500">
             Revenue Tools
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
@@ -224,11 +224,11 @@ export function EnginesSection() {
                 <Link key={tool.href} href={tool.href}>
                   <motion.div
                     whileHover={{ y: -3 }}
-                    className="rounded-2xl border border-black/6 bg-white p-6 hover:border-emerald-200 hover:shadow-md transition-all duration-200 cursor-pointer group"
+                    className="group cursor-pointer rounded-xl border border-black/8 bg-[#fffefa] p-6 shadow-sm transition-all duration-200 hover:-translate-y-px hover:border-emerald-200 hover:shadow-md"
                   >
                     <div className="flex items-start gap-4">
                       <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg"
                         style={{ background: `${tool.color}10`, border: `1px solid ${tool.color}25` }}
                       >
                         <Icon size={18} style={{ color: tool.color }} />
@@ -238,7 +238,7 @@ export function EnginesSection() {
                           <h3 className="font-bricolage text-base font-bold text-gray-900">
                             {tool.title}
                           </h3>
-                          <span className="font-jakarta text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
+                          <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[9px] font-semibold text-emerald-700">
                             {tool.badge}
                           </span>
                         </div>
@@ -272,18 +272,18 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="py-24 px-5 bg-white">
+    <section id="features" className="editorial-section bg-[#fffefa] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-violet-200 bg-violet-50 mb-5">
-            <span className="font-jakarta text-xs font-semibold text-violet-700 uppercase tracking-wide">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-violet-200 bg-violet-50 px-3.5 py-1.5">
+            <span className="font-jakarta text-xs font-semibold text-violet-700">
               Product depth
             </span>
           </div>
-          <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-5">
+          <h2 className="mb-5 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             A workspace for the messy middle between idea and evidence
           </h2>
-          <p className="font-jakarta text-lg text-gray-500 max-w-xl mx-auto">
+          <p className="mx-auto max-w-xl font-jakarta text-lg text-gray-600">
             The interface is built for reviewing evidence, naming uncertainty, and deciding what to test next.
           </p>
         </AnimatedSection>
@@ -293,9 +293,9 @@ export function FeaturesSection() {
             const Icon = f.icon;
             return (
               <StaggerItem key={f.title}>
-                <div className="rounded-2xl border border-black/6 bg-[#f7f8fc] p-6 hover:border-black/10 hover:bg-white hover:shadow-sm transition-all duration-200">
+                <div className="surface-inset h-full p-6 transition-all duration-200 hover:-translate-y-px hover:border-black/12 hover:bg-white hover:shadow-sm">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
+                    className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
                     style={{ background: `${f.color}10`, border: `1px solid ${f.color}25` }}
                   >
                     <Icon size={17} style={{ color: f.color }} />
@@ -335,19 +335,19 @@ const workflow = [
 
 export function HowItWorksSection() {
   return (
-    <section id="workflow" className="py-24 px-5 bg-[#f7f8fc]">
+    <section id="workflow" className="editorial-section bg-[var(--color-bg-primary)] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 mb-5">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
             <Zap size={12} className="text-emerald-600" />
-            <span className="font-jakarta text-xs font-semibold text-emerald-700 uppercase tracking-wide">
+            <span className="font-jakarta text-xs font-semibold text-emerald-700">
               Workflow
             </span>
           </div>
-          <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             From uncertainty to structured next steps
           </h2>
-          <p className="font-jakarta text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+          <p className="mx-auto max-w-2xl font-jakarta text-lg leading-relaxed text-gray-600">
             StartupX AI is designed around founder decisions, evidence review, and repeatable workflows.
           </p>
         </AnimatedSection>
@@ -357,9 +357,9 @@ export function HowItWorksSection() {
             const Icon = step.icon;
             return (
               <StaggerItem key={step.title}>
-                <div className="h-full rounded-2xl border border-black/6 bg-white p-7 shadow-sm">
+                <div className="surface-panel h-full p-7">
                   <div className="flex items-center justify-between mb-8">
-                    <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50">
                       <Icon size={18} className="text-emerald-600" />
                     </div>
                     <span className="font-mono text-xs font-bold text-gray-300">0{i + 1}</span>
@@ -392,29 +392,30 @@ export function ComparisonSection() {
   const columns = ["StartupX AI", "Consultants", "Blank chat"];
 
   return (
-    <section className="py-24 px-5 bg-white">
+    <section className="editorial-section bg-[#fffefa] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-blue-200 bg-blue-50 mb-5">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3.5 py-1.5">
             <Scale size={12} className="text-blue-600" />
-            <span className="font-jakarta text-xs font-semibold text-blue-700 uppercase tracking-wide">
+            <span className="font-jakarta text-xs font-semibold text-blue-700">
               Comparison
             </span>
           </div>
-          <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             Built for the gap between prompts and consultants
           </h2>
-          <p className="font-jakarta text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+          <p className="mx-auto max-w-2xl font-jakarta text-lg leading-relaxed text-gray-600">
             Get structured startup thinking with clearer limits, evidence gaps, and next actions.
           </p>
         </AnimatedSection>
 
         <AnimatedSection>
-          <div className="overflow-hidden rounded-2xl border border-black/6 bg-white shadow-sm">
-            <div className="grid grid-cols-[1.5fr_repeat(3,1fr)] bg-gray-50 border-b border-black/6">
-              <div className="p-4 font-bricolage text-xs font-bold text-gray-400 uppercase tracking-wide">Capability</div>
+          <div className="overflow-x-auto rounded-xl border border-black/8 bg-white shadow-sm">
+            <div className="min-w-[640px]">
+            <div className="grid grid-cols-[1.5fr_repeat(3,1fr)] border-b border-black/8 bg-[#f8f6f0]">
+              <div className="p-4 font-jakarta text-xs font-semibold text-gray-500">Capability</div>
               {columns.map((column) => (
-                <div key={column} className="p-4 text-center font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">
+                <div key={column} className="p-4 text-center font-jakarta text-xs font-semibold text-gray-700">
                   {column}
                 </div>
               ))}
@@ -433,6 +434,7 @@ export function ComparisonSection() {
                 ))}
               </div>
             ))}
+            </div>
           </div>
         </AnimatedSection>
       </div>
@@ -468,20 +470,20 @@ const trustItems = [
 
 export function TrustSection() {
   return (
-    <section className="py-24 px-5 bg-[#f7f8fc]">
+    <section className="editorial-section bg-[var(--color-bg-primary)] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 mb-5">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
               <Shield size={12} className="text-emerald-600" />
-              <span className="font-jakarta text-xs font-semibold text-emerald-700 uppercase tracking-wide">
+              <span className="font-jakarta text-xs font-semibold text-emerald-700">
                 Trust layer
               </span>
             </div>
-            <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-5">
+          <h2 className="mb-5 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
               Serious enough for real founder work
             </h2>
-            <p className="font-jakarta text-lg text-gray-500 leading-relaxed">
+            <p className="font-jakarta text-lg leading-relaxed text-gray-600">
               Strategy tools should feel clear, private, and accountable. StartupX AI keeps the product focused on what founders need to decide, test, and improve.
             </p>
           </div>
@@ -490,8 +492,8 @@ export function TrustSection() {
             {trustItems.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
-                  <div className="w-9 h-9 rounded-xl bg-gray-50 border border-black/6 flex items-center justify-center mb-4">
+                <div key={item.title} className="surface-panel p-6">
+                  <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-black/8 bg-[#f8f6f0]">
                     <Icon size={16} className="text-emerald-600" />
                   </div>
                   <h3 className="font-bricolage text-sm font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -545,18 +547,18 @@ const faqItems = [
 
 export function TestimonialsSection() {
   return (
-    <section className="py-24 px-5 bg-[#f7f8fc]">
+    <section className="editorial-section bg-[var(--color-bg-primary)] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-200 bg-amber-50 mb-5">
-            <span className="font-jakarta text-xs font-semibold text-amber-700 uppercase tracking-wide">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3.5 py-1.5">
+            <span className="font-jakarta text-xs font-semibold text-amber-700">
               Methodology
             </span>
           </div>
-          <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             Honest about what is known and unknown
           </h2>
-          <p className="mx-auto max-w-2xl font-jakarta text-lg leading-relaxed text-gray-500">
+          <p className="mx-auto max-w-2xl font-jakarta text-lg leading-relaxed text-gray-600">
             The system is designed to make uncertainty visible, not hide it behind confident language.
           </p>
         </AnimatedSection>
@@ -564,7 +566,7 @@ export function TestimonialsSection() {
         <StaggerContainer className="grid grid-cols-1 gap-5 md:grid-cols-2" staggerDelay={0.08}>
           {methodologyItems.map((item) => (
             <StaggerItem key={item.title}>
-              <div className="h-full rounded-xl border border-black/6 bg-white p-6 shadow-sm">
+              <div className="surface-panel h-full p-6">
                 <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50">
                   <CheckCircle2 size={16} className="text-emerald-700" />
                 </div>
@@ -576,7 +578,7 @@ export function TestimonialsSection() {
         </StaggerContainer>
 
         <AnimatedSection delay={0.12} className="mt-10">
-          <div className="rounded-xl border border-black/6 bg-white p-6 shadow-sm">
+          <div className="surface-panel p-6">
             <p className="mb-4 font-bricolage text-sm font-bold text-gray-900">FAQ</p>
             <div className="divide-y divide-black/6">
               {faqItems.map((item) => (
@@ -644,19 +646,19 @@ const plans = [
 
 export function PricingSection() {
   return (
-    <section id="pricing" className="py-24 px-5 bg-white">
+    <section id="pricing" className="editorial-section bg-[#fffefa] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-blue-200 bg-blue-50 mb-5">
-            <span className="font-jakarta text-xs font-semibold text-blue-700 uppercase tracking-wide">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3.5 py-1.5">
+            <span className="font-jakarta text-xs font-semibold text-blue-700">
               Simple Pricing
             </span>
           </div>
-          <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             Invest in your startup,{" "}
             <span className="text-gradient-brand">not consultants</span>
           </h2>
-          <p className="font-jakarta text-lg text-gray-500 max-w-lg mx-auto">
+          <p className="mx-auto max-w-lg font-jakarta text-lg text-gray-600">
             Start free with the core workflows. Upgrade when you need higher usage, exports, sharing, and the full assessment stack.
           </p>
         </AnimatedSection>
@@ -665,15 +667,15 @@ export function PricingSection() {
           {plans.map((plan) => (
             <StaggerItem key={plan.name}>
               <div
-                className={`relative h-full rounded-2xl border p-7 flex flex-col transition-all duration-200 ${
+                className={`relative flex h-full flex-col rounded-xl border p-7 transition-all duration-200 ${
                   plan.highlighted
-                    ? "border-emerald-300 bg-gradient-to-b from-emerald-50 to-white shadow-lg shadow-emerald-100"
-                    : "border-black/6 bg-[#f7f8fc] hover:bg-white hover:shadow-sm"
+                    ? "border-emerald-300 bg-gradient-to-b from-emerald-50 to-white shadow-md shadow-emerald-100"
+                    : "border-black/8 bg-[#f8f6f0] hover:bg-white hover:shadow-sm"
                 }`}
               >
                 {plan.badge && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="font-bricolage text-[10px] font-bold px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm shadow-emerald-500/30">
+                    <span className="rounded-md bg-emerald-700 px-3 py-1 font-mono text-[10px] font-semibold text-white shadow-sm shadow-emerald-900/20">
                       {plan.badge}
                     </span>
                   </div>
@@ -724,18 +726,18 @@ export function PricingSection() {
 // ============================================
 export function CTASection() {
   return (
-    <section className="py-24 px-5 bg-[#f7f8fc]">
+    <section className="editorial-section bg-[var(--color-bg-primary)] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection>
-          <div className="relative rounded-3xl overflow-hidden">
+          <div className="relative overflow-hidden rounded-2xl">
             {/* Gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600" />
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-800" />
             <div className="absolute inset-0 dot-pattern opacity-20" />
 
             <div className="relative p-12 sm:p-16 text-center">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/30 bg-white/15 mb-6">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                <span className="font-jakarta text-xs font-semibold text-white uppercase tracking-wide">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-md border border-white/30 bg-white/15 px-3.5 py-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                <span className="font-jakarta text-xs font-semibold text-white">
                   Ready to review the evidence?
                 </span>
               </div>
@@ -751,7 +753,7 @@ export function CTASection() {
                   <motion.button
                     whileHover={{ scale: 1.02, y: -1 }}
                     whileTap={{ scale: 0.98 }}
-                    className="h-14 px-8 rounded-2xl bg-white text-emerald-700 font-bricolage font-bold text-base shadow-lg shadow-black/8 hover:shadow-xl hover:shadow-black/8 transition-shadow flex items-center gap-2"
+                    className="flex h-14 items-center gap-2 rounded-xl bg-white px-8 font-jakarta text-base font-semibold text-emerald-800 shadow-lg shadow-black/8 transition-shadow hover:shadow-xl hover:shadow-black/8 focus-ring"
                   >
                     Start an assessment <ArrowRight size={18} />
                   </motion.button>
@@ -760,7 +762,7 @@ export function CTASection() {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="h-14 px-8 rounded-2xl border-2 border-white/40 text-white font-bricolage font-semibold text-base hover:bg-white/10 transition-colors"
+                    className="h-14 rounded-xl border border-white/40 px-8 font-jakarta text-base font-semibold text-white transition-colors hover:bg-white/10 focus-ring"
                   >
                     See all plans
                   </motion.button>

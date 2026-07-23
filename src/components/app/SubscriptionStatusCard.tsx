@@ -54,7 +54,7 @@ export default function SubscriptionStatusCard() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm animate-pulse">
+      <div className="surface-panel p-6">
         <div className="h-3 bg-gray-100 rounded-full w-32 mb-4" />
         <div className="h-6 bg-gray-100 rounded-full w-24 mb-3" />
         <div className="space-y-2">
@@ -80,14 +80,14 @@ export default function SubscriptionStatusCard() {
     : null;
 
   return (
-    <div className={`rounded-2xl border bg-white p-6 shadow-sm ${isPaid && data.active ? "border-emerald-200/60" : "border-black/6"}`}>
+    <div className={`rounded-xl border bg-[#fffefa] p-6 shadow-sm ${isPaid && data.active ? "border-emerald-200/70" : "border-black/8"}`}>
       <div className="flex items-center gap-2 mb-5">
         <Shield size={14} className={isPaid && data.active ? "text-emerald-600" : "text-gray-400"} />
-        <p className="font-bricolage text-xs font-bold text-gray-500 uppercase tracking-widest">Subscription Status</p>
+        <p className="font-jakarta text-xs font-semibold text-gray-500">Subscription Status</p>
       </div>
 
       <div className="flex items-center gap-2.5 mb-5">
-        <motion.div animate={isPaid && data.active ? { scale: [1, 1.2, 1] } : {}} transition={{ repeat: Infinity, duration: 2 }} className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${isPaid && data.active ? "bg-emerald-500" : "bg-gray-300"}`} />
+        <motion.div animate={isPaid && data.active ? { opacity: [0.7, 1, 0.7] } : {}} transition={{ repeat: Infinity, duration: 3 }} className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${isPaid && data.active ? "bg-emerald-500" : "bg-gray-300"}`} />
         <p className={`font-bricolage text-lg font-bold ${isPaid && data.active ? "text-gray-900" : "text-gray-500"}`}>
           {isFree ? "Starter Plan" : data.isExpired ? "Expired" : data.active ? "Active" : "Inactive"}
         </p>
@@ -108,7 +108,7 @@ export default function SubscriptionStatusCard() {
       {isFree && (
         <div className="mt-5 pt-4 border-t border-black/5">
           <Link href="/payment?plan=founder&billing=monthly">
-            <button className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-bricolage text-xs font-bold shadow-sm shadow-emerald-500/20 hover:shadow-md hover:shadow-emerald-500/30 transition-all">
+            <button className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-700 py-2.5 font-jakarta text-xs font-semibold text-white shadow-sm shadow-emerald-900/15 transition-all hover:bg-emerald-800 hover:shadow-md">
               <Zap size={11} />
               Upgrade to Founder - $5/mo
             </button>
@@ -123,7 +123,7 @@ export default function SubscriptionStatusCard() {
 function InfoRow({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <div className="w-6 h-6 rounded-lg bg-gray-50 border border-black/6 flex items-center justify-center flex-shrink-0">{icon}</div>
+      <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border border-black/8 bg-[#f8f6f0]">{icon}</div>
       <div>
         <p className="font-bricolage text-xs font-bold text-gray-700">{title}</p>
         <p className="font-jakarta text-[11px] text-gray-400">{subtitle}</p>

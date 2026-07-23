@@ -18,13 +18,13 @@ export default function EngineHeader({
   accentColor = "#10b981",
 }: EngineHeaderProps) {
   return (
-    <div className="pb-6 border-b border-black/6">
+    <div className="editorial-section pb-6 pt-5">
       <div className="flex items-start gap-4">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 border shadow-sm"
+          className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 border shadow-sm"
           style={{
             background: `${accentColor}10`,
             borderColor: `${accentColor}22`,
@@ -39,7 +39,7 @@ export default function EngineHeader({
               initial={{ opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.05 }}
-              className="font-bricolage text-xl font-bold text-gray-900"
+              className="font-bricolage text-[1.35rem] font-bold leading-tight text-gray-950"
             >
               {title}
             </motion.h1>
@@ -48,7 +48,7 @@ export default function EngineHeader({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.15 }}
-                className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bricolage font-bold border uppercase tracking-wider"
+                className="inline-flex items-center rounded-md border px-2 py-0.5 font-jakarta text-[10px] font-semibold leading-none"
                 style={{
                   background: `${accentColor}10`,
                   color: accentColor,
@@ -64,7 +64,7 @@ export default function EngineHeader({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="font-jakarta text-sm text-gray-500 leading-relaxed"
+            className="max-w-3xl font-jakarta text-sm leading-relaxed text-gray-600"
           >
             {description}
           </motion.p>

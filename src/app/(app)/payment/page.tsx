@@ -165,7 +165,7 @@ function PaymentPageContent() {
     return (
       <>
         <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-        <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-[#f7f8fc]">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-bg-primary)] p-6 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -197,7 +197,7 @@ function PaymentPageContent() {
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
 
-      <div className="min-h-screen bg-[#f7f8fc] p-6 lg:p-10">
+      <div className="min-h-screen bg-[var(--color-bg-primary)] p-6 lg:p-10">
         <div className="max-w-5xl mx-auto">
           <Link
             href="/dashboard"
@@ -487,7 +487,7 @@ function PaymentPageContent() {
 
 function PaymentPageFallback() {
   return (
-    <div className="min-h-screen p-6 lg:p-10 flex items-center justify-center bg-[#f7f8fc]">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg-primary)] p-6 lg:p-10">
       <div className="text-gray-400 text-sm font-bricolage">Loading payment page...</div>
     </div>
   );

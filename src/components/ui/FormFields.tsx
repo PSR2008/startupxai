@@ -16,9 +16,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const inputId = id || label?.toLowerCase().replace(/\s+/g, "-");
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex min-w-0 flex-col gap-1.5">
         {label && (
-          <label htmlFor={inputId} className="font-jakarta text-sm font-semibold text-gray-700">
+          <label htmlFor={inputId} className="font-jakarta text-sm font-semibold text-gray-800">
             {label}
             {props.required && <span className="text-rose-500 ml-1">*</span>}
           </label>
@@ -34,8 +34,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={cn(
-              "w-full h-10 px-3.5 rounded-xl text-sm font-jakarta",
-              "bg-white border text-gray-900 placeholder:text-gray-400",
+              "w-full h-10 px-3.5 rounded-lg text-sm font-jakarta",
+              "bg-white border text-gray-900 placeholder:text-gray-500 shadow-xs",
               "transition-all duration-150",
               "focus:outline-none focus:ring-2 focus:ring-emerald-500/15",
               error
@@ -49,7 +49,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         </div>
 
         {error && <p className="font-jakarta text-xs text-rose-500">{error}</p>}
-        {hint && !error && <p className="font-jakarta text-xs text-gray-400">{hint}</p>}
+        {hint && !error && <p className="font-jakarta text-xs leading-relaxed text-gray-500">{hint}</p>}
       </div>
     );
   }
@@ -73,10 +73,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const currentLength = typeof value === "string" ? value.length : 0;
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex min-w-0 flex-col gap-1.5">
         {label && (
           <div className="flex items-center justify-between">
-            <label htmlFor={inputId} className="font-jakarta text-sm font-semibold text-gray-700">
+            <label htmlFor={inputId} className="font-jakarta text-sm font-semibold text-gray-800">
               {label}
               {props.required && <span className="text-rose-500 ml-1">*</span>}
             </label>
@@ -93,8 +93,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           id={inputId}
           value={value}
           className={cn(
-            "w-full px-3.5 py-3 rounded-xl text-sm font-jakarta resize-none",
-            "bg-white border text-gray-900 placeholder:text-gray-400",
+            "w-full px-3.5 py-3 rounded-lg text-sm font-jakarta resize-none",
+            "bg-white border text-gray-900 placeholder:text-gray-500 shadow-xs",
             "transition-all duration-150",
             "focus:outline-none focus:ring-2 focus:ring-emerald-500/15",
             error
@@ -106,7 +106,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         />
 
         {error && <p className="font-jakarta text-xs text-rose-500">{error}</p>}
-        {hint && !error && <p className="font-jakarta text-xs text-gray-400">{hint}</p>}
+        {hint && !error && <p className="font-jakarta text-xs leading-relaxed text-gray-500">{hint}</p>}
       </div>
     );
   }
@@ -129,9 +129,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     const inputId = id || label?.toLowerCase().replace(/\s+/g, "-");
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex min-w-0 flex-col gap-1.5">
         {label && (
-          <label htmlFor={inputId} className="font-jakarta text-sm font-semibold text-gray-700">
+          <label htmlFor={inputId} className="font-jakarta text-sm font-semibold text-gray-800">
             {label}
             {props.required && <span className="text-rose-500 ml-1">*</span>}
           </label>
@@ -141,8 +141,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            "w-full h-10 px-3.5 rounded-xl text-sm font-jakarta appearance-none cursor-pointer",
-            "bg-white border text-gray-900",
+            "w-full h-10 px-3.5 rounded-lg text-sm font-jakarta appearance-none cursor-pointer",
+            "bg-white border text-gray-900 shadow-xs",
             "transition-all duration-150",
             "focus:outline-none focus:ring-2 focus:ring-emerald-500/15",
             error
@@ -166,7 +166,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         </select>
 
         {error && <p className="font-jakarta text-xs text-rose-500">{error}</p>}
-        {hint && !error && <p className="font-jakarta text-xs text-gray-400">{hint}</p>}
+        {hint && !error && <p className="font-jakarta text-xs leading-relaxed text-gray-500">{hint}</p>}
       </div>
     );
   }

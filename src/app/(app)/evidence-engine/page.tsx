@@ -177,7 +177,7 @@ export default function EvidenceEnginePage() {
           { icon: FlaskConical, title: "Experiments", detail: "Weak assumptions become practical tests." },
           { icon: ShieldCheck, title: "No fake sources", detail: "Missing provider data is shown as unavailable." },
         ].map(({ icon: Icon, title, detail }) => (
-          <div key={title} className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
+          <div key={title} className="surface-panel p-4">
             <Icon size={16} className="text-emerald-600" />
             <p className="mt-2 font-bricolage text-sm font-bold text-gray-900">{title}</p>
             <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
@@ -187,7 +187,7 @@ export default function EvidenceEnginePage() {
 
       <div className="mt-8 grid w-full grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(320px,0.8fr)_minmax(0,1.4fr)] xl:gap-8">
         <div className="min-w-0 space-y-5 xl:sticky xl:top-20">
-          <section className="rounded-xl border border-black/6 bg-white p-6 shadow-sm space-y-5">
+          <section className="surface-panel space-y-5 p-6">
             <div>
               <h3 className="font-bricolage text-base font-bold text-gray-900">Evidence project</h3>
               <p className="mt-1 font-jakarta text-xs text-gray-500">Create one durable project for evidence, scores, assumptions, and experiments.</p>
@@ -206,7 +206,7 @@ export default function EvidenceEnginePage() {
             <Input label="Website" type="url" placeholder="https://example.com" value={form.websiteUrl} onChange={set("websiteUrl")} leftIcon={<Link2 size={14} />} />
           </section>
 
-          <section className="rounded-xl border border-black/6 bg-[#fbfaf7] p-5 shadow-sm">
+          <section className="surface-inset p-5">
             <div className="mb-4 flex items-center gap-2">
               <NotebookPen size={15} className="text-emerald-700" />
               <h3 className="font-bricolage text-sm font-bold text-gray-900">Manual evidence entry</h3>
@@ -226,7 +226,7 @@ export default function EvidenceEnginePage() {
         <div ref={resultRef} className="min-w-0 w-full max-w-full scroll-mt-20 [overflow-wrap:anywhere]">
           <AnimatePresence mode="wait">
             {status === "idle" && (
-              <motion.section key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-full rounded-xl border border-dashed border-black/10 bg-white p-6 text-center shadow-sm sm:p-10">
+              <motion.section key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-full rounded-xl border border-dashed border-black/10 bg-[#fffefa] p-6 text-center shadow-sm sm:p-10">
                 <SearchCheck size={30} className="mx-auto text-emerald-600" />
                 <h3 className="mt-4 font-bricolage text-lg font-bold text-gray-900">Ready for structured assessment</h3>
                 <p className="mx-auto mt-2 max-w-md font-jakarta text-sm leading-relaxed text-gray-500">
@@ -245,10 +245,10 @@ export default function EvidenceEnginePage() {
 
             {status === "success" && result && activeScore && (
               <motion.div key="result" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-full min-w-0 space-y-5">
-                <section className="w-full max-w-full rounded-xl border border-black/6 bg-white p-5 shadow-sm sm:p-6">
+                <section className="surface-panel w-full max-w-full p-5 sm:p-6">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
-                      <p className="font-bricolage text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Evidence project</p>
+                      <p className="font-jakarta text-xs font-semibold text-emerald-700">Evidence project</p>
                       <h2 className="mt-1 break-words font-bricolage text-2xl font-bold text-gray-950">{result.project.startupName}</h2>
                       <div className="mt-3 flex flex-wrap gap-2">
                         <ConfidenceBadge confidence={result.project.confidence} />
@@ -257,7 +257,7 @@ export default function EvidenceEnginePage() {
                       </div>
                     </div>
                     <div className="w-full rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-center sm:max-w-xs sm:flex-shrink-0">
-                      <p className="font-bricolage text-[10px] font-bold uppercase tracking-wide text-emerald-700">Evidence Score</p>
+                      <p className="metadata-text text-emerald-700">Evidence Score</p>
                       <p className="font-bricolage text-4xl font-bold text-emerald-800">{result.project.overallScore}</p>
                       <p className="mt-2 font-jakarta text-[11px] leading-relaxed text-emerald-900">{EVIDENCE_SCORE_DISCLAIMER}</p>
                     </div>
@@ -287,14 +287,14 @@ export default function EvidenceEnginePage() {
 
                 <ScorePanel score={activeScore} />
 
-                <section id="assumptions" className="w-full max-w-full rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+                <section id="assumptions" className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <ClipboardList size={14} className="text-amber-700" />
                     <h3 className="font-bricolage text-sm font-bold text-gray-900">Claim-to-evidence map</h3>
                   </div>
                   <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-2">
                     {activeScore.assumptions.map((assumption) => (
-                      <div key={assumption} className="rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
+                      <div key={assumption} className="surface-inset p-4">
                         <p className="font-bricolage text-xs font-bold text-gray-900">Assumption</p>
                         <p className="mt-1 font-jakarta text-sm leading-relaxed text-gray-600">{assumption}</p>
                         <p className="mt-3 font-jakarta text-xs text-amber-700">Link this to customer research or an experiment result before raising confidence.</p>
@@ -303,7 +303,7 @@ export default function EvidenceEnginePage() {
                   </div>
                 </section>
 
-                <section className="w-full max-w-full rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+                <section className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <Database size={14} className="text-emerald-600" />
                     <h3 className="font-bricolage text-sm font-bold text-gray-900">Evidence collected</h3>
@@ -313,7 +313,7 @@ export default function EvidenceEnginePage() {
                   </div>
                 </section>
 
-                <section className="w-full max-w-full rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+                <section className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <Activity size={14} className="text-blue-600" />
                     <h3 className="font-bricolage text-sm font-bold text-gray-900">Provider status</h3>
@@ -323,14 +323,14 @@ export default function EvidenceEnginePage() {
                   </div>
                 </section>
 
-                <section id="experiments" className="w-full max-w-full rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+                <section id="experiments" className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <FlaskConical size={14} className="text-violet-600" />
                     <h3 className="font-bricolage text-sm font-bold text-gray-900">Recommended next validation actions</h3>
                   </div>
                   <div className="space-y-3">
                     {result.suggestedExperiments.map((experiment) => (
-                      <div key={experiment.hypothesis} className="rounded-lg border border-black/6 bg-gray-50 p-4">
+                      <div key={experiment.hypothesis} className="surface-inset p-4">
                         <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
                           <p className="min-w-0 font-bricolage text-sm font-bold text-gray-900">{experiment.experimentType}</p>
                           <Badge variant="violet" size="sm">{experiment.status}</Badge>
@@ -354,7 +354,7 @@ export default function EvidenceEnginePage() {
                   </div>
                 </section>
 
-                <section className="w-full max-w-full rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+                <section className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <Clock3 size={14} className="text-gray-600" />
                     <h3 className="font-bricolage text-sm font-bold text-gray-900">Project timeline</h3>
@@ -377,7 +377,7 @@ export default function EvidenceEnginePage() {
 function ScorePanel({ score }: { score: CategoryScore }) {
   const metrics = getScoreEvidenceMetrics(score);
   return (
-    <section className="w-full max-w-full rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
+    <section className="surface-panel w-full max-w-full p-5">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -417,7 +417,7 @@ function ScorePanel({ score }: { score: CategoryScore }) {
 
 function ManualEntry({ title, detail }: { title: string; detail: string }) {
   return (
-    <div className="rounded-lg border border-black/6 bg-white p-3">
+    <div className="rounded-lg border border-black/8 bg-[#fffefa] p-3">
       <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
       <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
     </div>
@@ -426,7 +426,7 @@ function ManualEntry({ title, detail }: { title: string; detail: string }) {
 
 function EmptyHint({ title, detail }: { title: string; detail: string }) {
   return (
-    <div className="rounded-lg border border-black/6 bg-[#fbfaf7] p-3">
+    <div className="surface-inset p-3">
       <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
       <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
     </div>
@@ -435,7 +435,7 @@ function EmptyHint({ title, detail }: { title: string; detail: string }) {
 
 function TimelineRow({ title, detail }: { title: string; detail: string }) {
   return (
-    <div className="relative rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
+    <div className="surface-inset relative p-4">
       <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
       <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
     </div>
@@ -485,7 +485,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
   }
 
   return (
-    <section className="w-full max-w-full rounded-xl border border-black/6 bg-white p-5 shadow-sm">
+    <section className="surface-panel w-full max-w-full p-5">
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h3 className="font-bricolage text-sm font-bold text-gray-900">Persisted workflow</h3>
@@ -495,7 +495,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
       </div>
 
       <div className="grid min-w-0 grid-cols-1 gap-3 xl:grid-cols-2 2xl:grid-cols-3">
-        <details className="min-w-0 rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
+        <details className="surface-inset min-w-0 p-4">
           <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-900">Add evidence</summary>
           <form className="mt-4 space-y-3" onSubmit={(e) => { e.preventDefault(); submit(`/api/evidence-projects/${projectId}/evidence`, new FormData(e.currentTarget)); e.currentTarget.reset(); }}>
             <MiniInput name="title" label="Title" required />
@@ -509,11 +509,11 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
               <MiniSelect name="source_quality" label="Quality" options={["low", "medium", "high"]} />
               <MiniSelect name="confidence" label="Confidence" options={["low", "medium", "high"]} />
             </div>
-            <button disabled={busy !== ""} className="focus-ring h-9 rounded-lg bg-emerald-700 px-3 font-bricolage text-xs font-bold text-white disabled:opacity-50">Add source</button>
+            <button disabled={busy !== ""} className="focus-ring h-9 rounded-lg bg-emerald-700 px-3 font-jakarta text-xs font-semibold text-white disabled:opacity-50">Add source</button>
           </form>
         </details>
 
-        <details className="min-w-0 rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
+        <details className="surface-inset min-w-0 p-4">
           <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-900">Record interview</summary>
           <form className="mt-4 space-y-3" onSubmit={(e) => { e.preventDefault(); submit(`/api/evidence-projects/${projectId}/interviews`, new FormData(e.currentTarget)); e.currentTarget.reset(); }}>
             <MiniInput name="participant_segment" label="Participant segment" required />
@@ -529,11 +529,11 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
               <input name="convert_to_evidence" type="checkbox" className="mt-0.5" />
               Convert this interview into customer-research evidence
             </label>
-            <button disabled={busy !== ""} className="focus-ring h-9 rounded-lg bg-emerald-700 px-3 font-bricolage text-xs font-bold text-white disabled:opacity-50">Record interview</button>
+            <button disabled={busy !== ""} className="focus-ring h-9 rounded-lg bg-emerald-700 px-3 font-jakarta text-xs font-semibold text-white disabled:opacity-50">Record interview</button>
           </form>
         </details>
 
-        <details className="min-w-0 rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
+        <details className="surface-inset min-w-0 p-4">
           <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-900">Track experiment</summary>
           <form className="mt-4 space-y-3" onSubmit={(e) => { e.preventDefault(); submit(`/api/evidence-projects/${projectId}/experiments`, new FormData(e.currentTarget)); e.currentTarget.reset(); }}>
             <MiniTextarea name="hypothesis" label="Hypothesis" required />
@@ -549,7 +549,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
             <MiniSelect name="outcome" label="Outcome" options={["inconclusive", "passed", "failed"]} />
             <MiniTextarea name="learning" label="Learning" />
             <MiniTextarea name="next_decision" label="Next decision" />
-            <button disabled={busy !== ""} className="focus-ring h-9 rounded-lg bg-emerald-700 px-3 font-bricolage text-xs font-bold text-white disabled:opacity-50">Create experiment</button>
+            <button disabled={busy !== ""} className="focus-ring h-9 rounded-lg bg-emerald-700 px-3 font-jakarta text-xs font-semibold text-white disabled:opacity-50">Create experiment</button>
           </form>
         </details>
       </div>

@@ -153,7 +153,7 @@ export default function ReportDetailPage() {
   if (loading) {
     return (
       <div className="p-6 lg:p-8 max-w-5xl mx-auto">
-        <div className="rounded-2xl border border-black/6 bg-white p-8 shadow-sm flex items-center gap-2 text-gray-400">
+        <div className="surface-panel flex items-center gap-2 p-8 text-gray-500">
           <Loader2 size={16} className="animate-spin" />
           <span className="font-jakarta text-sm">Loading report...</span>
         </div>
@@ -167,7 +167,7 @@ export default function ReportDetailPage() {
         <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-400 hover:text-gray-700 font-jakarta text-sm mb-6">
           <ArrowLeft size={14} /> Back to dashboard
         </Link>
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-8">
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-8">
           <p className="font-bricolage text-sm font-bold text-rose-700">Report unavailable</p>
           <p className="font-jakarta text-sm text-rose-600 mt-1">{error || "This report could not be found."}</p>
         </div>
@@ -190,7 +190,7 @@ export default function ReportDetailPage() {
             <>
               <button
                 onClick={copyShareUrl}
-                className="h-8 px-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 font-bricolage text-xs font-bold hover:bg-emerald-100 transition-colors flex items-center gap-1.5"
+                className="flex h-8 items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 font-jakarta text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100"
               >
                 <Copy size={13} />
                 {copied ? "Copied" : "Copy link"}
@@ -198,7 +198,7 @@ export default function ReportDetailPage() {
               <button
                 onClick={() => updateSharing(false)}
                 disabled={sharing}
-                className="h-8 px-3 rounded-lg border border-black/10 bg-white text-gray-600 font-bricolage text-xs font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                className="flex h-8 items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 font-jakarta text-xs font-semibold text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-50"
               >
                 <X size={13} />
                 Unshare
@@ -208,7 +208,7 @@ export default function ReportDetailPage() {
             <button
               onClick={() => updateSharing(true)}
               disabled={sharing}
-              className="h-8 px-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 font-bricolage text-xs font-bold hover:bg-emerald-100 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+              className="flex h-8 items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 font-jakarta text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 disabled:opacity-50"
             >
               {sharing ? <Loader2 size={13} className="animate-spin" /> : <Link2 size={13} />}
               Share
@@ -217,7 +217,7 @@ export default function ReportDetailPage() {
           <button
             onClick={deleteReport}
             disabled={deleting}
-            className="h-8 px-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 font-bricolage text-xs font-bold hover:bg-rose-100 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 font-jakarta text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-100 disabled:opacity-50"
           >
             {deleting ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
             Delete
@@ -225,7 +225,7 @@ export default function ReportDetailPage() {
         </div>
       </div>
 
-      <div className="no-print mb-5 rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
+      <div className="surface-panel no-print mb-5 p-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <p className="font-bricolage text-sm font-bold text-gray-900">Founder report outputs</p>

@@ -33,8 +33,8 @@ export default function SharedReportPage() {
   }, [params.token]);
 
   return (
-    <div className="min-h-screen bg-[#f7f8fc]">
-      <header className="no-print border-b border-black/6 bg-white">
+    <div className="min-h-screen bg-[var(--color-bg-primary)]">
+      <header className="no-print border-b border-black/8 bg-[#fffefa]/92 backdrop-blur">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
@@ -42,7 +42,7 @@ export default function SharedReportPage() {
             </div>
             <span className="font-bricolage text-sm font-bold text-gray-900">StartupX AI</span>
           </Link>
-          <Link href="/signup" className="font-bricolage text-xs font-bold text-emerald-700 hover:text-emerald-800">
+          <Link href="/signup" className="font-jakarta text-xs font-semibold text-emerald-700 hover:text-emerald-800">
             Create free account
           </Link>
         </div>
@@ -54,14 +54,14 @@ export default function SharedReportPage() {
         </Link>
 
         {loading && (
-          <div className="rounded-2xl border border-black/6 bg-white p-8 shadow-sm flex items-center gap-2 text-gray-400">
+          <div className="surface-panel flex items-center gap-2 p-8 text-gray-500">
             <Loader2 size={16} className="animate-spin" />
             <span className="font-jakarta text-sm">Loading shared report...</span>
           </div>
         )}
 
         {!loading && error && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-8">
+          <div className="rounded-xl border border-rose-200 bg-rose-50 p-8">
             <p className="font-bricolage text-sm font-bold text-rose-700">Shared report unavailable</p>
             <p className="font-jakarta text-sm text-rose-600 mt-1">{error}</p>
           </div>

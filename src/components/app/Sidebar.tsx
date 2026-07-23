@@ -68,10 +68,10 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="hidden lg:flex flex-col w-60 shrink-0 h-screen sticky top-0 border-r border-black/6 bg-white">
+    <aside className="hidden lg:flex flex-col w-60 shrink-0 h-screen sticky top-0 border-r border-black/8 bg-[#fffefa]/95">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 h-16 border-b border-black/5">
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
+      <div className="flex h-16 items-center gap-2.5 border-b border-black/8 px-5">
+        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-sm shadow-emerald-900/15">
           <Zap size={13} className="text-white" strokeWidth={2.5} />
         </div>
         <span className="font-bricolage text-sm font-bold text-gray-900">
@@ -83,7 +83,7 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5 scrollbar-hide">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="px-3 mb-1.5 font-bricolage text-[10px] font-bold uppercase tracking-widest text-gray-400">
+            <p className="mb-1.5 px-3 font-jakarta text-[11px] font-semibold text-gray-500">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -107,7 +107,7 @@ export default function Sidebar() {
                     />
                     <span className="flex-1 text-[13px]">{item.label}</span>
                     {"badge" in item && item.badge && (
-                      <span className="text-[9px] font-bricolage font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 leading-none">
+                      <span className="rounded-md border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 font-mono text-[9px] font-semibold leading-none text-emerald-700">
                         {item.badge}
                       </span>
                     )}
@@ -128,7 +128,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="p-3 border-t border-black/5 space-y-0.5">
+      <div className="space-y-0.5 border-t border-black/8 p-3">
         <Link
           href="/"
           className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-jakarta text-xs font-medium text-gray-400 hover:text-gray-700 hover:bg-black/4 transition-all"
