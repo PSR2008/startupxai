@@ -116,17 +116,17 @@ export default function HeroSection() {
               style={{ rotateX: sceneRotateX, rotateY: sceneRotateY }}
               aria-hidden="true"
             >
+              <div className="hero-evidence-summary">
+                {evidenceSummary.map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
+              </div>
               <div className="hero-perspective-field">
                 <div className="hero-back-pillar hero-back-pillar-left" />
                 <div className="hero-back-pillar hero-back-pillar-right" />
                 <div className="hero-decision-platform" />
                 <div className="hero-path hero-path-a" />
                 <div className="hero-scene-caption">From assumption to decision</div>
-                <div className="hero-evidence-summary">
-                  {evidenceSummary.map((item) => (
-                    <span key={item}>{item}</span>
-                  ))}
-                </div>
 
                 <div className="hero-evidence-core">
                   <div className="hero-core-shadow" />
@@ -148,6 +148,10 @@ export default function HeroSection() {
                 <div className="hero-workflow-node hero-node-claim" />
                 <div className="hero-workflow-node hero-node-experiment" />
                 <div className="hero-workflow-node hero-node-decision" />
+                <div className="hero-node-label hero-node-label-source">Source</div>
+                <div className="hero-node-label hero-node-label-claim">Claim</div>
+                <div className="hero-node-label hero-node-label-experiment">Experiment</div>
+                <div className="hero-node-label hero-node-label-decision">Decision</div>
               </div>
             </motion.div>
           </div>
