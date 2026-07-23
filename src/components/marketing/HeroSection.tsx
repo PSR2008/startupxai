@@ -44,13 +44,13 @@ export default function HeroSection() {
       ref={containerRef}
       onPointerMove={handlePointerMove}
       onPointerLeave={resetPointer}
-      className="hero-stage relative min-h-[96svh] overflow-hidden border-b border-white/10 pt-[5.35rem] pb-12 sm:pt-24 sm:pb-16"
+      className="hero-stage relative min-h-[92svh] overflow-hidden border-b border-white/10 pt-[5.35rem] pb-10 sm:pt-24 sm:pb-12"
     >
       <div className="absolute inset-0 hero-vignette" aria-hidden="true" />
       <div className="hero-floor-glow" aria-hidden="true" />
 
-      <motion.div className="container-custom relative flex min-h-[calc(96svh-8.5rem)] items-center">
-        <div className="hero-reference-frame relative min-w-0 w-full max-w-[calc(100vw-3rem)] overflow-hidden rounded-xl border border-white/12 bg-[#05070a] px-5 pb-7 pt-16 shadow-2xl sm:max-w-full sm:px-8 sm:pb-9 lg:px-12 lg:pb-12 xl:px-14">
+      <motion.div className="container-custom relative flex min-h-[calc(92svh-8rem)] items-center">
+        <div className="hero-reference-frame relative min-w-0 w-full max-w-[calc(100vw-3rem)] overflow-hidden rounded-xl border border-white/12 bg-[#05070a] px-5 pb-6 pt-16 shadow-2xl sm:max-w-full sm:px-8 sm:pb-8 lg:px-12 lg:pb-10 xl:px-14">
           <div className="absolute inset-0 hero-stage-grid opacity-80" aria-hidden="true" />
           <div className="absolute inset-0 hero-frame-shine" aria-hidden="true" />
           <div className="hero-spotlight hero-spotlight-emerald" aria-hidden="true" />
@@ -70,7 +70,7 @@ export default function HeroSection() {
             <span className="hidden rounded-md border border-white/10 px-2 py-1 font-jakarta text-slate-300 sm:inline-flex">Evidence Core</span>
           </div>
 
-          <div className="relative z-10 grid min-h-[35rem] min-w-0 grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)] lg:gap-8 xl:gap-10">
+          <div className="relative z-10 grid min-h-[32.5rem] min-w-0 grid-cols-1 items-center gap-9 lg:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)] lg:gap-8 xl:gap-10">
             <div className="min-w-0 max-w-full pt-4 lg:max-w-[43rem] lg:pt-6">
               <div className="mb-6 inline-flex items-center gap-2 rounded-md border border-white/12 bg-white/[0.055] px-3 py-1.5 shadow-sm shadow-black/20 backdrop-blur-md">
                 <ShieldCheck size={13} className="text-emerald-300" />
@@ -112,27 +112,15 @@ export default function HeroSection() {
             </div>
 
             <motion.div
-              className="hero-cinematic-scene relative min-h-[25rem] min-w-0 max-w-full overflow-hidden w-full justify-self-end lg:min-h-[34rem] lg:-translate-x-2 xl:translate-x-1"
+              className="hero-cinematic-scene relative min-h-[23rem] min-w-0 max-w-full overflow-hidden w-full justify-self-end lg:min-h-[31.5rem] lg:-translate-x-2 xl:translate-x-1"
               style={{ rotateX: sceneRotateX, rotateY: sceneRotateY }}
               aria-hidden="true"
             >
               <div className="hero-perspective-field">
-                <div className="hero-back-pillar hero-back-pillar-left">
-                  <span>Assumptions</span>
-                </div>
-                <div className="hero-back-pillar hero-back-pillar-right">
-                  <span>Evidence</span>
-                </div>
-                <div className="hero-decision-platform">
-                  <span>Decision</span>
-                </div>
+                <div className="hero-back-pillar hero-back-pillar-left" />
+                <div className="hero-back-pillar hero-back-pillar-right" />
+                <div className="hero-decision-platform" />
                 <div className="hero-path hero-path-a" />
-                <div className="hero-path hero-path-b" />
-                <div className="hero-path hero-path-c" />
-                <div className="hero-workflow-label hero-workflow-source">Source</div>
-                <div className="hero-workflow-label hero-workflow-claim">Claim</div>
-                <div className="hero-workflow-label hero-workflow-experiment">Experiment</div>
-                <div className="hero-workflow-label hero-workflow-decision">Decision</div>
                 <div className="hero-scene-caption">From assumption to decision</div>
                 <div className="hero-evidence-summary">
                   {evidenceSummary.map((item) => (
@@ -156,16 +144,10 @@ export default function HeroSection() {
                   <div className="hero-core-notch hero-core-notch-two" />
                   <div className="hero-core-notch hero-core-notch-three" />
                 </div>
-
-                <div className="hero-step-block hero-step-one">
-                  <span>Source</span>
-                </div>
-                <div className="hero-step-block hero-step-two">
-                  <span>Experiment</span>
-                </div>
-                <div className="hero-step-block hero-step-three">
-                  <span>Claim</span>
-                </div>
+                <div className="hero-workflow-node hero-node-source" />
+                <div className="hero-workflow-node hero-node-claim" />
+                <div className="hero-workflow-node hero-node-experiment" />
+                <div className="hero-workflow-node hero-node-decision" />
               </div>
             </motion.div>
           </div>

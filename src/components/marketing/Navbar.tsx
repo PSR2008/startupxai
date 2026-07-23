@@ -17,7 +17,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-  const isHomeHero = pathname === "/" && !scrolled;
+  const isHomePage = pathname === "/";
+  const isDarkNav = isHomePage || !scrolled;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -40,7 +41,7 @@ export default function Navbar() {
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          scrolled
+          !isDarkNav
             ? "bg-white/90 backdrop-blur-xl border-b border-black/6 shadow-sm shadow-black/8"
             : "bg-[#0b0f14]/72 backdrop-blur-xl border-b border-white/[0.06]"
         )}
@@ -52,7 +53,7 @@ export default function Navbar() {
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-shadow">
                 <Zap size={15} className="text-white" strokeWidth={2.5} />
               </div>
-              <span className={cn("font-bricolage text-base font-bold tracking-normal", isHomeHero ? "text-white" : "text-gray-900")}>
+              <span className={cn("font-bricolage text-base font-bold tracking-normal", isDarkNav ? "text-white" : "text-gray-900")}>
                 StartupX{" "}
                 <span className="text-gradient-brand">AI</span>
               </span>
@@ -67,8 +68,8 @@ export default function Navbar() {
                   className={cn(
                     "px-4 py-2 rounded-xl font-jakarta text-sm font-medium transition-all duration-150",
                     pathname === link.href
-                      ? isHomeHero ? "text-white bg-white/10" : "text-gray-900 bg-black/6"
-                      : isHomeHero ? "text-slate-300 hover:text-white hover:bg-white/10" : "text-gray-500 hover:text-gray-900 hover:bg-black/4"
+                      ? isDarkNav ? "text-white bg-white/10" : "text-gray-900 bg-black/6"
+                      : isDarkNav ? "text-slate-300 hover:text-white hover:bg-white/10" : "text-gray-500 hover:text-gray-900 hover:bg-black/4"
                   )}
                 >
                   {link.label}
@@ -82,7 +83,7 @@ export default function Navbar() {
                 href="/signin"
                 className={cn(
                   "font-jakarta text-sm font-medium transition-colors",
-                  isHomeHero ? "text-slate-300 hover:text-white" : "text-gray-500 hover:text-gray-900"
+                  isDarkNav ? "text-slate-300 hover:text-white" : "text-gray-500 hover:text-gray-900"
                 )}
               >
                 Sign In
@@ -99,7 +100,7 @@ export default function Navbar() {
               onClick={() => setMobileOpen(!mobileOpen)}
               className={cn(
                 "md:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all",
-                isHomeHero ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-gray-500 hover:text-gray-900 hover:bg-black/6"
+                isDarkNav ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-gray-500 hover:text-gray-900 hover:bg-black/6"
               )}
               aria-label="Toggle menu"
             >
