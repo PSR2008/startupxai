@@ -59,11 +59,11 @@ export default function HeroSection() {
 
           <div className="absolute left-5 right-5 top-4 z-10 flex items-center justify-between border-b border-white/[0.06] pb-4 text-[10px] text-slate-400 sm:left-8 sm:right-8 lg:left-12 lg:right-12">
             <span className="font-bricolage font-bold tracking-[0.28em] text-white">StartupX</span>
-            <div className="hidden items-center gap-3 font-mono text-[9px] font-medium text-slate-400 md:flex">
+            <div className="hidden items-center gap-3 font-mono text-[10px] font-medium text-slate-300 md:flex">
               {sceneLabels.map((label) => (
                 <span key={label} className="inline-flex items-center gap-3">
                   {label}
-                  {label !== "Decision" && <span className="h-px w-5 bg-emerald-300/35" />}
+                  {label !== "Decision" && <span className="h-px w-5 bg-emerald-300/40" />}
                 </span>
               ))}
             </div>
