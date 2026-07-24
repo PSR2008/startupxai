@@ -148,10 +148,6 @@ export default function HeroSection() {
                 <div className="hero-workflow-node hero-node-claim" />
                 <div className="hero-workflow-node hero-node-experiment" />
                 <div className="hero-workflow-node hero-node-decision" />
-                <div className="hero-node-label hero-node-label-source">Source</div>
-                <div className="hero-node-label hero-node-label-claim">Claim</div>
-                <div className="hero-node-label hero-node-label-experiment">Experiment</div>
-                <div className="hero-node-label hero-node-label-decision">Decision</div>
               </div>
             </motion.div>
           </div>
