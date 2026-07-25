@@ -148,7 +148,6 @@ export default function HeroSection() {
                 <div className="hero-workflow-node hero-node-experiment" />
                 <div className="hero-workflow-node hero-node-decision" />
               </div>
-              <div className="hero-scene-caption" aria-hidden="true">From assumption to decision</div>
             </motion.div>
           </div>
         </div>

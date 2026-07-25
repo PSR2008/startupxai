@@ -184,7 +184,6 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
 .hero-node-claim{left:40%;bottom:9.1rem}
 .hero-node-experiment{left:60%;bottom:9.1rem}
 .hero-node-decision{left:80%;bottom:9.1rem}
-.hero-scene-caption{position:absolute;left:50%;bottom:7.35rem;z-index:5;font-family:var(--font-mono);font-size:0.72rem;font-weight:500;letter-spacing:0.025em;color:rgba(226,232,240,0.72);transform:translateX(-50%);white-space:nowrap}
 .hero-evidence-summary{position:absolute;right:3%;top:0.5rem;z-index:4;display:flex;width:13.2rem;flex-direction:column;gap:0.42rem;border:1px solid rgba(255,255,255,0.18);background:linear-gradient(135deg,rgba(20,24,30,0.96),rgba(5,8,11,0.9));padding:0.82rem 0.88rem;border-radius:0.52rem;box-shadow:0 20px 38px rgba(0,0,0,0.44),inset 0 1px 0 rgba(255,255,255,0.11)}
 .hero-evidence-summary span{font-family:var(--font-body);font-size:0.88rem;font-weight:600;line-height:1.23;color:rgba(248,250,252,0.9)}
 .hero-evidence-summary span:first-child{color:rgba(209,250,229,0.9)}
@@ -225,14 +224,13 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   .hero-decision-platform{left:22%;bottom:6rem;width:56%}
   .hero-evidence-summary{right:3%;top:0.5rem;width:12rem}
   .hero-evidence-summary span{font-size:0.82rem}
-  .hero-scene-caption{bottom:7.15rem;font-size:0.66rem}
 }
 
 @media(max-width:640px){
   .hero-cinematic-scene{min-height:22rem!important}
   .hero-perspective-field{inset:0 -15% 0 -15%;transform:rotateX(0deg) rotateZ(0deg) scale(0.72)}
   .hero-perspective-field::after{height:10rem;left:18%;right:18%;bottom:1.2rem}
-  .hero-perspective-field::before,.hero-back-pillar,.hero-decision-platform,.hero-scene-caption,.hero-path-a,.hero-workflow-node{display:none}
+  .hero-perspective-field::before,.hero-back-pillar,.hero-decision-platform,.hero-path-a,.hero-workflow-node{display:none}
   .hero-evidence-core{left:50%;bottom:4.8rem;width:12.2rem;transform:translateX(-50%) translateZ(70px) rotateX(0deg)}
   .hero-evidence-summary{left:50%;right:auto;top:auto;bottom:0.35rem;width:13rem;transform:translateX(-50%);display:flex}
   .hero-evidence-summary span{font-size:0.78rem}
