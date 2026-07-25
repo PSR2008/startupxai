@@ -14,6 +14,7 @@ export default function HeroSection() {
         <div className="resadex-ring resadex-ring-three" />
         <div className="resadex-ring resadex-ring-four" />
       </div>
+      <div className="resadex-center-bead" aria-hidden="true" />
 
       <motion.div
         className="resadex-orb-wrap"
@@ -25,6 +26,7 @@ export default function HeroSection() {
         <div className="resadex-orb-shadow" />
         <div className="resadex-orb">
           <div className="resadex-orb-core" />
+          <div className="resadex-orb-bead" />
         </div>
       </motion.div>
 
