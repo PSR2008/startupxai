@@ -111,45 +111,47 @@ export default function HeroSection() {
               </div>
             </div>
 
-            <motion.div
-              className="hero-cinematic-scene relative min-h-[23rem] min-w-0 max-w-full overflow-hidden w-full justify-self-end lg:min-h-[31.5rem] lg:-translate-x-2 xl:translate-x-1"
-              style={{ rotateX: sceneRotateX, rotateY: sceneRotateY }}
-              aria-hidden="true"
-            >
-              <div className="hero-evidence-summary">
-                {evidenceSummary.map((item) => (
-                  <span key={item}>{item}</span>
-                ))}
-              </div>
-              <div className="hero-perspective-field">
-                <div className="hero-back-pillar hero-back-pillar-left" />
-                <div className="hero-back-pillar hero-back-pillar-right" />
-                <div className="hero-decision-platform" />
-                <div className="hero-path hero-path-a" />
-                <div className="hero-scene-caption">From assumption to decision</div>
-
-                <div className="hero-evidence-core">
-                  <div className="hero-core-shadow" />
-                  <div className="hero-core-ring hero-core-ring-outer" />
-                  <div className="hero-core-ring hero-core-ring-mid" />
-                  <div className="hero-core-ring hero-core-ring-inner" />
-                  <svg className="hero-core-symbol" viewBox="0 0 120 120" aria-hidden="true">
-                    <path d="M30 61h23l13-22 24 42" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="30" cy="61" r="6" />
-                    <circle cx="53" cy="61" r="5" />
-                    <circle cx="66" cy="39" r="5" />
-                    <circle cx="90" cy="81" r="6" />
-                  </svg>
-                  <div className="hero-core-notch hero-core-notch-one" />
-                  <div className="hero-core-notch hero-core-notch-two" />
-                  <div className="hero-core-notch hero-core-notch-three" />
+            <div className="hero-cinematic-wrap relative min-h-[23rem] min-w-0 max-w-full overflow-hidden w-full justify-self-end lg:min-h-[31.5rem] lg:-translate-x-2 xl:translate-x-1">
+              <motion.div
+                className="hero-cinematic-scene absolute inset-0"
+                style={{ rotateX: sceneRotateX, rotateY: sceneRotateY }}
+                aria-hidden="true"
+              >
+                <div className="hero-evidence-summary">
+                  {evidenceSummary.map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
                 </div>
-                <div className="hero-workflow-node hero-node-source" />
-                <div className="hero-workflow-node hero-node-claim" />
-                <div className="hero-workflow-node hero-node-experiment" />
-                <div className="hero-workflow-node hero-node-decision" />
-              </div>
-            </motion.div>
+                <div className="hero-perspective-field">
+                  <div className="hero-back-pillar hero-back-pillar-left" />
+                  <div className="hero-back-pillar hero-back-pillar-right" />
+                  <div className="hero-decision-platform" />
+                  <div className="hero-path hero-path-a" />
+
+                  <div className="hero-evidence-core">
+                    <div className="hero-core-shadow" />
+                    <div className="hero-core-ring hero-core-ring-outer" />
+                    <div className="hero-core-ring hero-core-ring-mid" />
+                    <div className="hero-core-ring hero-core-ring-inner" />
+                    <svg className="hero-core-symbol" viewBox="0 0 120 120" aria-hidden="true">
+                      <path d="M30 61h23l13-22 24 42" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="30" cy="61" r="6" />
+                      <circle cx="53" cy="61" r="5" />
+                      <circle cx="66" cy="39" r="5" />
+                      <circle cx="90" cy="81" r="6" />
+                    </svg>
+                    <div className="hero-core-notch hero-core-notch-one" />
+                    <div className="hero-core-notch hero-core-notch-two" />
+                    <div className="hero-core-notch hero-core-notch-three" />
+                  </div>
+                  <div className="hero-workflow-node hero-node-source" />
+                  <div className="hero-workflow-node hero-node-claim" />
+                  <div className="hero-workflow-node hero-node-experiment" />
+                  <div className="hero-workflow-node hero-node-decision" />
+                </div>
+              </motion.div>
+              <div className="hero-scene-caption" aria-hidden="true">From assumption to decision</div>
+            </div>
           </div>
         </div>
       </motion.div>
