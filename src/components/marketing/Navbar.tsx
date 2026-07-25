@@ -18,7 +18,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
-  const isDarkNav = isHomePage || !scrolled;
+  const isDarkNav = !isHomePage && !scrolled;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -40,14 +40,22 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          !isDarkNav
+          "fixed left-0 right-0 z-50 transition-all duration-300",
+          isHomePage ? "top-5 pointer-events-none bg-transparent" : "top-0",
+          !isHomePage && (!isDarkNav
             ? "bg-white/90 backdrop-blur-xl border-b border-black/6 shadow-sm shadow-black/8"
-            : "bg-[#0b0f14]/72 backdrop-blur-xl border-b border-white/[0.06]"
+            : "bg-[#0b0f14]/72 backdrop-blur-xl border-b border-white/[0.06]")
         )}
       >
         <div className="container-custom">
-          <nav className="flex items-center justify-between h-16">
+          <nav
+            className={cn(
+              "flex items-center justify-between",
+              isHomePage
+                ? "pointer-events-auto mx-auto h-[4.25rem] w-[calc(100vw-3rem)] max-w-[980px] rounded-[1.35rem] border border-white/55 bg-white/35 px-4 shadow-[0_18px_50px_rgba(33,50,71,0.16),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-2xl sm:w-full sm:px-5"
+                : "h-16"
+            )}
+          >
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-shadow">
@@ -68,8 +76,8 @@ export default function Navbar() {
                   className={cn(
                     "px-4 py-2 rounded-xl font-jakarta text-sm font-medium transition-all duration-150",
                     pathname === link.href
-                      ? isDarkNav ? "text-white bg-white/10" : "text-gray-900 bg-black/6"
-                      : isDarkNav ? "text-slate-300 hover:text-white hover:bg-white/10" : "text-gray-500 hover:text-gray-900 hover:bg-black/4"
+                      ? isDarkNav ? "text-white bg-white/10" : "text-slate-950 bg-white/35"
+                      : isDarkNav ? "text-slate-300 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-950 hover:bg-white/35"
                   )}
                 >
                   {link.label}
@@ -83,7 +91,7 @@ export default function Navbar() {
                 href="/signin"
                 className={cn(
                   "font-jakarta text-sm font-medium transition-colors",
-                  isDarkNav ? "text-slate-300 hover:text-white" : "text-gray-500 hover:text-gray-900"
+                  isDarkNav ? "text-slate-300 hover:text-white" : "text-slate-700 hover:text-slate-950"
                 )}
               >
                 Sign In
@@ -100,7 +108,7 @@ export default function Navbar() {
               onClick={() => setMobileOpen(!mobileOpen)}
               className={cn(
                 "md:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all",
-                isDarkNav ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-gray-500 hover:text-gray-900 hover:bg-black/6"
+                isDarkNav ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-950 hover:bg-white/35"
               )}
               aria-label="Toggle menu"
             >
