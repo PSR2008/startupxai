@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Creepster, IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
@@ -25,9 +26,8 @@ const monoFont = IBM_Plex_Mono({
   display: "swap",
 });
 
-const horrorFont = Creepster({
-  subsets: ["latin"],
-  weight: "400",
+const horrorFont = localFont({
+  src: "../fonts/SecretSolverRegular-3lYx3.otf",
   variable: "--font-horror",
   display: "swap",
 });
