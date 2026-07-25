@@ -189,119 +189,38 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
 .resadex-ring-four{width:min(42rem,62vw);height:min(18rem,30vw);border-color:rgba(255,255,255,0.42);animation-delay:-12s}
 .resadex-center-bead{
   position:absolute;
-  left:56.4%;
-  top:55%;
-  z-index:6;
-  width:clamp(5.25rem,8.2vw,7.8rem);
+  left:50%;
+  top:42%;
+  z-index:8;
+  width:clamp(8.75rem,11vw,10.5rem);
   aspect-ratio:1;
   border-radius:999px;
+  opacity:1;
   background:
-    radial-gradient(circle at 35% 25%,rgba(255,255,255,1),rgba(255,255,255,0.9) 14%,rgba(230,239,248,0.76) 28%,transparent 30%),
-    radial-gradient(circle at 66% 72%,rgba(20,35,58,0.46),rgba(61,83,113,0.22) 34%,transparent 58%),
-    linear-gradient(145deg,#ffffff 0%,#e6eef7 33%,#aebfd3 64%,#f9fbfe 100%);
-  border:1px solid rgba(255,255,255,0.92);
+    radial-gradient(circle at 32% 24%,#ffffff 0 12%,rgba(255,255,255,0.92) 18%,transparent 24%),
+    radial-gradient(circle at 64% 72%,rgba(12,27,48,0.82),rgba(45,67,96,0.5) 33%,transparent 57%),
+    conic-gradient(from 220deg,#ffffff 0deg,#dce7f1 44deg,#8198b2 116deg,#243955 188deg,#9fb3c9 264deg,#ffffff 360deg);
+  border:1.5px solid rgba(255,255,255,0.96);
   box-shadow:
-    0 20px 56px rgba(36,54,78,0.28),
-    0 0 0 1px rgba(84,106,132,0.16),
+    0 24px 62px rgba(28,43,66,0.34),
+    0 0 0 1px rgba(60,82,110,0.24),
     inset 0 1px 0 rgba(255,255,255,1),
-    inset -14px -16px 26px rgba(62,82,110,0.22);
+    inset 20px 22px 38px rgba(255,255,255,0.44),
+    inset -22px -24px 38px rgba(17,31,52,0.38);
   transform:translate(-50%,-50%);
   pointer-events:none;
 }
-.resadex-orb-wrap{
-  position:absolute;
-  left:50%;
-  top:36%;
-  z-index:5;
-  width:clamp(10rem,17vw,16rem);
-  aspect-ratio:1;
-  margin-left:clamp(-1rem,-2vw,-0.25rem);
-  transform:translate(-50%,-50%);
-  animation:resadex-orb-float 7.5s ease-in-out 1s infinite;
-}
-.resadex-orb-shadow{
-  position:absolute;
-  left:50%;
-  top:112%;
-  width:118%;
-  height:22%;
-  border-radius:999px;
-  background:radial-gradient(ellipse at center,rgba(32,46,66,0.46),rgba(87,106,130,0.18) 42%,transparent 70%);
-  filter:blur(16px);
-  transform:translateX(-50%);
-}
-.resadex-orb{
-  position:absolute;
-  inset:0;
-  border-radius:999px;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 33% 24%,rgba(255,255,255,1),rgba(255,255,255,0.44) 16%,transparent 29%),
-    radial-gradient(circle at 61% 66%,rgba(9,19,35,0.48),rgba(51,70,96,0.22) 35%,transparent 58%),
-    radial-gradient(circle at 50% 50%,rgba(236,244,251,0.9),rgba(184,199,216,0.52) 48%,rgba(61,80,106,0.4) 74%,rgba(255,255,255,0.7) 100%),
-    conic-gradient(from 218deg,rgba(255,255,255,0.96),rgba(86,104,130,0.46),rgba(255,255,255,0.86),rgba(31,47,72,0.42),rgba(255,255,255,0.9));
-  border:1px solid rgba(255,255,255,0.88);
-  box-shadow:
-    0 34px 86px rgba(38,55,80,0.36),
-    0 0 0 1px rgba(78,99,125,0.12),
-    inset 0 1px 0 rgba(255,255,255,0.98),
-    inset 18px 20px 42px rgba(255,255,255,0.34),
-    inset -28px -30px 58px rgba(24,39,62,0.3);
-}
-.resadex-orb::before{
-  content:"";
-  position:absolute;
-  inset:11%;
-  border-radius:inherit;
-  background:
-    radial-gradient(circle at 37% 28%,rgba(255,255,255,0.9),rgba(255,255,255,0.28) 24%,transparent 38%),
-    radial-gradient(circle at 65% 72%,rgba(28,44,68,0.22),transparent 48%);
-  border:1px solid rgba(255,255,255,0.54);
-}
-.resadex-orb::after{
+.resadex-center-bead::after{
   content:"";
   position:absolute;
   left:20%;
-  right:18%;
-  top:13%;
-  height:18%;
+  top:17%;
+  width:34%;
+  height:22%;
   border-radius:999px;
-  background:linear-gradient(100deg,transparent,rgba(255,255,255,0.92),transparent);
-  filter:blur(1px);
-  transform:rotate(-18deg);
-}
-.resadex-orb-core{
-  position:absolute;
-  inset:35%;
-  border-radius:999px;
-  background:
-    radial-gradient(circle at 38% 28%,rgba(255,255,255,1),rgba(255,255,255,0.78) 18%,transparent 32%),
-    radial-gradient(circle at 55% 58%,rgba(239,247,255,0.98),rgba(188,204,222,0.72) 58%,rgba(75,94,120,0.34));
-  border:1px solid rgba(255,255,255,0.68);
-  box-shadow:
-    0 8px 28px rgba(56,75,102,0.22),
-    inset 0 1px 0 rgba(255,255,255,0.96),
-    inset -8px -10px 18px rgba(57,76,104,0.16);
-}
-.resadex-orb-bead{
-  position:absolute;
-  left:50%;
-  top:50%;
-  z-index:2;
-  width:36%;
-  aspect-ratio:1;
-  border-radius:999px;
-  background:
-    radial-gradient(circle at 34% 24%,rgba(255,255,255,1),rgba(255,255,255,0.86) 16%,rgba(224,234,245,0.74) 31%,transparent 32%),
-    radial-gradient(circle at 62% 68%,rgba(31,48,73,0.42),rgba(82,103,130,0.18) 34%,transparent 58%),
-    linear-gradient(145deg,#ffffff 0%,#dce8f2 36%,#a9bacd 68%,#f8fbff 100%);
-  border:1px solid rgba(255,255,255,0.9);
-  box-shadow:
-    0 10px 30px rgba(36,54,78,0.28),
-    0 0 0 1px rgba(87,108,134,0.14),
-    inset 0 1px 0 rgba(255,255,255,1),
-    inset -9px -10px 18px rgba(63,82,108,0.2);
-  transform:translate(-50%,-50%);
+  background:rgba(255,255,255,0.92);
+  filter:blur(3px);
+  transform:rotate(-22deg);
 }
 .resadex-copy{
   position:absolute;
@@ -400,14 +319,8 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   0%{transform:translate(-51%,-50%) rotate(-14deg) scale(0.99)}
   100%{transform:translate(-49%,-51%) rotate(-10deg) scale(1.02)}
 }
-@keyframes resadex-orb-float{
-  0%,100%{translate:0 0}
-  50%{translate:0 -10px}
-}
-
 @media(max-width:900px){
   .resadex-hero{padding-top:6.75rem}
-  .resadex-orb-wrap{top:34%;width:clamp(8rem,24vw,11rem)}
   .resadex-copy{padding-bottom:5rem}
   .resadex-title{font-size:clamp(2.65rem,11vw,5.8rem);letter-spacing:clamp(0.22rem,1.8vw,1.1rem);gap:clamp(0.7rem,2.4vw,1.8rem)}
 }
@@ -419,8 +332,7 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   .resadex-ring-two{width:92vw;height:48vw}
   .resadex-ring-three{width:70vw;height:38vw}
   .resadex-ring-four{display:none}
-  .resadex-center-bead{left:69%;top:39%;width:5.3rem}
-  .resadex-orb-wrap{top:31%;width:8.5rem;margin-left:0}
+  .resadex-center-bead{left:67%;top:37%;width:5.4rem}
   .resadex-copy{left:0;right:0;width:100vw;overflow:hidden;padding:0 1rem 4.7rem}
   .resadex-copy>.resadex-kicker,.resadex-copy>.resadex-title,.resadex-copy>.resadex-subtitle,.resadex-copy>.resadex-actions{transform:translateX(-2.5rem)}
   .resadex-kicker{letter-spacing:0.22em;font-size:0.62rem}
