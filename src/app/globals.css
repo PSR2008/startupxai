@@ -208,6 +208,9 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
     inset 20px 22px 38px rgba(255,255,255,0.44),
     inset -22px -24px 38px rgba(17,31,52,0.38);
   transform:translate(-50%,-50%);
+  animation:resadex-bead-spin 16s linear infinite;
+  transform-origin:center;
+  will-change:transform;
   pointer-events:none;
 }
 .resadex-center-bead::after{
@@ -245,19 +248,24 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:clamp(1rem,4vw,4rem);
-  width:min(100%,72rem);
+  gap:clamp(0.7rem,2.1vw,2.35rem);
+  width:min(100%,68rem);
   margin:0;
-  color:#07111f;
+  color:transparent;
   font-family:var(--font-display);
-  font-size:clamp(3.25rem,8.6vw,8.1rem);
-  font-weight:500;
-  line-height:0.88;
-  letter-spacing:clamp(0.32rem,2.45vw,2.28rem);
+  font-size:clamp(3.5rem,7.3vw,7.15rem);
+  font-weight:700;
+  line-height:0.9;
+  letter-spacing:clamp(0.04rem,0.72vw,0.58rem);
   text-transform:uppercase;
   text-wrap:balance;
+  background:linear-gradient(180deg,#172234 0%,#07111f 52%,#020712 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  font-feature-settings:"ss01" 1,"kern" 1;
+  text-shadow:0 16px 34px rgba(25,40,62,0.1);
 }
-.resadex-title span:last-child{letter-spacing:clamp(0.16rem,1.8vw,1.5rem)}
+.resadex-title span:last-child{letter-spacing:clamp(0.02rem,0.45vw,0.34rem)}
 .resadex-subtitle{
   width:min(100%,42rem);
   margin:1.65rem auto 0;
@@ -319,10 +327,14 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   0%{transform:translate(-51%,-50%) rotate(-14deg) scale(0.99)}
   100%{transform:translate(-49%,-51%) rotate(-10deg) scale(1.02)}
 }
+@keyframes resadex-bead-spin{
+  0%{transform:translate(-50%,-50%) rotate(0deg)}
+  100%{transform:translate(-50%,-50%) rotate(360deg)}
+}
 @media(max-width:900px){
   .resadex-hero{padding-top:6.75rem}
   .resadex-copy{padding-bottom:5rem}
-  .resadex-title{font-size:clamp(2.65rem,11vw,5.8rem);letter-spacing:clamp(0.22rem,1.8vw,1.1rem);gap:clamp(0.7rem,2.4vw,1.8rem)}
+  .resadex-title{font-size:clamp(3rem,10vw,5.4rem);letter-spacing:clamp(0.03rem,0.6vw,0.36rem);gap:clamp(0.55rem,1.6vw,1.4rem)}
 }
 
 @media(max-width:640px){
@@ -336,8 +348,8 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   .resadex-copy{left:0;right:0;width:100vw;overflow:hidden;padding:0 1rem 4.7rem}
   .resadex-copy>.resadex-kicker,.resadex-copy>.resadex-title,.resadex-copy>.resadex-subtitle,.resadex-copy>.resadex-actions{transform:translateX(-2.5rem)}
   .resadex-kicker{letter-spacing:0.22em;font-size:0.62rem}
-  .resadex-title{flex-direction:column;gap:0.32rem;font-size:clamp(2.65rem,12vw,3.2rem);letter-spacing:0.16rem;line-height:0.95}
-  .resadex-title span:last-child{letter-spacing:0.16rem}
+  .resadex-title{flex-direction:column;gap:0.22rem;font-size:clamp(3rem,13vw,3.6rem);letter-spacing:0.02rem;line-height:0.92}
+  .resadex-title span:last-child{letter-spacing:0.02rem}
   .resadex-subtitle{width:min(100%,22rem);margin-top:1.2rem;font-size:0.98rem}
   .resadex-actions{flex-direction:column;width:min(100%,17.5rem);margin-left:auto;margin-right:auto}
   .resadex-actions a{width:100%}
@@ -486,6 +498,7 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
 
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:0.01ms!important}
+  .resadex-center-bead{animation:none!important;will-change:auto}
   .hero-core-rotor,.hero-core-rotor::after,.hero-core-ring-inner::before,.hero-path::before,.hero-workflow-node::after{animation:none!important;will-change:auto}
   .hero-frame-nav,.hero-copy-badge,.hero-copy-headline,.hero-copy-sub,.hero-cta-row,.hero-workflow-card,.hero-back-pillar,.hero-decision-platform,.hero-path,.hero-evidence-core,.hero-evidence-summary,.hero-evidence-summary span{opacity:1!important;animation:none!important}
   .hero-evidence-summary{transform:none!important}
