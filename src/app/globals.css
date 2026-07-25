@@ -252,17 +252,17 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   width:min(100%,68rem);
   margin:0;
   color:transparent;
-  font-family:var(--font-display);
+  font-family:var(--font-horror),var(--font-display);
   font-size:clamp(3.5rem,7.3vw,7.15rem);
-  font-weight:700;
-  line-height:0.9;
-  letter-spacing:clamp(0.04rem,0.72vw,0.58rem);
+  font-weight:400;
+  line-height:0.86;
+  letter-spacing:clamp(0.02rem,0.38vw,0.28rem);
   text-transform:uppercase;
   text-wrap:balance;
   background:linear-gradient(180deg,#172234 0%,#07111f 52%,#020712 100%);
   -webkit-background-clip:text;
   background-clip:text;
-  font-feature-settings:"ss01" 1,"kern" 1;
+  font-feature-settings:"kern" 1;
   text-shadow:0 16px 34px rgba(25,40,62,0.1);
 }
 .resadex-title span:last-child{letter-spacing:clamp(0.02rem,0.45vw,0.34rem)}

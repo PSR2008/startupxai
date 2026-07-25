@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import { Creepster, IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
@@ -22,6 +22,13 @@ const monoFont = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-mono",
+  display: "swap",
+});
+
+const horrorFont = Creepster({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-horror",
   display: "swap",
 });
 
@@ -102,7 +109,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable}`} suppressHydrationWarning>
+      <body className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable} ${horrorFont.variable}`} suppressHydrationWarning>
         {children}
         <Toaster
           position="top-right"
