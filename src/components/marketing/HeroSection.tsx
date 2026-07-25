@@ -2,7 +2,7 @@
 
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
-import type { PointerEvent } from "react";
+import type { CSSProperties, PointerEvent } from "react";
 import { useRef } from "react";
 import { ArrowRight, BarChart3, ClipboardList, SearchCheck, ShieldCheck } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -26,9 +26,17 @@ export default function HeroSection() {
 
   const sceneRotateY = useTransform(springX, [-1, 1], shouldReduceMotion ? [0, 0] : [-3, 3]);
   const sceneRotateX = useTransform(springY, [-1, 1], shouldReduceMotion ? [0, 0] : [2.4, -2.4]);
+  const backgroundX = useTransform(springX, [-1, 1], shouldReduceMotion ? ["0px", "0px"] : ["-3px", "3px"]);
+  const backgroundY = useTransform(springY, [-1, 1], shouldReduceMotion ? ["0px", "0px"] : ["-2px", "2px"]);
+  const platformX = useTransform(springX, [-1, 1], shouldReduceMotion ? ["0px", "0px"] : ["-4px", "4px"]);
+  const platformY = useTransform(springY, [-1, 1], shouldReduceMotion ? ["0px", "0px"] : ["-3px", "3px"]);
+  const coreX = useTransform(springX, [-1, 1], shouldReduceMotion ? ["0px", "0px"] : ["-6px", "6px"]);
+  const coreY = useTransform(springY, [-1, 1], shouldReduceMotion ? ["0px", "0px"] : ["-4px", "4px"]);
+  const summaryX = useTransform(springX, [-1, 1], shouldReduceMotion ? ["0px", "0px"] : ["-3px", "3px"]);
+  const summaryY = useTransform(springY, [-1, 1], shouldReduceMotion ? ["0px", "0px"] : ["-2px", "2px"]);
 
   function handlePointerMove(event: PointerEvent<HTMLElement>) {
-    if (shouldReduceMotion) return;
+    if (shouldReduceMotion || event.pointerType !== "mouse") return;
     const rect = event.currentTarget.getBoundingClientRect();
     pointerX.set(((event.clientX - rect.left) / rect.width - 0.5) * 2);
     pointerY.set(((event.clientY - rect.top) / rect.height - 0.5) * 2);
@@ -57,7 +65,7 @@ export default function HeroSection() {
           <div className="hero-spotlight hero-spotlight-silver" aria-hidden="true" />
           <div className="hero-spotlight hero-spotlight-white" aria-hidden="true" />
 
-          <div className="absolute left-5 right-5 top-4 z-10 flex items-center justify-between border-b border-white/[0.06] pb-4 text-[10px] text-slate-400 sm:left-8 sm:right-8 lg:left-12 lg:right-12">
+          <div className="hero-frame-nav absolute left-5 right-5 top-4 z-10 flex items-center justify-between border-b border-white/[0.06] pb-4 text-[10px] text-slate-400 sm:left-8 sm:right-8 lg:left-12 lg:right-12">
             <span className="font-bricolage font-bold tracking-[0.28em] text-white">StartupX</span>
             <div className="hidden items-center gap-3 font-mono text-[10px] font-medium text-slate-300 md:flex">
               {sceneLabels.map((label) => (
@@ -72,29 +80,29 @@ export default function HeroSection() {
 
           <div className="relative z-10 grid min-h-[32.5rem] min-w-0 grid-cols-1 items-center gap-9 lg:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)] lg:gap-8 xl:gap-10">
             <div className="min-w-0 max-w-full pt-4 lg:max-w-[43rem] lg:pt-6">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-md border border-white/12 bg-white/[0.055] px-3 py-1.5 shadow-sm shadow-black/20 backdrop-blur-md">
+              <div className="hero-copy-badge mb-6 inline-flex items-center gap-2 rounded-md border border-white/12 bg-white/[0.055] px-3 py-1.5 shadow-sm shadow-black/20 backdrop-blur-md">
                 <ShieldCheck size={13} className="text-emerald-300" />
                 <span className="font-jakarta text-xs font-semibold text-slate-200">
                   Evidence-backed founder workspace
                 </span>
               </div>
 
-              <h1 className="mb-8 max-w-[16.6ch] text-balance font-bricolage text-[clamp(2.1rem,8.8vw,4.75rem)] font-bold leading-[0.98] tracking-normal text-white lg:text-[clamp(3.75rem,4.95vw,4.85rem)]">
+              <h1 className="hero-copy-headline mb-8 max-w-[16.6ch] text-balance font-bricolage text-[clamp(2.1rem,8.8vw,4.75rem)] font-bold leading-[0.98] tracking-normal text-white lg:text-[clamp(3.75rem,4.95vw,4.85rem)]">
                 Build decisions on evidence, not optimism.
               </h1>
 
-              <p className="mb-9 max-w-[20rem] [overflow-wrap:anywhere] font-jakarta text-lg leading-relaxed text-slate-200/90 sm:max-w-xl">
+              <p className="hero-copy-sub mb-9 max-w-[20rem] [overflow-wrap:anywhere] font-jakarta text-lg leading-relaxed text-slate-200/90 sm:max-w-xl">
                 Collect market signals, assess assumptions, track experiments, and decide what to build next.
               </p>
 
-              <div className="mb-10 flex flex-col gap-3 sm:flex-row">
+              <div className="hero-cta-row mb-10 flex flex-col gap-3 sm:flex-row">
                 <Link href="/signup?next=/evidence-engine">
-                  <Button size="xl" icon={<ArrowRight size={18} />} iconPosition="right" className="shadow-xl shadow-emerald-950/40">
+                  <Button size="xl" icon={<ArrowRight size={18} />} iconPosition="right" className="hero-primary-cta shadow-xl shadow-emerald-950/40">
                     Start an assessment
                   </Button>
                 </Link>
                 <Link href="/#workflow">
-                  <Button variant="outline" size="xl" className="border-white/10 bg-white/[0.03] text-slate-100 backdrop-blur-md hover:border-white/18 hover:bg-white/[0.065]">
+                  <Button variant="outline" size="xl" className="hero-secondary-cta border-white/10 bg-white/[0.03] text-slate-100 backdrop-blur-md hover:border-white/18 hover:bg-white/[0.065]">
                     See how it works
                   </Button>
                 </Link>
@@ -102,7 +110,7 @@ export default function HeroSection() {
 
               <div className="grid max-w-[20rem] grid-cols-1 gap-3 sm:max-w-xl sm:grid-cols-3">
                 {workflowItems.map(({ icon: Icon, label, detail }) => (
-                  <div key={label} className="rounded-md border border-white/10 bg-white/[0.04] p-3.5 shadow-sm shadow-black/25 backdrop-blur-md">
+                  <div key={label} className="hero-workflow-card rounded-md border border-white/10 bg-white/[0.04] p-3.5 shadow-sm shadow-black/25 backdrop-blur-md">
                     <Icon size={15} className="mb-2.5 text-emerald-200" />
                     <p className="font-bricolage text-xs font-bold text-white">{label}</p>
                     <p className="mt-1 font-jakarta text-xs leading-relaxed text-slate-400">{detail}</p>
@@ -113,7 +121,18 @@ export default function HeroSection() {
 
             <motion.div
               className="hero-cinematic-scene relative min-h-[23rem] min-w-0 max-w-full overflow-hidden w-full justify-self-end lg:min-h-[31.5rem] lg:-translate-x-2 xl:translate-x-1"
-              style={{ rotateX: sceneRotateX, rotateY: sceneRotateY }}
+              style={{
+                rotateX: sceneRotateX,
+                rotateY: sceneRotateY,
+                "--hero-bg-x": backgroundX,
+                "--hero-bg-y": backgroundY,
+                "--hero-platform-x": platformX,
+                "--hero-platform-y": platformY,
+                "--hero-core-x": coreX,
+                "--hero-core-y": coreY,
+                "--hero-summary-x": summaryX,
+                "--hero-summary-y": summaryY,
+              } as CSSProperties}
               aria-hidden="true"
             >
               <div className="hero-evidence-summary">
