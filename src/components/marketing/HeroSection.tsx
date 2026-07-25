@@ -129,7 +129,12 @@ export default function HeroSection() {
 
                 <div className="hero-evidence-core">
                   <div className="hero-core-shadow" />
-                  <div className="hero-core-ring hero-core-ring-outer" />
+                  <div className="hero-core-rotor">
+                    <div className="hero-core-ring hero-core-ring-outer" />
+                    <div className="hero-core-notch hero-core-notch-one" />
+                    <div className="hero-core-notch hero-core-notch-two" />
+                    <div className="hero-core-notch hero-core-notch-three" />
+                  </div>
                   <div className="hero-core-ring hero-core-ring-mid" />
                   <div className="hero-core-ring hero-core-ring-inner" />
                   <svg className="hero-core-symbol" viewBox="0 0 120 120" aria-hidden="true">
@@ -139,9 +144,6 @@ export default function HeroSection() {
                     <circle cx="66" cy="39" r="5" />
                     <circle cx="90" cy="81" r="6" />
                   </svg>
-                  <div className="hero-core-notch hero-core-notch-one" />
-                  <div className="hero-core-notch hero-core-notch-two" />
-                  <div className="hero-core-notch hero-core-notch-three" />
                 </div>
                 <div className="hero-workflow-node hero-node-source" />
                 <div className="hero-workflow-node hero-node-claim" />
