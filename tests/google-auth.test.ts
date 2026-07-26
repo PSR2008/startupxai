@@ -6,6 +6,8 @@ import {
   DEFAULT_AUTH_DESTINATION,
   buildGoogleOAuthRedirectTo,
   authFailureRedirect,
+  getAuthorizationRedirectTo,
+  isExpectedGoogleAuthorizationUrl,
   normalizeAuthNextPath,
 } from "../src/lib/auth-flow";
 
@@ -40,6 +42,30 @@ test("Google OAuth redirect uses internal callback and encoded next path", () =>
   assert.doesNotMatch(redirectTo, /https:\/\/startupxai\.in\/(?:\?|$)/);
 });
 
+test("Supabase authorization URL redirect_to is inspected before browser navigation", () => {
+  const callback = buildGoogleOAuthRedirectTo("https://startupxai.in", "/evidence-engine");
+  const authorizationUrl =
+    "https://example.supabase.co/auth/v1/authorize" +
+    `?provider=google&redirect_to=${encodeURIComponent(callback)}` +
+    "&code_challenge=challenge&code_challenge_method=s256&skip_http_redirect=true";
+  assert.equal(getAuthorizationRedirectTo(authorizationUrl), callback);
+  assert.equal(isExpectedGoogleAuthorizationUrl(authorizationUrl, callback), true);
+  assert.equal(
+    isExpectedGoogleAuthorizationUrl(
+      "https://example.supabase.co/auth/v1/authorize?provider=google&code_challenge=challenge&code_challenge_method=s256",
+      callback
+    ),
+    false
+  );
+  assert.equal(
+    isExpectedGoogleAuthorizationUrl(
+      "https://example.supabase.co/auth/v1/authorize?provider=google&redirect_to=https%3A%2F%2Fstartupxai.in%2F&code_challenge=challenge&code_challenge_method=s256",
+      callback
+    ),
+    false
+  );
+});
+
 test("failure redirect is safe and hides provider internals", () => {
   const redirect = authFailureRedirect("https://startupxai.in");
   assert.equal(redirect.toString(), "https://startupxai.in/signin?reason=google-error");
@@ -52,8 +78,31 @@ test("Google auth button initiates Supabase OAuth with Google provider and callb
   assert.match(source, /buildGoogleOAuthRedirectTo/);
   assert.match(source, /Continue with Google/);
   assert.match(source, /redirectTo/);
+  assert.match(source, /skipBrowserRedirect:\s*true/);
+  assert.match(source, /isExpectedGoogleAuthorizationUrl\(data\.url, redirectTo\)/);
+  assert.match(source, /window\.location\.assign\(data\.url\)/);
   assert.doesNotMatch(source, /drive|gmail|calendar/i);
   assert.doesNotMatch(source, /scopes:/);
+});
+
+test("there is only one active Google OAuth initiation path", () => {
+  const button = readFileSync(join(process.cwd(), "src/components/auth/GoogleAuthButton.tsx"), "utf8");
+  const signin = readFileSync(join(process.cwd(), "src/app/(auth)/signin/page.tsx"), "utf8");
+  const signup = readFileSync(join(process.cwd(), "src/app/(auth)/signup/page.tsx"), "utf8");
+  const repoMatches = [button, signin, signup].join("\n").match(/signInWithOAuth/g) ?? [];
+  assert.equal(repoMatches.length, 1);
+  assert.match(signin, /<GoogleAuthButton nextPath=\{nextPath\} \/>/);
+  assert.match(signup, /<GoogleAuthButton nextPath=\{googleNextPath\} \/>/);
+});
+
+test("OAuth request does not fall back to the Supabase Site URL", () => {
+  const callback = buildGoogleOAuthRedirectTo("https://startupxai.in", null);
+  const siteUrlAuthorization =
+    "https://example.supabase.co/auth/v1/authorize" +
+    "?provider=google&redirect_to=https%3A%2F%2Fstartupxai.in%2F" +
+    "&code_challenge=challenge&code_challenge_method=s256";
+  assert.equal(callback, "https://startupxai.in/auth/callback?next=%2Fdashboard");
+  assert.equal(isExpectedGoogleAuthorizationUrl(siteUrlAuthorization, callback), false);
 });
 
 test("canonical browser Supabase client uses SSR PKCE and does not process URL fragments", () => {
@@ -72,8 +121,10 @@ test("Google authorization is configured for PKCE callback instead of implicit h
   const button = readFileSync(join(process.cwd(), "src/components/auth/GoogleAuthButton.tsx"), "utf8");
   const flow = readFileSync(join(process.cwd(), "src/lib/auth-flow.ts"), "utf8");
   assert.match(client, /flowType:\s*"pkce"/);
-  assert.match(flow, /\/auth\/callback\?next=/);
-  assert.match(flow, /encodeURIComponent\(safeNext\)/);
+  assert.match(flow, /new URL\("\/auth\/callback", safeOrigin\)/);
+  assert.match(flow, /searchParams\.set\("next", safeNext\)/);
+  assert.match(flow, /searchParams\.get\("redirect_to"\)/);
+  assert.match(flow, /searchParams\.has\("code_challenge"\)/);
   assert.match(button, /buildGoogleOAuthRedirectTo\(window\.location\.origin, safeNext\)/);
   assert.doesNotMatch(button, /window\.location\.href\s*=\s*["'`]\/["'`]/);
 });

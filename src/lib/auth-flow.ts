@@ -27,7 +27,33 @@ export function normalizeAuthNextPath(value?: string | null): string {
 export function buildGoogleOAuthRedirectTo(origin: string, nextPath?: string | null): string {
   const safeOrigin = origin.replace(/\/+$/, "");
   const safeNext = normalizeAuthNextPath(nextPath);
-  return `${safeOrigin}/auth/callback?next=${encodeURIComponent(safeNext)}`;
+  const callbackUrl = new URL("/auth/callback", safeOrigin);
+  callbackUrl.searchParams.set("next", safeNext);
+  return callbackUrl.toString();
+}
+
+export function getAuthorizationRedirectTo(authorizationUrl: string): string | null {
+  try {
+    const url = new URL(authorizationUrl);
+    return url.searchParams.get("redirect_to") ?? url.searchParams.get("redirectTo");
+  } catch {
+    return null;
+  }
+}
+
+export function isExpectedGoogleAuthorizationUrl(authorizationUrl: string, expectedCallbackUrl: string): boolean {
+  try {
+    const url = new URL(authorizationUrl);
+    const redirectTo = getAuthorizationRedirectTo(authorizationUrl);
+    return (
+      url.searchParams.get("provider") === "google" &&
+      redirectTo === expectedCallbackUrl &&
+      url.searchParams.has("code_challenge") &&
+      url.searchParams.has("code_challenge_method")
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function authFailureRedirect(origin: string): URL {

@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { AlertCircle } from "lucide-react";
-import { buildGoogleOAuthRedirectTo, GOOGLE_AUTH_ERROR_MESSAGE, normalizeAuthNextPath } from "@/lib/auth-flow";
+import {
+  buildGoogleOAuthRedirectTo,
+  GOOGLE_AUTH_ERROR_MESSAGE,
+  isExpectedGoogleAuthorizationUrl,
+  normalizeAuthNextPath,
+} from "@/lib/auth-flow";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 function GoogleIcon() {
@@ -27,13 +32,21 @@ export default function GoogleAuthButton({ nextPath }: { nextPath?: string | nul
       const supabase = getSupabaseBrowserClient();
       const safeNext = normalizeAuthNextPath(nextPath);
       const redirectTo = buildGoogleOAuthRedirectTo(window.location.origin, safeNext);
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo,
+          skipBrowserRedirect: true,
         },
       });
       if (oauthError) throw oauthError;
+      if (!data?.url || !isExpectedGoogleAuthorizationUrl(data.url, redirectTo)) {
+        if (process.env.NODE_ENV === "development") {
+          throw new Error("Google OAuth authorization URL is missing the application callback redirect.");
+        }
+        throw new Error("Google OAuth could not be started.");
+      }
+      window.location.assign(data.url);
     } catch {
       setError(GOOGLE_AUTH_ERROR_MESSAGE);
       setLoading(false);
