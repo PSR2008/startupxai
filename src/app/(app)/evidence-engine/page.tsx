@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Activity, ArrowRight, BarChart3, ClipboardList, Clock3, Database, FlaskConical, Link2, NotebookPen, SearchCheck, ShieldCheck } from "lucide-react";
+import { Activity, ArrowRight, BarChart3, ClipboardList, Clock3, Database, ExternalLink, FlaskConical, Link2, NotebookPen, SearchCheck, ShieldCheck } from "lucide-react";
 import EngineHeader from "@/components/app/EngineHeader";
 import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
@@ -21,8 +21,12 @@ type PersistedEvidenceRow = {
   claim: string | null;
   summary: string;
   evidence_type: string;
+  source_type?: string;
+  source_url?: string | null;
   source_quality: string;
   confidence: string;
+  evidence_direction?: string;
+  raw_metadata?: Record<string, unknown> | null;
 };
 
 type PersistedInterviewRow = {
@@ -50,6 +54,29 @@ type WorkflowState = {
   interviews: PersistedInterviewRow[];
   experiments: PersistedExperimentRow[];
   activity: PersistedActivityRow[];
+};
+
+type PublicSourcePreview = {
+  metadata: {
+    originalUrl: string;
+    canonicalUrl: string;
+    pageTitle: string | null;
+    description: string | null;
+    publisher: string | null;
+    author: string | null;
+    publicationDate: string | null;
+    retrievedAt: string;
+    language: string | null;
+    faviconUrl: string | null;
+    hostname: string;
+    httpStatus: number;
+    contentType: string;
+    excerpt: string | null;
+    label: "Public source - founder selected";
+    explanation: string;
+  };
+  warnings: string[];
+  duplicate: { id: string; title: string } | null;
 };
 
 const defaultForm: FormState = {
@@ -445,6 +472,19 @@ function TimelineRow({ title, detail }: { title: string; detail: string }) {
 function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId: string; workflow: WorkflowState | null; onRefresh: () => Promise<void> }) {
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
+  const [evidenceSource, setEvidenceSource] = useState<"founder_note" | "customer_interview" | "experiment_result" | "public_url" | "ai_suggestion_unverified">("founder_note");
+  const [publicPreview, setPublicPreview] = useState<PublicSourcePreview | null>(null);
+  const [publicPreviewInput, setPublicPreviewInput] = useState("");
+  const [publicPreviewError, setPublicPreviewError] = useState("");
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
+  const evidenceTypeForSource = {
+    founder_note: "founder_provided_evidence",
+    customer_interview: "customer_research",
+    experiment_result: "experiment_result",
+    public_url: "founder_provided_evidence",
+    ai_suggestion_unverified: "generated_assessment",
+  } as const;
 
   async function submit(path: string, formData: FormData, method = "POST") {
     setBusy(path);
@@ -465,6 +505,74 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
       return;
     }
     setMessage("Saved. Score and activity history updated.");
+    await onRefresh();
+  }
+
+  async function fetchPublicPreview(formData: FormData) {
+    setBusy("public-preview");
+    setMessage("");
+    setPublicPreview(null);
+    setPublicPreviewError("");
+    const url = String(formData.get("source_url") ?? "");
+    const res = await fetch("/api/evidence/source-preview", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(await getAuthHeaders()) },
+      body: JSON.stringify({ projectId, url }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setBusy("");
+    if (!res.ok || !data.success) {
+      setPublicPreviewError(data.error || "Could not preview this source.");
+      return;
+    }
+    setPublicPreviewInput(url);
+    setPublicPreview(data.data);
+    window.requestAnimationFrame(() => previewRef.current?.focus());
+  }
+
+  async function savePublicSource(formData: FormData) {
+    if (!publicPreview || publicPreview.duplicate) return;
+    const currentUrl = String(formData.get("source_url") ?? "");
+    if (currentUrl !== publicPreviewInput) {
+      setPublicPreviewError("Fetch source details again before saving this changed URL.");
+      setPublicPreview(null);
+      return;
+    }
+    const metadata = publicPreview.metadata;
+    const claim = String(formData.get("claim") ?? "");
+    const titleOverride = String(formData.get("title") ?? "").trim();
+    const interpretation = String(formData.get("description") ?? "").trim();
+    const body = {
+      evidence_source: "public_url",
+      evidence_type: "founder_provided_evidence",
+      title: titleOverride || metadata.pageTitle || metadata.hostname,
+      claim,
+      description: interpretation || "Founder selected this public source for review.",
+      evidence_direction: String(formData.get("evidence_direction") ?? "neutral"),
+      source_url: metadata.canonicalUrl,
+      source_name: metadata.publisher || metadata.hostname,
+      source_quality: "medium",
+      confidence: "low",
+      collected_at: metadata.retrievedAt,
+      evidence_status: "active",
+      linked_claims: claim ? [claim] : [],
+      public_source_metadata: metadata,
+    };
+    setBusy("public-save");
+    setMessage("");
+    const res = await fetch(`/api/evidence-projects/${projectId}/evidence`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(await getAuthHeaders()) },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    setBusy("");
+    if (!res.ok || !data.success) {
+      setMessage(data.error || "Could not save public source.");
+      return;
+    }
+    setPublicPreview(null);
+    setMessage("Public source saved with attribution. Score and activity history updated.");
     await onRefresh();
   }
 
@@ -497,20 +605,112 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
       <div className="grid min-w-0 grid-cols-1 gap-3 xl:grid-cols-2 2xl:grid-cols-3">
         <details className="surface-inset min-w-0 p-4">
           <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-900">Add evidence</summary>
-          <form className="mt-4 space-y-3" onSubmit={(e) => { e.preventDefault(); submit(`/api/evidence-projects/${projectId}/evidence`, new FormData(e.currentTarget)); e.currentTarget.reset(); }}>
-            <MiniInput name="title" label="Title" required />
-            <MiniInput name="claim" label="Claim or assumption" required />
-            <MiniTextarea name="description" label="Notes" required />
-            <MiniSelect name="evidence_type" label="Type" options={["verified_public_evidence", "founder_provided_evidence", "customer_research", "experiment_result", "assumption", "generated_assessment"]} />
-            <MiniSelect name="evidence_direction" label="Direction" options={["supporting", "contradicting", "neutral"]} />
-            <MiniInput name="source_url" label="Source URL" />
-            <MiniInput name="source_name" label="Source name" />
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <MiniSelect name="source_quality" label="Quality" options={["low", "medium", "high"]} />
-              <MiniSelect name="confidence" label="Confidence" options={["low", "medium", "high"]} />
-            </div>
-            <button disabled={busy !== ""} className="focus-ring h-9 rounded-lg bg-emerald-700 px-3 font-jakarta text-xs font-semibold text-white disabled:opacity-50">Add source</button>
-          </form>
+          <div className="mt-4 space-y-3">
+            <label className="block min-w-0">
+              <span className="font-bricolage text-[11px] font-bold uppercase tracking-wide text-gray-600">Evidence source</span>
+              <select
+                value={evidenceSource}
+                onChange={(event) => {
+                  setEvidenceSource(event.target.value as typeof evidenceSource);
+                  setPublicPreview(null);
+                  setPublicPreviewError("");
+                }}
+                className="mt-1 h-9 w-full min-w-0 rounded-lg border border-black/10 bg-white px-3 font-jakarta text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              >
+                <option value="founder_note">Founder note</option>
+                <option value="customer_interview">Customer interview</option>
+                <option value="experiment_result">Experiment result</option>
+                <option value="public_url">Public URL</option>
+                <option value="ai_suggestion_unverified">AI suggestion - unverified</option>
+              </select>
+            </label>
+
+            {evidenceSource === "public_url" ? (
+              <form
+                className="space-y-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (publicPreview) void savePublicSource(new FormData(e.currentTarget));
+                  else void fetchPublicPreview(new FormData(e.currentTarget));
+                }}
+              >
+                <MiniInput name="source_url" label="Public URL" type="url" required />
+                <MiniInput name="title" label="Evidence title override" />
+                <MiniInput name="claim" label="Related claim or assumption" required />
+                <MiniSelect name="evidence_direction" label="Direction" options={["supporting", "contradicting", "neutral"]} />
+                <MiniTextarea name="description" label="Founder interpretation" />
+                <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 font-jakarta text-xs leading-relaxed text-amber-900">
+                  Public URLs are founder-selected sources. StartupX AI retrieves metadata only; it does not decide whether the source proves the claim.
+                </p>
+                {publicPreviewError && (
+                  <p role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 font-jakarta text-xs leading-relaxed text-rose-700">
+                    {publicPreviewError}
+                  </p>
+                )}
+                {publicPreview && (
+                  <div ref={previewRef} tabIndex={-1} className="rounded-xl border border-blue-200 bg-blue-50/70 p-4 outline-none focus:ring-2 focus:ring-blue-400/30">
+                    <div className="mb-3 flex flex-wrap items-center gap-2">
+                      <Badge variant="blue" size="sm">Public source - founder selected</Badge>
+                      {publicPreview.duplicate && <Badge variant="amber" size="sm">Duplicate source detected</Badge>}
+                    </div>
+                    <p className="break-words font-bricolage text-sm font-bold text-gray-900">{publicPreview.metadata.pageTitle || "Page title unavailable"}</p>
+                    <p className="mt-1 break-words font-jakarta text-xs text-gray-600">{publicPreview.metadata.publisher || publicPreview.metadata.hostname}</p>
+                    <a href={publicPreview.metadata.canonicalUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex max-w-full items-center gap-1 break-all font-bricolage text-[11px] font-bold text-emerald-700">
+                      {publicPreview.metadata.canonicalUrl} <ExternalLink size={11} aria-hidden="true" />
+                    </a>
+                    <p className="mt-3 break-words font-jakarta text-xs leading-relaxed text-gray-600">{publicPreview.metadata.description || "Description unavailable"}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {publicPreview.metadata.publicationDate && <Badge variant="neutral" size="sm">Published {new Date(publicPreview.metadata.publicationDate).toLocaleDateString()}</Badge>}
+                      <Badge variant="neutral" size="sm">Retrieved {new Date(publicPreview.metadata.retrievedAt).toLocaleString()}</Badge>
+                      <Badge variant="neutral" size="sm">{publicPreview.metadata.httpStatus} - {publicPreview.metadata.contentType}</Badge>
+                    </div>
+                    <p className="mt-3 font-jakarta text-xs leading-relaxed text-blue-900">
+                      StartupX AI retrieved source metadata. The founder is responsible for deciding how this source relates to the claim.
+                    </p>
+                    {publicPreview.duplicate && (
+                      <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 font-jakarta text-xs leading-relaxed text-amber-900">
+                        This project already has a saved evidence item for this URL: {publicPreview.duplicate.title}. Cancel or choose a different source.
+                      </p>
+                    )}
+                    {publicPreview.warnings.length > 0 && (
+                      <ul className="mt-3 space-y-1">
+                        {publicPreview.warnings.map((warning) => <li key={warning} className="font-jakarta text-xs text-gray-500">{warning}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <button disabled={busy !== ""} type="button" onClick={(e) => void fetchPublicPreview(new FormData(e.currentTarget.form!))} className="focus-ring h-9 rounded-lg border border-black/10 bg-white px-3 font-jakarta text-xs font-semibold text-gray-700 disabled:opacity-50">
+                    {busy === "public-preview" ? "Fetching..." : "Fetch source details"}
+                  </button>
+                  <button disabled={busy !== "" || !publicPreview || Boolean(publicPreview.duplicate)} className="focus-ring h-9 rounded-lg bg-emerald-700 px-3 font-jakarta text-xs font-semibold text-white disabled:opacity-50">
+                    {busy === "public-save" ? "Saving..." : "Save attributed evidence"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); submit(`/api/evidence-projects/${projectId}/evidence`, new FormData(e.currentTarget)); e.currentTarget.reset(); }}>
+                <input type="hidden" name="evidence_source" value={evidenceSource} />
+                <input type="hidden" name="evidence_type" value={evidenceTypeForSource[evidenceSource]} />
+                <MiniInput name="title" label="Title" required />
+                <MiniInput name="claim" label="Claim or assumption" required />
+                <MiniTextarea name="description" label="Notes" required />
+                <MiniSelect name="evidence_direction" label="Direction" options={["supporting", "contradicting", "neutral"]} />
+                <MiniInput name="source_url" label="Source URL" />
+                <MiniInput name="source_name" label="Source name" />
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <MiniSelect name="source_quality" label="Quality" options={["low", "medium", "high"]} />
+                  <MiniSelect name="confidence" label="Confidence" options={["low", "medium", "high"]} />
+                </div>
+                {evidenceSource === "ai_suggestion_unverified" && (
+                  <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 font-jakarta text-xs leading-relaxed text-amber-900">
+                    AI suggestions remain unverified until evidence is attached.
+                  </p>
+                )}
+                <button disabled={busy !== ""} className="focus-ring h-9 rounded-lg bg-emerald-700 px-3 font-jakarta text-xs font-semibold text-white disabled:opacity-50">Add source</button>
+              </form>
+            )}
+          </div>
         </details>
 
         <details className="surface-inset min-w-0 p-4">

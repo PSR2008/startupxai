@@ -5,6 +5,7 @@ export const EVIDENCE_SCORE_DISCLAIMER =
 
 export type EvidenceDisplayClass =
   | "Verified public evidence"
+  | "Public URL"
   | "Founder-provided evidence"
   | "Customer research"
   | "Experiment result"
@@ -25,6 +26,7 @@ export function classifyEvidenceItem(item: EvidenceItem): EvidenceDisplayClass {
   const sourceType = item.sourceType.toLowerCase();
   const title = item.title.toLowerCase();
 
+  if (sourceType === "public_url" || sourceType.includes("public url")) return "Public URL";
   if (sourceType.includes("customer") || sourceType.includes("interview")) return "Customer research";
   if (sourceType.includes("experiment") || sourceType.includes("test result")) return "Experiment result";
   if (sourceType.includes("assumption") || title.includes("assumption")) return "Assumption";

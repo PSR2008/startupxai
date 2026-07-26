@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/supabase";
 import { getUserIdFromRequest } from "@/lib/usage-limit";
 import { generalRateLimiter, getRequestIp, rateLimitResponse } from "@/lib/rate-limit";
-import { assertPublicHttpUrl } from "@/lib/safe-url";
 import { evidenceDirectionToDb, evidenceWorkflowSchema, reliabilityForQuality, sanitizeText, verifiedStatusForEvidenceType } from "@/lib/evidence-workflow";
 import { recalculateAndPersistProject, recordProjectActivity, requireProjectAccess } from "@/lib/evidence-workflow-store";
+import { assertPublicSourceUrl } from "@/lib/public-source";
 
 export const runtime = "nodejs";
 
@@ -19,7 +19,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pr
   const body = await req.json().catch(() => null);
   const parsed = evidenceWorkflowSchema.partial().safeParse(body);
   if (!parsed.success) return NextResponse.json({ success: false, error: "Validation failed", details: parsed.error.flatten() }, { status: 422 });
-  const url = parsed.data.source_url ? await assertPublicHttpUrl(parsed.data.source_url) : null;
+  const url = parsed.data.source_url ? await assertPublicSourceUrl(parsed.data.source_url) : null;
   if (parsed.data.source_url && !url) return NextResponse.json({ success: false, error: "Invalid or unsafe source URL" }, { status: 422 });
 
   const admin = getSupabaseAdminClient();

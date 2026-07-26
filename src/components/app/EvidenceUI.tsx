@@ -27,6 +27,12 @@ export function ProviderStatus({ run }: { run: ProviderRunStatus }) {
 }
 
 export function EvidenceCard({ item }: { item: EvidenceItem }) {
+  const sourceMetadata = item.rawMetadata ?? {};
+  const isPublicUrl = item.sourceType === "public_url";
+  const hostname = typeof sourceMetadata.hostname === "string" ? sourceMetadata.hostname : null;
+  const retrievedAt = typeof sourceMetadata.retrievedAt === "string" ? sourceMetadata.retrievedAt : null;
+  const publicationDate = typeof sourceMetadata.publicationDate === "string" ? sourceMetadata.publicationDate : null;
+  const sourceExplanation = typeof sourceMetadata.explanation === "string" ? sourceMetadata.explanation : null;
   return (
     <article className="surface-panel min-w-0 max-w-full p-4">
       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -40,13 +46,28 @@ export function EvidenceCard({ item }: { item: EvidenceItem }) {
       {item.excerpt && (
         <p className="surface-inset mt-3 break-words p-3 font-jakarta text-xs leading-relaxed text-gray-500">{item.excerpt}</p>
       )}
+      {isPublicUrl && (
+        <div className="mt-3 rounded-xl border border-blue-200 bg-blue-50/70 p-3">
+          <p className="font-bricolage text-xs font-bold text-blue-900">Public source attribution</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Badge variant="blue" size="sm">Public URL</Badge>
+            {hostname && <Badge variant="neutral" size="sm">{hostname}</Badge>}
+            {retrievedAt && <Badge variant="neutral" size="sm">Retrieved {new Date(retrievedAt).toLocaleDateString()}</Badge>}
+            {publicationDate && <Badge variant="neutral" size="sm">Published {new Date(publicationDate).toLocaleDateString()}</Badge>}
+            <Badge variant="amber" size="sm">Relevance not independently verified</Badge>
+          </div>
+          {sourceExplanation && (
+            <p className="mt-2 break-words font-jakarta text-xs leading-relaxed text-blue-900">{sourceExplanation}</p>
+          )}
+        </div>
+      )}
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Badge variant={item.direction === "contradicts" ? "rose" : item.direction === "supports" ? "emerald" : "neutral"} size="sm">{item.direction}</Badge>
         <Badge variant="neutral" size="sm">relevance {item.relevanceScore}/100</Badge>
         <Badge variant="neutral" size="sm">reliability {item.reliabilityScore}/100</Badge>
         {item.sourceUrl && (
-          <a href={item.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex max-w-full items-center gap-1 break-all font-bricolage text-[11px] font-bold text-emerald-700 hover:text-emerald-800">
-            Open source <ExternalLink size={11} />
+          <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex max-w-full items-center gap-1 break-all font-bricolage text-[11px] font-bold text-emerald-700 hover:text-emerald-800" aria-label="Open source in a new tab">
+            Open source <ExternalLink size={11} aria-hidden="true" />
           </a>
         )}
       </div>
