@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 // ============================================
 // BROWSER-SAFE SUPABASE CLIENT
@@ -20,11 +21,12 @@ export function getSupabaseBrowserClient(): SupabaseClient {
     );
   }
 
-  _client = createClient(url, key, {
+  _client = createBrowserClient(url, key, {
     auth: {
+      flowType: "pkce",
       persistSession: true,
       autoRefreshToken: true,
-      detectSessionInUrl: true,
+      detectSessionInUrl: false,
     },
   });
 

@@ -37,6 +37,7 @@ test("Google OAuth redirect uses internal callback and encoded next path", () =>
     buildGoogleOAuthRedirectTo("https://startupxai.in/", "/"),
     "https://startupxai.in/auth/callback?next=%2Fdashboard"
   );
+  assert.doesNotMatch(redirectTo, /https:\/\/startupxai\.in\/(?:\?|$)/);
 });
 
 test("failure redirect is safe and hides provider internals", () => {
@@ -50,8 +51,31 @@ test("Google auth button initiates Supabase OAuth with Google provider and callb
   assert.match(source, /provider:\s*"google"/);
   assert.match(source, /buildGoogleOAuthRedirectTo/);
   assert.match(source, /Continue with Google/);
-  assert.match(source, /openid email profile/);
+  assert.match(source, /redirectTo/);
   assert.doesNotMatch(source, /drive|gmail|calendar/i);
+  assert.doesNotMatch(source, /scopes:/);
+});
+
+test("canonical browser Supabase client uses SSR PKCE and does not process URL fragments", () => {
+  const source = readFileSync(join(process.cwd(), "src/lib/supabase-client.ts"), "utf8");
+  assert.match(source, /createBrowserClient/);
+  assert.match(source, /@supabase\/ssr/);
+  assert.match(source, /flowType:\s*"pkce"/);
+  assert.match(source, /detectSessionInUrl:\s*false/);
+  assert.match(source, /persistSession:\s*true/);
+  assert.match(source, /autoRefreshToken:\s*true/);
+  assert.doesNotMatch(source, /createClient\(url,\s*key/);
+});
+
+test("Google authorization is configured for PKCE callback instead of implicit homepage flow", () => {
+  const client = readFileSync(join(process.cwd(), "src/lib/supabase-client.ts"), "utf8");
+  const button = readFileSync(join(process.cwd(), "src/components/auth/GoogleAuthButton.tsx"), "utf8");
+  const flow = readFileSync(join(process.cwd(), "src/lib/auth-flow.ts"), "utf8");
+  assert.match(client, /flowType:\s*"pkce"/);
+  assert.match(flow, /\/auth\/callback\?next=/);
+  assert.match(flow, /encodeURIComponent\(safeNext\)/);
+  assert.match(button, /buildGoogleOAuthRedirectTo\(window\.location\.origin, safeNext\)/);
+  assert.doesNotMatch(button, /window\.location\.href\s*=\s*["'`]\/["'`]/);
 });
 
 test("sign-in and sign-up preserve email password authentication", () => {
@@ -89,7 +113,7 @@ test("callback handles missing code and exchange failures without exposing token
   const route = readFileSync(join(process.cwd(), "src/app/auth/callback/route.ts"), "utf8");
   assert.match(route, /if \(!code\)/);
   assert.match(route, /exchange_failed/);
-  assert.doesNotMatch(route, /access_token|refresh_token|searchParams\.toString\(\)/);
+  assert.doesNotMatch(route, /access_token|refresh_token|searchParams\.toString\(\)|location\.hash/);
   assert.doesNotMatch(route, /properties:\s*\{[^}]*code\s*:/);
   assert.doesNotMatch(route, /properties:\s*\{[^}]*requestUrl/);
 });
@@ -107,6 +131,18 @@ test("authentication analytics do not include authorization codes or callback UR
   assert.match(route, /google_auth_completed/);
   assert.match(route, /google_auth_failed/);
   assert.doesNotMatch(route, /code.*properties|req\.url.*properties|requestUrl\.href/);
+});
+
+test("fragment token guard removes implicit tokens without creating a session", () => {
+  const guard = readFileSync(join(process.cwd(), "src/components/auth/AuthFragmentGuard.tsx"), "utf8");
+  const layout = readFileSync(join(process.cwd(), "src/app/layout.tsx"), "utf8");
+  assert.match(guard, /window\.location\.hash/);
+  assert.match(guard, /access_token/);
+  assert.match(guard, /refresh_token/);
+  assert.match(guard, /history\.replaceState/);
+  assert.match(guard, /\/signin\?reason=google-error/);
+  assert.doesNotMatch(guard, /setSession|exchangeCodeForSession|getSupabaseBrowserClient/);
+  assert.match(layout, /<AuthFragmentGuard \/>/);
 });
 
 test("protected-page return flow points sign-in next toward the requested app route", () => {

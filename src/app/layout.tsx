@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import localFont from "next/font/local";
 import { Toaster } from "react-hot-toast";
+import AuthFragmentGuard from "@/components/auth/AuthFragmentGuard";
 import "./globals.css";
 
 const bodyFont = IBM_Plex_Sans({
@@ -110,6 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable} ${horrorFont.variable}`} suppressHydrationWarning>
+        <AuthFragmentGuard />
         {children}
         <Toaster
           position="top-right"

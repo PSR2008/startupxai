@@ -31,7 +31,6 @@ export default function GoogleAuthButton({ nextPath }: { nextPath?: string | nul
         provider: "google",
         options: {
           redirectTo,
-          scopes: "openid email profile",
         },
       });
       if (oauthError) throw oauthError;
