@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { authFailureRedirect, normalizeAuthNextPath } from "@/lib/auth-flow";
+import { authFailureRedirect, normalizeAuthNextPath, OAUTH_NEXT_COOKIE } from "@/lib/auth-flow";
 import { getSupabaseAdminClient } from "@/lib/supabase";
 import { trackProductEvent } from "@/lib/analytics";
 
@@ -47,20 +47,35 @@ async function initializeOAuthUser(userId: string) {
   }
 }
 
+function clearOAuthIntent(response: NextResponse) {
+  response.cookies.set(OAUTH_NEXT_COOKIE, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
+}
+
 export async function GET(req: NextRequest) {
   const requestUrl = new URL(req.url);
   const code = requestUrl.searchParams.get("code");
-  const nextPath = normalizeAuthNextPath(requestUrl.searchParams.get("next"));
+  const cookieStore = await cookies();
+  const nextPath = normalizeAuthNextPath(cookieStore.get(OAUTH_NEXT_COOKIE)?.value);
 
   if (!code) {
     await trackProductEvent("google_auth_failed", { properties: { reason: "missing_code" } });
-    return NextResponse.redirect(authFailureRedirect(requestUrl.origin));
+    const response = NextResponse.redirect(authFailureRedirect(requestUrl.origin));
+    clearOAuthIntent(response);
+    return response;
   }
 
   const callbackClient = await createSupabaseCallbackClient();
   if (!callbackClient) {
     await trackProductEvent("google_auth_failed", { properties: { reason: "supabase_unavailable" } });
-    return NextResponse.redirect(authFailureRedirect(requestUrl.origin));
+    const response = NextResponse.redirect(authFailureRedirect(requestUrl.origin));
+    clearOAuthIntent(response);
+    return response;
   }
 
   const {
@@ -70,7 +85,9 @@ export async function GET(req: NextRequest) {
 
   if (error || !user) {
     await trackProductEvent("google_auth_failed", { properties: { reason: "exchange_failed" } });
-    return NextResponse.redirect(authFailureRedirect(requestUrl.origin));
+    const response = NextResponse.redirect(authFailureRedirect(requestUrl.origin));
+    clearOAuthIntent(response);
+    return response;
   }
 
   await initializeOAuthUser(user.id);
@@ -83,5 +100,6 @@ export async function GET(req: NextRequest) {
   callbackClient.responseCookies.forEach(({ name, value, options }) => {
     response.cookies.set(name, value, options);
   });
+  clearOAuthIntent(response);
   return response;
 }

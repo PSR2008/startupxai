@@ -28,7 +28,7 @@ export default function SigninPage() {
     if (reason === "confirm-email") {
       setErrorMsg("Please confirm your email before opening your account. Check your inbox, then sign in again.");
       setStatus("error");
-    } else if (reason === "google-error") {
+    } else if (reason === "google-error" || reason === "google-callback-misdirected") {
       setErrorMsg(GOOGLE_AUTH_ERROR_MESSAGE);
       setStatus("error");
     }

@@ -31,7 +31,14 @@ export default function GoogleAuthButton({ nextPath }: { nextPath?: string | nul
     try {
       const supabase = getSupabaseBrowserClient();
       const safeNext = normalizeAuthNextPath(nextPath);
-      const redirectTo = buildGoogleOAuthRedirectTo(window.location.origin, safeNext);
+      const intentResponse = await fetch("/api/auth/oauth-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ next: safeNext }),
+      });
+      if (!intentResponse.ok) throw new Error("Google OAuth intent could not be saved.");
+
+      const redirectTo = buildGoogleOAuthRedirectTo(window.location.origin);
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {

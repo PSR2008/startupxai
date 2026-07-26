@@ -9,6 +9,7 @@ import {
   getAuthorizationRedirectTo,
   isExpectedGoogleAuthorizationUrl,
   normalizeAuthNextPath,
+  OAUTH_NEXT_COOKIE,
 } from "../src/lib/auth-flow";
 
 test("valid internal next path is preserved for OAuth", () => {
@@ -32,18 +33,15 @@ test("missing, home, and auth-route next paths fall back to the authenticated da
   assert.equal(normalizeAuthNextPath("/login"), DEFAULT_AUTH_DESTINATION);
 });
 
-test("Google OAuth redirect uses internal callback and encoded next path", () => {
-  const redirectTo = buildGoogleOAuthRedirectTo("https://startupxai.in/", "/evidence-engine");
-  assert.equal(redirectTo, "https://startupxai.in/auth/callback?next=%2Fevidence-engine");
-  assert.equal(
-    buildGoogleOAuthRedirectTo("https://startupxai.in/", "/"),
-    "https://startupxai.in/auth/callback?next=%2Fdashboard"
-  );
-  assert.doesNotMatch(redirectTo, /https:\/\/startupxai\.in\/(?:\?|$)/);
+test("Google OAuth redirect uses exact query-free callback URL", () => {
+  const redirectTo = buildGoogleOAuthRedirectTo("https://startupxai.in/");
+  assert.equal(redirectTo, "https://startupxai.in/auth/callback");
+  assert.equal(buildGoogleOAuthRedirectTo("http://localhost:3000/"), "http://localhost:3000/auth/callback");
+  assert.doesNotMatch(redirectTo, /\?/);
 });
 
 test("Supabase authorization URL redirect_to is inspected before browser navigation", () => {
-  const callback = buildGoogleOAuthRedirectTo("https://startupxai.in", "/evidence-engine");
+  const callback = buildGoogleOAuthRedirectTo("https://startupxai.in");
   const authorizationUrl =
     "https://example.supabase.co/auth/v1/authorize" +
     `?provider=google&redirect_to=${encodeURIComponent(callback)}` +
@@ -75,6 +73,7 @@ test("Google auth button initiates Supabase OAuth with Google provider and callb
   const source = readFileSync(join(process.cwd(), "src/components/auth/GoogleAuthButton.tsx"), "utf8");
   assert.match(source, /signInWithOAuth/);
   assert.match(source, /provider:\s*"google"/);
+  assert.match(source, /fetch\("\/api\/auth\/oauth-intent"/);
   assert.match(source, /buildGoogleOAuthRedirectTo/);
   assert.match(source, /Continue with Google/);
   assert.match(source, /redirectTo/);
@@ -96,13 +95,25 @@ test("there is only one active Google OAuth initiation path", () => {
 });
 
 test("OAuth request does not fall back to the Supabase Site URL", () => {
-  const callback = buildGoogleOAuthRedirectTo("https://startupxai.in", null);
+  const callback = buildGoogleOAuthRedirectTo("https://startupxai.in");
   const siteUrlAuthorization =
     "https://example.supabase.co/auth/v1/authorize" +
     "?provider=google&redirect_to=https%3A%2F%2Fstartupxai.in%2F" +
     "&code_challenge=challenge&code_challenge_method=s256";
-  assert.equal(callback, "https://startupxai.in/auth/callback?next=%2Fdashboard");
+  assert.equal(callback, "https://startupxai.in/auth/callback");
   assert.equal(isExpectedGoogleAuthorizationUrl(siteUrlAuthorization, callback), false);
+});
+
+test("OAuth intent endpoint stores validated destination in a secure HttpOnly cookie", () => {
+  const route = readFileSync(join(process.cwd(), "src/app/api/auth/oauth-intent/route.ts"), "utf8");
+  assert.equal(OAUTH_NEXT_COOKIE, "startupx_oauth_next");
+  assert.match(route, /normalizeAuthNextPath/);
+  assert.match(route, /response\.cookies\.set\(OAUTH_NEXT_COOKIE, next/);
+  assert.match(route, /httpOnly:\s*true/);
+  assert.match(route, /secure:\s*process\.env\.NODE_ENV === "production"/);
+  assert.match(route, /sameSite:\s*"lax"/);
+  assert.match(route, /path:\s*"\/"/);
+  assert.match(route, /maxAge:\s*600/);
 });
 
 test("canonical browser Supabase client uses SSR PKCE and does not process URL fragments", () => {
@@ -122,10 +133,10 @@ test("Google authorization is configured for PKCE callback instead of implicit h
   const flow = readFileSync(join(process.cwd(), "src/lib/auth-flow.ts"), "utf8");
   assert.match(client, /flowType:\s*"pkce"/);
   assert.match(flow, /new URL\("\/auth\/callback", safeOrigin\)/);
-  assert.match(flow, /searchParams\.set\("next", safeNext\)/);
+  assert.doesNotMatch(flow, /callbackUrl\.searchParams\.set\("next"/);
   assert.match(flow, /searchParams\.get\("redirect_to"\)/);
   assert.match(flow, /searchParams\.has\("code_challenge"\)/);
-  assert.match(button, /buildGoogleOAuthRedirectTo\(window\.location\.origin, safeNext\)/);
+  assert.match(button, /buildGoogleOAuthRedirectTo\(window\.location\.origin\)/);
   assert.doesNotMatch(button, /window\.location\.href\s*=\s*["'`]\/["'`]/);
 });
 
@@ -142,6 +153,7 @@ test("callback exchanges the code, validates next, and redirects safely", () => 
   const route = readFileSync(join(process.cwd(), "src/app/auth/callback/route.ts"), "utf8");
   assert.match(route, /exchangeCodeForSession\(code\)/);
   assert.match(route, /normalizeAuthNextPath/);
+  assert.match(route, /cookieStore\.get\(OAUTH_NEXT_COOKIE\)\?\.value/);
   assert.match(route, /NextResponse\.redirect\(new URL\(nextPath, requestUrl\.origin\)\)/);
   assert.match(route, /authFailureRedirect/);
 });
@@ -150,7 +162,17 @@ test("successful callback attaches Supabase session cookies to the redirect resp
   const route = readFileSync(join(process.cwd(), "src/app/auth/callback/route.ts"), "utf8");
   assert.match(route, /responseCookies\.push\(\.\.\.cookiesToSet\)/);
   assert.match(route, /response\.cookies\.set\(name, value, options\)/);
+  assert.match(route, /clearOAuthIntent\(response\)/);
   assert.match(route, /return response/);
+});
+
+test("callback deletes OAuth intent cookie on success and failure", () => {
+  const route = readFileSync(join(process.cwd(), "src/app/auth/callback/route.ts"), "utf8");
+  assert.match(route, /function clearOAuthIntent/);
+  assert.match(route, /response\.cookies\.set\(OAUTH_NEXT_COOKIE, ""/);
+  assert.match(route, /maxAge:\s*0/);
+  assert.match(route, /missing_code/);
+  assert.match(route, /exchange_failed/);
 });
 
 test("Google signup without a requested next path uses login default, while email signup can keep onboarding", () => {
@@ -187,11 +209,16 @@ test("authentication analytics do not include authorization codes or callback UR
 test("fragment token guard removes implicit tokens without creating a session", () => {
   const guard = readFileSync(join(process.cwd(), "src/components/auth/AuthFragmentGuard.tsx"), "utf8");
   const layout = readFileSync(join(process.cwd(), "src/app/layout.tsx"), "utf8");
+  const signin = readFileSync(join(process.cwd(), "src/app/(auth)/signin/page.tsx"), "utf8");
   assert.match(guard, /window\.location\.hash/);
   assert.match(guard, /access_token/);
   assert.match(guard, /refresh_token/);
   assert.match(guard, /history\.replaceState/);
   assert.match(guard, /\/signin\?reason=google-error/);
+  assert.match(guard, /pathname === "\/"/);
+  assert.match(guard, /URLSearchParams\(window\.location\.search\)\.has\("code"\)/);
+  assert.match(guard, /\/signin\?reason=google-callback-misdirected/);
+  assert.match(signin, /reason === "google-error" \|\| reason === "google-callback-misdirected"/);
   assert.doesNotMatch(guard, /setSession|exchangeCodeForSession|getSupabaseBrowserClient/);
   assert.match(layout, /<AuthFragmentGuard \/>/);
 });

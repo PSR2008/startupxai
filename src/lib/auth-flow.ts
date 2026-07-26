@@ -1,4 +1,5 @@
 export const DEFAULT_AUTH_DESTINATION = "/dashboard";
+export const OAUTH_NEXT_COOKIE = "startupx_oauth_next";
 export const GOOGLE_AUTH_ERROR_MESSAGE =
   "Google sign-in could not be completed. Please try again.";
 
@@ -24,11 +25,9 @@ export function normalizeAuthNextPath(value?: string | null): string {
   return decoded;
 }
 
-export function buildGoogleOAuthRedirectTo(origin: string, nextPath?: string | null): string {
+export function buildGoogleOAuthRedirectTo(origin: string): string {
   const safeOrigin = origin.replace(/\/+$/, "");
-  const safeNext = normalizeAuthNextPath(nextPath);
   const callbackUrl = new URL("/auth/callback", safeOrigin);
-  callbackUrl.searchParams.set("next", safeNext);
   return callbackUrl.toString();
 }
 
