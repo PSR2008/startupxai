@@ -235,7 +235,7 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   pointer-events:none;
 }
 .resadex-kicker{
-  margin:0 0 1.3rem;
+  margin:0 0 0.55rem;
   font-family:var(--font-mono);
   font-size:clamp(0.64rem,0.9vw,0.78rem);
   font-weight:500;
@@ -243,6 +243,19 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   letter-spacing:0.42em;
   text-transform:uppercase;
   color:rgba(7,17,31,0.58);
+}
+.resadex-example-label{
+  margin:0 0 0.85rem;
+  border:1px solid rgba(7,17,31,0.12);
+  border-radius:999px;
+  background:rgba(255,255,255,0.28);
+  padding:0.28rem 0.68rem;
+  color:rgba(7,17,31,0.62);
+  font-family:var(--font-body);
+  font-size:0.72rem;
+  font-weight:600;
+  line-height:1;
+  backdrop-filter:blur(12px);
 }
 .resadex-title{
   display:flex;
@@ -339,15 +352,15 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
 
 @media(max-width:640px){
   .resadex-hero{padding:6rem 1rem 3.5rem}
-  .resadex-ring{top:38%;border-width:1.55rem}
+  .resadex-ring{top:35%;border-width:1.55rem}
   .resadex-ring-one{width:112vw;height:58vw}
   .resadex-ring-two{width:92vw;height:48vw}
   .resadex-ring-three{width:70vw;height:38vw}
   .resadex-ring-four{display:none}
-  .resadex-center-bead{left:67%;top:37%;width:5.4rem}
-  .resadex-copy{left:0;right:0;width:100vw;overflow:hidden;padding:0 1rem 4.7rem}
-  .resadex-copy>.resadex-kicker,.resadex-copy>.resadex-title,.resadex-copy>.resadex-subtitle,.resadex-copy>.resadex-actions{transform:translateX(-2.5rem)}
-  .resadex-kicker{letter-spacing:0.22em;font-size:0.62rem}
+  .resadex-center-bead{left:50%;top:34%;width:5.65rem}
+  .resadex-copy{left:0;right:0;width:100vw;overflow:hidden;padding:0 1rem 4.45rem}
+  .resadex-kicker{letter-spacing:0.2em;font-size:0.6rem}
+  .resadex-example-label{margin-bottom:0.72rem;font-size:0.68rem}
   .resadex-title{flex-direction:column;gap:0.36rem;font-size:clamp(3.75rem,16vw,4.65rem);letter-spacing:0.03rem;line-height:0.88}
   .resadex-title span:last-child{letter-spacing:0.03rem}
   .resadex-subtitle{width:min(100%,22rem);margin-top:1.2rem;font-size:0.98rem}

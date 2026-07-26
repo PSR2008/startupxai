@@ -46,6 +46,283 @@ export function LogoMarquee() {
 }
 
 // ============================================
+// EVIDENCE TRANSPARENCY SECTIONS
+// ============================================
+const evidenceEntryCards = [
+  {
+    title: "Founder-provided evidence",
+    description: "Interview notes, surveys, observations and research.",
+    label: "Founder provided",
+  },
+  {
+    title: "Linked sources",
+    description: "URLs, articles and competitor pages added by the founder.",
+    label: "Public URL",
+  },
+  {
+    title: "Experiment results",
+    description: "Landing-page tests, outreach results, sign-ups and customer responses.",
+    label: "Experiment result",
+  },
+  {
+    title: "AI-assisted suggestions",
+    description: "Possible claims and research directions that remain unverified until evidence is attached.",
+    label: "AI suggestion — unverified",
+  },
+];
+
+export function EvidenceEntrySection() {
+  return (
+    <section className="editorial-section bg-[#fffefa] px-5 py-20">
+      <div className="container-custom">
+        <AnimatedSection className="mb-12 max-w-3xl">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
+            <SearchCheck size={12} className="text-emerald-600" />
+            <span className="font-jakarta text-xs font-semibold text-emerald-700">Evidence intake</span>
+          </div>
+          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+            How evidence enters your workspace
+          </h2>
+          <p className="font-jakarta text-lg leading-relaxed text-gray-600">
+            StartupX AI organizes evidence founders add from customer discovery, research, source links and experiments. Generated suggestions stay separate until proof is attached.
+          </p>
+        </AnimatedSection>
+
+        <StaggerContainer className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" staggerDelay={0.06}>
+          {evidenceEntryCards.map((card) => (
+            <StaggerItem key={card.title}>
+              <div className="surface-panel h-full p-6">
+                <span className="mb-5 inline-flex rounded-md border border-black/8 bg-[#f8f6f0] px-2.5 py-1 font-mono text-[10px] font-semibold text-gray-600">
+                  {card.label}
+                </span>
+                <h3 className="mb-2 font-bricolage text-base font-bold text-gray-900">{card.title}</h3>
+                <p className="font-jakarta text-sm leading-relaxed text-gray-500">{card.description}</p>
+              </div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+
+        <AnimatedSection delay={0.1} className="mt-6">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-5">
+            <p className="font-jakarta text-sm leading-relaxed text-emerald-900">
+              StartupX AI does not secretly scrape private information. Founder-provided and imported evidence remains clearly attributed.
+            </p>
+          </div>
+        </AnimatedSection>
+      </div>
+    </section>
+  );
+}
+
+export function RealWorkflowSection() {
+  const rows = [
+    { label: "Assumption", value: "Operations leads urgently need better pricing review workflows.", status: "Unresolved claim" },
+    { label: "Supporting evidence", value: "Interview note from founder discovery call", status: "Customer interview · supporting · May 2026" },
+    { label: "Contradicting evidence", value: "Two prospects said spreadsheets are still acceptable", status: "Founder provided · contradicting · May 2026" },
+    { label: "Source attribution", value: "Founder notes and imported competitor URL", status: "Imported source · reviewed" },
+    { label: "Experiment", value: "Landing-page CTA test for pricing audit offer", status: "Experiment result · inconclusive" },
+    { label: "Decision", value: "Interview five more buyers before changing pricing page", status: "Decision recorded" },
+  ];
+
+  return (
+    <section className="editorial-section bg-[var(--color-bg-primary)] px-5 py-20">
+      <div className="container-custom">
+        <AnimatedSection className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+          <div>
+            <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3.5 py-1.5">
+              <FileText size={12} className="text-blue-600" />
+              <span className="font-jakarta text-xs font-semibold text-blue-700">Product workflow</span>
+            </div>
+            <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+              A real evidence workflow—not a generated startup report.
+            </h2>
+          </div>
+          <p className="font-jakarta text-lg leading-relaxed text-gray-600">
+            The workspace connects claims to evidence, marks contradictions, records experiments and preserves the decision that followed. The example below is illustrative and does not represent customer data.
+          </p>
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <div className="surface-panel overflow-hidden">
+            <div className="flex flex-col gap-3 border-b border-black/8 bg-[#f8f6f0] p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-bricolage text-base font-bold text-gray-900">Example assessment</p>
+                <p className="font-jakarta text-sm text-gray-500">SaaS pricing assessment · illustrative workflow</p>
+              </div>
+              <Link href="/methodology" className="font-jakarta text-sm font-semibold text-emerald-700 hover:text-emerald-900">
+                How assessments are calculated
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-[0.72fr_1.28fr]">
+              <div className="border-b border-black/8 p-6 lg:border-b-0 lg:border-r">
+                <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Evidence Score</p>
+                <div className="mt-3 flex items-end gap-3">
+                  <span className="font-bricolage text-5xl font-bold text-gray-950">62</span>
+                  <span className="mb-2 rounded-md border border-amber-200 bg-amber-50 px-2 py-1 font-jakarta text-xs font-semibold text-amber-700">
+                    Medium confidence
+                  </span>
+                </div>
+                <p className="mt-4 font-jakarta text-sm leading-relaxed text-gray-600">
+                  This score reflects the evidence currently available. It does not prove market demand or guarantee business success.
+                </p>
+                <div className="mt-5 grid grid-cols-1 gap-2">
+                  {["2 supporting items", "1 contradicting item", "1 completed experiment", "Missing: more buyer interviews"].map((item) => (
+                    <div key={item} className="rounded-lg border border-black/8 bg-white px-3 py-2 font-jakarta text-sm text-gray-600">
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="divide-y divide-black/6">
+                {rows.map((row) => (
+                  <div key={row.label} className="grid grid-cols-1 gap-2 p-5 sm:grid-cols-[0.35fr_1fr]">
+                    <p className="font-bricolage text-sm font-bold text-gray-900">{row.label}</p>
+                    <div>
+                      <p className="font-jakarta text-sm leading-relaxed text-gray-700">{row.value}</p>
+                      <p className="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{row.status}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </AnimatedSection>
+      </div>
+    </section>
+  );
+}
+
+export function DifferentiationSection() {
+  const general = ["temporary conversation", "generates possible answers", "does not structure experiments over time", "generated text may not be connected to proof"];
+  const startupx = ["persistent founder workspace", "connects claims to evidence", "records experiments and outcomes", "shows contradictions and missing evidence", "preserves decision history"];
+  const comparisons = [
+    { title: "General AI assistant", items: general },
+    { title: "StartupX AI", items: startupx },
+  ];
+
+  return (
+    <section className="editorial-section bg-[#fffefa] px-5 py-20">
+      <div className="container-custom">
+        <AnimatedSection className="mb-12 max-w-3xl">
+          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+            Not another one-time AI answer
+          </h2>
+          <p className="font-jakarta text-lg leading-relaxed text-gray-600">
+            StartupX AI is built for recurring founder work: collecting proof, seeing contradictions and deciding the next experiment.
+          </p>
+        </AnimatedSection>
+
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          {comparisons.map(({ title, items }) => (
+            <AnimatedSection key={title}>
+              <div className="surface-panel h-full p-6">
+                <h3 className="mb-5 font-bricolage text-lg font-bold text-gray-900">{title}</h3>
+                <div className="space-y-3">
+                  {items.map((item) => (
+                    <div key={item} className="flex items-start gap-3">
+                      <CheckCircle2 size={15} className="mt-1 flex-shrink-0 text-emerald-600" />
+                      <p className="font-jakarta text-sm leading-relaxed text-gray-600">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </AnimatedSection>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function RecurringEvidenceSection() {
+  const useCases = ["record customer interviews", "review contradictions", "update assumptions", "track experiments", "compare evidence over time", "preserve decision history", "prepare reports and investor updates"];
+  const flow = ["Customer interview", "new evidence", "updated assumption", "experiment", "result", "decision"];
+
+  return (
+    <section className="editorial-section bg-[var(--color-bg-primary)] px-5 py-20">
+      <div className="container-custom">
+        <AnimatedSection className="text-center mb-12">
+          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+            Your startup changes every week. Your evidence should too.
+          </h2>
+          <p className="mx-auto max-w-2xl font-jakarta text-lg leading-relaxed text-gray-600">
+            Use the workspace repeatedly as new interviews, experiments and decisions change what you believe.
+          </p>
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <div className="surface-panel p-6">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {flow.map((step, index) => (
+                <div key={step} className="flex items-center gap-2">
+                  <span className="rounded-lg border border-black/8 bg-[#f8f6f0] px-3 py-2 font-jakarta text-sm font-semibold text-gray-700">
+                    {step}
+                  </span>
+                  {index < flow.length - 1 && <ArrowRight size={14} className="text-gray-300" />}
+                </div>
+              ))}
+            </div>
+          </div>
+        </AnimatedSection>
+
+        <StaggerContainer className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4" staggerDelay={0.04}>
+          {useCases.map((item) => (
+            <StaggerItem key={item}>
+              <div className="surface-inset p-4 font-jakarta text-sm font-medium text-gray-600">{item}</div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </div>
+    </section>
+  );
+}
+
+export function CapabilitiesSection() {
+  const available = ["manual evidence collection", "interview and research notes", "supporting and contradicting evidence", "assumption tracking", "experiment tracking", "decision history", "evidence-backed assessments", "reports and exports"];
+  const planned = ["optional public-source integrations", "automated market-signal monitoring", "additional research providers", "improved team collaboration"];
+  const capabilityGroups = [
+    { title: "Available now", items: available, badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+    { title: "Being developed", items: planned, badgeClass: "bg-amber-50 text-amber-700 border-amber-200" },
+  ];
+
+  return (
+    <section className="editorial-section bg-[#fffefa] px-5 py-20">
+      <div className="container-custom">
+        <AnimatedSection className="mb-12 max-w-3xl">
+          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+            What StartupX AI does today
+          </h2>
+          <p className="font-jakarta text-lg leading-relaxed text-gray-600">
+            Current capabilities are separated from what is being developed, so the product does not imply automatic research coverage that is not live yet.
+          </p>
+        </AnimatedSection>
+
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          {capabilityGroups.map(({ title, items, badgeClass }) => (
+            <AnimatedSection key={title}>
+              <div className="surface-panel h-full p-6">
+                <span className={`mb-5 inline-flex rounded-md border px-2.5 py-1 font-jakarta text-xs font-semibold ${badgeClass}`}>
+                  {title}
+                </span>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {items.map((item) => (
+                    <div key={item} className="flex items-start gap-2">
+                      <CheckCircle2 size={15} className="mt-1 flex-shrink-0 text-emerald-600" />
+                      <p className="font-jakarta text-sm leading-relaxed text-gray-600">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </AnimatedSection>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================
 // ENGINES SECTION
 // ============================================
 const engines = [
@@ -614,7 +891,7 @@ const plans = [
     name: "Founder",
     price: `$${PLANS.founder.monthlyPrice}`,
     period: "/month",
-    description: "For solo founders assessing assumptions seriously",
+    description: "For solo founders running continuous customer discovery.",
     features: [`${PLANS.founder.analysesPerMonth} analyses/month`, "All assessment tools", "25 ColdDM generations", "25 BrandForge generations", "Investor memo + slide summary", "PDF exports", "Saved history"],
     cta: "Upgrade to Founder",
     href: "/payment?plan=founder&billing=monthly",
@@ -625,7 +902,7 @@ const plans = [
     name: "Growth",
     price: `$${PLANS.growth.monthlyPrice}`,
     period: "/month",
-    description: "For founders iterating weekly",
+    description: "For founders testing assumptions and experiments every week.",
     features: [`${PLANS.growth.analysesPerMonth} analyses/month`, "All assessment tools", "100 ColdDM generations", "100 BrandForge generations", "Investor memo + slide summary", "Shareable reports", "3 workspaces"],
     cta: "Upgrade to Growth",
     href: "/payment?plan=growth&billing=monthly",
@@ -636,7 +913,7 @@ const plans = [
     name: "Scale",
     price: `$${PLANS.scale.monthlyPrice}`,
     period: "/month",
-    description: "For heavier usage and small teams",
+    description: "For teams managing multiple products, evidence sources and decisions.",
     features: [`${PLANS.scale.analysesPerMonth} analyses/month`, "All assessment tools", "300 ColdDM generations", "300 BrandForge generations", "Investor memo + slide summary", "Team-ready workspaces", "Priority processing"],
     cta: "Upgrade to Scale",
     href: "/payment?plan=scale&billing=monthly",

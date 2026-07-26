@@ -3,9 +3,14 @@ import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
 import HeroSection from "@/components/marketing/HeroSection";
 import {
+  CapabilitiesSection,
+  DifferentiationSection,
+  EvidenceEntrySection,
   LogoMarquee,
   EnginesSection,
   FeaturesSection,
+  RealWorkflowSection,
+  RecurringEvidenceSection,
   HowItWorksSection,
   ComparisonSection,
   TrustSection,
@@ -25,10 +30,15 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[var(--color-bg-primary)] overflow-x-hidden">
       <Navbar />
       <HeroSection />
+      <RealWorkflowSection />
+      <EvidenceEntrySection />
       <LogoMarquee />
       <EnginesSection />
       <FeaturesSection />
+      <DifferentiationSection />
+      <RecurringEvidenceSection />
       <HowItWorksSection />
+      <CapabilitiesSection />
       <ComparisonSection />
       <TrustSection />
       <TestimonialsSection />

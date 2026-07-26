@@ -15,6 +15,9 @@ export default function HeroSection() {
         <p className="resadex-kicker">
           Evidence-backed founder workspace
         </p>
+        <p className="resadex-example-label">
+          Example assessment
+        </p>
 
         <h1 className="resadex-title">
           <span>STARTUPX</span>
@@ -22,7 +25,7 @@ export default function HeroSection() {
         </h1>
 
         <p className="resadex-subtitle">
-          Collect market signals, assess assumptions, track experiments, and decide what to build next.
+          Add evidence from customer interviews, research and experiments. Connect it to your assumptions and decide what to test next.
         </p>
 
         <div className="resadex-actions">

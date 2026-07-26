@@ -37,7 +37,7 @@ const plans = [
   },
   {
     name: "Founder",
-    tagline: "For solo founders assessing assumptions seriously",
+    tagline: "For solo founders running continuous customer discovery.",
     price: `$${PLANS.founder.monthlyPrice}`,
     priceNote: "per month",
     annualNote: `$${PLANS.founder.yearlyPrice} billed annually`,
@@ -61,7 +61,7 @@ const plans = [
   },
   {
     name: "Growth",
-    tagline: "For weekly iteration",
+    tagline: "For founders testing assumptions and experiments every week.",
     price: `$${PLANS.growth.monthlyPrice}`,
     priceNote: "per month",
     annualNote: `$${PLANS.growth.yearlyPrice} billed annually`,
@@ -85,7 +85,7 @@ const plans = [
   },
   {
     name: "Scale",
-    tagline: "For teams making more decisions",
+    tagline: "For teams managing multiple products, evidence sources and decisions.",
     price: `$${PLANS.scale.monthlyPrice}`,
     priceNote: "per month",
     annualNote: `$${PLANS.scale.yearlyPrice} billed annually`,
