@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle } from "lucide-react";
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
+import { GOOGLE_AUTH_ERROR_MESSAGE, normalizeAuthNextPath } from "@/lib/auth-flow";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 type Status = "idle" | "loading" | "error";
@@ -17,11 +19,17 @@ export default function SigninPage() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
+  const [nextPath, setNextPath] = useState("/dashboard");
 
   useEffect(() => {
-    const reason = new URLSearchParams(window.location.search).get("reason");
+    const params = new URLSearchParams(window.location.search);
+    const reason = params.get("reason");
+    setNextPath(normalizeAuthNextPath(params.get("next")));
     if (reason === "confirm-email") {
       setErrorMsg("Please confirm your email before opening your account. Check your inbox, then sign in again.");
+      setStatus("error");
+    } else if (reason === "google-error") {
+      setErrorMsg(GOOGLE_AUTH_ERROR_MESSAGE);
       setStatus("error");
     }
   }, []);
@@ -51,7 +59,7 @@ export default function SigninPage() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push(nextPath);
       router.refresh();
     } catch (err: unknown) {
       const raw = err instanceof Error ? err.message : "Sign in failed.";
@@ -91,7 +99,7 @@ export default function SigninPage() {
           <h1 className="font-bricolage text-2xl font-bold text-gray-900 mb-1.5">Welcome back</h1>
           <p className="font-jakarta text-sm text-gray-500">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-emerald-600 hover:text-emerald-700 transition-colors font-semibold">
+            <Link href={`/signup?next=${encodeURIComponent(nextPath)}`} className="text-emerald-600 hover:text-emerald-700 transition-colors font-semibold">
               Sign up free
             </Link>
           </p>
@@ -99,6 +107,14 @@ export default function SigninPage() {
 
         {/* Card */}
         <div className="rounded-2xl border border-black/8 bg-white p-8 space-y-5 shadow-lg shadow-black/5">
+          <GoogleAuthButton nextPath={nextPath} />
+
+          <div className="flex items-center gap-3" aria-hidden="true">
+            <span className="h-px flex-1 bg-black/8" />
+            <span className="font-jakarta text-[11px] font-semibold text-gray-400">or continue with email</span>
+            <span className="h-px flex-1 bg-black/8" />
+          </div>
+
           {/* Email */}
           <div className="space-y-1.5">
             <label className="font-jakarta text-sm font-semibold text-gray-700">

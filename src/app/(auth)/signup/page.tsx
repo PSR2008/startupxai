@@ -1,10 +1,12 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
+import { GOOGLE_AUTH_ERROR_MESSAGE, normalizeAuthNextPath } from "@/lib/auth-flow";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -26,6 +28,16 @@ export default function SignupPage() {
   const [resendStatus, setResendStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
+  const [nextPath, setNextPath] = useState("/onboarding");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setNextPath(normalizeAuthNextPath(params.get("next") || "/onboarding"));
+    if (params.get("reason") === "google-error") {
+      setErrorMsg(GOOGLE_AUTH_ERROR_MESSAGE);
+      setStatus("error");
+    }
+  }, []);
 
   const validate = () => {
     const errs: { email?: string; password?: string } = {};
@@ -57,7 +69,7 @@ export default function SignupPage() {
       if (error) throw error;
 
       if (data.session) {
-        router.push("/onboarding");
+        router.push(nextPath);
         router.refresh();
         return;
       }
@@ -183,7 +195,7 @@ export default function SignupPage() {
           <h1 className="font-bricolage text-2xl font-bold text-gray-900 mb-1.5">Create your account</h1>
           <p className="font-jakarta text-sm text-gray-500">
             Already have an account?{" "}
-            <Link href="/signin" className="text-emerald-600 hover:text-emerald-700 transition-colors font-semibold">
+            <Link href={`/signin?next=${encodeURIComponent(nextPath)}`} className="text-emerald-600 hover:text-emerald-700 transition-colors font-semibold">
               Sign in
             </Link>
           </p>
@@ -191,6 +203,14 @@ export default function SignupPage() {
 
         {/* Card */}
         <div className="rounded-2xl border border-black/8 bg-white p-8 space-y-5 shadow-lg shadow-black/5">
+          <GoogleAuthButton nextPath={nextPath} />
+
+          <div className="flex items-center gap-3" aria-hidden="true">
+            <span className="h-px flex-1 bg-black/8" />
+            <span className="font-jakarta text-[11px] font-semibold text-gray-400">or continue with email</span>
+            <span className="h-px flex-1 bg-black/8" />
+          </div>
+
           {/* Perks banner */}
           <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-3.5 flex items-start gap-3">
             <CheckCircle2 size={15} className="text-emerald-600 flex-shrink-0 mt-0.5" />
