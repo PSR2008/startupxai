@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
-import { GOOGLE_AUTH_ERROR_MESSAGE, normalizeAuthNextPath } from "@/lib/auth-flow";
+import { DEFAULT_AUTH_DESTINATION, GOOGLE_AUTH_ERROR_MESSAGE, normalizeAuthNextPath } from "@/lib/auth-flow";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -29,10 +29,13 @@ export default function SignupPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [nextPath, setNextPath] = useState("/onboarding");
+  const [googleNextPath, setGoogleNextPath] = useState(DEFAULT_AUTH_DESTINATION);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setNextPath(normalizeAuthNextPath(params.get("next") || "/onboarding"));
+    const requestedNext = params.get("next");
+    setNextPath(normalizeAuthNextPath(requestedNext || "/onboarding"));
+    setGoogleNextPath(normalizeAuthNextPath(requestedNext));
     if (params.get("reason") === "google-error") {
       setErrorMsg(GOOGLE_AUTH_ERROR_MESSAGE);
       setStatus("error");
@@ -203,7 +206,7 @@ export default function SignupPage() {
 
         {/* Card */}
         <div className="rounded-2xl border border-black/8 bg-white p-8 space-y-5 shadow-lg shadow-black/5">
-          <GoogleAuthButton nextPath={nextPath} />
+          <GoogleAuthButton nextPath={googleNextPath} />
 
           <div className="flex items-center gap-3" aria-hidden="true">
             <span className="h-px flex-1 bg-black/8" />

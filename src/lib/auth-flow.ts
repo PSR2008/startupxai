@@ -1,6 +1,6 @@
 export const DEFAULT_AUTH_DESTINATION = "/dashboard";
 export const GOOGLE_AUTH_ERROR_MESSAGE =
-  "Google sign-in could not be completed. Please try again or continue with email.";
+  "Google sign-in could not be completed. Please try again.";
 
 export function normalizeAuthNextPath(value?: string | null): string {
   if (!value) return DEFAULT_AUTH_DESTINATION;
@@ -12,7 +12,15 @@ export function normalizeAuthNextPath(value?: string | null): string {
   }
   if (!decoded.startsWith("/") || decoded.startsWith("//")) return DEFAULT_AUTH_DESTINATION;
   if (decoded.includes("\\") || decoded.includes("\n") || decoded.includes("\r")) return DEFAULT_AUTH_DESTINATION;
-  if (decoded.startsWith("/auth/callback") || decoded.startsWith("/signin") || decoded.startsWith("/login")) return DEFAULT_AUTH_DESTINATION;
+  if (decoded === "/") return DEFAULT_AUTH_DESTINATION;
+  if (
+    decoded.startsWith("/auth/callback") ||
+    decoded.startsWith("/signin") ||
+    decoded.startsWith("/signup") ||
+    decoded.startsWith("/login")
+  ) {
+    return DEFAULT_AUTH_DESTINATION;
+  }
   return decoded;
 }
 

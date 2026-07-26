@@ -13,18 +13,21 @@ async function createSupabaseCallbackClient() {
   if (!supabaseUrl || !supabaseAnonKey) return null;
 
   const cookieStore = await cookies();
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
+  const responseCookies: Array<{ name: string; value: string; options: CookieOptions }> = [];
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
       },
       setAll(cookiesToSet: Array<{ name: string; value: string; options: CookieOptions }>) {
+        responseCookies.push(...cookiesToSet);
         cookiesToSet.forEach(({ name, value, options }) => {
           cookieStore.set(name, value, options);
         });
       },
     },
   });
+  return { supabase, responseCookies };
 }
 
 async function initializeOAuthUser(userId: string) {
@@ -54,8 +57,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(authFailureRedirect(requestUrl.origin));
   }
 
-  const supabase = await createSupabaseCallbackClient();
-  if (!supabase) {
+  const callbackClient = await createSupabaseCallbackClient();
+  if (!callbackClient) {
     await trackProductEvent("google_auth_failed", { properties: { reason: "supabase_unavailable" } });
     return NextResponse.redirect(authFailureRedirect(requestUrl.origin));
   }
@@ -63,7 +66,7 @@ export async function GET(req: NextRequest) {
   const {
     data: { user },
     error,
-  } = await supabase.auth.exchangeCodeForSession(code);
+  } = await callbackClient.supabase.auth.exchangeCodeForSession(code);
 
   if (error || !user) {
     await trackProductEvent("google_auth_failed", { properties: { reason: "exchange_failed" } });
@@ -76,5 +79,9 @@ export async function GET(req: NextRequest) {
     properties: { provider: "google" },
   });
 
-  return NextResponse.redirect(new URL(nextPath, requestUrl.origin));
+  const response = NextResponse.redirect(new URL(nextPath, requestUrl.origin));
+  callbackClient.responseCookies.forEach(({ name, value, options }) => {
+    response.cookies.set(name, value, options);
+  });
+  return response;
 }

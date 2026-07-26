@@ -2,23 +2,41 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildGoogleOAuthRedirectTo, authFailureRedirect, normalizeAuthNextPath } from "../src/lib/auth-flow";
+import {
+  DEFAULT_AUTH_DESTINATION,
+  buildGoogleOAuthRedirectTo,
+  authFailureRedirect,
+  normalizeAuthNextPath,
+} from "../src/lib/auth-flow";
 
 test("valid internal next path is preserved for OAuth", () => {
   assert.equal(normalizeAuthNextPath("/evidence-engine"), "/evidence-engine");
+  assert.equal(normalizeAuthNextPath("/dashboard"), "/dashboard");
   assert.equal(normalizeAuthNextPath("/reports/abc?tab=summary"), "/reports/abc?tab=summary");
 });
 
 test("external and protocol-relative next URLs are rejected", () => {
-  assert.equal(normalizeAuthNextPath("https://evil.example/path"), "/dashboard");
-  assert.equal(normalizeAuthNextPath("//evil.example/path"), "/dashboard");
-  assert.equal(normalizeAuthNextPath("http:%2f%2fevil.example/path"), "/dashboard");
-  assert.equal(normalizeAuthNextPath("/auth/callback?code=x"), "/dashboard");
+  assert.equal(normalizeAuthNextPath("https://evil.example/path"), DEFAULT_AUTH_DESTINATION);
+  assert.equal(normalizeAuthNextPath("//evil.example/path"), DEFAULT_AUTH_DESTINATION);
+  assert.equal(normalizeAuthNextPath("http:%2f%2fevil.example/path"), DEFAULT_AUTH_DESTINATION);
+});
+
+test("missing, home, and auth-route next paths fall back to the authenticated dashboard", () => {
+  assert.equal(normalizeAuthNextPath(null), DEFAULT_AUTH_DESTINATION);
+  assert.equal(normalizeAuthNextPath("/"), DEFAULT_AUTH_DESTINATION);
+  assert.equal(normalizeAuthNextPath("/auth/callback?code=x"), DEFAULT_AUTH_DESTINATION);
+  assert.equal(normalizeAuthNextPath("/signin?next=/evidence-engine"), DEFAULT_AUTH_DESTINATION);
+  assert.equal(normalizeAuthNextPath("/signup"), DEFAULT_AUTH_DESTINATION);
+  assert.equal(normalizeAuthNextPath("/login"), DEFAULT_AUTH_DESTINATION);
 });
 
 test("Google OAuth redirect uses internal callback and encoded next path", () => {
   const redirectTo = buildGoogleOAuthRedirectTo("https://startupxai.in/", "/evidence-engine");
   assert.equal(redirectTo, "https://startupxai.in/auth/callback?next=%2Fevidence-engine");
+  assert.equal(
+    buildGoogleOAuthRedirectTo("https://startupxai.in/", "/"),
+    "https://startupxai.in/auth/callback?next=%2Fdashboard"
+  );
 });
 
 test("failure redirect is safe and hides provider internals", () => {
@@ -51,6 +69,20 @@ test("callback exchanges the code, validates next, and redirects safely", () => 
   assert.match(route, /normalizeAuthNextPath/);
   assert.match(route, /NextResponse\.redirect\(new URL\(nextPath, requestUrl\.origin\)\)/);
   assert.match(route, /authFailureRedirect/);
+});
+
+test("successful callback attaches Supabase session cookies to the redirect response", () => {
+  const route = readFileSync(join(process.cwd(), "src/app/auth/callback/route.ts"), "utf8");
+  assert.match(route, /responseCookies\.push\(\.\.\.cookiesToSet\)/);
+  assert.match(route, /response\.cookies\.set\(name, value, options\)/);
+  assert.match(route, /return response/);
+});
+
+test("Google signup without a requested next path uses login default, while email signup can keep onboarding", () => {
+  const signup = readFileSync(join(process.cwd(), "src/app/(auth)/signup/page.tsx"), "utf8");
+  assert.match(signup, /googleNextPath/);
+  assert.match(signup, /setGoogleNextPath\(normalizeAuthNextPath\(requestedNext\)\)/);
+  assert.match(signup, /setNextPath\(normalizeAuthNextPath\(requestedNext \|\| "\/onboarding"\)\)/);
 });
 
 test("callback handles missing code and exchange failures without exposing tokens", () => {
