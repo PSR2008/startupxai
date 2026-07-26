@@ -2,8 +2,20 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
-import { EVIDENCE_SCORE_DISCLAIMER, classifyEvidenceItem, getScoreEvidenceMetrics } from "../src/lib/evidence-display";
+import {
+  EVIDENCE_SCORE_DISCLAIMER,
+  classifyEvidenceItem,
+  getComponentCalculations,
+  getConfidenceExplanation,
+  getConfidenceImprovementItems,
+  getDisplayedTotal,
+  getEvidenceProvenance,
+  getMissingEvidenceItems,
+  getRecommendedTests,
+  getScoreEvidenceMetrics,
+} from "../src/lib/evidence-display";
 import { calculateEvidenceScores, overallValidationScore, suggestExperiments } from "../src/lib/evidence-scoring";
+import { buildFounderReportContent, type StoredAnalysis } from "../src/lib/reporting";
 import {
   evidenceWorkflowSchema,
   experimentSchema,
@@ -15,7 +27,7 @@ import {
   type StoredEvidenceForScore,
   type StoredExperimentForScore,
 } from "../src/lib/evidence-workflow";
-import type { EvidenceEngineInput, EvidenceItem } from "../src/lib/evidence-types";
+import type { EvidenceEngineInput, EvidenceItem, ValidationProjectResult } from "../src/lib/evidence-types";
 import { normalizeHttpUrl } from "../src/lib/safe-url";
 
 const input: EvidenceEngineInput = {
@@ -96,6 +108,124 @@ test("score display metadata includes disclaimer and transparency fields", () =>
   assert.match(metrics.confidenceLevel, /^(low|medium|high)$/);
   assert.ok(metrics.calculationSummary.includes("Calculated with"));
   assert.ok(metrics.improvementAction.length > 0);
+});
+
+test("confidence explanation reflects founder-only evidence and changes with customer evidence", () => {
+  const scores = calculateEvidenceScores(input, [evidence[1]]);
+  const founderOnly: ValidationProjectResult = {
+    project: { id: "p1", startupName: "ProofDesk", overallScore: overallValidationScore(scores).score, confidence: "low", scoreVersion: "test", createdAt: new Date().toISOString() },
+    input,
+    scores,
+    evidenceItems: [evidence[1]],
+    providerRuns: [],
+    suggestedExperiments: suggestExperiments(input, scores),
+    limitations: [],
+  };
+  const founderExplanation = getConfidenceExplanation(founderOnly);
+  assert.match(founderExplanation.summary, /low evidence confidence/i);
+  assert.ok(founderExplanation.reasons.some((reason) => /founder provided/i.test(reason)));
+  assert.ok(founderExplanation.reasons.some((reason) => /No customer interviews/i.test(reason)));
+
+  const customerEvidence = { ...evidence[1], id: "ev_customer", sourceType: "customer interview", title: "Customer interview", verifiedStatus: "user_provided" as const };
+  const withCustomer = getConfidenceExplanation({ ...founderOnly, evidenceItems: [evidence[1], customerEvidence] });
+  assert.equal(withCustomer.reasons.some((reason) => /No customer interviews/i.test(reason)), false);
+});
+
+test("confidence explanation changes when experiment evidence exists", () => {
+  const scores = calculateEvidenceScores(input, evidence);
+  const experimentEvidence: EvidenceItem = {
+    ...evidence[1],
+    id: "ev_experiment",
+    title: "Landing-page test result",
+    sourceType: "experiment result",
+    verifiedStatus: "user_provided",
+  };
+  const result: ValidationProjectResult = {
+    project: { id: "p1", startupName: "ProofDesk", overallScore: overallValidationScore(scores).score, confidence: "low", scoreVersion: "test", createdAt: new Date().toISOString() },
+    input,
+    scores,
+    evidenceItems: [...evidence, experimentEvidence],
+    providerRuns: [],
+    suggestedExperiments: suggestExperiments(input, scores),
+    limitations: [],
+  };
+  assert.equal(getConfidenceExplanation(result).reasons.some((reason) => /No completed experiment outcomes/i.test(reason)), false);
+});
+
+test("component calculations reconcile to displayed total and expose deductions", () => {
+  const [score] = calculateEvidenceScores({ ...input, knownCompetitors: "", mainAssumptions: "", websiteUrl: "" }, []);
+  const calculations = getComponentCalculations(score);
+  assert.equal(getDisplayedTotal(score), score.score);
+  assert.equal(calculations.reduce((sum, item) => sum + item.finalContribution, 0), score.score);
+  assert.ok(calculations.every((item) => item.weightPercent > 0));
+  assert.ok(calculations.some((item) => item.deductions.length > 0));
+});
+
+test("evidence provenance shows public attribution and unverified generated suggestions", () => {
+  const publicItem: EvidenceItem = {
+    ...evidence[0],
+    sourceType: "public_url",
+    rawMetadata: { hostname: "example.com", retrievedAt: "2026-07-27T00:00:00.000Z", claim: "Market timing is supported" },
+  };
+  const generatedItem: EvidenceItem = {
+    ...evidence[1],
+    id: "ev_ai",
+    title: "Generated assessment note",
+    sourceType: "model assessment",
+    verifiedStatus: "inferred",
+  };
+  const provenance = getEvidenceProvenance([publicItem, generatedItem]);
+  assert.equal(provenance[0].attribution, "Public source - founder selected");
+  assert.equal(provenance[0].hostname, "example.com");
+  assert.equal(provenance[1].sourceLabel, "Generated assessment");
+  assert.equal(provenance[1].verificationStatus, "unverified");
+});
+
+test("missing evidence and confidence improvement use actual gaps", () => {
+  const score = calculateEvidenceScores({ ...input, knownCompetitors: "", mainAssumptions: "", websiteUrl: "" }, [])[0];
+  const missing = getMissingEvidenceItems(score);
+  const improvements = getConfidenceImprovementItems(score);
+  assert.ok(missing.length > 0);
+  assert.ok(missing.every((item) => item.whyItMatters.includes(score.label.toLowerCase())));
+  assert.ok(improvements.some((item) => /More evidence does not automatically mean stronger evidence/.test(item)));
+
+  const complete = { ...score, components: score.components.map((component) => ({ ...component, evidenceKind: "verified" as const })) };
+  assert.equal(getMissingEvidenceItems(complete).length, 0);
+});
+
+test("recommended tests connect to weakest assumptions instead of generic advice", () => {
+  const scores = calculateEvidenceScores(input, evidence);
+  const recommendations = getRecommendedTests(scores, suggestExperiments(input, scores));
+  assert.equal(recommendations.length, 3);
+  assert.ok(recommendations.every((item) => item.hypothesis.includes(input.startupName)));
+  assert.ok(recommendations.every((item) => item.metric.length > 0 && item.successThreshold.length > 0));
+  assert.equal(recommendations.some((item) => item.test === "Do more market research."), false);
+});
+
+test("generated reports include evidence transparency fields when analysis output has them", () => {
+  const analysis: StoredAnalysis = {
+    id: "analysis_1",
+    user_id: "user_1",
+    engine_type: "idea",
+    input_data: { idea: "ProofDesk", targetAudience: input.targetCustomer },
+    output_data: {
+      executiveSummary: "Evidence assessment summary",
+      confidenceExplanation: "Low confidence because customer research is missing.",
+      componentCalculations: [{ componentName: "Customer urgency", finalContribution: 8 }],
+      evidenceProvenance: [{ title: "Founder note", sourceLabel: "Founder-provided evidence" }],
+      missingEvidence: ["Customer interviews"],
+      recommendedTests: ["Run 5 customer interviews"],
+    },
+    created_at: new Date().toISOString(),
+  };
+
+  const content = buildFounderReportContent(analysis, null, "detailed");
+  const sectionTitles = content.sections.map((section) => section.title);
+  assert.ok(sectionTitles.includes("Assessment Confidence"));
+  assert.ok(sectionTitles.includes("Score Calculation Details"));
+  assert.ok(sectionTitles.includes("Evidence Provenance"));
+  assert.ok(sectionTitles.includes("Missing Evidence And Contradictions"));
+  assert.ok(sectionTitles.includes("Recommended Next Validation Tests"));
 });
 
 test("overallValidationScore is bounded and confidence is explicit", () => {

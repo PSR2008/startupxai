@@ -122,9 +122,20 @@ function compact<T>(items: Array<T | null | undefined>): T[] {
   return items.filter(Boolean) as T[];
 }
 
+function buildEvidenceReportSections(output: Record<string, unknown>): FounderReportSection[] {
+  return compact([
+    section("Assessment Confidence", output.confidenceExplanation ?? output.confidenceReasons ?? output.confidence),
+    section("Score Calculation Details", undefined, output.componentCalculations ?? output.scoreComponents ?? output.scores),
+    section("Evidence Provenance", undefined, output.evidenceProvenance ?? output.evidenceItems ?? output.sources),
+    section("Missing Evidence And Contradictions", undefined, output.missingEvidence ?? output.validationGaps ?? output.limitations),
+    section("Recommended Next Validation Tests", undefined, output.recommendedTests ?? output.suggestedExperiments ?? output.nextValidationActions),
+  ]);
+}
+
 function buildSections(analysis: StoredAnalysis, type: ReportOutputType): FounderReportSection[] {
   const output = analysis.output_data ?? {};
   const engine = analysis.engine_type;
+  const evidenceSections = buildEvidenceReportSections(output);
 
   if (type === "investor_memo") {
     return compact([
@@ -136,6 +147,7 @@ function buildSections(analysis: StoredAnalysis, type: ReportOutputType): Founde
       section("Business / Revenue Model", output.revenueVerdict, output.pricingSuggestions),
       section("Go-To-Market Direction", undefined, output.customerAcquisitionPriorities ?? output.launchSteps),
       section("Important Risks", undefined, output.riskFactors ?? output.whyItMayFail ?? output.conversionBlockers),
+      ...evidenceSections,
       section("Immediate Next Step", output.whatToFixFirst, output.actionableNextSteps),
     ]);
   }
@@ -153,6 +165,7 @@ function buildSections(analysis: StoredAnalysis, type: ReportOutputType): Founde
       section("9. Pricing", undefined, output.pricingSuggestions ?? output.psychologicalPricingTips),
       section("10. Go-To-Market", output.outreachDirection, output.launchSteps ?? output.customerAcquisitionPriorities),
       section("11. Risks", undefined, output.riskFactors ?? output.whyItMayFail ?? output.revenueLeaks),
+      ...evidenceSections,
       section("12. Next Steps", output.whatToFixFirst, output.actionableNextSteps ?? output.launchSteps),
     ]);
   }
@@ -171,6 +184,7 @@ function buildSections(analysis: StoredAnalysis, type: ReportOutputType): Founde
     section("User Psychology Insights", output.brutalRoast, output.uxRecommendations),
     section("Growth Recommendations", undefined, output.launchSteps ?? output.customerAcquisitionPriorities),
     section("Founder Decisions", output.finalVerdict, output.actionableNextSteps ?? output.top3Priorities),
+    ...evidenceSections,
     section("Brand Recommendations", output.brandPackSummary, output.positioningLines ?? output.taglines),
     section("Cold Outreach Recommendations", undefined, output.followUpVariants ?? output.ctaVariations),
   ]);

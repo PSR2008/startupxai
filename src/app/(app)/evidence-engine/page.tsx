@@ -10,7 +10,17 @@ import Badge from "@/components/ui/Badge";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import { ConfidenceBadge, DataFreshnessBadge, EvidenceCard, MethodologyDrawer, ProviderStatus, ValidationDecisionPanel } from "@/components/app/EvidenceUI";
 import { getAuthHeaders } from "@/lib/auth-headers-client";
-import { EVIDENCE_SCORE_DISCLAIMER, getScoreEvidenceMetrics } from "@/lib/evidence-display";
+import {
+  EVIDENCE_SCORE_DISCLAIMER,
+  getComponentCalculations,
+  getConfidenceExplanation,
+  getConfidenceImprovementItems,
+  getDisplayedTotal,
+  getEvidenceProvenance,
+  getMissingEvidenceItems,
+  getRecommendedTests,
+  getScoreEvidenceMetrics,
+} from "@/lib/evidence-display";
 import type { CategoryScore, EvidenceEngineInput, ValidationProjectResult } from "@/lib/evidence-types";
 
 type FormState = EvidenceEngineInput;
@@ -291,6 +301,8 @@ export default function EvidenceEnginePage() {
                   </div>
                 </section>
 
+                <AssessmentExplainability result={result} />
+
                 <ValidationDecisionPanel overallScore={result.project.overallScore} confidence={result.project.confidence} />
 
                 <PersistedWorkflowPanel
@@ -333,9 +345,10 @@ export default function EvidenceEnginePage() {
                 <section className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <Database size={14} className="text-emerald-600" />
-                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Evidence collected</h3>
+                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Evidence used in this assessment</h3>
                   </div>
-                  <div className="grid grid-cols-1 gap-3">
+                  <EvidenceProvenanceList result={result} score={activeScore} />
+                  <div className="mt-4 grid grid-cols-1 gap-3">
                     {result.evidenceItems.map((item) => <EvidenceCard key={item.id} item={item} />)}
                   </div>
                 </section>
@@ -355,18 +368,7 @@ export default function EvidenceEnginePage() {
                     <FlaskConical size={14} className="text-violet-600" />
                     <h3 className="font-bricolage text-sm font-bold text-gray-900">Recommended next validation actions</h3>
                   </div>
-                  <div className="space-y-3">
-                    {result.suggestedExperiments.map((experiment) => (
-                      <div key={experiment.hypothesis} className="surface-inset p-4">
-                        <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-                          <p className="min-w-0 font-bricolage text-sm font-bold text-gray-900">{experiment.experimentType}</p>
-                          <Badge variant="violet" size="sm">{experiment.status}</Badge>
-                        </div>
-                        <p className="font-jakarta text-sm leading-relaxed text-gray-600">{experiment.hypothesis}</p>
-                        <p className="mt-2 font-jakarta text-xs text-gray-500">Metric: {experiment.successMetric} - sample size {experiment.minimumSampleSize}</p>
-                      </div>
-                    ))}
-                  </div>
+                  <RecommendedTestsList result={result} />
                 </section>
 
                 <section className="w-full max-w-full rounded-2xl border border-amber-200 bg-amber-50 p-4">
@@ -401,8 +403,99 @@ export default function EvidenceEnginePage() {
   );
 }
 
+function AssessmentExplainability({ result }: { result: ValidationProjectResult }) {
+  const explanation = getConfidenceExplanation(result);
+  const insufficient = result.project.confidence === "low";
+  return (
+    <section aria-labelledby="assessment-summary-heading" className="surface-panel w-full max-w-full p-5">
+      <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(260px,0.8fr)]">
+        <div className="min-w-0">
+          <p className="font-jakarta text-xs font-semibold text-emerald-700">Assessment summary</p>
+          <h3 id="assessment-summary-heading" className="mt-1 break-words font-bricolage text-lg font-bold text-gray-950">
+            {insufficient ? "Insufficient evidence for a reliable market conclusion." : explanation.label}
+          </h3>
+          <p className="mt-2 break-words font-jakarta text-sm leading-relaxed text-gray-600">{explanation.summary}</p>
+          <p className="mt-2 break-words font-jakarta text-xs leading-relaxed text-gray-500">
+            Assessment score measures current weighted evidence signals. Evidence confidence measures how much those signals rely on independent, recent, high-quality evidence. Decision readiness remains provisional until customer research and experiments are recorded.
+          </p>
+        </div>
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <h4 className="font-bricolage text-sm font-bold text-amber-950">Why confidence is currently {result.project.confidence}</h4>
+          <ul className="mt-3 space-y-2">
+            {explanation.reasons.map((reason) => (
+              <li key={reason} className="break-words font-jakarta text-xs leading-relaxed text-amber-900">{reason}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function EvidenceProvenanceList({ result, score }: { result: ValidationProjectResult; score: CategoryScore }) {
+  const provenance = getEvidenceProvenance(result.evidenceItems, score);
+  if (!provenance.length) {
+    return (
+      <div className="rounded-xl border border-dashed border-black/10 bg-[#fbfaf7] p-4 font-jakarta text-sm text-gray-500">
+        No linked evidence items were used for this selected score. Founder input and unavailable weighted components are still shown in the calculation.
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-2">
+      {provenance.map((item) => (
+        <article key={item.id} className="surface-inset min-w-0 p-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <h4 className="break-words font-bricolage text-sm font-bold text-gray-900">{item.title}</h4>
+              <p className="mt-1 break-words font-jakarta text-xs text-gray-500">{item.attribution}</p>
+            </div>
+            <Badge variant={item.direction === "contradicts" ? "rose" : item.direction === "supports" ? "emerald" : "neutral"} size="sm">{item.direction}</Badge>
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <MetricBlock label="Source type" value={item.sourceLabel} />
+            <MetricBlock label="Verification" value={item.verificationStatus} />
+            <MetricBlock label="Public host" value={item.hostname ?? "Not applicable"} />
+            <MetricBlock label="Retrieved" value={item.retrievedAt ? new Date(item.retrievedAt).toLocaleDateString() : "Not recorded"} />
+          </div>
+          <p className="mt-3 break-words font-jakarta text-xs leading-relaxed text-gray-600">Linked claim: {item.linkedClaim}</p>
+          <p className="mt-2 break-words font-jakarta text-xs leading-relaxed text-gray-500">Impact: {item.resultImpact}</p>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function RecommendedTestsList({ result }: { result: ValidationProjectResult }) {
+  const tests = getRecommendedTests(result.scores, result.suggestedExperiments);
+  return (
+    <div className="space-y-3">
+      {tests.map((test) => (
+        <div key={test.hypothesis} className="surface-inset p-4">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+            <p className="min-w-0 font-bricolage text-sm font-bold text-gray-900">{test.test}</p>
+            <Badge variant="violet" size="sm">{test.evidenceType}</Badge>
+          </div>
+          <p className="font-jakarta text-sm leading-relaxed text-gray-600">{test.hypothesis}</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <MetricBlock label="Audience" value={test.targetAudience} />
+            <MetricBlock label="Metric" value={test.metric} />
+            <MetricBlock label="Threshold" value={test.successThreshold} />
+            <MetricBlock label="Duration" value={test.duration} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ScorePanel({ score }: { score: CategoryScore }) {
   const metrics = getScoreEvidenceMetrics(score);
+  const calculations = getComponentCalculations(score);
+  const missingItems = getMissingEvidenceItems(score);
+  const confidenceImprovements = getConfidenceImprovementItems(score);
+  const displayedTotal = getDisplayedTotal(score);
   return (
     <section className="surface-panel w-full max-w-full p-5">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -429,11 +522,43 @@ function ScorePanel({ score }: { score: CategoryScore }) {
         <TextBlock title="Supporting evidence" items={score.supportingEvidence} />
         <TextBlock title="Opposing evidence" items={score.opposingEvidence.length ? score.opposingEvidence : ["No opposing evidence captured yet."]} />
         <TextBlock title="Assumptions" items={score.assumptions} />
-        <TextBlock title="Missing evidence" items={metrics.missingEvidence.length ? metrics.missingEvidence : ["No missing weighted inputs for this score."]} />
-        <TextBlock title="How the score was calculated" items={[metrics.calculationSummary]} />
-        <TextBlock title="What would improve the score" items={[metrics.improvementAction]} />
+        <TextBlock title="What is still missing" items={missingItems.length ? missingItems.map((item) => `${item.title}: ${item.evidenceNeeded}. ${item.whyItMatters} ${item.confidenceImpact}`) : ["No missing weighted inputs for this score."]} />
+        <TextBlock title="What would raise confidence" items={confidenceImprovements} />
         <TextBlock title="Recommended next validation actions" items={[score.recommendedNextAction]} />
       </div>
+      <details className="mt-4 rounded-xl border border-black/8 bg-gray-50 p-4">
+        <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-900">How this was calculated</summary>
+        <p className="mt-2 break-words font-jakarta text-xs leading-relaxed text-gray-500">{score.methodology}</p>
+        <div className="mt-4 space-y-3">
+          {calculations.map((item) => (
+            <div key={item.componentName} className="rounded-lg border border-black/6 bg-white p-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <p className="break-words font-bricolage text-sm font-bold text-gray-900">{item.componentName}</p>
+                  <p className="mt-1 break-words font-jakarta text-xs leading-relaxed text-gray-500">{item.purpose}</p>
+                </div>
+                <Badge variant="neutral" size="sm">Weight {item.weightPercent}%</Badge>
+              </div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                <MetricBlock label="Raw result" value={`${item.rawScore}/100`} />
+                <MetricBlock label="Weighted contribution" value={`${item.weightedContribution}/100`} />
+                <MetricBlock label="Final contribution" value={`${item.finalContribution}`} />
+                <MetricBlock label="Linked evidence" value={String(item.linkedEvidenceIds.length)} />
+              </div>
+              {(item.deductions.length > 0 || item.missingEvidence.length > 0) && (
+                <ul className="mt-3 space-y-1">
+                  {[...item.deductions, ...item.missingEvidence.map((missing) => `Missing evidence: ${missing}`)].map((reason) => (
+                    <li key={reason} className="break-words font-jakarta text-xs leading-relaxed text-gray-600">{reason}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-jakarta text-xs leading-relaxed text-emerald-900">
+          Component contribution total: {displayedTotal}/100. Displayed score: {score.score}/100.
+        </p>
+      </details>
       <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 font-jakarta text-xs leading-relaxed text-amber-900">{score.uncertainty}</p>
       <div className="mt-4">
         <MethodologyDrawer score={score} />

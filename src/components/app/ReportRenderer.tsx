@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { CalendarDays, FileText } from "lucide-react";
+import { EVIDENCE_SCORE_DISCLAIMER } from "@/lib/evidence-display";
 import type { FounderReportContent, GeneratedReport } from "@/lib/reporting";
 
 export interface RenderableReport {
@@ -92,7 +93,54 @@ function renderObject(value: Record<string, unknown>) {
   );
 }
 
+function firstPresent(output: Record<string, unknown>, keys: string[]): unknown {
+  return keys.map((key) => output[key]).find((value) => {
+    if (Array.isArray(value)) return value.length > 0;
+    if (value && typeof value === "object") return Object.keys(value as Record<string, unknown>).length > 0;
+    return typeof value === "string" && value.trim().length > 0;
+  });
+}
+
+function renderEvidenceAssessmentSummary(output: Record<string, unknown>): ReactNode | null {
+  const scoreDetails = firstPresent(output, ["scores", "scoreComponents", "calculationComponents", "componentCalculations"]);
+  const confidenceDetails = firstPresent(output, ["confidenceExplanation", "confidenceReasons", "confidence"]);
+  const evidenceProvenance = firstPresent(output, ["evidenceProvenance", "evidenceItems", "sources"]);
+  const missingEvidence = firstPresent(output, ["missingEvidence", "validationGaps", "limitations"]);
+  const recommendedTests = firstPresent(output, ["recommendedTests", "suggestedExperiments", "nextValidationActions"]);
+
+  if (!scoreDetails && !confidenceDetails && !evidenceProvenance && !missingEvidence && !recommendedTests) {
+    return null;
+  }
+
+  const sections = [
+    ["Score calculation", scoreDetails],
+    ["Confidence explanation", confidenceDetails],
+    ["Evidence provenance", evidenceProvenance],
+    ["Missing evidence and contradictions", missingEvidence],
+    ["Recommended next tests", recommendedTests],
+  ] as const;
+
+  return (
+    <div className="mb-5 space-y-4 rounded-xl border border-amber-200 bg-amber-50/70 p-4">
+      <div>
+        <h3 className="font-bricolage text-sm font-bold text-amber-950">Evidence assessment transparency</h3>
+        <p className="mt-1 font-jakarta text-xs leading-relaxed text-amber-900">{EVIDENCE_SCORE_DISCLAIMER}</p>
+      </div>
+      <div className="space-y-3">
+        {sections.map(([title, value]) => value ? (
+          <div key={title} className="rounded-lg border border-black/6 bg-white/75 p-3">
+            <p className="mb-2 font-jakarta text-xs font-semibold text-gray-700">{title}</p>
+            {renderValue(value)}
+          </div>
+        ) : null)}
+      </div>
+    </div>
+  );
+}
+
 export default function ReportRenderer({ report }: { report: RenderableReport }) {
+  const evidenceSummary = renderEvidenceAssessmentSummary(report.output_data);
+
   return (
     <>
       <div className="surface-panel mb-5 overflow-hidden p-0">
@@ -130,6 +178,7 @@ export default function ReportRenderer({ report }: { report: RenderableReport })
 
         <section className="surface-panel min-w-0 p-5">
           <h2 className="font-bricolage text-sm font-bold text-gray-950 mb-4">Report Output</h2>
+          {evidenceSummary}
           {renderObject(report.output_data)}
         </section>
       </div>

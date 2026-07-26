@@ -36,6 +36,14 @@ const labels = [
   "AI suggestion - unverified",
 ];
 
+const implementedModel = [
+  "Initial Evidence Engine assessments calculate ten category scores from weighted components such as problem specificity, target customer specificity, public evidence availability, competitor evidence, pricing evidence, trend evidence and evidence strength.",
+  "Each component has a normalized 0-100 result and a weight. The result screen shows the raw result, weighted contribution, deductions, missing evidence and a reconciled total.",
+  "Category confidence is low, medium or high based on the amount and type of available evidence. Verified public evidence raises confidence more than founder-provided or inferred signals.",
+  "Persisted workflow scores are recalculated from stored evidence and completed experiment outcomes using source quality, freshness, confidence, direction and contradiction handling.",
+  "Generated assessments are weighted lowest and are never treated as verified evidence unless a founder attaches real evidence.",
+];
+
 export default function MethodologyPage() {
   return (
     <div className="px-5 pb-20 pt-32">
@@ -103,6 +111,22 @@ export default function MethodologyPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="mb-10 surface-panel p-6">
+          <h2 className="mb-4 font-bricolage text-2xl font-bold tracking-tight text-gray-950">
+            Implemented calculation model
+          </h2>
+          <ul className="space-y-3">
+            {implementedModel.map((item) => (
+              <li key={item} className="rounded-lg border border-black/6 bg-[#f8f6f0] p-3 font-jakarta text-sm leading-relaxed text-gray-600">
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 font-jakarta text-sm leading-relaxed text-gray-600">
+            The result screen includes the calculation details directly so founders do not need to visit this page to understand why a score is low, medium or high.
+          </p>
         </section>
 
         <Link
