@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AIProviderResponseError, analyzeCompetitors } from "@/lib/ai";
+import { AIProviderResponseError, AIProviderTimeoutError, COMPETITOR_MAX_RETRIES, COMPETITOR_MAX_TOKENS, COMPETITOR_PROVIDER_TIMEOUT_MS, analyzeCompetitors } from "@/lib/ai";
 import { competitorEngineSchema, validateInput } from "@/lib/validation";
 import {
   analysisRateLimiter,
@@ -21,11 +21,16 @@ type CompetitorErrorCode =
   | "RATE_LIMITED"
   | "PROVIDER_ERROR"
   | "PROVIDER_TIMEOUT"
+  | "PROVIDER_RATE_LIMITED"
+  | "PROVIDER_AUTH_ERROR"
   | "INVALID_PROVIDER_RESPONSE"
   | "INTERNAL_ERROR";
 
-const GENERIC_MESSAGE = "Competitor analysis could not be completed. Please try again.";
-const PROVIDER_UNEXPECTED_MESSAGE = "The analysis provider returned an unexpected response.";
+const GENERIC_MESSAGE = "Competitor analysis could not be completed.";
+const PROVIDER_UNEXPECTED_MESSAGE = "The analysis provider returned an invalid response.";
+const PROVIDER_TIMEOUT_MESSAGE = "The analysis provider took too long to respond.";
+const PROVIDER_RATE_LIMIT_MESSAGE = "The analysis provider is temporarily busy. Please try again shortly.";
+const PROVIDER_AUTH_MESSAGE = "The analysis service is temporarily unavailable.";
 
 function jsonSuccess(data: unknown) {
   return NextResponse.json(
@@ -80,7 +85,7 @@ function classifyProviderFailure(error: unknown): {
     return { code: error.code, status: 502, retryable: true, providerStatus: null };
   }
 
-  if (error instanceof Error && error.name === "AbortError") {
+  if (error instanceof AIProviderTimeoutError || (error instanceof Error && error.name === "AbortError")) {
     return { code: "PROVIDER_TIMEOUT", status: 504, retryable: true, providerStatus: null };
   }
 
@@ -88,28 +93,17 @@ function classifyProviderFailure(error: unknown): {
   if (status === 408 || status === 504) {
     return { code: "PROVIDER_TIMEOUT", status: 504, retryable: true, providerStatus: status };
   }
+  if (status === 429) {
+    return { code: "PROVIDER_RATE_LIMITED", status: 502, retryable: true, providerStatus: status };
+  }
+  if (status === 401 || status === 403) {
+    return { code: "PROVIDER_AUTH_ERROR", status: 502, retryable: false, providerStatus: status };
+  }
   if (status && status >= 400) {
     return { code: "PROVIDER_ERROR", status: 502, retryable: status === 429 || status >= 500, providerStatus: status };
   }
 
   return { code: "INTERNAL_ERROR", status: 500, retryable: true, providerStatus: null };
-}
-
-async function withTimeout<T>(work: Promise<T>, ms: number): Promise<T> {
-  let timeout: NodeJS.Timeout | undefined;
-  const timeoutPromise = new Promise<T>((_, reject) => {
-    timeout = setTimeout(() => {
-      const error = new Error("Competitor analysis provider timed out.");
-      error.name = "AbortError";
-      reject(error);
-    }, ms);
-  });
-
-  try {
-    return await Promise.race([work, timeoutPromise]);
-  } finally {
-    if (timeout) clearTimeout(timeout);
-  }
 }
 
 async function safeAccessErrorResponse(response: NextResponse) {
@@ -152,6 +146,7 @@ async function safeAccessErrorResponse(response: NextResponse) {
 }
 
 function safeLogFailure(params: {
+  requestId: string;
   code: CompetitorErrorCode;
   providerStatus: number | null;
   durationMs: number;
@@ -161,6 +156,7 @@ function safeLogFailure(params: {
 }) {
   console.error("[CompetitorEngine] analysis failed", {
     tool: "competitor-intelligence",
+    requestId: params.requestId,
     errorCategory: params.code,
     providerStatus: params.providerStatus,
     durationMs: params.durationMs,
@@ -170,10 +166,42 @@ function safeLogFailure(params: {
   });
 }
 
+function logPhase(params: {
+  requestId: string;
+  phase: string;
+  elapsedMs: number;
+  providerStatus?: number | null;
+  code?: string;
+  retryable?: boolean;
+}) {
+  console.info("[CompetitorEngine] phase", {
+    route: "api/analyze/competitor",
+    requestId: params.requestId,
+    phase: params.phase,
+    elapsedMs: params.elapsedMs,
+    providerName: params.phase === "provider" ? "anthropic" : undefined,
+    modelName: params.phase === "provider" ? process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6" : undefined,
+    providerStatus: params.providerStatus,
+    code: params.code,
+    retryable: params.retryable,
+  });
+}
+
+function userMessageFor(code: CompetitorErrorCode): string {
+  if (code === "PROVIDER_TIMEOUT") return PROVIDER_TIMEOUT_MESSAGE;
+  if (code === "PROVIDER_RATE_LIMITED") return PROVIDER_RATE_LIMIT_MESSAGE;
+  if (code === "PROVIDER_AUTH_ERROR") return PROVIDER_AUTH_MESSAGE;
+  if (code === "INVALID_PROVIDER_RESPONSE") return PROVIDER_UNEXPECTED_MESSAGE;
+  return GENERIC_MESSAGE;
+}
+
 export async function POST(request: NextRequest) {
   const startedAt = Date.now();
+  const requestId = crypto.randomUUID();
   const ip = getRequestIp(request);
+  const rateStartedAt = Date.now();
   const rateCheck = analysisRateLimiter.check(ip);
+  logPhase({ requestId, phase: "rate_limit", elapsedMs: Date.now() - rateStartedAt });
   if (!rateCheck.success) {
     return jsonError({
       code: "RATE_LIMITED",
@@ -189,16 +217,22 @@ export async function POST(request: NextRequest) {
   }
 
   let body: unknown;
+  const parseBodyStartedAt = Date.now();
   try { body = await request.json(); } catch {
     return jsonError({ code: "INVALID_REQUEST", message: "Invalid request body.", status: 400, retryable: false });
   }
+  logPhase({ requestId, phase: "request_body", elapsedMs: Date.now() - parseBodyStartedAt });
 
+  const validationStartedAt = Date.now();
   const validation = validateInput(competitorEngineSchema, body);
+  logPhase({ requestId, phase: "validation", elapsedMs: Date.now() - validationStartedAt });
   if (!validation.success) {
     return jsonError({ code: "INVALID_REQUEST", message: "Please check the competitor analysis inputs.", status: 400, retryable: false });
   }
 
+  const authStartedAt = Date.now();
   const usageCheck = await checkAnalysisAccess(request, "competitor");
+  logPhase({ requestId, phase: "auth_entitlements", elapsedMs: Date.now() - authStartedAt });
   if (!usageCheck.allowed) return safeAccessErrorResponse(usageCheck.response!);
 
   await trackProductEvent("competitor_analysis_started", {
@@ -213,29 +247,39 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await withTimeout(analyzeCompetitors(validation.data), 52_000);
+    const result = await analyzeCompetitors(validation.data, (phase, elapsedMs) => logPhase({ requestId, phase, elapsedMs }));
+    const usageStartedAt = Date.now();
     const recorded = await recordAnalysisUsage(usageCheck.userId!, "competitor", usageCheck.entitlements.monthlyAnalyses);
+    logPhase({ requestId, phase: "usage_record", elapsedMs: Date.now() - usageStartedAt });
     if (!recorded.inserted) {
       const response = limitReachedAfterWorkResponse({ feature: "monthly_analyses", currentUsage: recorded.currentUsage, limit: recorded.limit, plan: usageCheck.plan });
       return safeAccessErrorResponse(response);
     }
+    const persistenceStartedAt = Date.now();
     const ipHash = await hashIp(ip);
     const sessionId = request.headers.get("x-session-id") || `anon_${Date.now()}`;
     if (usageCheck.entitlements.canSaveHistory) {
       await saveAnalysis({ sessionId, engineType: "competitor", inputData: validation.data as unknown as Record<string, unknown>, outputData: result as unknown as Record<string, unknown>, ipHash, userId: usageCheck.userId ?? undefined });
     }
+    logPhase({ requestId, phase: "persistence", elapsedMs: Date.now() - persistenceStartedAt });
     await trackProductEvent("competitor_analysis_succeeded", {
       userId: usageCheck.userId,
       properties: {
         tool: "competitor-intelligence",
+        request_id: requestId,
         duration_ms: Date.now() - startedAt,
+        provider_timeout_ms: COMPETITOR_PROVIDER_TIMEOUT_MS,
+        provider_max_retries: COMPETITOR_MAX_RETRIES,
+        output_token_limit: COMPETITOR_MAX_TOKENS,
       },
     });
+    logPhase({ requestId, phase: "total", elapsedMs: Date.now() - startedAt });
     return jsonSuccess(result);
   } catch (error) {
     const failure = classifyProviderFailure(error);
     const durationMs = Date.now() - startedAt;
     safeLogFailure({
+      requestId,
       code: failure.code,
       providerStatus: failure.providerStatus,
       durationMs,
@@ -247,13 +291,15 @@ export async function POST(request: NextRequest) {
       userId: usageCheck.userId,
       properties: {
         tool: "competitor-intelligence",
+        request_id: requestId,
         error_code: failure.code,
         retryable: failure.retryable,
       },
     });
+    logPhase({ requestId, phase: "total", elapsedMs: durationMs, providerStatus: failure.providerStatus, code: failure.code, retryable: failure.retryable });
     return jsonError({
       code: failure.code,
-      message: failure.code === "INVALID_PROVIDER_RESPONSE" ? PROVIDER_UNEXPECTED_MESSAGE : GENERIC_MESSAGE,
+      message: userMessageFor(failure.code),
       status: failure.status,
       retryable: failure.retryable,
     });

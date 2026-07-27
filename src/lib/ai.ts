@@ -28,6 +28,15 @@ function getClient(): Anthropic {
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 const MAX_TOKENS = 4096;
+export const COMPETITOR_PROVIDER_TIMEOUT_MS = 45_000;
+export const COMPETITOR_MAX_TOKENS = 1800;
+export const COMPETITOR_MAX_RETRIES = 0;
+const COMPETITOR_INPUT_LIMITS = {
+  idea: 420,
+  competitorNames: 350,
+  industry: 160,
+  startupUrl: 240,
+};
 
 export class AIProviderResponseError extends Error {
   code: "INVALID_PROVIDER_RESPONSE";
@@ -39,6 +48,26 @@ export class AIProviderResponseError extends Error {
     this.code = "INVALID_PROVIDER_RESPONSE";
     this.retryable = true;
   }
+}
+
+export class AIProviderTimeoutError extends Error {
+  code: "PROVIDER_TIMEOUT";
+  retryable: boolean;
+
+  constructor(message = "The analysis provider took too long to respond.") {
+    super(message);
+    this.name = "AIProviderTimeoutError";
+    this.code = "PROVIDER_TIMEOUT";
+    this.retryable = true;
+  }
+}
+
+export interface ProviderTimingSink {
+  (phase: "prompt" | "provider" | "parse" | "schema", elapsedMs: number): void;
+}
+
+function boundInput(value: string | undefined, maxLength: number): string {
+  return (value ?? "").trim().slice(0, maxLength);
 }
 
 const BASE_SYSTEM_PROMPT = `
@@ -155,6 +184,22 @@ export function parseCompetitorOutput(text: string): CompetitorEngineOutput {
   return parsed.data;
 }
 
+function normalizeProviderError(error: unknown): never {
+  if (error instanceof Error && error.name === "AbortError") {
+    throw new AIProviderTimeoutError();
+  }
+  if (error && typeof error === "object") {
+    const record = error as { code?: unknown; name?: unknown; message?: unknown };
+    const code = typeof record.code === "string" ? record.code.toLowerCase() : "";
+    const name = typeof record.name === "string" ? record.name.toLowerCase() : "";
+    const message = typeof record.message === "string" ? record.message.toLowerCase() : "";
+    if (code.includes("timeout") || name.includes("timeout") || message.includes("timed out") || message.includes("timeout")) {
+      throw new AIProviderTimeoutError();
+    }
+  }
+  throw error;
+}
+
 // ============================================
 // IDEA & MARKET ENGINE
 // ============================================
@@ -229,57 +274,82 @@ export async function analyzeCompetitors(input: {
   competitorNames?: string;
   industry?: string;
   startupUrl?: string;
-}): Promise<CompetitorEngineOutput> {
+}, timing?: ProviderTimingSink): Promise<CompetitorEngineOutput> {
   const client = getClient();
+  const promptStartedAt = Date.now();
+  const bounded = {
+    idea: boundInput(input.idea, COMPETITOR_INPUT_LIMITS.idea),
+    competitorNames: boundInput(input.competitorNames, COMPETITOR_INPUT_LIMITS.competitorNames),
+    industry: boundInput(input.industry, COMPETITOR_INPUT_LIMITS.industry),
+    startupUrl: boundInput(input.startupUrl, COMPETITOR_INPUT_LIMITS.startupUrl),
+  };
 
-  const prompt = `You are a world-class competitive intelligence analyst who has advised Fortune 500 companies and top startups.
+  const prompt = `Assess competitor positioning for this startup using only the supplied context and general model knowledge. Do not claim live research or verified market facts.
 
-Analyze the competitive landscape for this startup:
+Startup idea: ${bounded.idea}
+${bounded.competitorNames ? `Known competitors: ${bounded.competitorNames}` : ""}
+${bounded.industry ? `Industry: ${bounded.industry}` : ""}
+${bounded.startupUrl ? `Product URL: ${bounded.startupUrl}` : ""}
 
-STARTUP IDEA: ${input.idea}
-${input.competitorNames ? `KNOWN COMPETITORS: ${input.competitorNames}` : ""}
-${input.industry ? `INDUSTRY: ${input.industry}` : ""}
-${input.startupUrl ? `STARTUP URL: ${input.startupUrl}` : ""}
-
-Respond ONLY with a valid JSON object. No markdown, no preamble:
+Return only valid JSON matching this schema:
 
 {
   "directCompetitors": [
     {
-      "name": "<competitor name>",
-      "description": "<1-2 sentence description>",
-      "strengths": [<2-3 specific strengths>],
-      "weaknesses": [<2-3 specific exploitable weaknesses>],
-      "url": "<website if known>"
+      "name": "<name>",
+      "description": "<one concise sentence>",
+      "strengths": ["<strength>", "<strength>"],
+      "weaknesses": ["<weakness>", "<weakness>"],
+      "url": "<known website or empty string>"
     }
   ],
   "indirectCompetitors": [
     {
-      "name": "<competitor name>",
-      "description": "<1-2 sentence description>",
-      "strengths": [<2-3 specific strengths>],
-      "weaknesses": [<2-3 specific exploitable weaknesses>],
-      "url": "<website if known>"
+      "name": "<name>",
+      "description": "<one concise sentence>",
+      "strengths": ["<strength>", "<strength>"],
+      "weaknesses": ["<weakness>", "<weakness>"],
+      "url": "<known website or empty string>"
     }
   ],
-  "positioningGaps": [<3-5 specific, exploitable positioning gaps>],
-  "howToBeatThem": [<4-6 specific, tactical strategies>],
-  "whiteSpaceOpportunities": [<3-5 underserved market areas>],
-  "comparisonSummary": "<3-4 sentence strategic summary of the competitive landscape>",
-  "strategicAdvantage": "<2-3 sentences on the strongest angle to win against incumbents>"
+  "positioningGaps": ["<gap>", "<gap>", "<gap>"],
+  "howToBeatThem": ["<strategy>", "<strategy>", "<strategy>", "<strategy>"],
+  "whiteSpaceOpportunities": ["<opportunity>", "<opportunity>", "<opportunity>"],
+  "comparisonSummary": "<2 concise sentences>",
+  "strategicAdvantage": "<2 concise sentences>"
 }
 
-Use real competitor names where relevant. Be commercially specific.`;
+Use relevant known competitor names when supplied. Keep arrays compact and specific.`;
+  timing?.("prompt", Date.now() - promptStartedAt);
 
-  const response = await client.messages.create({
-    model: MODEL,
-    max_tokens: MAX_TOKENS,
-    messages: [{ role: "user", content: prompt }],
-  });
+  const providerStartedAt = Date.now();
+  let response: Awaited<ReturnType<typeof client.messages.create>>;
+  try {
+    response = await client.messages.create(
+      {
+        model: MODEL,
+        max_tokens: COMPETITOR_MAX_TOKENS,
+        messages: [{ role: "user", content: prompt }],
+      },
+      {
+        timeout: COMPETITOR_PROVIDER_TIMEOUT_MS,
+        maxRetries: COMPETITOR_MAX_RETRIES,
+      }
+    );
+  } catch (error) {
+    timing?.("provider", Date.now() - providerStartedAt);
+    normalizeProviderError(error);
+  }
+  timing?.("provider", Date.now() - providerStartedAt);
 
+  const parseStartedAt = Date.now();
   const text = response.content[0].type === "text" ? response.content[0].text : "";
+  timing?.("parse", Date.now() - parseStartedAt);
 
-  return parseCompetitorOutput(text);
+  const schemaStartedAt = Date.now();
+  const parsed = parseCompetitorOutput(text);
+  timing?.("schema", Date.now() - schemaStartedAt);
+  return parsed;
 }
 
 // ============================================

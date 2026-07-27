@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
@@ -47,8 +47,18 @@ export default function CompetitorPage() {
   const [result, setResult] = useState<CompetitorEngineOutput | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorDetail, setErrorDetail] = useState("");
+  const [errorCode, setErrorCode] = useState("");
   const [retryCount, setRetryCount] = useState(0);
   const [copied, setCopied] = useState(false);
+  const activeRequestRef = useRef(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      activeRequestRef.current += 1;
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   const validate = () => {
     const e: Partial<FormState> = {};
@@ -67,21 +77,35 @@ export default function CompetitorPage() {
     setCopied(false);
     setErrorMessage("");
     setErrorDetail("");
+    setErrorCode("");
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const requestId = activeRequestRef.current + 1;
+    activeRequestRef.current = requestId;
 
     try {
       const res = await fetch("/api/analyze/competitor", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(options.retry ? { "X-StartupX-Retry": "1" } : {}), ...(await getAuthHeaders()) },
         body: JSON.stringify(form),
+        signal: controller.signal,
       });
+      if (requestId !== activeRequestRef.current) return;
       const data = await readSafeApiResponse<CompetitorEngineOutput>(res);
+      if (requestId !== activeRequestRef.current) return;
       if (!data.ok) {
+        setErrorCode(data.code);
         setErrorMessage(data.message || GENERIC_ANALYSIS_ERROR);
         setErrorDetail(
           data.code === "INVALID_PROVIDER_RESPONSE"
             ? "The analysis provider returned an unexpected response. Your input was not lost. Please try again."
-            : data.code === "PROVIDER_TIMEOUT"
-            ? "The request timed out. Your input was not lost."
+          : data.code === "PROVIDER_TIMEOUT"
+            ? "The analysis provider did not respond within the available time. Your input was not lost."
+            : data.code === "PROVIDER_RATE_LIMITED"
+            ? "The analysis provider is temporarily busy. Please try again shortly."
+            : data.code === "PROVIDER_AUTH_ERROR"
+            ? "The analysis service is temporarily unavailable."
             : data.code === "PLAN_LIMIT_REACHED" || data.code === "RATE_LIMITED"
             ? "Usage limit reached."
             : data.code === "AUTHENTICATION_REQUIRED"
@@ -95,9 +119,13 @@ export default function CompetitorPage() {
       setStatus("success");
       logUsageClient("competitor");
     } catch (err) {
+      if (requestId !== activeRequestRef.current) return;
+      if (err instanceof Error && err.name === "AbortError") return;
       setErrorMessage(GENERIC_ANALYSIS_ERROR);
-      setErrorDetail(err instanceof Error && err.name === "AbortError" ? "The request timed out." : "Your input was not lost. Please try again.");
+      setErrorDetail("Your input was not lost. Please try again.");
       setStatus("error");
+    } finally {
+      if (requestId === activeRequestRef.current) abortControllerRef.current = null;
     }
   };
 
@@ -262,6 +290,7 @@ export default function CompetitorPage() {
                 <CompetitorErrorState
                   message={errorMessage}
                   detail={errorDetail}
+                  code={errorCode}
                   retryDisabled={retryCount >= 1}
                   onRetry={() => handleSubmit({ retry: true })}
                   onEdit={() => setStatus("idle")}
@@ -375,12 +404,14 @@ export default function CompetitorPage() {
 function CompetitorErrorState({
   message,
   detail,
+  code,
   retryDisabled,
   onRetry,
   onEdit,
 }: {
   message: string;
   detail: string;
+  code: string;
   retryDisabled: boolean;
   onRetry: () => void;
   onEdit: () => void;
@@ -391,7 +422,7 @@ function CompetitorErrorState({
         <ShieldAlert size={20} className="text-rose-500" />
       </div>
       <div className="mt-4 space-y-2">
-        <p className="font-bricolage text-base font-bold text-gray-950">Analysis could not be completed</p>
+        <p className="font-bricolage text-base font-bold text-gray-950">{code === "PROVIDER_TIMEOUT" ? "Analysis took too long" : "Analysis could not be completed"}</p>
         <p className="mx-auto max-w-md font-jakarta text-sm leading-relaxed text-gray-600">
           {detail || "The analysis provider returned an unexpected response. Your input was not lost. Please try again."}
         </p>

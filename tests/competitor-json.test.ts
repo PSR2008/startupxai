@@ -2,7 +2,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
-import { AIProviderResponseError, parseCompetitorOutput } from "../src/lib/ai";
+import {
+  AIProviderResponseError,
+  COMPETITOR_MAX_RETRIES,
+  COMPETITOR_MAX_TOKENS,
+  COMPETITOR_PROVIDER_TIMEOUT_MS,
+  parseCompetitorOutput,
+} from "../src/lib/ai";
 import { GENERIC_ANALYSIS_ERROR, readSafeApiResponse } from "../src/lib/safe-api-response";
 
 const validProviderJson = {
@@ -102,6 +108,69 @@ test("competitor API route uses normalized JSON envelopes for success and failur
   assert.ok(route.indexOf("saveAnalysis") > route.indexOf("analyzeCompetitors"));
   assert.equal(route.includes("new Response("), false);
   assert.equal(route.includes("console.error(\"[CompetitorEngine] Analysis failed:\", error)"), false);
+});
+
+test("competitor route budget exceeds one centralized provider timeout", () => {
+  const route = readFileSync(join(process.cwd(), "src/app/api/analyze/competitor/route.ts"), "utf8");
+  const ai = readFileSync(join(process.cwd(), "src/lib/ai.ts"), "utf8");
+
+  assert.ok(route.includes("export const runtime = \"nodejs\""));
+  assert.ok(route.includes("export const maxDuration = 60"));
+  assert.equal(COMPETITOR_PROVIDER_TIMEOUT_MS, 45_000);
+  assert.ok(COMPETITOR_PROVIDER_TIMEOUT_MS < 60_000);
+  assert.equal(COMPETITOR_MAX_RETRIES, 0);
+  assert.equal(COMPETITOR_MAX_TOKENS, 1800);
+  assert.equal(route.includes("Promise.race"), false);
+  assert.equal(route.includes("withTimeout"), false);
+  assert.ok(ai.includes("timeout: COMPETITOR_PROVIDER_TIMEOUT_MS"));
+  assert.ok(ai.includes("maxRetries: COMPETITOR_MAX_RETRIES"));
+});
+
+test("competitor prompt uses bounded input and compact output only", () => {
+  const ai = readFileSync(join(process.cwd(), "src/lib/ai.ts"), "utf8");
+  assert.ok(ai.includes("COMPETITOR_INPUT_LIMITS"));
+  assert.ok(ai.includes("idea: 420"));
+  assert.ok(ai.includes("competitorNames: 350"));
+  assert.ok(ai.includes("Do not claim live research or verified market facts"));
+  assert.ok(ai.includes("one concise sentence"));
+  assert.equal(ai.includes("Fortune 500 companies and top startups"), false);
+  assert.equal(ai.includes("Be commercially specific.`;"), false);
+});
+
+test("competitor route classifies provider failures distinctly", () => {
+  const route = readFileSync(join(process.cwd(), "src/app/api/analyze/competitor/route.ts"), "utf8");
+  for (const code of ["PROVIDER_TIMEOUT", "PROVIDER_RATE_LIMITED", "PROVIDER_AUTH_ERROR", "INVALID_PROVIDER_RESPONSE", "PROVIDER_ERROR", "INTERNAL_ERROR"]) {
+    assert.ok(route.includes(code), `${code} missing`);
+  }
+  assert.ok(route.includes("status === 429"));
+  assert.ok(route.includes("status === 401 || status === 403"));
+  assert.ok(route.includes("status === 408 || status === 504"));
+  assert.ok(route.includes("The analysis provider took too long to respond."));
+  assert.ok(route.includes("The analysis service is temporarily unavailable."));
+});
+
+test("competitor route logs phase timing without prompt text or secrets", () => {
+  const route = readFileSync(join(process.cwd(), "src/app/api/analyze/competitor/route.ts"), "utf8");
+  for (const phase of ["rate_limit", "request_body", "validation", "auth_entitlements", "usage_record", "persistence", "total"]) {
+    assert.ok(route.includes(`phase: "${phase}"`) || route.includes(`phase: '${phase}'`) || route.includes(phase), `${phase} missing`);
+  }
+  assert.ok(route.includes("requestId"));
+  assert.ok(route.includes("providerStatus"));
+  assert.ok(route.includes("retryable"));
+  assert.equal(route.includes("authorization"), false);
+  assert.equal(route.includes("apiKey"), false);
+  assert.equal(route.includes("prompt:"), false);
+});
+
+test("competitor client handles timeout, cancellation, stale responses, and retry limit", () => {
+  const source = readFileSync(join(process.cwd(), "src/app/(app)/competitor-intelligence/page.tsx"), "utf8");
+  assert.ok(source.includes("AbortController"));
+  assert.ok(source.includes("signal: controller.signal"));
+  assert.ok(source.includes("requestId !== activeRequestRef.current"));
+  assert.ok(source.includes("Analysis took too long"));
+  assert.ok(source.includes("The analysis provider did not respond within the available time"));
+  assert.ok(source.includes("retryCount >= 1"));
+  assert.ok(source.includes("status === \"loading\""));
 });
 
 test("competitor client uses safe parsing and does not display raw parse errors", () => {
