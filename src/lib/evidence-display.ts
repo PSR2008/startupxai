@@ -49,7 +49,8 @@ export interface EvidenceProvenanceItem {
   linkedClaim: string;
   attribution: string;
   hostname: string | null;
-  retrievedAt: string | null;
+  timestampLabel: "Added" | "Recorded" | "Retrieved" | "Generated";
+  timestamp: string | null;
   verificationStatus: string;
   resultImpact: string;
   publicNotesSafe: boolean;
@@ -99,6 +100,14 @@ function publicHostname(item: EvidenceItem): string | null {
 
 function evidenceMatchesScore(item: EvidenceItem, score: CategoryScore) {
   return item.evidenceCategory === score.category || item.evidenceCategory === "evidence_strength";
+}
+
+export function getEvidenceTimestampLabel(item: EvidenceItem): EvidenceProvenanceItem["timestampLabel"] {
+  const label = classifyEvidenceItem(item);
+  if (label === "Customer research" || label === "Experiment result") return "Recorded";
+  if (label === "Public URL" || label === "Verified public evidence") return "Retrieved";
+  if (label === "Generated assessment") return "Generated";
+  return "Added";
 }
 
 function linkedEvidenceIds(component: CategoryScore["components"][number]): string[] {
@@ -206,7 +215,8 @@ export function getEvidenceProvenance(items: EvidenceItem[], score?: CategorySco
       linkedClaim: claim || "No linked claim recorded",
       attribution,
       hostname: publicHostname(item),
-      retrievedAt: item.publishedOrRetrievedAt ?? item.accessedAt ?? null,
+      timestampLabel: getEvidenceTimestampLabel(item),
+      timestamp: item.publishedOrRetrievedAt ?? item.accessedAt ?? null,
       verificationStatus: sourceLabel === "Generated assessment" ? "unverified" : item.verifiedStatus.replace("_", " "),
       resultImpact:
         item.direction === "contradicts"

@@ -10,6 +10,7 @@ import {
   getConfidenceImprovementItems,
   getDisplayedTotal,
   getEvidenceProvenance,
+  getEvidenceTimestampLabel,
   getMissingEvidenceItems,
   getRecommendedTests,
   getScoreEvidenceMetrics,
@@ -179,6 +180,64 @@ test("evidence provenance shows public attribution and unverified generated sugg
   assert.equal(provenance[0].hostname, "example.com");
   assert.equal(provenance[1].sourceLabel, "Generated assessment");
   assert.equal(provenance[1].verificationStatus, "unverified");
+});
+
+test("evidence timestamp labels match the evidence source type", () => {
+  assert.equal(getEvidenceTimestampLabel({ ...evidence[1], sourceType: "founder-provided evidence" }), "Added");
+  assert.equal(getEvidenceTimestampLabel({ ...evidence[0], sourceType: "public_url", verifiedStatus: "verified" }), "Retrieved");
+  assert.equal(getEvidenceTimestampLabel({ ...evidence[1], sourceType: "customer interview" }), "Recorded");
+  assert.equal(getEvidenceTimestampLabel({ ...evidence[1], sourceType: "experiment result" }), "Recorded");
+  assert.equal(getEvidenceTimestampLabel({ ...evidence[1], sourceType: "model assessment", verifiedStatus: "inferred" }), "Generated");
+});
+
+test("evidence provenance hides absent public host and keeps real public host", () => {
+  const founderItem: EvidenceItem = {
+    ...evidence[1],
+    id: "ev_founder_hostless",
+    sourceType: "founder-provided evidence",
+    sourceUrl: undefined,
+    rawMetadata: {},
+  };
+  const publicItem: EvidenceItem = {
+    ...evidence[0],
+    id: "ev_public_hosted",
+    sourceType: "public_url",
+    sourceUrl: "https://example.com/research",
+    rawMetadata: { hostname: "example.com" },
+  };
+  const provenance = getEvidenceProvenance([founderItem, publicItem]);
+  assert.equal(provenance[0].hostname, null);
+  assert.equal(provenance[1].hostname, "example.com");
+});
+
+test("provider status copy does not expose internal environment names", () => {
+  const providerSource = readFileSync(join(process.cwd(), "src/lib/evidence-providers.ts"), "utf8");
+  for (const internalName of ["EVIDENCE_SEARCH_API_KEY", "REDDIT_CLIENT_ID", "REDDIT_CLIENT_SECRET", "PRODUCT_HUNT_TOKEN"]) {
+    assert.equal(providerSource.includes(internalName), false, `${internalName} should not be shown in provider copy`);
+  }
+  assert.ok(providerSource.includes("Automatic public web research is not currently enabled."));
+  assert.ok(providerSource.includes("Reddit evidence is not collected automatically."));
+  assert.ok(providerSource.includes("Product Hunt evidence is not collected automatically."));
+});
+
+test("calculation details render through one accessible trigger", () => {
+  const source = readFileSync(join(process.cwd(), "src/app/(app)/evidence-engine/page.tsx"), "utf8");
+  assert.equal((source.match(/How this was calculated/g) ?? []).length, 1);
+  assert.equal(source.includes("How this score was calculated"), false);
+  assert.ok(source.includes("aria-expanded={calculationOpen}"));
+  assert.ok(source.includes("aria-controls={calculationRegionId}"));
+  assert.ok(source.includes("role=\"region\""));
+  assert.ok(source.includes("data-analytics-event=\"calculation_details_opened\""));
+});
+
+test("stored evidence actions remain horizontal and preserve edit/delete behavior", () => {
+  const source = readFileSync(join(process.cwd(), "src/app/(app)/evidence-engine/page.tsx"), "utf8");
+  assert.ok(source.includes("setEditingEvidenceId"));
+  assert.ok(source.includes("deleteEvidence(item.id)"));
+  assert.ok(source.includes("Delete this evidence item? This cannot be undone."));
+  assert.ok(source.includes("\"PATCH\""));
+  assert.ok(source.includes("flex-shrink-0 items-center"));
+  assert.ok((source.match(/whitespace-nowrap/g) ?? []).length >= 2);
 });
 
 test("missing evidence and confidence improvement use actual gaps", () => {

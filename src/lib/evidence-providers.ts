@@ -227,20 +227,18 @@ export async function collectEvidence(input: EvidenceEngineInput): Promise<{
   providerRuns.push(
     {
       providerName: "Web search provider",
-      status: process.env.EVIDENCE_SEARCH_API_KEY ? "configured" : "not_configured",
-      message: process.env.EVIDENCE_SEARCH_API_KEY
-        ? "Search provider key is present, but live search collection is not enabled in this release."
-        : "Set EVIDENCE_SEARCH_API_KEY to enable a compliant web search adapter in a future provider release.",
+      status: "not_configured",
+      message: "Automatic public web research is not currently enabled. You can still add attributed public URLs manually.",
     },
     {
       providerName: "Reddit provider",
-      status: process.env.REDDIT_CLIENT_ID && process.env.REDDIT_CLIENT_SECRET ? "configured" : "not_configured",
-      message: "Reddit evidence is not fetched unless official API credentials and OAuth flow are configured.",
+      status: "not_configured",
+      message: "Reddit evidence is not collected automatically. Relevant posts or comments can be added manually as attributed evidence.",
     },
     {
       providerName: "Product Hunt provider",
-      status: process.env.PRODUCT_HUNT_TOKEN ? "configured" : "not_configured",
-      message: "Product Hunt evidence is not fetched unless PRODUCT_HUNT_TOKEN is configured.",
+      status: "not_configured",
+      message: "Product Hunt evidence is not collected automatically. Relevant launch pages can be added manually as attributed evidence.",
     },
   );
 

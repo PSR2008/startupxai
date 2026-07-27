@@ -36,7 +36,7 @@ export default function Badge({ children, variant = "neutral", size = "sm", clas
   return (
     <span
       className={cn(
-        "inline-flex max-w-full items-center gap-1.5 border rounded-md font-jakarta font-semibold leading-none",
+        "inline-flex max-w-full items-center gap-1.5 whitespace-nowrap border rounded-md font-jakarta font-semibold leading-none",
         variants[variant],
         size === "sm" ? "px-2.5 py-1 text-[11px]" : "px-3 py-1.5 text-xs",
         className

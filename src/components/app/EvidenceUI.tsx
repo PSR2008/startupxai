@@ -10,16 +10,17 @@ export function ConfidenceBadge({ confidence }: { confidence: EvidenceConfidence
 
 export function SourceBadge({ item }: { item: EvidenceItem }) {
   const variant = item.verifiedStatus === "verified" ? "emerald" : item.verifiedStatus === "user_provided" ? "blue" : "neutral";
-  return <Badge variant={variant} size="sm">{classifyEvidenceItem(item)}</Badge>;
+  return <Badge variant={variant} size="sm" className="min-w-0 whitespace-normal break-normal leading-snug">{classifyEvidenceItem(item)}</Badge>;
 }
 
 export function ProviderStatus({ run }: { run: ProviderRunStatus }) {
   const variant = run.status === "success" || run.status === "configured" ? "emerald" : run.status === "not_configured" ? "amber" : run.status === "failed" ? "rose" : "neutral";
+  const label = run.status === "not_configured" ? "Not connected" : run.status.replace("_", " ");
   return (
     <div className="surface-inset min-w-0 p-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="min-w-0 break-words font-bricolage text-xs font-bold text-gray-900">{run.providerName}</p>
-        <Badge variant={variant} size="sm" className="flex-shrink-0">{run.status.replace("_", " ")}</Badge>
+        <Badge variant={variant} size="sm" className="flex-shrink-0">{label}</Badge>
       </div>
       <p className="mt-2 break-words font-jakarta text-xs leading-relaxed text-gray-500">{run.message}</p>
     </div>

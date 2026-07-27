@@ -8,7 +8,7 @@ import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
-import { ConfidenceBadge, DataFreshnessBadge, EvidenceCard, MethodologyDrawer, ProviderStatus, ValidationDecisionPanel } from "@/components/app/EvidenceUI";
+import { ConfidenceBadge, DataFreshnessBadge, EvidenceCard, ProviderStatus, ValidationDecisionPanel } from "@/components/app/EvidenceUI";
 import { getAuthHeaders } from "@/lib/auth-headers-client";
 import {
   EVIDENCE_SCORE_DISCLAIMER,
@@ -451,13 +451,17 @@ function EvidenceProvenanceList({ result, score }: { result: ValidationProjectRe
               <h4 className="break-words font-bricolage text-sm font-bold text-gray-900">{item.title}</h4>
               <p className="mt-1 break-words font-jakarta text-xs text-gray-500">{item.attribution}</p>
             </div>
-            <Badge variant={item.direction === "contradicts" ? "rose" : item.direction === "supports" ? "emerald" : "neutral"} size="sm">{item.direction}</Badge>
+            <Badge variant={item.direction === "contradicts" ? "rose" : item.direction === "supports" ? "emerald" : "neutral"} size="sm" className="flex-shrink-0">{item.direction}</Badge>
           </div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            <MetricBlock label="Source type" value={item.sourceLabel} />
-            <MetricBlock label="Verification" value={item.verificationStatus} />
-            <MetricBlock label="Public host" value={item.hostname ?? "Not applicable"} />
-            <MetricBlock label="Retrieved" value={item.retrievedAt ? new Date(item.retrievedAt).toLocaleDateString() : "Not recorded"} />
+            {[
+              { label: "Source type", value: item.sourceLabel },
+              { label: "Verification", value: item.verificationStatus },
+              item.hostname ? { label: "Public host", value: item.hostname } : null,
+              item.timestamp ? { label: item.timestampLabel, value: new Date(item.timestamp).toLocaleDateString() } : null,
+            ].filter((field): field is { label: string; value: string } => Boolean(field)).map((field) => (
+              <MetricBlock key={`${item.id}-${field.label}`} label={field.label} value={field.value} />
+            ))}
           </div>
           <p className="mt-3 break-words font-jakarta text-xs leading-relaxed text-gray-600">Linked claim: {item.linkedClaim}</p>
           <p className="mt-2 break-words font-jakarta text-xs leading-relaxed text-gray-500">Impact: {item.resultImpact}</p>
@@ -496,6 +500,8 @@ function ScorePanel({ score }: { score: CategoryScore }) {
   const missingItems = getMissingEvidenceItems(score);
   const confidenceImprovements = getConfidenceImprovementItems(score);
   const displayedTotal = getDisplayedTotal(score);
+  const [calculationOpen, setCalculationOpen] = useState(false);
+  const calculationRegionId = `calculation-details-${score.category}`;
   return (
     <section className="surface-panel w-full max-w-full p-5">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -526,43 +532,54 @@ function ScorePanel({ score }: { score: CategoryScore }) {
         <TextBlock title="What would raise confidence" items={confidenceImprovements} />
         <TextBlock title="Recommended next validation actions" items={[score.recommendedNextAction]} />
       </div>
-      <details className="mt-4 rounded-xl border border-black/8 bg-gray-50 p-4">
-        <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-900">How this was calculated</summary>
-        <p className="mt-2 break-words font-jakarta text-xs leading-relaxed text-gray-500">{score.methodology}</p>
-        <div className="mt-4 space-y-3">
-          {calculations.map((item) => (
-            <div key={item.componentName} className="rounded-lg border border-black/6 bg-white p-3">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                  <p className="break-words font-bricolage text-sm font-bold text-gray-900">{item.componentName}</p>
-                  <p className="mt-1 break-words font-jakarta text-xs leading-relaxed text-gray-500">{item.purpose}</p>
+      <div className="mt-4 rounded-xl border border-black/8 bg-gray-50 p-4">
+        <button
+          type="button"
+          aria-expanded={calculationOpen}
+          aria-controls={calculationRegionId}
+          data-analytics-event="calculation_details_opened"
+          onClick={() => setCalculationOpen((open) => !open)}
+          className="focus-ring flex w-full items-center justify-between gap-3 text-left font-bricolage text-sm font-bold text-gray-900"
+        >
+          <span>How this was calculated</span>
+          <span aria-hidden="true" className="text-xs text-gray-500">{calculationOpen ? "Hide" : "Show"}</span>
+        </button>
+        {calculationOpen && (
+          <div id={calculationRegionId} role="region" aria-label="Score calculation details">
+            <p className="mt-3 break-words font-jakarta text-xs leading-relaxed text-gray-500">{score.methodology}</p>
+            <div className="mt-4 space-y-3">
+              {calculations.map((item) => (
+                <div key={item.componentName} className="rounded-lg border border-black/6 bg-white p-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="break-words font-bricolage text-sm font-bold text-gray-900">{item.componentName}</p>
+                      <p className="mt-1 break-words font-jakarta text-xs leading-relaxed text-gray-500">{item.purpose}</p>
+                    </div>
+                    <Badge variant="neutral" size="sm" className="flex-shrink-0">Weight {item.weightPercent}%</Badge>
+                  </div>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                    <MetricBlock label="Raw result" value={`${item.rawScore}/100`} />
+                    <MetricBlock label="Weighted contribution" value={`${item.weightedContribution}/100`} />
+                    <MetricBlock label="Final contribution" value={`${item.finalContribution}`} />
+                    <MetricBlock label="Linked evidence" value={String(item.linkedEvidenceIds.length)} />
+                  </div>
+                  {(item.deductions.length > 0 || item.missingEvidence.length > 0) && (
+                    <ul className="mt-3 space-y-1">
+                      {[...item.deductions, ...item.missingEvidence.map((missing) => `Missing evidence: ${missing}`)].map((reason) => (
+                        <li key={reason} className="break-words font-jakarta text-xs leading-relaxed text-gray-600">{reason}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-                <Badge variant="neutral" size="sm">Weight {item.weightPercent}%</Badge>
-              </div>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                <MetricBlock label="Raw result" value={`${item.rawScore}/100`} />
-                <MetricBlock label="Weighted contribution" value={`${item.weightedContribution}/100`} />
-                <MetricBlock label="Final contribution" value={`${item.finalContribution}`} />
-                <MetricBlock label="Linked evidence" value={String(item.linkedEvidenceIds.length)} />
-              </div>
-              {(item.deductions.length > 0 || item.missingEvidence.length > 0) && (
-                <ul className="mt-3 space-y-1">
-                  {[...item.deductions, ...item.missingEvidence.map((missing) => `Missing evidence: ${missing}`)].map((reason) => (
-                    <li key={reason} className="break-words font-jakarta text-xs leading-relaxed text-gray-600">{reason}</li>
-                  ))}
-                </ul>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
-        <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-jakarta text-xs leading-relaxed text-emerald-900">
-          Component contribution total: {displayedTotal}/100. Displayed score: {score.score}/100.
-        </p>
-      </details>
-      <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 font-jakarta text-xs leading-relaxed text-amber-900">{score.uncertainty}</p>
-      <div className="mt-4">
-        <MethodologyDrawer score={score} />
+            <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-jakarta text-xs leading-relaxed text-emerald-900">
+              Component contribution total: {displayedTotal}/100. Displayed score: {score.score}/100.
+            </p>
+          </div>
+        )}
       </div>
+      <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 font-jakarta text-xs leading-relaxed text-amber-900">{score.uncertainty}</p>
     </section>
   );
 }
@@ -601,6 +618,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
   const [publicPreview, setPublicPreview] = useState<PublicSourcePreview | null>(null);
   const [publicPreviewInput, setPublicPreviewInput] = useState("");
   const [publicPreviewError, setPublicPreviewError] = useState("");
+  const [editingEvidenceId, setEditingEvidenceId] = useState<string | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
   const evidenceTypeForSource = {
@@ -883,16 +901,34 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
         <PersistedList title="Stored evidence" empty="No manually added evidence yet.">
           {workflow?.evidence?.map((item) => (
             <div key={item.id} className="min-w-0 rounded-lg border border-black/6 bg-gray-50 p-3">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
+              <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0 flex-1">
                   <p className="break-words font-bricolage text-xs font-bold text-gray-900">{item.title}</p>
                   <p className="mt-1 break-words font-jakarta text-xs text-gray-500">{item.claim || item.summary}</p>
                   <p className="mt-1 break-words font-jakarta text-[11px] capitalize text-gray-400">{item.evidence_type.replaceAll("_", " ")} - {item.source_quality} quality - {item.confidence} confidence</p>
                 </div>
-                <button onClick={() => deleteEvidence(item.id)} disabled={busy === item.id} className="w-fit font-bricolage text-[11px] font-bold text-rose-600">Delete</button>
+                <div className="flex flex-shrink-0 items-center justify-start gap-2 sm:justify-end" aria-label={`Actions for ${item.title}`}>
+                  <button
+                    type="button"
+                    onClick={() => setEditingEvidenceId((current) => current === item.id ? null : item.id)}
+                    className="focus-ring inline-flex h-7 items-center rounded-md border border-black/10 bg-white px-2.5 font-bricolage text-[11px] font-bold leading-none text-emerald-700 whitespace-nowrap hover:border-emerald-200 hover:bg-emerald-50"
+                    aria-expanded={editingEvidenceId === item.id}
+                    aria-controls={`edit-evidence-${item.id}`}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteEvidence(item.id)}
+                    disabled={busy === item.id}
+                    className="focus-ring inline-flex h-7 items-center rounded-md border border-rose-200 bg-white px-2.5 font-bricolage text-[11px] font-bold leading-none text-rose-600 whitespace-nowrap hover:bg-rose-50 disabled:opacity-50"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-              <details className="mt-3 rounded-md border border-black/6 bg-white p-2">
-                <summary className="cursor-pointer list-none font-bricolage text-[11px] font-bold text-emerald-700">Edit evidence</summary>
+              {editingEvidenceId === item.id && (
+                <div id={`edit-evidence-${item.id}`} className="mt-3 rounded-md border border-black/6 bg-white p-2">
                 <form className="mt-3 space-y-2" onSubmit={(e) => { e.preventDefault(); submit(`/api/evidence-projects/${projectId}/evidence/${item.id}`, new FormData(e.currentTarget), "PATCH"); }}>
                   <MiniInput name="title" label="Title" defaultValue={item.title} />
                   <MiniInput name="claim" label="Claim" defaultValue={item.claim ?? ""} />
@@ -903,7 +939,8 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
                   </div>
                   <button disabled={busy !== ""} className="focus-ring h-8 rounded-lg bg-gray-900 px-3 font-bricolage text-[11px] font-bold text-white disabled:opacity-50">Save edit</button>
                 </form>
-              </details>
+                </div>
+              )}
             </div>
           ))}
         </PersistedList>
