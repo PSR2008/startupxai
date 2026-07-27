@@ -20,10 +20,11 @@ import { Input, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import ExportPdfButton from "@/components/ui/ExportPdfButton";
-import { AnalysisLoading, ErrorState } from "@/components/ui/States";
+import { AnalysisLoading } from "@/components/ui/States";
 import type { Competitor, CompetitorEngineOutput } from "@/types";
 import { logUsageClient } from "@/lib/usage-client";
 import { getAuthHeaders } from "@/lib/auth-headers-client";
+import { GENERIC_ANALYSIS_ERROR, readSafeApiResponse } from "@/lib/safe-api-response";
 
 interface FormState {
   idea: string;
@@ -45,6 +46,8 @@ export default function CompetitorPage() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [result, setResult] = useState<CompetitorEngineOutput | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [errorDetail, setErrorDetail] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
   const [copied, setCopied] = useState(false);
 
   const validate = () => {
@@ -54,24 +57,46 @@ export default function CompetitorPage() {
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (options: { retry?: boolean } = {}) => {
+    if (status === "loading") return;
+    if (options.retry && retryCount >= 1) return;
     if (!validate()) return;
+    if (options.retry) setRetryCount((count) => count + 1);
+    if (!options.retry) setRetryCount(0);
     setStatus("loading");
     setCopied(false);
+    setErrorMessage("");
+    setErrorDetail("");
 
     try {
       const res = await fetch("/api/analyze/competitor", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...(await getAuthHeaders()) },
+        headers: { "Content-Type": "application/json", ...(options.retry ? { "X-StartupX-Retry": "1" } : {}), ...(await getAuthHeaders()) },
         body: JSON.stringify(form),
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || "Analysis failed");
+      const data = await readSafeApiResponse<CompetitorEngineOutput>(res);
+      if (!data.ok) {
+        setErrorMessage(data.message || GENERIC_ANALYSIS_ERROR);
+        setErrorDetail(
+          data.code === "INVALID_PROVIDER_RESPONSE"
+            ? "The analysis provider returned an unexpected response. Your input was not lost. Please try again."
+            : data.code === "PROVIDER_TIMEOUT"
+            ? "The request timed out. Your input was not lost."
+            : data.code === "PLAN_LIMIT_REACHED" || data.code === "RATE_LIMITED"
+            ? "Usage limit reached."
+            : data.code === "AUTHENTICATION_REQUIRED"
+            ? "Please sign in again."
+            : data.detail || "Your input was not lost. Please try again."
+        );
+        setStatus("error");
+        return;
+      }
       setResult(data.data);
       setStatus("success");
       logUsageClient("competitor");
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : "Analysis failed.");
+      setErrorMessage(GENERIC_ANALYSIS_ERROR);
+      setErrorDetail(err instanceof Error && err.name === "AbortError" ? "The request timed out." : "Your input was not lost. Please try again.");
       setStatus("error");
     }
   };
@@ -79,6 +104,8 @@ export default function CompetitorPage() {
   const set = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((p) => ({ ...p, [field]: e.target.value }));
     if (errors[field]) setErrors((p) => ({ ...p, [field]: undefined }));
+    if (status === "error") setStatus("idle");
+    setRetryCount(0);
   };
 
   const copyReport = async () => {
@@ -193,7 +220,7 @@ export default function CompetitorPage() {
             />
           </div>
 
-          <Button size="lg" fullWidth onClick={handleSubmit} loading={status === "loading"} icon={<Swords size={15} />} iconPosition="right">
+          <Button size="lg" fullWidth onClick={() => handleSubmit()} loading={status === "loading"} disabled={status === "loading"} icon={<Swords size={15} />} iconPosition="right">
             {status === "loading" ? "Mapping competitors..." : "Run Competitor Analysis"}
           </Button>
         </div>
@@ -232,7 +259,13 @@ export default function CompetitorPage() {
 
             {status === "error" && (
               <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <ErrorState message={errorMessage} onRetry={() => setStatus("idle")} />
+                <CompetitorErrorState
+                  message={errorMessage}
+                  detail={errorDetail}
+                  retryDisabled={retryCount >= 1}
+                  onRetry={() => handleSubmit({ retry: true })}
+                  onEdit={() => setStatus("idle")}
+                />
               </motion.div>
             )}
 
@@ -334,6 +367,45 @@ export default function CompetitorPage() {
             )}
           </AnimatePresence>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function CompetitorErrorState({
+  message,
+  detail,
+  retryDisabled,
+  onRetry,
+  onEdit,
+}: {
+  message: string;
+  detail: string;
+  retryDisabled: boolean;
+  onRetry: () => void;
+  onEdit: () => void;
+}) {
+  return (
+    <div role="alert" aria-live="polite" className="flex min-h-80 flex-col items-center justify-center rounded-2xl border border-rose-200 bg-white p-8 text-center shadow-sm shadow-rose-100/60">
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50">
+        <ShieldAlert size={20} className="text-rose-500" />
+      </div>
+      <div className="mt-4 space-y-2">
+        <p className="font-bricolage text-base font-bold text-gray-950">Analysis could not be completed</p>
+        <p className="mx-auto max-w-md font-jakarta text-sm leading-relaxed text-gray-600">
+          {detail || "The analysis provider returned an unexpected response. Your input was not lost. Please try again."}
+        </p>
+        <p className="mx-auto max-w-md font-jakarta text-xs leading-relaxed text-gray-400">
+          {message || GENERIC_ANALYSIS_ERROR}
+        </p>
+      </div>
+      <div className="mt-5 flex flex-wrap justify-center gap-2">
+        <Button size="sm" onClick={onRetry} disabled={retryDisabled} icon={<Swords size={13} />}>
+          Try again
+        </Button>
+        <Button variant="outline" size="sm" onClick={onEdit}>
+          Edit inputs
+        </Button>
       </div>
     </div>
   );

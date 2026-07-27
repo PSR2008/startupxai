@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { z } from "zod";
 import type {
   IdeaEngineOutput,
   CompetitorEngineOutput,
@@ -27,6 +28,18 @@ function getClient(): Anthropic {
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 const MAX_TOKENS = 4096;
+
+export class AIProviderResponseError extends Error {
+  code: "INVALID_PROVIDER_RESPONSE";
+  retryable: boolean;
+
+  constructor(message = "The analysis provider returned an invalid response.") {
+    super(message);
+    this.name = "AIProviderResponseError";
+    this.code = "INVALID_PROVIDER_RESPONSE";
+    this.retryable = true;
+  }
+}
 
 const BASE_SYSTEM_PROMPT = `
 You are a world-class startup analyst (ex-McKinsey, YC partner level).
@@ -99,6 +112,47 @@ function extractJson<T>(text: string, fallback: T): T {
   }
 
   return fallback;
+}
+
+function extractRequiredJson(text: string): unknown {
+  const jsonBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const candidates = [jsonBlockMatch?.[1], text.match(/\{[\s\S]*\}/)?.[0]].filter((item): item is string => Boolean(item));
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      // Try the next candidate.
+    }
+  }
+
+  throw new AIProviderResponseError();
+}
+
+const competitorSchema = z.object({
+  name: z.string().trim().min(1),
+  description: z.string().trim().min(1),
+  strengths: z.array(z.string().trim().min(1)).default([]),
+  weaknesses: z.array(z.string().trim().min(1)).default([]),
+  url: z.string().trim().optional(),
+});
+
+export const competitorOutputSchema = z.object({
+  directCompetitors: z.array(competitorSchema),
+  indirectCompetitors: z.array(competitorSchema),
+  positioningGaps: z.array(z.string().trim().min(1)),
+  howToBeatThem: z.array(z.string().trim().min(1)),
+  whiteSpaceOpportunities: z.array(z.string().trim().min(1)),
+  comparisonSummary: z.string().trim().min(1),
+  strategicAdvantage: z.string().trim().min(1),
+});
+
+export function parseCompetitorOutput(text: string): CompetitorEngineOutput {
+  const parsed = competitorOutputSchema.safeParse(extractRequiredJson(text));
+  if (!parsed.success) {
+    throw new AIProviderResponseError("The analysis provider returned incomplete competitor analysis.");
+  }
+  return parsed.data;
 }
 
 // ============================================
@@ -224,16 +278,8 @@ Use real competitor names where relevant. Be commercially specific.`;
   });
 
   const text = response.content[0].type === "text" ? response.content[0].text : "";
-  
-  return extractJson<CompetitorEngineOutput>(text, {
-    directCompetitors: [],
-    indirectCompetitors: [],
-    positioningGaps: [],
-    howToBeatThem: [],
-    whiteSpaceOpportunities: [],
-    comparisonSummary: "Analysis failed. Please try again.",
-    strategicAdvantage: "Analysis failed.",
-  });
+
+  return parseCompetitorOutput(text);
 }
 
 // ============================================
