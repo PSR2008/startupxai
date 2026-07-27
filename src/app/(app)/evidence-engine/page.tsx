@@ -160,6 +160,7 @@ export default function EvidenceEnginePage() {
   };
 
   const submit = async () => {
+    if (status === "loading") return;
     if (!validate()) return;
     setStatus("loading");
     setResult(null);
@@ -222,8 +223,8 @@ export default function EvidenceEnginePage() {
         ))}
       </div>
 
-      <div className="mt-8 grid w-full grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(320px,0.8fr)_minmax(0,1.4fr)] xl:gap-8">
-        <div className="min-w-0 space-y-5 xl:sticky xl:top-20">
+      <div className="mt-8 space-y-8">
+        <div className={status === "idle" ? "mx-auto max-w-4xl space-y-5" : "hidden"}>
           <section className="surface-panel space-y-5 p-6">
             <div>
               <h3 className="font-bricolage text-base font-bold text-gray-900">Evidence project</h3>
@@ -260,7 +261,7 @@ export default function EvidenceEnginePage() {
           </Button>
         </div>
 
-        <div ref={resultRef} className="min-w-0 w-full max-w-full scroll-mt-20 [overflow-wrap:anywhere]">
+        <div ref={resultRef} className={status === "idle" ? "hidden" : "min-w-0 w-full max-w-full scroll-mt-20 [overflow-wrap:anywhere]"}>
           <AnimatePresence mode="wait">
             {status === "idle" && (
               <motion.section key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-full rounded-xl border border-dashed border-black/10 bg-[#fffefa] p-6 text-center shadow-sm sm:p-10">
@@ -278,7 +279,14 @@ export default function EvidenceEnginePage() {
             )}
 
             {status === "loading" && <AnalysisLoading engine="evidence" />}
-            {status === "error" && <ErrorState message={errorMessage} onRetry={() => setStatus("idle")} />}
+            {status === "error" && (
+              <div className="space-y-3">
+                <ErrorState message={errorMessage} onRetry={submit} />
+                <div className="flex justify-center">
+                  <Button variant="outline" size="sm" onClick={() => setStatus("idle")}>Edit project inputs</Button>
+                </div>
+              </div>
+            )}
 
             {status === "success" && result && activeScore && (
               <motion.div key="result" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-full min-w-0 space-y-5">
@@ -291,6 +299,10 @@ export default function EvidenceEnginePage() {
                         <ConfidenceBadge confidence={result.project.confidence} />
                         <DataFreshnessBadge />
                         <Badge variant="neutral" size="sm">{result.project.scoreVersion}</Badge>
+                      </div>
+                      <div className="mt-4 flex flex-wrap gap-2 no-print">
+                        <Button variant="outline" size="sm" onClick={() => setStatus("idle")}>Edit project inputs</Button>
+                        <Button variant="outline" size="sm" onClick={submit}>Run again</Button>
                       </div>
                     </div>
                     <div className="w-full rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-center sm:max-w-xs sm:flex-shrink-0">

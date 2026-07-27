@@ -201,8 +201,8 @@ export default function CompetitorPage() {
         <ContextCard icon={<Swords size={16} />} title="Battle plan" detail="How to compete with focus" tone="teal" />
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
-        <div className="lg:col-span-2 space-y-5">
+      <div className="mt-8 space-y-8">
+        <div className={status === "idle" ? "mx-auto max-w-4xl space-y-5" : "hidden"}>
           <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50 space-y-5">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -253,7 +253,7 @@ export default function CompetitorPage() {
           </Button>
         </div>
 
-        <div className="lg:col-span-3">
+        <div className={status === "idle" ? "hidden" : "w-full min-w-0 max-w-full"}>
           <AnimatePresence mode="wait">
             {status === "idle" && (
               <motion.div
@@ -307,6 +307,8 @@ export default function CompetitorPage() {
                       <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{form.idea || "Competitor map"}</h3>
                     </div>
                     <div className="flex flex-wrap gap-2 no-print">
+                      <Button variant="outline" size="sm" onClick={() => setStatus("idle")}>Edit inputs</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleSubmit()}>Run again</Button>
                       <ExportPdfButton />
                       <Button variant="outline" size="sm" onClick={copyReport} icon={copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}>
                         {copied ? "Copied" : "Copy report"}

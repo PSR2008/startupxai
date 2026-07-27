@@ -128,6 +128,7 @@ export default function IdeaEnginePage() {
   };
 
   const handleSubmit = async () => {
+    if (status === "loading") return;
     if (!validate()) return;
 
     setStatus("loading");
@@ -276,8 +277,8 @@ export default function IdeaEnginePage() {
         ))}
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
-        <div className="lg:col-span-2 space-y-5">
+      <div className="mt-8 space-y-8">
+        <div className={status === "idle" ? "mx-auto max-w-4xl space-y-5" : "hidden"}>
           <div className="rounded-2xl border border-black/6 bg-white p-6 space-y-5 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -361,14 +362,9 @@ export default function IdeaEnginePage() {
             {status === "loading" ? "Analyzing..." : "Run Market Analysis"}
           </Button>
 
-          {status === "success" && result && (
-            <p className="font-jakarta text-xs text-gray-400 text-center">
-              Analysis complete - Report generated on the right
-            </p>
-          )}
         </div>
 
-        <div className="lg:col-span-3">
+        <div className={status === "idle" ? "hidden" : "w-full min-w-0 max-w-full"}>
           <AnimatePresence mode="wait">
             {status === "idle" && (
               <motion.div
@@ -384,7 +380,7 @@ export default function IdeaEnginePage() {
                 <div>
                   <p className="font-bricolage text-sm font-semibold text-gray-800 mb-1">Ready to analyze</p>
                   <p className="font-jakarta text-sm text-gray-400 max-w-xs">
-                    Fill in your startup details on the left and click Run Market Analysis.
+                    Fill in your startup details, then run the market assessment.
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full max-w-lg mt-2">
@@ -415,7 +411,12 @@ export default function IdeaEnginePage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <ErrorState message={errorMessage} onRetry={() => setStatus("idle")} />
+                <div className="space-y-3">
+                  <ErrorState message={errorMessage} onRetry={handleSubmit} />
+                  <div className="flex justify-center">
+                    <Button variant="outline" size="sm" onClick={() => setStatus("idle")}>Edit inputs</Button>
+                  </div>
+                </div>
               </motion.div>
             )}
 
@@ -438,6 +439,8 @@ export default function IdeaEnginePage() {
                       </h3>
                     </div>
                     <div className="flex flex-wrap gap-2 no-print">
+                      <Button variant="outline" size="sm" onClick={() => setStatus("idle")}>Edit inputs</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleSubmit()}>Run again</Button>
                       <ExportPdfButton />
                       <button
                         onClick={copyReport}
