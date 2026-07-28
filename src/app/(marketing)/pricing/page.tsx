@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   title: "Pricing - StartupX AI",
   description:
     "Simple, transparent pricing for founders. Start free, upgrade when you need the full assessment stack.",
+  alternates: {
+    canonical: "/pricing",
+  },
+  openGraph: {
+    url: "/pricing",
+  },
 };
 
 const plans = [

@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   title: "Assessment Methodology - StartupX AI",
   description:
     "How StartupX AI calculates evidence-backed assessments, confidence levels, missing evidence and limitations.",
+  alternates: {
+    canonical: "/methodology",
+  },
+  openGraph: {
+    url: "/methodology",
+  },
 };
 
 const principles = [

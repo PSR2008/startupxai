@@ -1,14 +1,13 @@
 import type { MetadataRoute } from "next";
-
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://startupxai.in";
+import { canonicalUrl } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ["", "/pricing", "/support", "/privacy", "/signin", "/signup"];
+  const routes = ["/", "/pricing", "/methodology", "/support", "/privacy"];
 
   return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
+    url: canonicalUrl(route),
     lastModified: new Date("2026-05-27"),
-    changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1 : 0.7,
+    changeFrequency: route === "/" ? "weekly" : "monthly",
+    priority: route === "/" ? 1 : 0.7,
   }));
 }

@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://startupxai.in";
+import { canonicalUrl } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -9,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/", "/dashboard", "/profile", "/reports", "/share", "/onboarding", "/internal", "/payment"],
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: canonicalUrl("/sitemap.xml"),
   };
 }

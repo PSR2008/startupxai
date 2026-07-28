@@ -4,6 +4,12 @@ import AnimatedSection from "@/components/shared/AnimatedSection";
 export const metadata: Metadata = {
   title: "Privacy Policy - StartupX AI",
   description: "How StartupX AI collects, uses, and protects your data.",
+  alternates: {
+    canonical: "/privacy",
+  },
+  openGraph: {
+    url: "/privacy",
+  },
 };
 
 const sections = [

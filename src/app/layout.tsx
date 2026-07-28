@@ -3,6 +3,7 @@ import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import localFont from "next/font/local";
 import { Toaster } from "react-hot-toast";
 import AuthFragmentGuard from "@/components/auth/AuthFragmentGuard";
+import { SEO_BASE_URL } from "@/lib/seo";
 import "./globals.css";
 
 const bodyFont = IBM_Plex_Sans({
@@ -34,7 +35,7 @@ const horrorFont = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://startupxai.in"),
+  metadataBase: new URL(SEO_BASE_URL),
   title: {
     default: "StartupX AI - Founder Intelligence Workspace",
     template: "%s | StartupX AI",
@@ -75,7 +76,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://startupxai.in",
+    url: SEO_BASE_URL,
     siteName: "StartupX AI",
     title: "StartupX AI - Founder Intelligence Workspace",
     description:
