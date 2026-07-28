@@ -379,7 +379,7 @@ const engines = [
   {
     icon: Target,
     title: "Founder Decision Engine",
-    description: "Prioritize founder decisions with top risks, what not to build, traction paths to test, and a confidence score.",
+    description: "Prioritize founder decisions with context completeness, top risks, features to postpone, and traction experiments to test.",
     href: "/founder-decision",
     color: "#7c3aed",
     bg: "rgba(124,58,237,0.06)",

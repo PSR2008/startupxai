@@ -215,7 +215,7 @@ export interface DecisionEngineOutput {
   biggestStrategicMistake: string;
   fastestPathToTraction: string;
   finalVerdict: string;
-  confidenceScore: number; // 0-100
+  confidenceScore?: number; // Legacy field; not rendered as strategic confidence.
   founderSummary: string;
   actionableNextSteps: string[];
 }

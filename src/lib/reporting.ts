@@ -183,7 +183,15 @@ function buildSections(analysis: StoredAnalysis, type: ReportOutputType): Founde
     section("Revenue Model Analysis", undefined, output.monetizationModels),
     section("User Psychology Insights", output.brutalRoast, output.uxRecommendations),
     section("Growth Recommendations", undefined, output.launchSteps ?? output.customerAcquisitionPriorities),
-    section("Founder Decisions", output.finalVerdict, output.actionableNextSteps ?? output.top3Priorities),
+    section(
+      "Founder Decision Brief",
+      output.finalVerdict ? `Strategic interpretation: ${output.finalVerdict}` : undefined,
+      [
+        "This interpretation is generated from the context provided. It is not independent market validation or a prediction of business success.",
+        "Independent evidence: No independent evidence was included in this brief unless explicitly attached in the workflow.",
+        ...asStringArray(output.actionableNextSteps ?? output.top3Priorities),
+      ]
+    ),
     ...evidenceSections,
     section("Brand Recommendations", output.brandPackSummary, output.positioningLines ?? output.taglines),
     section("Cold Outreach Recommendations", undefined, output.followUpVariants ?? output.ctaVariations),

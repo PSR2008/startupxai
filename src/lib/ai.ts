@@ -600,9 +600,21 @@ export async function analyzeDecision(input: {
 }): Promise<DecisionEngineOutput> {
   const client = getClient();
 
-  const prompt = `You are a world-class startup mentor, board advisor, and former founder who has built and sold multiple companies. You give the kind of advice that would come from a seasoned co-founder, not a consultant.
+  const prompt = `You are a calibrated startup strategy assistant. You produce decision-support briefs from founder-provided context.
 
-Give executive-level strategic guidance for this founder:
+You must clearly separate known founder-provided facts from AI-assisted interpretation. Do not present your reasoning as verified evidence, independent market validation, a final verdict, or a prediction of business success.
+
+Do not claim:
+- "You are solving a real pain point"
+- "The market wants this"
+- "You have exactly 60 days"
+- "This will work"
+- "This is your biggest mistake"
+- "These users will become paying customers"
+
+Do not invent timelines, user counts, revenue, traction, market proof, customer urgency, or willingness to pay. Use calibrated language such as "Based on your description", "A risk worth testing is", "Your current information suggests", "One possible interpretation is", and "This assumption should be tested through".
+
+Give a focused strategic brief for this founder:
 
 STARTUP IDEA: ${input.idea}
 DESCRIPTION: ${input.description}
@@ -611,28 +623,27 @@ ${input.currentStatus ? `CURRENT STATUS: ${input.currentStatus}` : ""}
 ${input.biggestChallenge ? `BIGGEST CHALLENGE: ${input.biggestChallenge}` : ""}
 ${input.resources ? `RESOURCES/CONSTRAINTS: ${input.resources}` : ""}
 
-Respond ONLY with a valid JSON object. No markdown, no preamble:
+Respond ONLY with a valid JSON object. No markdown, no preamble. Keep recommendations measurable and no more than three priorities.
 
 {
   "top3Priorities": [
     {
       "rank": <1|2|3>,
       "priority": "<specific priority>",
-      "why": "<2 sentence explanation>",
+      "why": "<2 sentence calibrated explanation. State whether it is based on founder context or evidence. Include assumption tested and measurable completion condition in plain language.>",
       "timeframe": "<e.g. Next 2 weeks>"
     }
   ],
-  "whatToFixFirst": "<specific, actionable first fix>",
-  "whatNotToBuildYet": [<3-5 things to avoid building right now>],
-  "biggestStrategicMistake": "<honest 2 sentence description of their biggest mistake or risk>",
-  "fastestPathToTraction": "<specific 2-3 sentence fastest path>",
-  "finalVerdict": "<honest 3-4 sentence executive verdict on viability and path>",
-  "confidenceScore": <integer 0-100>,
-  "founderSummary": "<5-6 sentence actionable founder brief>",
-  "actionableNextSteps": [<5-8 specific next steps ordered by priority>]
+  "whatToFixFirst": "<first issue to investigate, not a proven fix>",
+  "whatNotToBuildYet": [<3-5 features to postpone until core assumptions are tested>],
+  "biggestStrategicMistake": "<highest-risk assumption to investigate, not a factual mistake>",
+  "fastestPathToTraction": "<suggested traction experiment with target audience, metric and completion condition>",
+  "finalVerdict": "<strategic interpretation. Begin with 'Based on your description'. Do not call it a verdict. Do not claim viability is proven.>",
+  "founderSummary": "<5-6 sentence AI-assisted founder brief that lists assumptions and limitations>",
+  "actionableNextSteps": [<3-6 specific experimental actions ordered by priority. The first item must be the next 48 hours action.>]
 }
 
-Be honest, commercially aware, and strategic. Not cheerleading. Not generic.`;
+Limitations to include in the brief: this cannot independently determine market demand, willingness to pay, customer urgency or product viability unless relevant evidence is supplied. Recommended actions are experiments, not predictions.`;
 
   const response = await client.messages.create({
     model: MODEL,
@@ -649,7 +660,6 @@ Be honest, commercially aware, and strategic. Not cheerleading. Not generic.`;
     biggestStrategicMistake: "Analysis failed.",
     fastestPathToTraction: "Analysis failed.",
     finalVerdict: "Analysis failed. Please try again.",
-    confidenceScore: 0,
     founderSummary: "Analysis failed.",
     actionableNextSteps: [],
   });
