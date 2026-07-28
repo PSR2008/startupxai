@@ -306,16 +306,25 @@ export default function EvidenceEnginePage() {
                       </div>
                     </div>
                     <div className="w-full rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-center sm:max-w-xs sm:flex-shrink-0">
-                      <p className="metadata-text text-emerald-700">Evidence Score</p>
-                      <p className="font-bricolage text-4xl font-bold text-emerald-800">{result.project.overallScore}</p>
-                      <p className="mt-2 font-jakarta text-[11px] leading-relaxed text-emerald-900">{EVIDENCE_SCORE_DISCLAIMER}</p>
+                      <p className="metadata-text text-emerald-700">{result.project.overallScore === null ? "Evidence coverage" : "Evidence Score"}</p>
+                      {result.project.overallScore === null ? (
+                        <>
+                          <p className="font-bricolage text-2xl font-bold text-emerald-900">Insufficient evidence</p>
+                          <p className="mt-1 font-jakarta text-xs leading-relaxed text-emerald-900">
+                            {result.evidenceCoverage.assessableDimensions}/{result.evidenceCoverage.totalDimensions} dimensions assessable
+                          </p>
+                        </>
+                      ) : (
+                        <p className="font-bricolage text-4xl font-bold text-emerald-800">{result.project.overallScore}</p>
+                      )}
+                      <p className="mt-2 font-jakarta text-[11px] leading-relaxed text-emerald-900">{result.project.overallScore === null ? result.evidenceCoverage.summary : EVIDENCE_SCORE_DISCLAIMER}</p>
                     </div>
                   </div>
                 </section>
 
                 <AssessmentExplainability result={result} />
 
-                <ValidationDecisionPanel overallScore={result.project.overallScore} confidence={result.project.confidence} />
+                {result.project.overallScore === null ? <EvidenceCoveragePanel result={result} /> : <ValidationDecisionPanel overallScore={result.project.overallScore} confidence={result.project.confidence} />}
 
                 <PersistedWorkflowPanel
                   projectId={result.project.id}
@@ -330,8 +339,9 @@ export default function EvidenceEnginePage() {
                       onClick={() => setActiveCategory(score.category)}
                       className={`min-w-0 rounded-2xl border p-3 text-left transition-colors ${activeCategory === score.category ? "border-emerald-300 bg-emerald-50" : "border-black/6 bg-white hover:bg-gray-50"}`}
                     >
-                      <p className="font-bricolage text-xl font-bold text-gray-950">{score.score}</p>
+                      <p className="font-bricolage text-lg font-bold text-gray-950">{score.score === null ? "Unscored" : score.score}</p>
                       <p className="mt-1 font-jakarta text-[11px] leading-tight text-gray-500">{score.label}</p>
+                      {score.score === null && <p className="mt-1 font-jakarta text-[10px] leading-tight text-amber-700">Insufficient evidence</p>}
                     </button>
                   ))}
                 </section>
@@ -506,6 +516,46 @@ function RecommendedTestsList({ result }: { result: ValidationProjectResult }) {
   );
 }
 
+function EvidenceCoveragePanel({ result }: { result: ValidationProjectResult }) {
+  const coverage = result.evidenceCoverage;
+  return (
+    <section className="surface-panel w-full max-w-full p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <ShieldCheck size={18} className="text-emerald-700" />
+            <h3 className="font-bricolage text-base font-bold text-gray-950">Assessment not yet evidence-backed</h3>
+            <Badge variant="amber" size="sm">Insufficient evidence for scoring</Badge>
+          </div>
+          <p className="mt-2 max-w-2xl font-jakarta text-sm leading-relaxed text-gray-600">
+            Founder context has been captured, but numerical Evidence Scores stay hidden until enough independent evidence is linked.
+          </p>
+        </div>
+      </div>
+      <div className="mt-4 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricBlock label="Assessable dimensions" value={`${coverage.assessableDimensions}/${coverage.totalDimensions}`} />
+        <MetricBlock label="Minimum needed" value={`${coverage.minimumAssessableDimensions} dimensions`} />
+        <MetricBlock label="Qualifying evidence" value={String(coverage.qualifiedEvidenceCount)} />
+        <MetricBlock label="Founder context excluded" value={String(coverage.excludedFounderContextCount)} />
+      </div>
+      <div className="mt-4 grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-2">
+        <TextBlock
+          title="Missing score coverage"
+          items={coverage.missingDimensions.length ? coverage.missingDimensions.map((item) => `${item} needs qualifying evidence.`) : ["All required dimensions are assessable."]}
+        />
+        <TextBlock
+          title="Recommended next validation actions"
+          items={[
+            "Add customer research tied to the riskiest assumptions.",
+            "Attach verified public sources for market timing, competitors, and alternatives.",
+            "Complete experiments before using experiment outcomes in the score.",
+          ]}
+        />
+      </div>
+    </section>
+  );
+}
+
 function ScorePanel({ score }: { score: CategoryScore }) {
   const metrics = getScoreEvidenceMetrics(score);
   const calculations = getComponentCalculations(score);
@@ -523,11 +573,21 @@ function ScorePanel({ score }: { score: CategoryScore }) {
             <ConfidenceBadge confidence={score.confidence} />
             {metrics.insufficientEvidence && <Badge variant="amber" size="sm">Insufficient evidence</Badge>}
           </div>
+          <p className="mt-2 font-jakarta text-xs leading-relaxed text-gray-500">{score.definition}</p>
           <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-600">{score.conclusion}</p>
         </div>
         <div className="w-full sm:max-w-xs sm:flex-shrink-0 sm:text-right">
-          <p className="font-bricolage text-4xl font-bold text-emerald-700">{score.score}</p>
-          <p className="mt-2 font-jakarta text-[11px] leading-relaxed text-gray-500">{EVIDENCE_SCORE_DISCLAIMER}</p>
+          {score.score === null ? (
+            <>
+              <p className="font-bricolage text-2xl font-bold text-amber-800">Insufficient evidence</p>
+              <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{score.evidenceCoverage.qualifyingEvidenceCount} qualifying item(s)</p>
+            </>
+          ) : (
+            <>
+              <p className="font-bricolage text-4xl font-bold text-emerald-700">{score.score}</p>
+              <p className="mt-2 font-jakarta text-[11px] leading-relaxed text-gray-500">{EVIDENCE_SCORE_DISCLAIMER}</p>
+            </>
+          )}
         </div>
       </div>
       <div className="mb-3 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -570,9 +630,9 @@ function ScorePanel({ score }: { score: CategoryScore }) {
                     <Badge variant="neutral" size="sm" className="flex-shrink-0">Weight {item.weightPercent}%</Badge>
                   </div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                    <MetricBlock label="Raw result" value={`${item.rawScore}/100`} />
-                    <MetricBlock label="Weighted contribution" value={`${item.weightedContribution}/100`} />
-                    <MetricBlock label="Final contribution" value={`${item.finalContribution}`} />
+                    <MetricBlock label="Raw result" value={item.rawScore === null ? "Not calculated" : `${item.rawScore}/100`} />
+                    <MetricBlock label="Weighted contribution" value={item.weightedContribution === null ? "Not calculated" : `${item.weightedContribution}/100`} />
+                    <MetricBlock label="Final contribution" value={item.finalContribution === null ? "Not calculated" : `${item.finalContribution}`} />
                     <MetricBlock label="Linked evidence" value={String(item.linkedEvidenceIds.length)} />
                   </div>
                   {(item.deductions.length > 0 || item.missingEvidence.length > 0) && (
@@ -585,9 +645,15 @@ function ScorePanel({ score }: { score: CategoryScore }) {
                 </div>
               ))}
             </div>
-            <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-jakarta text-xs leading-relaxed text-emerald-900">
-              Component contribution total: {displayedTotal}/100. Displayed score: {score.score}/100.
-            </p>
+            {score.score === null ? (
+              <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 font-jakarta text-xs leading-relaxed text-amber-900">
+                No numerical calculation is shown because this dimension has not met its minimum independent-evidence threshold.
+              </p>
+            ) : (
+              <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-jakarta text-xs leading-relaxed text-emerald-900">
+                Component contribution total: {displayedTotal}/100. Displayed score: {score.score}/100.
+              </p>
+            )}
           </div>
         )}
       </div>

@@ -89,9 +89,11 @@ export async function POST(request: NextRequest) {
         evidenceItems,
         providerRuns,
         suggestedExperiments,
+        evidenceCoverage: overall.coverage,
         limitations: [
-          "Scores are provisional when independent source providers are not configured.",
-          "Founder input is stored as user-provided evidence, not verified market truth.",
+          "Founder input is context for what to test. It does not count as independent evidence for scoring.",
+          "Numerical Evidence Scores are hidden until deterministic evidence thresholds are met.",
+          "Planned experiments and generated assessments do not increase confidence.",
           "No market size, search volume, review count, Reddit frequency, or pricing claim is shown unless a provider actually retrieved it.",
         ],
       },

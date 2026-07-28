@@ -32,9 +32,9 @@ export interface ComponentCalculation {
   componentName: string;
   purpose: string;
   weightPercent: number;
-  rawScore: number;
-  weightedContribution: number;
-  finalContribution: number;
+  rawScore: number | null;
+  weightedContribution: number | null;
+  finalContribution: number | null;
   deductions: string[];
   reasonCodes: string[];
   linkedEvidenceIds: string[];
@@ -160,13 +160,13 @@ export function getConfidenceExplanation(result: ValidationProjectResult): Confi
 export function getComponentCalculations(score: CategoryScore): ComponentCalculation[] {
   const base = score.components.map((component) => {
     const weightPercent = Math.round(component.weight * 100);
-    const weightedContribution = Math.round(component.normalizedValue * component.weight);
+    const weightedContribution = component.normalizedValue === null ? null : Math.round(component.normalizedValue * component.weight);
     const missingEvidence = component.evidenceKind === "unavailable" ? [component.componentName] : [];
     const deductions: string[] = [];
     if (component.evidenceKind === "unavailable") deductions.push("Unavailable input limits confidence for this component.");
     if (component.evidenceKind === "user_provided") deductions.push("Founder-provided input is useful context but not independent proof.");
     if (component.evidenceKind === "inferred") deductions.push("Inferred signal is weighted cautiously because it is not direct evidence.");
-    if (component.normalizedValue < 45) deductions.push("Low raw component result reduced the total.");
+    if (component.normalizedValue !== null && component.normalizedValue < 45) deductions.push("Low raw component result reduced the total.");
     return {
       componentName: component.componentName,
       purpose: `${component.componentName} contributes to ${score.label.toLowerCase()}.`,
@@ -180,20 +180,22 @@ export function getComponentCalculations(score: CategoryScore): ComponentCalcula
       missingEvidence,
     };
   });
-  const delta = score.score - base.reduce((sum, item) => sum + item.finalContribution, 0);
+  if (score.score === null) return base;
+  const delta = score.score - base.reduce((sum, item) => sum + (item.finalContribution ?? 0), 0);
   if (base.length && delta !== 0) {
     const last = base[base.length - 1];
     base[base.length - 1] = {
       ...last,
-      finalContribution: last.finalContribution + delta,
+      finalContribution: (last.finalContribution ?? 0) + delta,
       deductions: [...last.deductions, `Rounded reconciliation adjusted this displayed contribution by ${delta > 0 ? "+" : ""}${delta}.`],
     };
   }
   return base;
 }
 
-export function getDisplayedTotal(score: CategoryScore): number {
-  return getComponentCalculations(score).reduce((sum, component) => sum + component.finalContribution, 0);
+export function getDisplayedTotal(score: CategoryScore): number | null {
+  if (score.score === null) return null;
+  return getComponentCalculations(score).reduce((sum, component) => sum + (component.finalContribution ?? 0), 0);
 }
 
 export function getEvidenceProvenance(items: EvidenceItem[], score?: CategoryScore): EvidenceProvenanceItem[] {
@@ -230,6 +232,21 @@ export function getEvidenceProvenance(items: EvidenceItem[], score?: CategorySco
 }
 
 export function getMissingEvidenceItems(score: CategoryScore): MissingEvidenceItem[] {
+  if (score.missingRequirements.length) {
+    return score.missingRequirements.slice(0, 5).map((requirement) => ({
+      title: "Insufficient evidence",
+      whyItMatters: `${requirement} This is required before scoring ${score.label.toLowerCase()}.`,
+      affectedAssumption: score.assumptions[0] ?? `Assess ${score.label.toLowerCase()}.`,
+      evidenceNeeded: /customer/i.test(requirement)
+        ? "Customer research"
+        : /experiment/i.test(requirement)
+        ? "Completed experiment result"
+        : /public|source/i.test(requirement)
+        ? "Verified public evidence"
+        : "Qualifying independent evidence",
+      confidenceImpact: "This dimension remains unscored until the minimum evidence threshold is met.",
+    }));
+  }
   const missingComponents = score.components.filter((component) => component.evidenceKind === "unavailable");
   const hasAnyAvailableInput = score.components.some((component) => component.evidenceKind !== "unavailable");
   const fallback = score.confidence === "low" && !hasAnyAvailableInput ? score.components.slice(0, 2) : [];
@@ -261,7 +278,7 @@ export function getConfidenceImprovementItems(score: CategoryScore): string[] {
 }
 
 export function getRecommendedTests(scores: CategoryScore[], experiments: SuggestedExperiment[]): RecommendedTestItem[] {
-  const weakest = [...scores].sort((a, b) => a.score - b.score).slice(0, 3);
+  const weakest = [...scores].sort((a, b) => (a.score ?? -1) - (b.score ?? -1)).slice(0, 3);
   return weakest.map((score, index) => {
     const experiment = experiments.find((item) => item.assumptionTested === score.assumptions[0]) ?? experiments[index];
     return {
@@ -282,13 +299,10 @@ export function getRecommendedTests(scores: CategoryScore[], experiments: Sugges
 }
 
 export function getScoreEvidenceMetrics(score: CategoryScore): ScoreEvidenceMetrics {
-  const evidenceComponents = score.components.filter((component) => component.evidenceKind !== "unavailable");
   const missingEvidence = score.components
     .filter((component) => component.evidenceKind === "unavailable")
     .map((component) => component.componentName);
-  const evidenceCount = score.supportingEvidence.filter((item) => !/insufficient evidence|insufficient public evidence/i.test(item)).length
-    + score.opposingEvidence.length
-    + evidenceComponents.length;
+  const evidenceCount = score.evidenceCoverage.qualifyingEvidenceCount;
   const verifiedWeight = score.components
     .filter((component) => component.evidenceKind === "verified")
     .reduce((sum, component) => sum + component.weight, 0);
@@ -300,6 +314,7 @@ export function getScoreEvidenceMetrics(score: CategoryScore): ScoreEvidenceMetr
     .reduce((sum, component) => sum + component.weight, 0);
 
   const evidenceQuality: ScoreEvidenceMetrics["evidenceQuality"] =
+    score.score === null ? "Insufficient" :
     verifiedWeight >= 0.4 ? "Strong" :
     verifiedWeight > 0 || founderWeight >= 0.45 ? "Moderate" :
     availableWeight > 0.5 ? "Low" :
@@ -308,12 +323,12 @@ export function getScoreEvidenceMetrics(score: CategoryScore): ScoreEvidenceMetr
   return {
     evidenceCount,
     evidenceQuality,
-    missingEvidence,
+    missingEvidence: score.missingRequirements.length ? score.missingRequirements : missingEvidence,
     confidenceLevel: score.confidence,
     calculationSummary: score.methodology,
     improvementAction: missingEvidence.length
-      ? `Add evidence for ${missingEvidence.slice(0, 3).join(", ")}.`
+      ? `Add evidence for ${(score.missingRequirements.length ? score.missingRequirements : missingEvidence).slice(0, 3).join(", ")}.`
       : score.recommendedNextAction,
-    insufficientEvidence: score.confidence === "low" || evidenceQuality === "Insufficient" || evidenceCount < 3,
+    insufficientEvidence: score.score === null || score.confidence === "low" || evidenceQuality === "Insufficient" || evidenceCount < 3,
   };
 }

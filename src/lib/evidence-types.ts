@@ -15,6 +15,7 @@ export type EvidenceDirection = "supports" | "contradicts" | "neutral";
 export type EvidenceVerifiedStatus = "verified" | "inferred" | "user_provided" | "unavailable";
 export type EvidenceKind = "verified" | "inferred" | "user_provided" | "ai_interpretation" | "unavailable";
 export type EvidenceSentiment = "positive" | "neutral" | "negative" | "mixed";
+export type EvidenceAssessmentStatus = "assessed" | "unassessed";
 
 export interface EvidenceEngineInput {
   startupName: string;
@@ -51,28 +52,62 @@ export interface EvidenceItem {
 export interface ScoreComponent {
   componentName: string;
   rawSignal: Record<string, unknown>;
-  normalizedValue: number;
+  normalizedValue: number | null;
   weight: number;
-  contribution: number;
+  contribution: number | null;
   evidenceKind: EvidenceKind;
+}
+
+export interface ScoreEvidenceCoverage {
+  assessable: boolean;
+  qualifyingEvidenceCount: number;
+  supportingEvidenceCount: number;
+  contradictingEvidenceCount: number;
+  completedExperimentCount: number;
+  excludedFounderContextCount: number;
+  excludedGeneratedAssessmentCount: number;
+  minimumRequired: string;
 }
 
 export interface CategoryScore {
   category: EvidenceCategory;
   label: string;
-  score: number;
+  score: number | null;
+  assessmentStatus: EvidenceAssessmentStatus;
+  definition: string;
   confidence: EvidenceConfidence;
   conclusion: string;
   supportingEvidence: string[];
   opposingEvidence: string[];
+  qualifyingEvidenceIds: string[];
+  contradictingEvidenceIds: string[];
+  excludedEvidenceIds: string[];
+  excludedEvidenceSummary: string[];
+  missingRequirements: string[];
   assumptions: string[];
   uncertainty: string;
   sourceReferences: Array<{ title: string; url?: string | null; sourceName: string }>;
   methodology: string;
   recommendedNextAction: string;
   components: ScoreComponent[];
+  evidenceCoverage: ScoreEvidenceCoverage;
   scoreVersion: string;
   calculatedAt: string;
+}
+
+export interface OverallEvidenceCoverage {
+  assessableDimensions: number;
+  totalDimensions: number;
+  minimumAssessableDimensions: number;
+  qualifiedEvidenceCount: number;
+  customerResearchCount: number;
+  completedExperimentCount: number;
+  verifiedPublicEvidenceCount: number;
+  excludedFounderContextCount: number;
+  excludedGeneratedAssessmentCount: number;
+  missingDimensions: string[];
+  statusLabel: string;
+  summary: string;
 }
 
 export interface ProviderRunStatus {
@@ -101,7 +136,7 @@ export interface ValidationProjectResult {
   project: {
     id: string;
     startupName: string;
-    overallScore: number;
+    overallScore: number | null;
     confidence: EvidenceConfidence;
     scoreVersion: string;
     createdAt: string;
@@ -111,5 +146,6 @@ export interface ValidationProjectResult {
   evidenceItems: EvidenceItem[];
   providerRuns: ProviderRunStatus[];
   suggestedExperiments: SuggestedExperiment[];
+  evidenceCoverage: OverallEvidenceCoverage;
   limitations: string[];
 }

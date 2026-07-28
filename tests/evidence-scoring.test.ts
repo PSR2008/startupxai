@@ -79,9 +79,10 @@ const evidence: EvidenceItem[] = [
 test("calculateEvidenceScores returns transparent category scores", () => {
   const scores = calculateEvidenceScores(input, evidence);
   assert.equal(scores.length, 10);
-  assert.ok(scores.every((score) => score.score >= 0 && score.score <= 100));
+  assert.ok(scores.every((score) => score.score === null || (score.score >= 0 && score.score <= 100)));
   assert.ok(scores.every((score) => score.components.length > 0));
   assert.ok(scores.some((score) => score.components.some((component) => component.evidenceKind === "unavailable")));
+  assert.ok(scores.some((score) => score.assessmentStatus === "unassessed"));
 });
 
 test("evidence items are classified with product-facing evidence labels", () => {
@@ -95,7 +96,8 @@ test("evidence items are classified with product-facing evidence labels", () => 
 
 test("low-evidence scores expose insufficient-evidence states", () => {
   const sparseScores = calculateEvidenceScores({ ...input, knownCompetitors: "", mainAssumptions: "", websiteUrl: "" }, []);
-  assert.ok(sparseScores.some((score) => score.conclusion.startsWith("Insufficient evidence.")));
+  assert.ok(sparseScores.every((score) => score.score === null));
+  assert.ok(sparseScores.some((score) => score.conclusion.startsWith("Insufficient evidence")));
   assert.ok(sparseScores.some((score) => getScoreEvidenceMetrics(score).insufficientEvidence));
 });
 
@@ -103,23 +105,25 @@ test("score display metadata includes disclaimer and transparency fields", () =>
   const [score] = calculateEvidenceScores(input, evidence);
   const metrics = getScoreEvidenceMetrics(score);
   assert.match(EVIDENCE_SCORE_DISCLAIMER, /does not prove market demand or guarantee business success/);
-  assert.ok(metrics.evidenceCount >= 1);
+  assert.ok(metrics.evidenceCount >= 0);
   assert.match(metrics.evidenceQuality, /^(Strong|Moderate|Low|Insufficient)$/);
   assert.ok(Array.isArray(metrics.missingEvidence));
   assert.match(metrics.confidenceLevel, /^(low|medium|high)$/);
-  assert.ok(metrics.calculationSummary.includes("Calculated with"));
+  assert.ok(metrics.calculationSummary.includes("Not calculated") || metrics.calculationSummary.includes("Calculated from"));
   assert.ok(metrics.improvementAction.length > 0);
 });
 
 test("confidence explanation reflects founder-only evidence and changes with customer evidence", () => {
   const scores = calculateEvidenceScores(input, [evidence[1]]);
+  const overall = overallValidationScore(scores);
   const founderOnly: ValidationProjectResult = {
-    project: { id: "p1", startupName: "ProofDesk", overallScore: overallValidationScore(scores).score, confidence: "low", scoreVersion: "test", createdAt: new Date().toISOString() },
+    project: { id: "p1", startupName: "ProofDesk", overallScore: overall.score, confidence: "low", scoreVersion: "test", createdAt: new Date().toISOString() },
     input,
     scores,
     evidenceItems: [evidence[1]],
     providerRuns: [],
     suggestedExperiments: suggestExperiments(input, scores),
+    evidenceCoverage: overall.coverage,
     limitations: [],
   };
   const founderExplanation = getConfidenceExplanation(founderOnly);
@@ -134,6 +138,7 @@ test("confidence explanation reflects founder-only evidence and changes with cus
 
 test("confidence explanation changes when experiment evidence exists", () => {
   const scores = calculateEvidenceScores(input, evidence);
+  const overall = overallValidationScore(scores);
   const experimentEvidence: EvidenceItem = {
     ...evidence[1],
     id: "ev_experiment",
@@ -142,12 +147,13 @@ test("confidence explanation changes when experiment evidence exists", () => {
     verifiedStatus: "user_provided",
   };
   const result: ValidationProjectResult = {
-    project: { id: "p1", startupName: "ProofDesk", overallScore: overallValidationScore(scores).score, confidence: "low", scoreVersion: "test", createdAt: new Date().toISOString() },
+    project: { id: "p1", startupName: "ProofDesk", overallScore: overall.score, confidence: "low", scoreVersion: "test", createdAt: new Date().toISOString() },
     input,
     scores,
     evidenceItems: [...evidence, experimentEvidence],
     providerRuns: [],
     suggestedExperiments: suggestExperiments(input, scores),
+    evidenceCoverage: overall.coverage,
     limitations: [],
   };
   assert.equal(getConfidenceExplanation(result).reasons.some((reason) => /No completed experiment outcomes/i.test(reason)), false);
@@ -156,10 +162,41 @@ test("confidence explanation changes when experiment evidence exists", () => {
 test("component calculations reconcile to displayed total and expose deductions", () => {
   const [score] = calculateEvidenceScores({ ...input, knownCompetitors: "", mainAssumptions: "", websiteUrl: "" }, []);
   const calculations = getComponentCalculations(score);
-  assert.equal(getDisplayedTotal(score), score.score);
-  assert.equal(calculations.reduce((sum, item) => sum + item.finalContribution, 0), score.score);
+  assert.equal(getDisplayedTotal(score), null);
+  assert.equal(score.score, null);
   assert.ok(calculations.every((item) => item.weightPercent > 0));
   assert.ok(calculations.some((item) => item.deductions.length > 0));
+});
+
+test("founder context and generated assessments do not create numerical scores", () => {
+  const founderOnly = calculateEvidenceScores(input, [
+    evidence[1],
+    { ...evidence[1], id: "ev_ai", sourceType: "model assessment", verifiedStatus: "inferred", title: "Generated assessment" },
+  ]);
+  assert.ok(founderOnly.every((score) => score.score === null));
+  assert.ok(founderOnly.every((score) => score.confidence === "low"));
+  assert.ok(founderOnly.some((score) => score.excludedEvidenceSummary.some((item) => /founder context|generated assessment/i.test(item))));
+  assert.equal(overallValidationScore(founderOnly).score, null);
+});
+
+test("qualified customer evidence can make a dimension assessable without founder input weight", () => {
+  const customerEvidence: EvidenceItem[] = [1, 2, 3].map((index) => ({
+    ...evidence[1],
+    id: `ev_customer_${index}`,
+    evidenceCategory: "customer_urgency",
+    title: `Customer interview ${index}`,
+    summary: "Customer described frequent painful manual reporting and a current workaround.",
+    sourceType: "customer interview",
+    verifiedStatus: "user_provided",
+    reliabilityScore: 85,
+    relevanceScore: 90,
+    rawMetadata: { interviewDate: "2026-07-20" },
+  }));
+  const score = calculateEvidenceScores(input, customerEvidence).find((item) => item.category === "customer_urgency");
+  assert.ok(score);
+  assert.equal(score.assessmentStatus, "assessed");
+  assert.notEqual(score.score, null);
+  assert.ok(score.qualifyingEvidenceIds.length >= 3);
 });
 
 test("evidence provenance shows public attribution and unverified generated suggestions", () => {
@@ -248,7 +285,12 @@ test("missing evidence and confidence improvement use actual gaps", () => {
   assert.ok(missing.every((item) => item.whyItMatters.includes(score.label.toLowerCase())));
   assert.ok(improvements.some((item) => /More evidence does not automatically mean stronger evidence/.test(item)));
 
-  const complete = { ...score, components: score.components.map((component) => ({ ...component, evidenceKind: "verified" as const })) };
+  const complete = {
+    ...score,
+    score: 72,
+    missingRequirements: [],
+    components: score.components.map((component) => ({ ...component, normalizedValue: 72, contribution: 72 * component.weight, evidenceKind: "verified" as const })),
+  };
   assert.equal(getMissingEvidenceItems(complete).length, 0);
 });
 
@@ -287,10 +329,12 @@ test("generated reports include evidence transparency fields when analysis outpu
   assert.ok(sectionTitles.includes("Recommended Next Validation Tests"));
 });
 
-test("overallValidationScore is bounded and confidence is explicit", () => {
+test("overallValidationScore returns coverage when too few dimensions are assessable", () => {
   const overall = overallValidationScore(calculateEvidenceScores(input, evidence));
-  assert.ok(overall.score >= 0 && overall.score <= 100);
+  assert.equal(overall.score, null);
   assert.match(overall.confidence, /^(low|medium|high)$/);
+  assert.equal(overall.coverage.statusLabel, "Insufficient evidence for scoring");
+  assert.ok(overall.coverage.missingDimensions.length > 0);
 });
 
 test("suggestExperiments turns weak categories into planned tests", () => {
@@ -415,9 +459,10 @@ test("stored score recalculation shows insufficient evidence below thresholds", 
     experiments: [],
   });
   assert.equal(score.confidence, "low");
-  assert.ok(score.score <= 44);
+  assert.equal(score.score, null);
+  assert.equal(score.assessmentStatus, "unassessed");
   assert.match(score.conclusion, /^Insufficient evidence\./);
-  assert.ok(score.components.some((component) => component.rawSignal.minimumRequired === 3));
+  assert.ok(score.components.some((component) => component.rawSignal.minimumRequired));
 });
 
 test("stored score recalculation uses quality, freshness, links, and completed experiments", () => {
@@ -467,7 +512,7 @@ test("stored score recalculation uses quality, freshness, links, and completed e
     { id: "exp_1", hypothesis: "Founders add sources during onboarding", status: "completed", outcome: "passed", learning: "4 of 5 founders added sources.", updated_at: now },
   ];
   const score = recalculateStoredEvidenceScore({ category: "customer_urgency", label: "Customer urgency", evidence: evidenceRows, experiments });
-  assert.ok(score.score > 44);
+  assert.ok(score.score !== null && score.score > 44);
   assert.match(score.methodology, /source quality, freshness, confidence, direction/);
   assert.ok(score.components.some((component) => Array.isArray(component.rawSignal.linkedEvidenceIds)));
   assert.ok(score.components.some((component) => Array.isArray(component.rawSignal.linkedExperimentIds)));
@@ -504,7 +549,7 @@ test("contradicting evidence lowers stored evidence scores", () => {
     ],
     experiments: [],
   });
-  assert.ok(withContradiction.score < supportingOnly.score);
+  assert.ok(withContradiction.score !== null && supportingOnly.score !== null && withContradiction.score < supportingOnly.score);
   assert.ok(withContradiction.opposingEvidence.length > 0);
 });
 

@@ -135,17 +135,26 @@ function daysOld(dateValue?: string | null) {
 }
 
 export function evidenceWeight(item: StoredEvidenceForScore): number {
+  if (item.evidence_type === "founder_provided_evidence" || item.evidence_type === "assumption" || item.evidence_type === "generated_assessment") {
+    return 0;
+  }
   const typeWeight =
     item.evidence_type === "verified_public_evidence" ? 1 :
     item.evidence_type === "customer_research" ? 0.9 :
     item.evidence_type === "experiment_result" ? 0.95 :
-    item.evidence_type === "founder_provided_evidence" ? 0.55 :
-    item.evidence_type === "assumption" ? 0.25 :
-    0.15;
+    0;
   const qualityWeight = item.source_quality === "high" ? 1 : item.source_quality === "medium" ? 0.7 : 0.4;
   const freshnessWeight = Math.max(0.55, 1 - daysOld(item.updated_at ?? item.created_at) / 365);
   const confidenceWeight = item.confidence === "high" ? 1 : item.confidence === "medium" ? 0.7 : 0.45;
   return typeWeight * qualityWeight * freshnessWeight * confidenceWeight;
+}
+
+function isQualifyingEvidence(item: StoredEvidenceForScore): boolean {
+  return item.evidence_type === "verified_public_evidence" || item.evidence_type === "customer_research" || item.evidence_type === "experiment_result";
+}
+
+function completedExperimentCount(experiments: StoredExperimentForScore[]): number {
+  return experiments.filter((item) => (item.status === "completed" || item.status === "closed") && Boolean(item.outcome)).length;
 }
 
 export function recalculateStoredEvidenceScore(params: {
@@ -155,16 +164,19 @@ export function recalculateStoredEvidenceScore(params: {
   experiments: StoredExperimentForScore[];
 }): CategoryScore {
   const relevant = params.evidence.filter((item) => item.evidence_category === params.category || item.evidence_category === "evidence_strength");
-  const completedExperiments = params.experiments.filter((item) => item.status === "completed" || item.status === "closed");
-  const supporting = relevant.filter((item) => item.evidence_direction === "supports");
-  const contradicting = relevant.filter((item) => item.evidence_direction === "contradicts");
+  const qualifying = relevant.filter(isQualifyingEvidence);
+  const excludedFounderContext = relevant.filter((item) => item.evidence_type === "founder_provided_evidence" || item.evidence_type === "assumption");
+  const excludedGenerated = relevant.filter((item) => item.evidence_type === "generated_assessment");
+  const completedExperiments = params.experiments.filter((item) => (item.status === "completed" || item.status === "closed") && Boolean(item.outcome));
+  const supporting = qualifying.filter((item) => item.evidence_direction === "supports");
+  const contradicting = qualifying.filter((item) => item.evidence_direction === "contradicts");
   const weightedSupport = supporting.reduce((sum, item) => sum + evidenceWeight(item), 0);
   const weightedContradiction = contradicting.reduce((sum, item) => sum + evidenceWeight(item), 0);
   const experimentLift = completedExperiments.reduce((sum, item) => sum + (item.outcome === "passed" ? 0.75 : item.outcome === "failed" ? -0.55 : 0), 0);
-  const evidenceCount = relevant.length + completedExperiments.length;
+  const evidenceCount = qualifying.length + completedExperiments.length;
   const raw = 42 + weightedSupport * 13 - weightedContradiction * 14 + experimentLift * 8;
   const hasMinimumEvidence = evidenceCount >= 3 && (supporting.length > 0 || contradicting.length > 0);
-  const score = hasMinimumEvidence ? Math.max(0, Math.min(100, Math.round(raw))) : Math.max(0, Math.min(44, Math.round(raw)));
+  const score = hasMinimumEvidence ? Math.max(0, Math.min(100, Math.round(raw))) : null;
   const confidence: EvidenceConfidence =
     !hasMinimumEvidence ? "low" :
     evidenceCount >= 6 && weightedSupport + weightedContradiction >= 3 ? "high" :
@@ -172,33 +184,33 @@ export function recalculateStoredEvidenceScore(params: {
   const components: ScoreComponent[] = [
     {
       componentName: "Supporting evidence",
-      normalizedValue: Math.min(100, Math.round(weightedSupport * 25)),
+      normalizedValue: hasMinimumEvidence ? Math.min(100, Math.round(weightedSupport * 25)) : null,
       weight: 0.4,
-      contribution: Math.round(Math.min(100, weightedSupport * 25) * 0.4),
+      contribution: hasMinimumEvidence ? Math.round(Math.min(100, weightedSupport * 25) * 0.4) : null,
       evidenceKind: supporting.some((item) => item.evidence_type === "verified_public_evidence") ? "verified" : supporting.length ? "user_provided" : "unavailable",
       rawSignal: { evidenceCount: supporting.length, linkedEvidenceIds: supporting.map((item) => item.id) },
     },
     {
       componentName: "Contradicting evidence",
-      normalizedValue: Math.max(0, 100 - Math.round(weightedContradiction * 30)),
+      normalizedValue: hasMinimumEvidence ? Math.max(0, 100 - Math.round(weightedContradiction * 30)) : null,
       weight: 0.25,
-      contribution: Math.round(Math.max(0, 100 - weightedContradiction * 30) * 0.25),
+      contribution: hasMinimumEvidence ? Math.round(Math.max(0, 100 - weightedContradiction * 30) * 0.25) : null,
       evidenceKind: contradicting.length ? "user_provided" : "unavailable",
       rawSignal: { evidenceCount: contradicting.length, linkedEvidenceIds: contradicting.map((item) => item.id) },
     },
     {
       componentName: "Completed experiments",
-      normalizedValue: Math.min(100, completedExperiments.length * 30),
+      normalizedValue: hasMinimumEvidence ? Math.min(100, completedExperiments.length * 30) : null,
       weight: 0.2,
-      contribution: Math.round(Math.min(100, completedExperiments.length * 30) * 0.2),
+      contribution: hasMinimumEvidence ? Math.round(Math.min(100, completedExperiments.length * 30) * 0.2) : null,
       evidenceKind: completedExperiments.length ? "user_provided" : "unavailable",
       rawSignal: { evidenceCount: completedExperiments.length, linkedExperimentIds: completedExperiments.map((item) => item.id) },
     },
     {
       componentName: "Minimum evidence threshold",
-      normalizedValue: hasMinimumEvidence ? 100 : 15,
+      normalizedValue: hasMinimumEvidence ? 100 : null,
       weight: 0.15,
-      contribution: Math.round((hasMinimumEvidence ? 100 : 15) * 0.15),
+      contribution: hasMinimumEvidence ? 15 : null,
       evidenceKind: hasMinimumEvidence ? "user_provided" : "unavailable",
       rawSignal: { evidenceCount, minimumRequired: 3 },
     },
@@ -208,18 +220,40 @@ export function recalculateStoredEvidenceScore(params: {
     category: params.category,
     label: params.label,
     score,
+    assessmentStatus: hasMinimumEvidence ? "assessed" : "unassessed",
+    definition: `${params.label} is assessed only when stored evidence meets the minimum independent-evidence threshold.`,
     confidence,
     conclusion: hasMinimumEvidence
       ? `${params.label} reflects stored evidence and completed experiment results with ${confidence} confidence.`
       : `Insufficient evidence. Add at least three relevant evidence items or completed experiments before using this score for a decision.`,
     supportingEvidence: supporting.length ? supporting.map((item) => item.summary).slice(0, 4) : ["Insufficient evidence"],
     opposingEvidence: contradicting.map((item) => item.summary).slice(0, 4),
+    qualifyingEvidenceIds: qualifying.map((item) => item.id),
+    contradictingEvidenceIds: contradicting.map((item) => item.id),
+    excludedEvidenceIds: [...excludedFounderContext, ...excludedGenerated].map((item) => item.id),
+    excludedEvidenceSummary: [
+      ...(excludedFounderContext.length ? [`${excludedFounderContext.length} founder context or assumption item${excludedFounderContext.length === 1 ? "" : "s"} excluded from scoring weight.`] : []),
+      ...(excludedGenerated.length ? [`${excludedGenerated.length} generated assessment item${excludedGenerated.length === 1 ? "" : "s"} excluded from scoring weight.`] : []),
+    ],
+    missingRequirements: hasMinimumEvidence ? [] : ["Add at least three qualifying evidence items or completed experiments linked to this dimension.", "Founder context, assumptions, planned experiments, and generated assessments do not qualify as independent evidence."],
     assumptions: relevant.filter((item) => item.evidence_type === "assumption").map((item) => item.claim || item.title),
     uncertainty: hasMinimumEvidence ? "Stored evidence meets the minimum threshold, but the score remains provisional." : "Minimum evidence threshold is not met, so confidence is low.",
     sourceReferences: relevant.map((item) => ({ title: item.title, sourceName: item.source_quality })),
-    methodology: "Calculated from stored evidence using source quality, freshness, confidence, direction, and completed experiment outcomes. Generated assessments are weighted lowest and never counted as verified evidence.",
+    methodology: hasMinimumEvidence
+      ? "Calculated from stored customer research, verified public evidence, and completed experiment outcomes using source quality, freshness, confidence, direction, and supporting-versus-contradicting evidence. Founder context and generated assessments have zero independent-evidence weight."
+      : "Not calculated because the minimum evidence threshold is not met. Founder context, assumptions, planned experiments, and generated assessments have zero independent-evidence weight.",
     recommendedNextAction: hasMinimumEvidence ? "Review contradicting evidence and record the next decision." : "Add customer research, verified public evidence, or a completed experiment result.",
     components,
+    evidenceCoverage: {
+      assessable: hasMinimumEvidence,
+      qualifyingEvidenceCount: qualifying.length,
+      supportingEvidenceCount: supporting.length,
+      contradictingEvidenceCount: contradicting.length,
+      completedExperimentCount: completedExperimentCount(params.experiments),
+      excludedFounderContextCount: excludedFounderContext.length,
+      excludedGeneratedAssessmentCount: excludedGenerated.length,
+      minimumRequired: "At least three qualifying evidence items or completed experiments.",
+    },
     scoreVersion: SCORE_VERSION,
     calculatedAt: new Date().toISOString(),
   };

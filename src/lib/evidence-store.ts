@@ -75,7 +75,7 @@ export async function persistEvidenceProject(params: {
   scores: CategoryScore[];
   providerRuns: ProviderRunStatus[];
   suggestedExperiments: SuggestedExperiment[];
-  overallScore: number;
+  overallScore: number | null;
   confidence: "low" | "medium" | "high";
   scoreVersion: string;
 }): Promise<ValidationProjectResult["project"] | null> {
@@ -163,7 +163,9 @@ export async function persistEvidenceProject(params: {
     user_id: params.userId,
     previous_score: null,
     new_score: params.overallScore,
-    change_reason: "Initial evidence-backed validation score created from founder input and available provider evidence.",
+    change_reason: params.overallScore === null
+      ? "Initial assessment created. No overall Evidence Score is shown until independent evidence thresholds are met."
+      : "Initial Evidence Score created from qualifying independent evidence.",
     score_version: params.scoreVersion,
   });
 
@@ -178,7 +180,7 @@ export async function persistEvidenceProject(params: {
   return {
     id: projectId,
     startupName: String(project.startup_name),
-    overallScore: Number(project.overall_score),
+    overallScore: project.overall_score === null ? null : Number(project.overall_score),
     confidence: project.confidence as "low" | "medium" | "high",
     scoreVersion: String(project.score_version),
     createdAt: String(project.created_at),

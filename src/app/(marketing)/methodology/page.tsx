@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const principles = [
   {
     title: "Evidence quality",
-    body: "Higher-quality inputs carry more weight: customer interviews, completed experiments, dated source links and clearly attributed founder research are stronger than unsupported assumptions.",
+    body: "Higher-quality inputs carry more weight: customer interviews, completed experiments and dated source links qualify for scoring. Founder context explains what to test, but it is not independent proof.",
   },
   {
     title: "Evidence quantity",
@@ -28,7 +28,7 @@ const principles = [
 ];
 
 const labels = [
-  "Founder provided",
+  "Founder context",
   "Customer interview",
   "Experiment result",
   "Public URL",
@@ -37,11 +37,11 @@ const labels = [
 ];
 
 const implementedModel = [
-  "Initial Evidence Engine assessments calculate ten category scores from weighted components such as problem specificity, target customer specificity, public evidence availability, competitor evidence, pricing evidence, trend evidence and evidence strength.",
-  "Each component has a normalized 0-100 result and a weight. The result screen shows the raw result, weighted contribution, deductions, missing evidence and a reconciled total.",
-  "Category confidence is low, medium or high based on the amount and type of available evidence. Verified public evidence raises confidence more than founder-provided or inferred signals.",
-  "Persisted workflow scores are recalculated from stored evidence and completed experiment outcomes using source quality, freshness, confidence, direction and contradiction handling.",
-  "Generated assessments are weighted lowest and are never treated as verified evidence unless a founder attaches real evidence.",
+  "Evidence Engine assessments evaluate ten dimensions, but a dimension receives no numerical score until its independent-evidence threshold is met.",
+  "Founder descriptions, target customers, business models, known competitors and assumptions are stored as context. They have zero independent-evidence weight.",
+  "Qualified evidence includes verified public evidence, customer research and completed experiment results. Planned experiments and generated assessments do not raise scores or confidence.",
+  "Scored dimensions show component-level calculations using source quality, freshness, relevance, evidence direction and supporting-versus-contradicting signals.",
+  "An overall Evidence Score appears only when enough dimensions are assessable. Otherwise the product shows Evidence Coverage and the missing requirements.",
 ];
 
 export default function MethodologyPage() {
@@ -58,7 +58,7 @@ export default function MethodologyPage() {
             How assessments are calculated
           </h1>
           <p className="max-w-3xl font-jakarta text-lg leading-relaxed text-gray-600">
-            StartupX AI turns founder inputs, attached evidence and experiment history into structured findings. It does not prove market demand or guarantee business success.
+            StartupX AI turns founder context, attached evidence and experiment history into structured findings. It does not prove market demand or guarantee business success.
           </p>
         </section>
 
@@ -125,7 +125,7 @@ export default function MethodologyPage() {
             ))}
           </ul>
           <p className="mt-4 font-jakarta text-sm leading-relaxed text-gray-600">
-            The result screen includes the calculation details directly so founders do not need to visit this page to understand why a score is low, medium or high.
+            The result screen includes calculation details and threshold status directly, so founders can see why a dimension is scored or why it remains unassessed.
           </p>
         </section>
 

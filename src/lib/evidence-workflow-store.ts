@@ -86,9 +86,12 @@ export async function recalculateAndPersistProject(projectId: string, userId: st
     evidence,
     experiments,
   }));
-  const overall = Math.round(scores.reduce((sum, score) => sum + score.score, 0) / (scores.length || 1));
-  const confidence = scores.filter((score) => score.confidence !== "low").length >= 4 ? "medium" : "low";
-  const previousScore = Number(workflow.project.overall_score ?? 0);
+  const assessedScores = scores.filter((score) => score.score !== null);
+  const overall = assessedScores.length >= 6
+    ? Math.round(assessedScores.reduce((sum, score) => sum + (score.score ?? 0), 0) / assessedScores.length)
+    : null;
+  const confidence = overall === null ? "low" : scores.filter((score) => score.confidence !== "low").length >= 4 ? "medium" : "low";
+  const previousScore = workflow.project.overall_score === null ? null : Number(workflow.project.overall_score ?? 0);
 
   await admin.from("validation_projects").update({
     overall_score: overall,
@@ -102,7 +105,7 @@ export async function recalculateAndPersistProject(projectId: string, userId: st
     previous_score: previousScore,
     new_score: overall,
     change_reason: reason,
-    score_version: scores[0]?.scoreVersion ?? "sx-evidence-v1",
+    score_version: scores[0]?.scoreVersion ?? "sx-evidence-v2",
   });
 
   if (previousScore !== overall) {
@@ -110,8 +113,8 @@ export async function recalculateAndPersistProject(projectId: string, userId: st
       projectId,
       userId,
       activityType: "score_changed",
-      title: `Evidence Score changed from ${previousScore} to ${overall}`,
-      metadata: { previousScore, newScore: overall, reason },
+      title: overall === null ? "Evidence Score no longer shown until thresholds are met" : `Evidence Score changed from ${previousScore ?? "unscored"} to ${overall}`,
+      metadata: { previousScore, newScore: overall, reason, assessedDimensions: assessedScores.length },
     });
   }
 
