@@ -13,7 +13,7 @@ const navbar = readFileSync(join(root, "src/components/marketing/Navbar.tsx"), "
 
 test("homepage renders one ScrollStack product introduction after the Lightfall hero", () => {
   assert.match(page, /import ProductScrollStackSection/);
-  assert.match(page, /<HeroSection \/>\s*<ProductScrollStackSection \/>/);
+  assert.match(page, /<HeroSection \/>\s*<div className="homepage-galaxy-stage">[\s\S]*<ProductScrollStackSection \/>/);
   assert.doesNotMatch(page, /<EnginesSection \/>/);
   assert.doesNotMatch(page, /<FeaturesSection \/>/);
 });
