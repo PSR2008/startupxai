@@ -11,11 +11,11 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-body)", "ui-sans-serif", "system-ui", "sans-serif"],
         body: ["var(--font-body)", "ui-sans-serif", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "ui-sans-serif", "system-ui", "sans-serif"],
-        heading: ["var(--font-display)", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "ui-serif", "Georgia", "serif"],
+        heading: ["var(--font-display)", "ui-serif", "Georgia", "serif"],
         mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "Consolas", "monospace"],
-        // Legacy aliases now point at the new typography system.
-        bricolage: ["var(--font-display)", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Legacy aliases kept for compatibility while the product uses the new typography system.
+        bricolage: ["var(--font-body)", "ui-sans-serif", "system-ui", "sans-serif"],
         jakarta: ["var(--font-body)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {

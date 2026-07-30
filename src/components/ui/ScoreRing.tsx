@@ -69,7 +69,7 @@ export default function ScoreRing({ score, size = 120, strokeWidth = 8, label, s
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-bricolage font-bold leading-none tabular-nums" style={{ fontSize: size * 0.22, color }}>
+          <span className="font-jakarta font-bold leading-none tabular-nums" style={{ fontSize: size * 0.22, color }}>
             {displayScore}
           </span>
           <span className="font-jakarta text-gray-400 leading-none mt-0.5" style={{ fontSize: size * 0.1 }}>
@@ -78,7 +78,7 @@ export default function ScoreRing({ score, size = 120, strokeWidth = 8, label, s
         </div>
       </div>
       <div className="text-center">
-        {label && <p className="font-bricolage text-sm font-semibold text-gray-800">{label}</p>}
+        {label && <p className="font-jakarta text-sm font-semibold text-gray-800">{label}</p>}
         <p className="font-jakarta text-xs text-gray-400 mt-0.5">{sublabel ?? getScoreLabel()}</p>
       </div>
     </div>

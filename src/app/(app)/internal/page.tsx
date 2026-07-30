@@ -44,7 +44,7 @@ export default function InternalPage() {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-2">
           <Activity size={18} className="text-emerald-600" />
-          <h1 className="font-bricolage text-3xl font-bold text-gray-900">Internal Diagnostics</h1>
+          <h1 className="font-jakarta text-3xl font-bold text-gray-900">Internal Diagnostics</h1>
         </div>
         <p className="font-jakarta text-sm text-gray-500">
           Quick production readiness check for core StartupX AI services.
@@ -58,12 +58,12 @@ export default function InternalPage() {
         </div>
       ) : !health ? (
         <div className="rounded-2xl border border-rose-200 bg-rose-50 p-8">
-          <p className="font-bricolage text-sm font-bold text-rose-700">Health check unavailable</p>
+          <p className="font-jakarta text-sm font-bold text-rose-700">Health check unavailable</p>
         </div>
       ) : (
         <div className="space-y-5">
           <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
-            <p className="font-bricolage text-sm font-bold text-gray-900">{health.service}</p>
+            <p className="font-jakarta text-sm font-bold text-gray-900">{health.service}</p>
             <p className="font-jakarta text-xs text-gray-400 mt-1">
               {health.environment} - v{health.version} - {new Date(health.timestamp).toLocaleString()}
             </p>

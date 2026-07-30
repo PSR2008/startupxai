@@ -202,7 +202,7 @@ export default function GrowthEnginePage() {
           <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50 space-y-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="font-bricolage text-base font-bold text-gray-900">Growth context</h3>
+                <h3 className="font-jakarta text-base font-bold text-gray-900">Growth context</h3>
                 <p className="mt-1 font-jakarta text-xs text-gray-500">Anchor the plan in your audience, stage, and current channels.</p>
               </div>
               <Badge variant="midnight" size="sm">
@@ -253,7 +253,7 @@ export default function GrowthEnginePage() {
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-200 bg-blue-50">
                   <TrendingUp size={22} className="text-blue-600" />
                 </div>
-                <p className="mt-4 font-bricolage text-base font-bold text-gray-900">Ready to build the traction plan</p>
+                <p className="mt-4 font-jakarta text-base font-bold text-gray-900">Ready to build the traction plan</p>
                 <p className="mt-2 max-w-sm font-jakarta text-sm leading-relaxed text-gray-500">
                   Enter your startup details to get channels, content hooks, outreach direction, campaign ideas, and launch steps.
                 </p>
@@ -289,8 +289,8 @@ export default function GrowthEnginePage() {
                 <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="font-bricolage text-[11px] font-bold uppercase tracking-[0.18em] text-blue-700">Growth report</p>
-                      <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{form.idea || "Growth strategy"}</h3>
+                      <p className="font-jakarta text-[11px] font-bold uppercase tracking-[0.18em] text-blue-700">Growth report</p>
+                      <h3 className="mt-1 font-jakarta text-xl font-bold text-gray-950">{form.idea || "Growth strategy"}</h3>
                     </div>
                     <div className="flex flex-wrap gap-2 no-print">
                       <Button variant="outline" size="sm" onClick={() => setStatus("idle")}>Edit inputs</Button>
@@ -312,16 +312,16 @@ export default function GrowthEnginePage() {
                   <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50">
                     <div className="mb-4 flex items-center gap-2">
                       <Target size={15} className="text-blue-600" />
-                      <h3 className="font-bricolage text-sm font-bold text-gray-900">First 10 Customers Plan</h3>
+                      <h3 className="font-jakarta text-sm font-bold text-gray-900">First 10 Customers Plan</h3>
                     </div>
                     <div className="space-y-3">
                       {result.first10CustomersPlan.map((step) => (
                         <div key={step.step} className="flex gap-3 rounded-xl border border-blue-100 bg-blue-50/60 p-3">
                           <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-blue-200 bg-white">
-                            <span className="font-bricolage text-xs font-bold text-blue-700">{String(step.step).padStart(2, "0")}</span>
+                            <span className="font-jakarta text-xs font-bold text-blue-700">{String(step.step).padStart(2, "0")}</span>
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="font-bricolage text-sm font-semibold text-gray-950">{step.action}</p>
+                            <p className="font-jakarta text-sm font-semibold text-gray-950">{step.action}</p>
                             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                               <span className="font-jakarta text-xs text-gray-500">{step.timeline}</span>
                               <span className="font-jakarta text-xs font-semibold text-blue-700">{step.expectedOutcome}</span>
@@ -337,7 +337,7 @@ export default function GrowthEnginePage() {
                   <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                     <div className="mb-4 flex items-center gap-2">
                       <Zap size={14} className="text-blue-600" />
-                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Channel Stack</h4>
+                      <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">Channel Stack</h4>
                     </div>
                     <div className="space-y-3">
                       {result.channelSuggestions.map((channel) => (
@@ -351,7 +351,7 @@ export default function GrowthEnginePage() {
                   <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                     <div className="mb-4 flex items-center gap-2">
                       <MessageSquare size={14} className="text-emerald-600" />
-                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Outreach Direction</h4>
+                      <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">Outreach Direction</h4>
                     </div>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                       {[
@@ -384,7 +384,7 @@ export default function GrowthEnginePage() {
                   <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                     <div className="mb-3 flex items-center gap-2">
                       <Users size={14} className="text-blue-600" />
-                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Audience Segments</h4>
+                      <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">Audience Segments</h4>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {result.audienceSegments.map((segment, index) => (
@@ -415,7 +415,7 @@ function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; tit
     <MagicBentoCard className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>{icon}</div>
       <div>
-        <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
+        <p className="font-jakarta text-sm font-bold text-gray-900">{title}</p>
         <p className="mt-0.5 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
       </div>
     </MagicBentoCard>
@@ -425,7 +425,7 @@ function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; tit
 function MetricTile({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3">
-      <p className="font-bricolage text-2xl font-bold text-blue-700">{value}</p>
+      <p className="font-jakarta text-2xl font-bold text-blue-700">{value}</p>
       <p className="font-jakarta text-xs text-gray-500">{label}</p>
     </div>
   );
@@ -439,7 +439,7 @@ function BulletPanel({ icon, title, items, tone }: { icon: React.ReactNode; titl
     <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
       <div className="mb-3 flex items-center gap-2">
         <span className={iconClass}>{icon}</span>
-        <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">{title}</h4>
+        <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">{title}</h4>
       </div>
       <div className="space-y-2">
         {items.map((item, index) => (
@@ -458,7 +458,7 @@ function BadgePanel({ icon, title, items, variant }: { icon: React.ReactNode; ti
     <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
       <div className="mb-3 flex items-center gap-2">
         <span className="text-emerald-600">{icon}</span>
-        <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">{title}</h4>
+        <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">{title}</h4>
       </div>
       <div className="space-y-2">
         {items.map((item, index) => (
@@ -476,7 +476,7 @@ function LaunchPanel({ items }: { items: string[] }) {
     <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
       <div className="mb-3 flex items-center gap-2">
         <CheckCircle2 size={13} className="text-teal-600" />
-        <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Launch Steps</h4>
+        <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">Launch Steps</h4>
       </div>
       <div className="space-y-2">
         {items.map((item, index) => (
@@ -496,7 +496,7 @@ function ChannelCard({ channel }: { channel: GrowthChannel }) {
   return (
     <div className="rounded-xl border border-black/6 bg-gray-50 p-4">
       <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <p className="font-bricolage text-sm font-bold text-gray-950">{channel.channel}</p>
+        <p className="font-jakarta text-sm font-bold text-gray-950">{channel.channel}</p>
         <div className="flex flex-wrap gap-1.5">
           <StatusPill label="Effort" value={channel.effort} color={effortColor[channel.effort]} />
           <StatusPill label="Impact" value={channel.impact} color={impactColor[channel.impact]} />
@@ -505,7 +505,7 @@ function ChannelCard({ channel }: { channel: GrowthChannel }) {
       <p className="mb-3 font-jakarta text-xs leading-relaxed text-gray-500">{channel.description}</p>
       <div className="flex flex-wrap gap-1.5">
         {channel.tactics.map((tactic, index) => (
-          <span key={index} className={cn("rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 font-bricolage text-[10px] font-medium text-blue-700")}>
+          <span key={index} className={cn("rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 font-jakarta text-[10px] font-medium text-blue-700")}>
             {tactic}
           </span>
         ))}
@@ -516,7 +516,7 @@ function ChannelCard({ channel }: { channel: GrowthChannel }) {
 
 function StatusPill({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <span className="rounded-full border px-1.5 py-0.5 font-bricolage text-[9px] font-bold capitalize" style={{ color, borderColor: `${color}40`, background: `${color}10` }}>
+    <span className="rounded-full border px-1.5 py-0.5 font-jakarta text-[9px] font-bold capitalize" style={{ color, borderColor: `${color}40`, background: `${color}10` }}>
       {label}: {value}
     </span>
   );

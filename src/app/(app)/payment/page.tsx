@@ -175,7 +175,7 @@ function PaymentPageContent() {
               <CheckCircle2 size={40} className="text-emerald-600" />
             </div>
             <div>
-              <h1 className="font-bricolage text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
+              <h1 className="font-jakarta text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
               <p className="font-jakarta text-gray-500">
                 Welcome to StartupX AI{" "}
                 <span className="text-emerald-600 font-semibold">{plan.name}</span>.
@@ -183,7 +183,7 @@ function PaymentPageContent() {
               </p>
             </div>
             <Link href="/profile">
-              <button className="w-full h-12 rounded-xl font-bricolage text-sm font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md shadow-emerald-500/25 hover:shadow-lg hover:shadow-emerald-500/35 transition-all">
+              <button className="w-full h-12 rounded-xl font-jakarta text-sm font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md shadow-emerald-500/25 hover:shadow-lg hover:shadow-emerald-500/35 transition-all">
                 View plan status
               </button>
             </Link>
@@ -208,7 +208,7 @@ function PaymentPageContent() {
 
           {/* Page header */}
           <div className="mb-8">
-            <h1 className="font-bricolage text-3xl font-bold text-gray-900 mb-1">
+            <h1 className="font-jakarta text-3xl font-bold text-gray-900 mb-1">
               Complete your purchase
             </h1>
             <p className="font-jakarta text-sm text-gray-500">
@@ -238,7 +238,7 @@ function PaymentPageContent() {
             <div className="rounded-2xl border border-black/6 bg-white p-8 space-y-6 shadow-sm">
               {/* Billing toggle */}
               <div>
-                <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide mb-3">
+                <p className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide mb-3">
                   Select Plan
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -255,11 +255,11 @@ function PaymentPageContent() {
                             : "border-black/8 bg-gray-50 hover:border-black/14 hover:bg-white"
                         }`}
                       >
-                        <p className={`font-bricolage text-sm font-bold ${active ? "text-emerald-700" : "text-gray-800"}`}>
+                        <p className={`font-jakarta text-sm font-bold ${active ? "text-emerald-700" : "text-gray-800"}`}>
                           {option.name}
                         </p>
                         <p className="font-jakarta text-xs text-gray-400 mt-1">
-                          ${option.price}/mo · {option.features[0]}
+                          ${option.price}/mo Â· {option.features[0]}
                         </p>
                       </button>
                     );
@@ -268,7 +268,7 @@ function PaymentPageContent() {
               </div>
 
               <div>
-                <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide mb-3">
+                <p className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide mb-3">
                   Billing Cycle
                 </p>
                 <div className="flex gap-3">
@@ -276,7 +276,7 @@ function PaymentPageContent() {
                     <button
                       key={c}
                       onClick={() => setBilling(c)}
-                      className={`flex-1 py-3 px-4 rounded-xl border font-bricolage text-sm font-semibold transition-all ${
+                      className={`flex-1 py-3 px-4 rounded-xl border font-jakarta text-sm font-semibold transition-all ${
                         billing === c
                           ? "border-emerald-400 bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100"
                           : "border-black/8 bg-gray-50 text-gray-500 hover:border-black/14 hover:bg-white"
@@ -298,7 +298,7 @@ function PaymentPageContent() {
                 {founderHighlights.map(({ icon: Icon, label, detail }) => (
                   <div key={label} className="rounded-xl border border-black/6 bg-gray-50 p-4">
                     <Icon size={15} className="text-emerald-600 mb-2" />
-                    <p className="font-bricolage text-xs font-bold text-gray-800">{label}</p>
+                    <p className="font-jakarta text-xs font-bold text-gray-800">{label}</p>
                     <p className="font-jakarta text-[11px] text-gray-400 mt-1 leading-relaxed">{detail}</p>
                   </div>
                 ))}
@@ -306,12 +306,12 @@ function PaymentPageContent() {
 
               {/* Account details */}
               <div className="space-y-4">
-                <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide pb-2 border-b border-black/5">
+                <p className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide pb-2 border-b border-black/5">
                   Account Details
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide block mb-1.5">
+                    <label className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide block mb-1.5">
                       Full Name <span className="text-rose-500">*</span>
                     </label>
                     <input
@@ -322,7 +322,7 @@ function PaymentPageContent() {
                     />
                   </div>
                   <div>
-                    <label className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide block mb-1.5">
+                    <label className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide block mb-1.5">
                       Email <span className="text-rose-500">*</span>
                     </label>
                     <input
@@ -338,7 +338,7 @@ function PaymentPageContent() {
 
               {/* Coupon */}
               <div>
-                <label className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide block mb-1.5">
+                <label className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide block mb-1.5">
                   Coupon Code{" "}
                   <span className="text-gray-400 normal-case font-normal tracking-normal">(optional)</span>
                 </label>
@@ -367,7 +367,7 @@ function PaymentPageContent() {
               <button
                 onClick={handlePay}
                 disabled={status === "loading"}
-                className="w-full h-12 py-3.5 rounded-xl font-bricolage text-base font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/30 active:translate-y-0 shadow-md shadow-emerald-500/20"
+                className="w-full h-12 py-3.5 rounded-xl font-jakarta text-base font-bold text-white bg-gradient-to-br from-emerald-500 to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/30 active:translate-y-0 shadow-md shadow-emerald-500/20"
               >
                 {status === "loading" ? (
                   <>
@@ -390,14 +390,14 @@ function PaymentPageContent() {
             {/* Right: order summary */}
             <div className="h-fit sticky top-6 space-y-4">
               <div className="rounded-2xl border border-black/6 bg-white p-7 shadow-sm">
-                <p className="font-bricolage text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">
+                <p className="font-jakarta text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">
                     {plan.name} unlocks
                 </p>
 
                 {/* Plan name + stars */}
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-bricolage text-xl font-bold text-gray-900">{plan.name} Plan</p>
+                    <p className="font-jakarta text-xl font-bold text-gray-900">{plan.name} Plan</p>
                     <div className="flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} size={10} className="text-amber-400 fill-amber-400" />
@@ -409,7 +409,7 @@ function PaymentPageContent() {
 
                 {/* Price display */}
                 <div className="flex items-end gap-1.5 mb-1">
-                  <span className="font-bricolage text-4xl font-bold text-gray-900">${price}</span>
+                  <span className="font-jakarta text-4xl font-bold text-gray-900">${price}</span>
                   <span className="font-jakarta text-sm text-gray-400 mb-2">
                     {billing === "annual" ? "/year" : "/month"}
                   </span>
@@ -449,7 +449,7 @@ function PaymentPageContent() {
                     <span className="text-gray-500">Subtotal</span>
                     <span className="text-gray-800">${price}</span>
                   </div>
-                  <div className="flex justify-between font-bricolage font-bold text-base pt-2 border-t border-black/5">
+                  <div className="flex justify-between font-jakarta font-bold text-base pt-2 border-t border-black/5">
                     <span className="text-gray-700">Total</span>
                     <span className="text-gray-900">${price}</span>
                   </div>
@@ -458,7 +458,7 @@ function PaymentPageContent() {
 
               {/* Trust signals */}
               <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
-                <p className="font-bricolage text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
+                <p className="font-jakarta text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
                   You&apos;re in safe hands
                 </p>
                 <div className="space-y-2.5">
@@ -488,7 +488,7 @@ function PaymentPageContent() {
 function PaymentPageFallback() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg-primary)] p-6 lg:p-10">
-      <div className="text-gray-400 text-sm font-bricolage">Loading payment page...</div>
+      <div className="text-gray-400 text-sm font-jakarta">Loading payment page...</div>
     </div>
   );
 }

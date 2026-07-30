@@ -272,7 +272,7 @@ export default function IdeaEnginePage() {
         ].map(({ icon: Icon, label, text }) => (
           <MagicBentoCard key={label} className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
             <Icon size={16} className="text-emerald-600 mb-2" />
-            <p className="font-bricolage text-xs font-bold text-gray-900">{label}</p>
+            <p className="font-jakarta text-xs font-bold text-gray-900">{label}</p>
             <p className="font-jakarta text-xs text-gray-400 mt-1">{text}</p>
           </MagicBentoCard>
         ))}
@@ -283,12 +283,12 @@ export default function IdeaEnginePage() {
           <div className="rounded-2xl border border-black/6 bg-white p-6 space-y-5 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="font-bricolage text-sm font-bold text-gray-900">Startup context</h3>
+                <h3 className="font-jakarta text-sm font-bold text-gray-900">Startup context</h3>
                 <p className="font-jakarta text-xs text-gray-400 mt-1">
                   Better input creates a sharper market report.
                 </p>
               </div>
-              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-bricolage text-[10px] font-bold uppercase tracking-wide text-emerald-700">
+              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-jakarta text-[10px] font-bold uppercase tracking-wide text-emerald-700">
                 3 required
               </span>
             </div>
@@ -379,7 +379,7 @@ export default function IdeaEnginePage() {
                   <Lightbulb size={20} className="text-emerald-700" />
                 </div>
                 <div>
-                  <p className="font-bricolage text-sm font-semibold text-gray-800 mb-1">Ready to analyze</p>
+                  <p className="font-jakarta text-sm font-semibold text-gray-800 mb-1">Ready to analyze</p>
                   <p className="font-jakarta text-sm text-gray-400 max-w-xs">
                     Fill in your startup details, then run the market assessment.
                   </p>
@@ -432,10 +432,10 @@ export default function IdeaEnginePage() {
                 <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div>
-                      <p className="font-bricolage text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">
+                      <p className="font-jakarta text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">
                         Founder report
                       </p>
-                      <h3 className="font-bricolage text-xl font-bold text-gray-900">
+                      <h3 className="font-jakarta text-xl font-bold text-gray-900">
                         {form.idea || "Idea analysis"}
                       </h3>
                     </div>
@@ -445,7 +445,7 @@ export default function IdeaEnginePage() {
                       <ExportPdfButton />
                       <button
                         onClick={copyReport}
-                        className="h-10 px-4 rounded-xl border border-black/8 bg-gray-50 font-bricolage text-xs font-bold text-gray-700 hover:bg-white transition-colors flex items-center gap-2 w-fit"
+                        className="h-10 px-4 rounded-xl border border-black/8 bg-gray-50 font-jakarta text-xs font-bold text-gray-700 hover:bg-white transition-colors flex items-center gap-2 w-fit"
                       >
                         {copied ? <CheckCircle2 size={14} className="text-emerald-600" /> : <Copy size={14} />}
                         {copied ? "Copied" : "Copy report"}
@@ -476,7 +476,7 @@ export default function IdeaEnginePage() {
                     <div className="flex items-start gap-3">
                       <CheckCircle2 size={16} className="text-emerald-600 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-bricolage text-sm font-bold text-emerald-800 mb-1">Assessment finding</p>
+                        <p className="font-jakarta text-sm font-bold text-emerald-800 mb-1">Assessment finding</p>
                         <p className="font-jakarta text-sm text-emerald-700 leading-relaxed">{verdict}</p>
                       </div>
                     </div>
@@ -486,7 +486,7 @@ export default function IdeaEnginePage() {
                 <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm">
                   <div className="flex items-center gap-2 mb-3">
                     <Copy size={15} className="text-gray-600" />
-                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Executive Summary</h3>
+                    <h3 className="font-jakarta text-sm font-bold text-gray-900">Executive Summary</h3>
                   </div>
 
                   <p className="font-jakarta text-sm text-gray-600 leading-relaxed">
@@ -517,13 +517,13 @@ export default function IdeaEnginePage() {
                     <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-6 space-y-4">
                       <div className="flex items-center gap-2">
                         <Lightbulb size={15} className="text-amber-700" />
-                        <h3 className="font-bricolage text-sm font-bold text-gray-800">
+                        <h3 className="font-jakarta text-sm font-bold text-gray-800">
                           Improved Idea
                         </h3>
                       </div>
 
                       <div>
-                        <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
+                        <p className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                           Better Version
                         </p>
                         <p className="font-jakarta text-sm text-gray-600 leading-relaxed">
@@ -532,7 +532,7 @@ export default function IdeaEnginePage() {
                       </div>
 
                       <div>
-                        <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
+                        <p className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                           New Positioning
                         </p>
                         <p className="font-jakarta text-sm text-gray-600 leading-relaxed">
@@ -541,7 +541,7 @@ export default function IdeaEnginePage() {
                       </div>
 
                       <div>
-                        <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
+                        <p className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                           Monetization Twist
                         </p>
                         <p className="font-jakarta text-sm text-gray-600 leading-relaxed">
@@ -550,7 +550,7 @@ export default function IdeaEnginePage() {
                       </div>
 
                       <div>
-                        <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
+                        <p className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
                           Defensibility
                         </p>
                         <p className="font-jakarta text-sm text-gray-600 leading-relaxed">
@@ -564,7 +564,7 @@ export default function IdeaEnginePage() {
                 <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
                     <Compass size={14} className="text-emerald-600" />
-                    <span className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">
+                    <span className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide">
                       Category Positioning
                     </span>
                   </div>
@@ -639,7 +639,7 @@ function ResultList({
     <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
       <div className="flex items-center gap-2 mb-3">
         {icon}
-        <h4 className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">
+        <h4 className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide">
           {title}
         </h4>
       </div>

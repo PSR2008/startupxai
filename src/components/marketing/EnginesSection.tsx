@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -81,7 +81,7 @@ export function EvidenceEntrySection() {
             <SearchCheck size={12} className="text-emerald-600" />
             <span className="font-jakarta text-xs font-semibold text-emerald-700">Evidence intake</span>
           </div>
-          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             How evidence enters your workspace
           </h2>
           <p className="font-jakarta text-lg leading-relaxed text-gray-600">
@@ -96,7 +96,7 @@ export function EvidenceEntrySection() {
                 <span className="mb-5 inline-flex rounded-md border border-black/8 bg-[#f8f6f0] px-2.5 py-1 font-mono text-[10px] font-semibold text-gray-600">
                   {card.label}
                 </span>
-                <h3 className="mb-2 font-bricolage text-base font-bold text-gray-900">{card.title}</h3>
+                <h3 className="mb-2 font-jakarta text-base font-bold text-gray-900">{card.title}</h3>
                 <p className="font-jakarta text-sm leading-relaxed text-gray-500">{card.description}</p>
               </MagicBentoCard>
             </StaggerItem>
@@ -134,7 +134,7 @@ export function RealWorkflowSection() {
               <FileText size={12} className="text-blue-600" />
               <span className="font-jakarta text-xs font-semibold text-blue-700">Product workflow</span>
             </div>
-            <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+            <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
               A real evidence workflow—not a generated startup report.
             </h2>
           </div>
@@ -147,7 +147,7 @@ export function RealWorkflowSection() {
           <div className="surface-panel overflow-hidden">
             <div className="flex flex-col gap-3 border-b border-black/8 bg-[#f8f6f0] p-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="font-bricolage text-base font-bold text-gray-900">Example assessment</p>
+                <p className="font-jakarta text-base font-bold text-gray-900">Example assessment</p>
                 <p className="font-jakarta text-sm text-gray-500">SaaS pricing assessment · illustrative workflow</p>
               </div>
               <Link href="/methodology" className="font-jakarta text-sm font-semibold text-emerald-700 hover:text-emerald-900">
@@ -158,7 +158,7 @@ export function RealWorkflowSection() {
               <div className="border-b border-black/8 p-6 lg:border-b-0 lg:border-r">
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Evidence Score</p>
                 <div className="mt-3 flex items-end gap-3">
-                  <span className="font-bricolage text-5xl font-bold text-gray-950">62</span>
+                  <span className="font-jakarta text-5xl font-bold text-gray-950">62</span>
                   <span className="mb-2 rounded-md border border-amber-200 bg-amber-50 px-2 py-1 font-jakarta text-xs font-semibold text-amber-700">
                     Medium confidence
                   </span>
@@ -178,7 +178,7 @@ export function RealWorkflowSection() {
               <div className="divide-y divide-black/6">
                 {rows.map((row) => (
                   <div key={row.label} className="grid grid-cols-1 gap-2 p-5 sm:grid-cols-[0.35fr_1fr]">
-                    <p className="font-bricolage text-sm font-bold text-gray-900">{row.label}</p>
+                    <p className="font-jakarta text-sm font-bold text-gray-900">{row.label}</p>
                     <div>
                       <p className="font-jakarta text-sm leading-relaxed text-gray-700">{row.value}</p>
                       <p className="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{row.status}</p>
@@ -206,7 +206,7 @@ export function DifferentiationSection() {
     <section className="editorial-section bg-[#fffefa] px-5 py-20">
       <div className="container-custom">
         <AnimatedSection className="mb-12 max-w-3xl">
-          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             Not another one-time AI answer
           </h2>
           <p className="font-jakarta text-lg leading-relaxed text-gray-600">
@@ -218,7 +218,7 @@ export function DifferentiationSection() {
           {comparisons.map(({ title, items }) => (
             <AnimatedSection key={title}>
               <div className="surface-panel h-full p-6">
-                <h3 className="mb-5 font-bricolage text-lg font-bold text-gray-900">{title}</h3>
+                <h3 className="mb-5 font-jakarta text-lg font-bold text-gray-900">{title}</h3>
                 <div className="space-y-3">
                   {items.map((item) => (
                     <div key={item} className="flex items-start gap-3">
@@ -244,7 +244,7 @@ export function RecurringEvidenceSection() {
     <section className="editorial-section bg-[var(--color-bg-primary)] px-5 py-20">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-12">
-          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             Your startup changes every week. Your evidence should too.
           </h2>
           <p className="mx-auto max-w-2xl font-jakarta text-lg leading-relaxed text-gray-600">
@@ -291,7 +291,7 @@ export function CapabilitiesSection() {
     <section className="editorial-section bg-[#fffefa] px-5 py-20">
       <div className="container-custom">
         <AnimatedSection className="mb-12 max-w-3xl">
-          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             What StartupX AI does today
           </h2>
           <p className="font-jakarta text-lg leading-relaxed text-gray-600">
@@ -419,7 +419,7 @@ export function EnginesSection() {
               Evidence Workflow
             </span>
           </div>
-          <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-5">
+          <h2 className="font-display text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-5">
             A complete founder assessment system.{" "}
             <span className="text-gradient-brand">From assumptions to evidence.</span>
           </h2>
@@ -451,7 +451,7 @@ export function EnginesSection() {
                   </div>
 
                   <div className="flex-1">
-                    <h3 className="font-bricolage text-base font-bold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                    <h3 className="font-jakarta text-base font-bold text-gray-900 mb-2 group-hover:text-black transition-colors">
                       {engine.title}
                     </h3>
                     <p className="font-jakarta text-sm text-gray-500 leading-relaxed">
@@ -511,7 +511,7 @@ export function EnginesSection() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1.5">
-                          <h3 className="font-bricolage text-base font-bold text-gray-900">
+                          <h3 className="font-jakarta text-base font-bold text-gray-900">
                             {tool.title}
                           </h3>
                           <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[9px] font-semibold text-emerald-700">
@@ -556,7 +556,7 @@ export function FeaturesSection() {
               Product depth
             </span>
           </div>
-          <h2 className="mb-5 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="mb-5 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             A workspace for the messy middle between idea and evidence
           </h2>
           <p className="mx-auto max-w-xl font-jakarta text-lg text-gray-600">
@@ -576,7 +576,7 @@ export function FeaturesSection() {
                   >
                     <Icon size={17} style={{ color: f.color }} />
                   </div>
-                  <h3 className="font-bricolage text-sm font-bold text-gray-900 mb-2">{f.title}</h3>
+                  <h3 className="font-jakarta text-sm font-bold text-gray-900 mb-2">{f.title}</h3>
                   <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{f.description}</p>
                 </MagicBentoCard>
               </StaggerItem>
@@ -620,7 +620,7 @@ export function HowItWorksSection() {
               Workflow
             </span>
           </div>
-          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             From uncertainty to structured next steps
           </h2>
           <p className="mx-auto max-w-2xl font-jakarta text-lg leading-relaxed text-gray-600">
@@ -640,7 +640,7 @@ export function HowItWorksSection() {
                     </div>
                     <span className="font-mono text-xs font-bold text-gray-300">0{i + 1}</span>
                   </div>
-                  <h3 className="font-bricolage text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
+                  <h3 className="font-jakarta text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
                   <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{step.description}</p>
                 </MagicBentoCard>
               </StaggerItem>
@@ -677,7 +677,7 @@ export function ComparisonSection() {
               Comparison
             </span>
           </div>
-          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             Built for the gap between prompts and consultants
           </h2>
           <p className="mx-auto max-w-2xl font-jakarta text-lg leading-relaxed text-gray-600">
@@ -756,7 +756,7 @@ export function TrustSection() {
                 Trust layer
               </span>
             </div>
-          <h2 className="mb-5 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="mb-5 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
               Serious enough for real founder work
             </h2>
             <p className="font-jakarta text-lg leading-relaxed text-gray-600">
@@ -772,7 +772,7 @@ export function TrustSection() {
                   <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-black/8 bg-[#f8f6f0]">
                     <Icon size={16} className="text-emerald-600" />
                   </div>
-                  <h3 className="font-bricolage text-sm font-bold text-gray-900 mb-2">{item.title}</h3>
+                  <h3 className="font-jakarta text-sm font-bold text-gray-900 mb-2">{item.title}</h3>
                   <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{item.description}</p>
                 </MagicBentoCard>
               );
@@ -831,7 +831,7 @@ export function TestimonialsSection() {
               Methodology
             </span>
           </div>
-          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             Honest about what is known and unknown
           </h2>
           <p className="mx-auto max-w-2xl font-jakarta text-lg leading-relaxed text-gray-600">
@@ -846,7 +846,7 @@ export function TestimonialsSection() {
                 <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50">
                   <CheckCircle2 size={16} className="text-emerald-700" />
                 </div>
-                <p className="font-bricolage text-sm font-bold text-gray-900">{item.title}</p>
+                <p className="font-jakarta text-sm font-bold text-gray-900">{item.title}</p>
                 <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-500">{item.detail}</p>
               </MagicBentoCard>
             </StaggerItem>
@@ -855,11 +855,11 @@ export function TestimonialsSection() {
 
         <AnimatedSection delay={0.12} className="mt-10">
           <div className="surface-panel p-6">
-            <p className="mb-4 font-bricolage text-sm font-bold text-gray-900">FAQ</p>
+            <p className="mb-4 font-jakarta text-sm font-bold text-gray-900">FAQ</p>
             <div className="divide-y divide-black/6">
               {faqItems.map((item) => (
                 <details key={item.q} className="group py-4 first:pt-0 last:pb-0">
-                  <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-800">
+                  <summary className="cursor-pointer list-none font-jakarta text-sm font-bold text-gray-800">
                     {item.q}
                   </summary>
                   <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-500">{item.a}</p>
@@ -930,7 +930,7 @@ export function PricingSection() {
               Simple Pricing
             </span>
           </div>
-          <h2 className="mb-4 font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             Invest in your startup,{" "}
             <span className="text-gradient-brand">not consultants</span>
           </h2>
@@ -958,9 +958,9 @@ export function PricingSection() {
                 )}
 
                 <div className="mb-6">
-                  <p className="font-bricolage text-sm font-bold text-gray-500 mb-3">{plan.name}</p>
+                  <p className="font-jakarta text-sm font-bold text-gray-500 mb-3">{plan.name}</p>
                   <div className="flex items-end gap-1 mb-2">
-                    <span className="font-bricolage text-4xl font-bold text-gray-900">{plan.price}</span>
+                    <span className="font-jakarta text-4xl font-bold text-gray-900">{plan.price}</span>
                     {plan.period && (
                       <span className="font-jakarta text-sm text-gray-400 mb-1.5">{plan.period}</span>
                     )}
@@ -1017,7 +1017,7 @@ export function CTASection() {
                   Ready to review the evidence?
                 </span>
               </div>
-              <h2 className="font-bricolage text-4xl sm:text-5xl font-bold text-white tracking-tight mb-5">
+              <h2 className="font-display text-4xl sm:text-5xl font-bold text-white tracking-tight mb-5">
                 Start with the assumptions that matter most
               </h2>
               <p className="font-jakarta text-lg text-emerald-100 max-w-lg mx-auto mb-10 leading-relaxed">

@@ -55,7 +55,7 @@ export function AnalysisLoading({ engine }: { engine: string }) {
           {messages.map((msg, i) => (
             <motion.p
               key={msg}
-              className="font-bricolage text-sm font-semibold text-gray-700"
+              className="font-jakarta text-sm font-semibold text-gray-700"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: [0, 1, 1, 0], y: [10, 0, 0, -10] }}
               transition={{
@@ -108,7 +108,7 @@ export function ErrorState({ message = "Something went wrong. Please try again."
           <Crown size={20} className="text-amber-600" />
         </div>
         <div className="space-y-1">
-          <p className="font-bricolage text-sm font-bold text-gray-900">Usage Limit Reached</p>
+          <p className="font-jakarta text-sm font-bold text-gray-900">Usage Limit Reached</p>
           <p className="font-jakarta text-sm text-gray-500 max-w-sm">{message}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-2">
@@ -138,7 +138,7 @@ export function ErrorState({ message = "Something went wrong. Please try again."
           {isAuth ? <Lock size={20} className="text-amber-600" /> : <Crown size={20} className="text-amber-600" />}
         </div>
         <div className="space-y-1">
-          <p className="font-bricolage text-sm font-bold text-gray-900">{isAuth ? "Sign In Required" : "Upgrade Required"}</p>
+          <p className="font-jakarta text-sm font-bold text-gray-900">{isAuth ? "Sign In Required" : "Upgrade Required"}</p>
           <p className="font-jakarta text-sm text-gray-500 max-w-sm">{message}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-2">
@@ -167,7 +167,7 @@ export function ErrorState({ message = "Something went wrong. Please try again."
         <AlertTriangle size={20} className="text-rose-500" />
       </div>
       <div className="space-y-1">
-        <p className="font-bricolage text-sm font-bold text-gray-900">Analysis Failed</p>
+        <p className="font-jakarta text-sm font-bold text-gray-900">Analysis Failed</p>
         <p className="font-jakarta text-sm text-gray-500 max-w-sm">{message}</p>
       </div>
       {onRetry && (
@@ -192,7 +192,7 @@ export function EmptyState({ icon, title, description, action }: { icon?: React.
         </div>
       )}
       <div className="space-y-1.5">
-        <p className="font-bricolage text-base font-bold text-gray-900">{title}</p>
+        <p className="font-jakarta text-base font-bold text-gray-900">{title}</p>
         <p className="font-jakarta text-sm text-gray-500 max-w-xs leading-relaxed">{description}</p>
       </div>
       {action}

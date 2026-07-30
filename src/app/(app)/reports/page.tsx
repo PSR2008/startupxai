@@ -9,7 +9,7 @@ export default function ReportsPage() {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-2">
           <FileText size={18} className="text-emerald-600" />
-          <h1 className="font-bricolage text-3xl font-bold text-gray-900">Reports</h1>
+          <h1 className="font-jakarta text-3xl font-bold text-gray-900">Reports</h1>
         </div>
         <p className="font-jakarta text-sm text-gray-500">
           Your saved analysis history across every StartupX AI engine.

@@ -128,7 +128,7 @@ export default function DecisionEnginePage() {
           <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50 space-y-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="font-bricolage text-base font-bold text-gray-900">Founder context</h3>
+                <h3 className="font-jakarta text-base font-bold text-gray-900">Founder context</h3>
                 <p className="mt-1 font-jakarta text-xs text-gray-500">The sharper your constraints, the sharper the decision.</p>
               </div>
               <Badge variant="violet" size="sm">
@@ -186,7 +186,7 @@ export default function DecisionEnginePage() {
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-violet-200 bg-violet-50">
                   <Target size={22} className="text-violet-700" />
                 </div>
-                <p className="mt-4 font-bricolage text-base font-bold text-gray-900">Ready for a founder-level decision</p>
+                <p className="mt-4 font-jakarta text-base font-bold text-gray-900">Ready for a founder-level decision</p>
                 <p className="mt-2 max-w-sm font-jakarta text-sm leading-relaxed text-gray-500">
                   Share your context to get an AI-assisted interpretation, context completeness, top priorities, and a focused action plan.
                 </p>
@@ -228,8 +228,8 @@ export default function DecisionEnginePage() {
                 <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50">
                   <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="font-bricolage text-[11px] font-bold uppercase tracking-[0.18em] text-violet-700">Founder brief</p>
-                      <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{form.idea || "Founder decision"}</h3>
+                      <p className="font-jakarta text-[11px] font-bold uppercase tracking-[0.18em] text-violet-700">Founder brief</p>
+                      <h3 className="mt-1 font-jakarta text-xl font-bold text-gray-950">{form.idea || "Founder decision"}</h3>
                     </div>
                     <div className="flex flex-wrap gap-2 no-print">
                       <Button variant="outline" size="sm" onClick={() => setStatus("idle")}>Edit inputs</Button>
@@ -243,8 +243,8 @@ export default function DecisionEnginePage() {
 
                   <div className="grid grid-cols-1 gap-4 lg:grid-cols-[0.85fr_1.15fr]">
                     <div className="rounded-xl border border-violet-200 bg-violet-50 p-4">
-                      <p className="font-bricolage text-xs font-bold uppercase tracking-wide text-violet-800">Context completeness</p>
-                      <p className="mt-2 font-bricolage text-2xl font-bold text-violet-950">{completeness.label}</p>
+                      <p className="font-jakarta text-xs font-bold uppercase tracking-wide text-violet-800">Context completeness</p>
+                      <p className="mt-2 font-jakarta text-2xl font-bold text-violet-950">{completeness.label}</p>
                       <p className="mt-2 font-jakarta text-xs leading-relaxed text-violet-900">This measures only supplied information, not viability or probability of success.</p>
                       <div className="mt-3 space-y-2">
                         {[...completeness.suppliedReasons, ...completeness.missingReasons].slice(0, 7).map((reason) => (
@@ -255,7 +255,7 @@ export default function DecisionEnginePage() {
                     <div className="min-w-0 flex-1">
                       <div className="mb-2 flex items-center gap-2">
                         <Target size={14} className="text-violet-700" />
-                        <span className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Strategic interpretation</span>
+                        <span className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">Strategic interpretation</span>
                       </div>
                       <p className="mb-3 rounded-lg border border-amber-200 bg-amber-50 p-3 font-jakarta text-xs leading-relaxed text-amber-900">{STRATEGIC_INTERPRETATION_DISCLAIMER}</p>
                       <p className="font-jakarta text-sm leading-relaxed text-gray-650">{calibrateDecisionText(result.finalVerdict)}</p>
@@ -266,7 +266,7 @@ export default function DecisionEnginePage() {
                 <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                   <div className="mb-4 flex items-center gap-2">
                     <ClipboardCheck size={14} className="text-slate-700" />
-                    <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Basis of this brief</h4>
+                    <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">Basis of this brief</h4>
                   </div>
                   <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
                     <BriefBasis title="Founder-provided context" items={["startup idea", "product description", "target audience", "current status", "constraints and goals supplied"]} />
@@ -279,7 +279,7 @@ export default function DecisionEnginePage() {
                 <div className="rounded-2xl border border-violet-200 bg-violet-50 p-5">
                   <div className="mb-2 flex items-center gap-2">
                     <Lightbulb size={14} className="text-violet-700" />
-                    <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-violet-800">Founder Summary</h4>
+                    <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-violet-800">Founder Summary</h4>
                   </div>
                   <p className="font-jakarta text-sm leading-relaxed text-gray-650">{calibrateDecisionText(result.founderSummary)}</p>
                 </div>
@@ -298,7 +298,7 @@ export default function DecisionEnginePage() {
 
                 {hierarchy.laterParked.length > 0 && (
                   <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
-                    <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Later / parked</h4>
+                    <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">Later / parked</h4>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {hierarchy.laterParked.map((item, index) => <Badge key={`${item}-${index}`} variant="neutral">{item}</Badge>)}
                     </div>
@@ -306,7 +306,7 @@ export default function DecisionEnginePage() {
                 )}
 
                 <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-                  <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-amber-900">Limitations</h4>
+                  <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-amber-900">Limitations</h4>
                   <p className="mt-2 font-jakarta text-sm leading-relaxed text-amber-950">{DECISION_LIMITATION}</p>
                   <p className="mt-2 font-jakarta text-sm leading-relaxed text-amber-950">{DECISION_EXPERIMENT_LIMITATION}</p>
                 </div>
@@ -315,17 +315,17 @@ export default function DecisionEnginePage() {
                   <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                     <div className="mb-4 flex items-center gap-2">
                       <CheckCircle2 size={14} className="text-emerald-600" />
-                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Top 3 Priorities</h4>
+                      <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">Top 3 Priorities</h4>
                     </div>
                     <div className="space-y-3">
                       {priorities.map((priority) => (
                         <div key={priority.rank} className="flex gap-3 rounded-xl border border-emerald-100 bg-emerald-50/60 p-4">
                           <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-emerald-200 bg-white">
-                            <span className="font-bricolage text-xs font-bold text-emerald-700">{priority.rank}</span>
+                            <span className="font-jakarta text-xs font-bold text-emerald-700">{priority.rank}</span>
                           </div>
                           <div className="flex-1">
                             <div className="mb-1 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-                              <p className="font-bricolage text-sm font-bold text-gray-950">{priority.priority}</p>
+                              <p className="font-jakarta text-sm font-bold text-gray-950">{priority.priority}</p>
                               <span className="font-jakarta text-xs font-semibold text-emerald-700">{priority.timeframe}</span>
                             </div>
                             <p className="font-jakarta text-xs leading-relaxed text-gray-600">{calibrateDecisionText(priority.why)}</p>
@@ -352,7 +352,7 @@ export default function DecisionEnginePage() {
                   <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                     <div className="mb-3 flex items-center gap-2">
                       <X size={13} className="text-rose-500" />
-                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Features to postpone until core assumptions are tested</h4>
+                      <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">Features to postpone until core assumptions are tested</h4>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {result.whatNotToBuildYet.map((item, index) => (
@@ -368,7 +368,7 @@ export default function DecisionEnginePage() {
                   <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                     <div className="mb-4 flex items-center gap-2">
                       <CheckCircle2 size={14} className="text-teal-600" />
-                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">AI-assisted recommendations</h4>
+                      <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">AI-assisted recommendations</h4>
                     </div>
                     <div className="space-y-2">
                       {result.actionableNextSteps.slice(0, 6).map((step, index) => (
@@ -405,7 +405,7 @@ function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; tit
     <MagicBentoCard className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>{icon}</div>
       <div>
-        <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
+        <p className="font-jakarta text-sm font-bold text-gray-900">{title}</p>
         <p className="mt-0.5 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
       </div>
     </MagicBentoCard>
@@ -423,7 +423,7 @@ function StrategyCard({ icon, title, body, tone, wide = false }: { icon: React.R
     <div className={`rounded-2xl border p-5 ${toneClasses[tone]} ${wide ? "" : ""}`}>
       <div className="mb-2 flex items-center gap-2">
         {icon}
-        <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide">{title}</h4>
+        <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide">{title}</h4>
       </div>
       <p className="font-jakarta text-sm leading-relaxed text-gray-650">{body}</p>
     </div>
@@ -433,7 +433,7 @@ function StrategyCard({ icon, title, body, tone, wide = false }: { icon: React.R
 function BriefBasis({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="rounded-xl border border-black/8 bg-[#fffefa] p-4">
-      <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
+      <p className="font-jakarta text-xs font-bold text-gray-900">{title}</p>
       <ul className="mt-2 space-y-1">
         {items.map((item) => (
           <li key={item} className="font-jakarta text-xs leading-relaxed text-gray-600">- {item}</li>
@@ -447,8 +447,8 @@ function ActionCard({ title, action, tone }: { title: string; action: { objectiv
   const toneClasses = tone === "emerald" ? "border-emerald-200 bg-emerald-50" : "border-blue-200 bg-blue-50";
   return (
     <MagicBentoCard className={`rounded-2xl border p-5 ${toneClasses}`}>
-      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-800">{title}</h4>
-      <p className="mt-3 font-bricolage text-sm font-bold text-gray-950">{action.objective}</p>
+      <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-800">{title}</h4>
+      <p className="mt-3 font-jakarta text-sm font-bold text-gray-950">{action.objective}</p>
       <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-650">{action.exactAction}</p>
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         <MiniFact label="Target audience" value={action.targetAudience} />

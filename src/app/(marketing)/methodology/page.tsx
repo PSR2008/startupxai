@@ -61,7 +61,7 @@ export default function MethodologyPage() {
               Methodology
             </span>
           </div>
-          <h1 className="mb-5 font-bricolage text-5xl font-bold tracking-tight text-gray-950 sm:text-6xl">
+          <h1 className="mb-5 font-display text-5xl font-bold tracking-tight text-gray-950 sm:text-6xl">
             How assessments are calculated
           </h1>
           <p className="max-w-3xl font-jakarta text-lg leading-relaxed text-gray-600">
@@ -72,7 +72,7 @@ export default function MethodologyPage() {
         <MagicBentoGrid className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2" preset="marketing" glowColor="16, 185, 129" spotlightOpacity={0.07}>
           {principles.map((item) => (
             <MagicBentoCard key={item.title} className="surface-panel p-6">
-              <h2 className="mb-2 font-bricolage text-lg font-bold text-gray-900">
+              <h2 className="mb-2 font-display text-lg font-bold text-gray-900">
                 {item.title}
               </h2>
               <p className="font-jakarta text-sm leading-relaxed text-gray-600">
@@ -83,7 +83,7 @@ export default function MethodologyPage() {
         </MagicBentoGrid>
 
         <section className="mb-8 surface-panel p-6">
-          <h2 className="mb-4 font-bricolage text-2xl font-bold tracking-tight text-gray-950">
+          <h2 className="mb-4 font-display text-2xl font-bold tracking-tight text-gray-950">
             Verified, unverified and missing evidence
           </h2>
           <MagicBentoGrid className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3" preset="marketing" glowColor="16, 185, 129" spotlightOpacity={0.06}>
@@ -100,7 +100,7 @@ export default function MethodologyPage() {
 
         <section className="mb-10 surface-panel overflow-hidden">
           <div className="border-b border-black/8 bg-[#f8f6f0] p-5">
-            <h2 className="font-bricolage text-2xl font-bold tracking-tight text-gray-950">
+            <h2 className="font-display text-2xl font-bold tracking-tight text-gray-950">
               What affects confidence
             </h2>
           </div>
@@ -121,7 +121,7 @@ export default function MethodologyPage() {
         </section>
 
         <section className="mb-10 surface-panel p-6">
-          <h2 className="mb-4 font-bricolage text-2xl font-bold tracking-tight text-gray-950">
+          <h2 className="mb-4 font-display text-2xl font-bold tracking-tight text-gray-950">
             Implemented calculation model
           </h2>
           <ul className="space-y-3">

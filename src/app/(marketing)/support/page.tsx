@@ -104,11 +104,11 @@ export default function SupportPage() {
         <AnimatedSection className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-sage-800/50 bg-sage-950/40 mb-6">
             <Zap size={11} className="text-emerald-600" />
-            <span className="font-bricolage text-xs font-semibold text-emerald-600">
+            <span className="font-jakarta text-xs font-semibold text-emerald-600">
               We&apos;re here to help
             </span>
           </div>
-          <h1 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-800 tracking-tight mb-4">
+          <h1 className="font-display text-4xl sm:text-5xl font-bold text-gray-800 tracking-tight mb-4">
             Support & Contact
           </h1>
           <p className="font-jakarta text-lg text-gray-500 max-w-xl mx-auto">
@@ -130,13 +130,13 @@ export default function SupportPage() {
                   >
                     <Icon size={18} style={{ color: ch.color }} />
                   </div>
-                  <h3 className="font-bricolage text-sm font-bold text-gray-800 mb-1.5">
+                  <h3 className="font-jakarta text-sm font-bold text-gray-800 mb-1.5">
                     {ch.title}
                   </h3>
                   <p className="font-jakarta text-sm text-gray-500 mb-3 leading-relaxed">
                     {ch.description}
                   </p>
-                  <p className="font-bricolage text-sm font-semibold" style={{ color: ch.color }}>
+                  <p className="font-jakarta text-sm font-semibold" style={{ color: ch.color }}>
                     {ch.detail}
                   </p>
                   <p className="font-jakarta text-xs text-gray-500 mt-1">
@@ -152,7 +152,7 @@ export default function SupportPage() {
         <AnimatedSection id="contact">
           <div className="max-w-2xl mx-auto">
             <div className="rounded-2xl border border-black/8 bg-gray-50 p-8">
-              <h2 className="font-bricolage text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="font-display text-2xl font-bold text-gray-800 mb-2">
                 Send us a message
               </h2>
               <p className="font-jakarta text-sm text-gray-500 mb-8">
@@ -169,7 +169,7 @@ export default function SupportPage() {
                     <CheckCircle2 size={24} className="text-emerald-600" />
                   </div>
                   <div>
-                    <p className="font-bricolage text-lg font-bold text-gray-800 mb-1.5">
+                    <p className="font-jakarta text-lg font-bold text-gray-800 mb-1.5">
                       Message sent successfully
                     </p>
                     <p className="font-jakarta text-sm text-gray-500">
@@ -179,7 +179,7 @@ export default function SupportPage() {
                   </div>
                   <button
                     onClick={() => { setSubmitted(false); setForm({ name: "", email: "", subject: "", message: "" }); }}
-                    className="font-bricolage text-sm font-semibold text-emerald-600 hover:text-emerald-600 transition-colors mt-2"
+                    className="font-jakarta text-sm font-semibold text-emerald-600 hover:text-emerald-600 transition-colors mt-2"
                   >
                     Send another message
                   </button>

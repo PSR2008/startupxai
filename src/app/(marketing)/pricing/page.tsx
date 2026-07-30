@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle2, X, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -151,11 +151,11 @@ export default function PricingPage() {
         <AnimatedSection className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-sage-800/50 bg-sage-950/40 mb-6">
             <Zap size={11} className="text-emerald-600" />
-            <span className="font-bricolage text-xs font-semibold text-emerald-600">
+            <span className="font-jakarta text-xs font-semibold text-emerald-600">
               Simple, honest pricing
             </span>
           </div>
-          <h1 className="font-bricolage text-5xl sm:text-6xl font-bold text-gray-800 tracking-tight mb-5">
+          <h1 className="font-display text-5xl sm:text-6xl font-bold text-gray-800 tracking-tight mb-5">
             Invest in your startup,{" "}
             <span className="text-gradient-sage">not consultants</span>
           </h1>
@@ -178,7 +178,7 @@ export default function PricingPage() {
               >
                 {plan.badge && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="font-bricolage text-[10px] font-bold px-3 py-1.5 rounded-full bg-gradient-to-r from-sage-700 to-forest-700 text-white shadow-lg">
+                    <span className="font-jakarta text-[10px] font-bold px-3 py-1.5 rounded-full bg-gradient-to-r from-sage-700 to-forest-700 text-white shadow-lg">
                       {plan.badge}
                     </span>
                   </div>
@@ -187,7 +187,7 @@ export default function PricingPage() {
                 {/* Plan info */}
                 <div className="mb-8">
                   <p
-                    className="font-bricolage text-xs font-bold uppercase tracking-widest mb-1"
+                    className="font-jakarta text-xs font-bold uppercase tracking-widest mb-1"
                     style={{ color: plan.color }}
                   >
                     {plan.name}
@@ -196,7 +196,7 @@ export default function PricingPage() {
                     {plan.tagline}
                   </p>
                   <div className="flex items-end gap-1.5">
-                    <span className="font-bricolage text-4xl font-bold text-gray-800">
+                    <span className="font-jakarta text-4xl font-bold text-gray-800">
                       {plan.price}
                     </span>
                     <span className="font-jakarta text-sm text-gray-500 mb-1">
@@ -253,7 +253,7 @@ export default function PricingPage() {
 
         {/* FAQ */}
         <AnimatedSection className="max-w-3xl mx-auto">
-          <h2 className="font-bricolage text-3xl font-bold text-gray-800 text-center mb-10">
+          <h2 className="font-display text-3xl font-bold text-gray-800 text-center mb-10">
             Frequently asked questions
           </h2>
           <div className="space-y-4">
@@ -262,7 +262,7 @@ export default function PricingPage() {
                 key={faq.q}
                 className="rounded-xl border border-black/6 bg-gray-50 p-6"
               >
-                <h3 className="font-bricolage text-sm font-bold text-gray-800 mb-2.5">
+                <h3 className="font-jakarta text-sm font-bold text-gray-800 mb-2.5">
                   {faq.q}
                 </h3>
                 <p className="font-jakarta text-sm text-gray-500 leading-relaxed">

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -132,7 +132,7 @@ export default function SignupPage() {
             </div>
           </div>
           <div>
-            <h1 className="font-bricolage text-2xl font-bold text-gray-900 mb-2">Check your inbox</h1>
+            <h1 className="font-jakarta text-2xl font-bold text-gray-900 mb-2">Check your inbox</h1>
             <p className="font-jakarta text-sm text-gray-500 leading-relaxed">
               We sent a confirmation link to{" "}
               <span className="text-gray-900 font-semibold">{email}</span>.
@@ -140,11 +140,11 @@ export default function SignupPage() {
             </p>
           </div>
           <div className="rounded-2xl border border-black/8 bg-white p-5 text-left space-y-2.5 shadow-sm">
-            <p className="font-bricolage text-xs font-bold text-gray-400 uppercase tracking-wide">Next steps</p>
+            <p className="font-jakarta text-xs font-bold text-gray-400 uppercase tracking-wide">Next steps</p>
             {["Check your email (including spam folder)", "Click the confirmation link", "Log in and start building"].map((step, i) => (
               <div key={i} className="flex items-start gap-2.5">
                 <span className="w-5 h-5 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="font-bricolage text-[9px] font-bold text-emerald-600">{i + 1}</span>
+                  <span className="font-jakarta text-[9px] font-bold text-emerald-600">{i + 1}</span>
                 </span>
                 <span className="font-jakarta text-sm text-gray-600">{step}</span>
               </div>
@@ -152,7 +152,7 @@ export default function SignupPage() {
           </div>
           <Link
             href="/signin"
-            className="inline-flex items-center gap-2 font-bricolage text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+            className="inline-flex items-center gap-2 font-jakarta text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             Go to sign in <ArrowRight size={14} />
           </Link>
@@ -191,11 +191,11 @@ export default function SignupPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25">
               <Zap size={16} className="text-white" strokeWidth={2.5} />
             </div>
-            <span className="font-bricolage text-lg font-bold text-gray-900">
+            <span className="font-jakarta text-lg font-bold text-gray-900">
               StartupX <span className="text-gradient-brand">AI</span>
             </span>
           </Link>
-          <h1 className="font-bricolage text-2xl font-bold text-gray-900 mb-1.5">Create your account</h1>
+          <h1 className="font-jakarta text-2xl font-bold text-gray-900 mb-1.5">Create your account</h1>
           <p className="font-jakarta text-sm text-gray-500">
             Already have an account?{" "}
             <Link href={`/signin?next=${encodeURIComponent(nextPath)}`} className="text-emerald-600 hover:text-emerald-700 transition-colors font-semibold">

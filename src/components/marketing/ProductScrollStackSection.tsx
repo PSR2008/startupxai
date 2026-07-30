@@ -143,7 +143,7 @@ const stackCards: StackCard[] = [
     number: "05",
     category: "Core workflow",
     title: "Founder Decisions",
-    positioning: "Record what was decided—and why.",
+    positioning: "Record what was decidedâ€”and why.",
     description: "Preserve decision context so the team can see how evidence changed the next move.",
     capabilities: [
       "Capture important founder decisions",
@@ -306,7 +306,7 @@ export default function ProductScrollStackSection() {
               The StartupX AI workspace
             </span>
           </div>
-          <h2 className="font-bricolage text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+          <h2 className="font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
             From assumptions to evidence-backed decisions
           </h2>
           <p className="mx-auto mt-5 max-w-2xl font-jakarta text-lg leading-relaxed text-gray-600">
@@ -352,7 +352,7 @@ export default function ProductScrollStackSection() {
                     <Icon size={20} strokeWidth={2.2} />
                   </div>
 
-                  <h3 className="font-bricolage text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">
+                  <h3 className="font-jakarta text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">
                     {card.title}
                   </h3>
                   <p className="mt-4 font-jakarta text-lg font-semibold leading-snug text-gray-800">

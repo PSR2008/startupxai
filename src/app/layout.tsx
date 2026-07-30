@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
-import localFont from "next/font/local";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import AuthFragmentGuard from "@/components/auth/AuthFragmentGuard";
 import { SEO_BASE_URL } from "@/lib/seo";
@@ -14,9 +13,10 @@ const bodyFont = IBM_Plex_Sans({
   display: "swap",
 });
 
-const displayFont = Space_Grotesk({
+const displayFont = Newsreader({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
@@ -25,12 +25,6 @@ const monoFont = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-mono",
-  display: "swap",
-});
-
-const horrorFont = localFont({
-  src: "../fonts/SecretSolverRegular-3lYx3.otf",
-  variable: "--font-horror",
   display: "swap",
 });
 
@@ -111,7 +105,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable} ${horrorFont.variable}`} suppressHydrationWarning>
+      <body className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable}`} suppressHydrationWarning>
         <AuthFragmentGuard />
         {children}
         <Toaster

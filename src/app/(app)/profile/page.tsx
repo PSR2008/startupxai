@@ -249,14 +249,14 @@ export default function ProfilePage() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h1 className="font-bricolage text-3xl font-bold text-gray-900 mb-2">Profile</h1>
+            <h1 className="font-jakarta text-3xl font-bold text-gray-900 mb-2">Profile</h1>
             <p className="font-jakarta text-sm text-gray-500">
               Manage your account, plan, and usage from one place.
             </p>
           </div>
           <button
             onClick={handleLogout}
-            className="h-10 px-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-600 font-bricolage text-xs font-bold flex items-center gap-2 hover:bg-rose-100 transition-colors w-fit"
+            className="h-10 px-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-600 font-jakarta text-xs font-bold flex items-center gap-2 hover:bg-rose-100 transition-colors w-fit"
           >
             <LogOut size={14} />
             Sign out
@@ -277,10 +277,10 @@ export default function ProfilePage() {
                 <Compass size={17} className="text-emerald-600" />
               </div>
               <div className="min-w-0">
-                <p className="font-bricolage text-sm font-bold text-gray-900">Founder context</p>
+                <p className="font-jakarta text-sm font-bold text-gray-900">Founder context</p>
                 {founderProfile ? (
                   <>
-                    <p className="font-bricolage text-lg font-bold text-gray-900 mt-1 break-words">{founderProfile.startup_idea}</p>
+                    <p className="font-jakarta text-lg font-bold text-gray-900 mt-1 break-words">{founderProfile.startup_idea}</p>
                     <p className="font-jakarta text-sm text-gray-500 mt-1 max-w-3xl">{founderProfile.product_summary}</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {[founderProfile.industry, founderProfile.founder_stage, founderProfile.region, founderProfile.primary_goal]
@@ -297,7 +297,7 @@ export default function ProfilePage() {
                 )}
               </div>
             </div>
-            <Link href="/onboarding" className="h-9 px-3.5 rounded-xl border border-black/8 bg-gray-50 text-gray-700 font-bricolage text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-white transition-colors w-fit flex-shrink-0">
+            <Link href="/onboarding" className="h-9 px-3.5 rounded-xl border border-black/8 bg-gray-50 text-gray-700 font-jakarta text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-white transition-colors w-fit flex-shrink-0">
               <Compass size={13} />
               {founderProfile ? "Edit setup" : "Complete setup"}
             </Link>
@@ -316,7 +316,7 @@ export default function ProfilePage() {
                 <UserCircle size={28} className="text-emerald-600" />
               </div>
               <div className="min-w-0">
-                <p className="font-bricolage text-xl font-bold text-gray-900 truncate">{profile.email}</p>
+                <p className="font-jakarta text-xl font-bold text-gray-900 truncate">{profile.email}</p>
                 <p className="font-jakarta text-sm text-gray-400">StartupX AI account</p>
               </div>
             </div>
@@ -346,7 +346,7 @@ export default function ProfilePage() {
             <div className="flex items-start gap-2 mb-5">
               <ShieldCheck size={16} className="text-emerald-600 mt-0.5" />
               <div>
-                <p className="font-bricolage text-sm font-bold text-gray-900">Account security</p>
+                <p className="font-jakarta text-sm font-bold text-gray-900">Account security</p>
                 <p className="font-jakarta text-xs text-gray-400">
                   Manage password and email verification.
                 </p>
@@ -357,7 +357,7 @@ export default function ProfilePage() {
               <div className="rounded-xl border border-black/6 bg-gray-50 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <KeyRound size={15} className="text-gray-500" />
-                  <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">Change password</p>
+                  <p className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide">Change password</p>
                 </div>
                 <div className="flex flex-col sm:flex-row xl:flex-col 2xl:flex-row gap-2">
                   <input
@@ -373,7 +373,7 @@ export default function ProfilePage() {
                   <button
                     onClick={handlePasswordChange}
                     disabled={securityStatus === "loading"}
-                    className="h-10 px-4 rounded-xl bg-emerald-600 text-white font-bricolage text-xs font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors flex-shrink-0"
+                    className="h-10 px-4 rounded-xl bg-emerald-600 text-white font-jakarta text-xs font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors flex-shrink-0"
                   >
                     {securityStatus === "loading" ? "Updating..." : "Update"}
                   </button>
@@ -383,7 +383,7 @@ export default function ProfilePage() {
               <div className="rounded-xl border border-black/6 bg-gray-50 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Mail size={15} className="text-gray-500" />
-                  <p className="font-bricolage text-xs font-bold text-gray-700 uppercase tracking-wide">Email confirmation</p>
+                  <p className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide">Email confirmation</p>
                 </div>
                 <div className="flex flex-col sm:flex-row xl:flex-col 2xl:flex-row sm:items-start 2xl:items-center justify-between gap-3">
                   <p className="font-jakarta text-sm text-gray-600">
@@ -392,7 +392,7 @@ export default function ProfilePage() {
                   <button
                     onClick={handleResendConfirmation}
                     disabled={Boolean(profile.emailConfirmedAt) || resendStatus === "loading"}
-                    className="h-10 px-4 rounded-xl border border-black/10 bg-white text-gray-700 font-bricolage text-xs font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5 flex-shrink-0"
+                    className="h-10 px-4 rounded-xl border border-black/10 bg-white text-gray-700 font-jakarta text-xs font-bold hover:bg-gray-50 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5 flex-shrink-0"
                   >
                     <RefreshCw size={13} className={resendStatus === "loading" ? "animate-spin" : ""} />
                     Resend
@@ -421,12 +421,12 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2">
                 <TrendingUp size={15} className="text-emerald-600" />
-                <p className="font-bricolage text-sm font-bold text-gray-900">Monthly usage</p>
+                <p className="font-jakarta text-sm font-bold text-gray-900">Monthly usage</p>
               </div>
-              <span className="font-bricolage text-xs font-bold text-gray-500">{usagePct}%</span>
+              <span className="font-jakarta text-xs font-bold text-gray-500">{usagePct}%</span>
             </div>
             <div className="mb-2">
-              <span className="font-bricolage text-3xl font-bold text-gray-900">{usage.analyses_used}</span>
+              <span className="font-jakarta text-3xl font-bold text-gray-900">{usage.analyses_used}</span>
               <span className="font-jakarta text-sm text-gray-400"> / {usage.monthly_limit}</span>
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
@@ -438,10 +438,10 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
               {usageRows.slice(1).map((row) => (
                 <div key={row.label} className="rounded-xl border border-black/6 bg-gray-50 px-4 py-3">
-                  <p className="font-bricolage text-xs font-bold text-gray-500 uppercase tracking-wide">{row.label}</p>
+                  <p className="font-jakarta text-xs font-bold text-gray-500 uppercase tracking-wide">{row.label}</p>
                   <p className="font-jakarta text-sm text-gray-700 mt-1">
-                    <span className="font-bricolage font-bold text-gray-900">{row.used}</span> / {row.limit}
-                    <span className="text-gray-400"> · {row.remaining} left</span>
+                    <span className="font-jakarta font-bold text-gray-900">{row.used}</span> / {row.limit}
+                    <span className="text-gray-400"> Â· {row.remaining} left</span>
                   </p>
                 </div>
               ))}
@@ -456,7 +456,7 @@ export default function ProfilePage() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Zap size={15} className="text-amber-500" />
-              <p className="font-bricolage text-sm font-bold text-gray-900">Quick actions</p>
+              <p className="font-jakarta text-sm font-bold text-gray-900">Quick actions</p>
             </div>
             <div className="space-y-2">
               <Link href="/dashboard" className="flex items-center justify-between rounded-xl border border-black/6 bg-gray-50 px-4 py-3 hover:bg-white transition-colors">
@@ -481,13 +481,13 @@ export default function ProfilePage() {
             <div className="flex items-center gap-2">
               <CreditCard size={16} className="text-emerald-600" />
               <div>
-                <p className="font-bricolage text-sm font-bold text-gray-900">Billing history</p>
+                <p className="font-jakarta text-sm font-bold text-gray-900">Billing history</p>
                 <p className="font-jakarta text-xs text-gray-400">
                   {isPaid ? `${getPlanLabel(usage.active_plan)} ${usage.billing_cycle ?? "monthly"} plan renews/expires on ${planExpiry}.` : "No paid plan is active yet."}
                 </p>
               </div>
             </div>
-            <Link href="/payment?plan=founder&billing=monthly" className="h-9 px-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-bricolage text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-100 transition-colors w-fit">
+            <Link href="/payment?plan=founder&billing=monthly" className="h-9 px-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-jakarta text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-100 transition-colors w-fit">
               <Crown size={13} />
               {isPaid ? "Manage plan" : "Upgrade"}
             </Link>
@@ -496,7 +496,7 @@ export default function ProfilePage() {
           {payments.length === 0 ? (
             <div className="rounded-xl border border-dashed border-black/10 bg-gray-50 p-5">
               <ReceiptText size={18} className="text-gray-300 mb-3" />
-              <p className="font-bricolage text-sm font-bold text-gray-800 mb-1">No payments yet</p>
+              <p className="font-jakarta text-sm font-bold text-gray-800 mb-1">No payments yet</p>
               <p className="font-jakarta text-xs text-gray-400">Successful paid plan payments will appear here.</p>
             </div>
           ) : (
@@ -505,7 +505,7 @@ export default function ProfilePage() {
                 <thead>
                   <tr className="border-b border-black/6">
                     {["Date", "Plan", "Billing", "Amount", "Status"].map((heading) => (
-                      <th key={heading} className="py-3 font-bricolage text-[11px] font-bold text-gray-400 uppercase tracking-wide">
+                      <th key={heading} className="py-3 font-jakarta text-[11px] font-bold text-gray-400 uppercase tracking-wide">
                         {heading}
                       </th>
                     ))}
@@ -517,7 +517,7 @@ export default function ProfilePage() {
                       <td className="py-3 font-jakarta text-sm text-gray-600">{formatDate(payment.created_at)}</td>
                       <td className="py-3 font-jakarta text-sm text-gray-700 capitalize">{payment.plan}</td>
                       <td className="py-3 font-jakarta text-sm text-gray-500 capitalize">{payment.billing_cycle}</td>
-                      <td className="py-3 font-bricolage text-sm font-bold text-gray-900">
+                      <td className="py-3 font-jakarta text-sm font-bold text-gray-900">
                         {payment.currency} {((payment.amount ?? 0) / 100).toFixed(2)}
                       </td>
                       <td className="py-3">
@@ -551,7 +551,7 @@ function InfoCard({
   return (
     <div className="rounded-xl border border-black/6 bg-gray-50 p-4 min-w-0">
       <div className={iconClassName}>{icon}</div>
-      <p className="font-bricolage text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 mt-3">{label}</p>
+      <p className="font-jakarta text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 mt-3">{label}</p>
       <p className="font-jakarta text-sm text-gray-800 break-words">{value}</p>
     </div>
   );

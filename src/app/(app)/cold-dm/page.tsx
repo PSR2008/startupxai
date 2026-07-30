@@ -171,7 +171,7 @@ export default function ColdDMPage() {
           <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50 space-y-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="font-bricolage text-base font-bold text-gray-900">Outreach context</h3>
+                <h3 className="font-jakarta text-base font-bold text-gray-900">Outreach context</h3>
                 <p className="mt-1 font-jakarta text-xs text-gray-500">Give the engine the buyer, offer, tone, and personalization angle.</p>
               </div>
               <Badge variant="sage" size="sm">
@@ -219,7 +219,7 @@ export default function ColdDMPage() {
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50">
                   <MessageSquare size={22} className="text-emerald-700" />
                 </div>
-                <p className="mt-4 font-bricolage text-base font-bold text-gray-900">Ready to write outreach</p>
+                <p className="mt-4 font-jakarta text-base font-bold text-gray-900">Ready to write outreach</p>
                 <p className="mt-2 max-w-sm font-jakarta text-sm leading-relaxed text-gray-500">
                   Add your product, buyer, and offer to generate messages that are specific, clear, and easy to send.
                 </p>
@@ -255,8 +255,8 @@ export default function ColdDMPage() {
                 <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="font-bricolage text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700">Outreach pack</p>
-                      <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{form.product || "Cold outreach"}</h3>
+                      <p className="font-jakarta text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700">Outreach pack</p>
+                      <h3 className="mt-1 font-jakarta text-xl font-bold text-gray-950">{form.product || "Cold outreach"}</h3>
                     </div>
                     <div className="flex flex-wrap gap-2 no-print">
                       <Button variant="outline" size="sm" onClick={() => setStatus("idle")}>Edit inputs</Button>
@@ -276,7 +276,7 @@ export default function ColdDMPage() {
                           key={tab.id}
                           onClick={() => setActiveTab(tab.id)}
                           className={cn(
-                            "flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-bricolage text-xs font-semibold transition-all",
+                            "flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-jakarta text-xs font-semibold transition-all",
                             activeTab === tab.id ? "border border-emerald-200 bg-emerald-50 text-emerald-700" : "text-gray-500 hover:bg-gray-50 hover:text-gray-800",
                           )}
                         >
@@ -303,13 +303,13 @@ export default function ColdDMPage() {
                     <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                       <div className="mb-4 flex items-center gap-2">
                         <ArrowRight size={14} className="text-amber-700" />
-                        <h4 className="font-bricolage text-sm font-bold text-gray-900">Follow-up Sequence</h4>
+                        <h4 className="font-jakarta text-sm font-bold text-gray-900">Follow-up Sequence</h4>
                       </div>
                       <div className="space-y-3">
                         {result.followUpVariants.map((message, index) => (
                           <div key={index} className="rounded-xl border border-amber-100 bg-amber-50/60 p-4">
                             <div className="mb-2.5 flex items-center justify-between gap-3">
-                              <span className="font-bricolage text-xs font-bold text-amber-700">Follow-up #{index + 1}</span>
+                              <span className="font-jakarta text-xs font-bold text-amber-700">Follow-up #{index + 1}</span>
                               <CopyButton text={message} showLabel />
                             </div>
                             <p className="whitespace-pre-wrap font-jakarta text-sm leading-relaxed text-gray-650">{message}</p>
@@ -322,7 +322,7 @@ export default function ColdDMPage() {
                       <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                         <div className="mb-4 flex items-center gap-2">
                           <Zap size={14} className="text-emerald-600" />
-                          <h4 className="font-bricolage text-sm font-bold text-gray-900">CTA Variations</h4>
+                          <h4 className="font-jakarta text-sm font-bold text-gray-900">CTA Variations</h4>
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {result.ctaVariations.map((cta, index) => (
@@ -356,7 +356,7 @@ function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; tit
     <MagicBentoCard className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>{icon}</div>
       <div>
-        <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
+        <p className="font-jakarta text-sm font-bold text-gray-900">{title}</p>
         <p className="mt-0.5 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
       </div>
     </MagicBentoCard>
@@ -402,11 +402,11 @@ function EmailCard({ email }: { email: ColdEmailMessage }) {
       </div>
       <div className="space-y-3">
         <div className="rounded-lg border border-black/6 bg-gray-50 p-3">
-          <p className="mb-1 font-bricolage text-xs font-semibold text-gray-400">Subject</p>
+          <p className="mb-1 font-jakarta text-xs font-semibold text-gray-400">Subject</p>
           <p className="font-jakarta text-sm text-gray-900">{email.subject}</p>
         </div>
         <div className="rounded-lg border border-black/6 bg-gray-50 p-3">
-          <p className="mb-2 font-bricolage text-xs font-semibold text-gray-400">Body</p>
+          <p className="mb-2 font-jakarta text-xs font-semibold text-gray-400">Body</p>
           <p className="whitespace-pre-wrap font-jakarta text-sm leading-relaxed text-gray-650">{email.body}</p>
         </div>
       </div>

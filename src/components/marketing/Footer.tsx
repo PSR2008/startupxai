@@ -98,7 +98,7 @@ export default function Footer({ variant = "default" }: FooterProps) {
               >
                 <Zap size={14} className="text-white" strokeWidth={2.5} />
               </div>
-              <span className={isHomepage ? "font-bricolage text-base font-bold text-white" : "font-bricolage text-base font-bold text-gray-900"}>
+              <span className={isHomepage ? "font-jakarta text-base font-bold text-white" : "font-jakarta text-base font-bold text-gray-900"}>
                 StartupX <span className={isHomepage ? "text-emerald-300" : "text-gradient-brand"}>AI</span>
               </span>
             </Link>

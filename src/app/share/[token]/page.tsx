@@ -40,7 +40,7 @@ export default function SharedReportPage() {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
               <Zap size={14} className="text-white" />
             </div>
-            <span className="font-bricolage text-sm font-bold text-gray-900">StartupX AI</span>
+            <span className="font-jakarta text-sm font-bold text-gray-900">StartupX AI</span>
           </Link>
           <Link href="/signup" className="font-jakarta text-xs font-semibold text-emerald-700 hover:text-emerald-800">
             Create free account
@@ -62,7 +62,7 @@ export default function SharedReportPage() {
 
         {!loading && error && (
           <div className="rounded-xl border border-rose-200 bg-rose-50 p-8">
-            <p className="font-bricolage text-sm font-bold text-rose-700">Shared report unavailable</p>
+            <p className="font-jakarta text-sm font-bold text-rose-700">Shared report unavailable</p>
             <p className="font-jakarta text-sm text-rose-600 mt-1">{error}</p>
           </div>
         )}

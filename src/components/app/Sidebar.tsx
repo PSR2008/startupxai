@@ -74,7 +74,7 @@ export default function Sidebar() {
         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-sm shadow-emerald-900/15">
           <Zap size={13} className="text-white" strokeWidth={2.5} />
         </div>
-        <span className="font-bricolage text-sm font-bold text-gray-900">
+        <span className="font-jakarta text-sm font-bold text-gray-900">
           StartupX <span className="text-gradient-brand">AI</span>
         </span>
       </div>

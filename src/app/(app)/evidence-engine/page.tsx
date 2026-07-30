@@ -218,7 +218,7 @@ export default function EvidenceEnginePage() {
         ].map(({ icon: Icon, title, detail }) => (
           <MagicBentoCard key={title} className="surface-panel p-4">
             <Icon size={16} className="text-emerald-600" />
-            <p className="mt-2 font-bricolage text-sm font-bold text-gray-900">{title}</p>
+            <p className="mt-2 font-jakarta text-sm font-bold text-gray-900">{title}</p>
             <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
           </MagicBentoCard>
         ))}
@@ -228,7 +228,7 @@ export default function EvidenceEnginePage() {
         <div className={status === "idle" ? "mx-auto max-w-4xl space-y-5" : "hidden"}>
           <section className="surface-panel space-y-5 p-6">
             <div>
-              <h3 className="font-bricolage text-base font-bold text-gray-900">Evidence project</h3>
+              <h3 className="font-jakarta text-base font-bold text-gray-900">Evidence project</h3>
               <p className="mt-1 font-jakarta text-xs text-gray-500">Create one durable project for evidence, scores, assumptions, and experiments.</p>
             </div>
             <Input label="Startup name" value={form.startupName} onChange={set("startupName")} error={errors.startupName} required />
@@ -248,7 +248,7 @@ export default function EvidenceEnginePage() {
           <section className="surface-inset p-5">
             <div className="mb-4 flex items-center gap-2">
               <NotebookPen size={15} className="text-emerald-700" />
-              <h3 className="font-bricolage text-sm font-bold text-gray-900">Manual evidence entry</h3>
+              <h3 className="font-jakarta text-sm font-bold text-gray-900">Manual evidence entry</h3>
             </div>
             <MagicBentoGrid className="space-y-3" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.07}>
               <ManualEntry title="Add a source" detail="Paste a customer quote, public URL, support message, or research note after the assessment runs." />
@@ -267,7 +267,7 @@ export default function EvidenceEnginePage() {
             {status === "idle" && (
               <motion.section key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-full rounded-xl border border-dashed border-black/10 bg-[#fffefa] p-6 text-center shadow-sm sm:p-10">
                 <SearchCheck size={30} className="mx-auto text-emerald-600" />
-                <h3 className="mt-4 font-bricolage text-lg font-bold text-gray-900">Ready for structured assessment</h3>
+                <h3 className="mt-4 font-jakarta text-lg font-bold text-gray-900">Ready for structured assessment</h3>
                 <p className="mx-auto mt-2 max-w-md font-jakarta text-sm leading-relaxed text-gray-500">
                   This workflow will not invent source links, market size, search volume, or competitor facts. Unavailable evidence stays visibly unavailable.
                 </p>
@@ -295,7 +295,7 @@ export default function EvidenceEnginePage() {
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <p className="font-jakarta text-xs font-semibold text-emerald-700">Evidence project</p>
-                      <h2 className="mt-1 break-words font-bricolage text-2xl font-bold text-gray-950">{result.project.startupName}</h2>
+                      <h2 className="mt-1 break-words font-jakarta text-2xl font-bold text-gray-950">{result.project.startupName}</h2>
                       <div className="mt-3 flex flex-wrap gap-2">
                         <ConfidenceBadge confidence={result.project.confidence} />
                         <DataFreshnessBadge />
@@ -310,13 +310,13 @@ export default function EvidenceEnginePage() {
                       <p className="metadata-text text-emerald-700">{result.project.overallScore === null ? "Evidence coverage" : "Evidence Score"}</p>
                       {result.project.overallScore === null ? (
                         <>
-                          <p className="font-bricolage text-2xl font-bold text-emerald-900">Insufficient evidence</p>
+                          <p className="font-jakarta text-2xl font-bold text-emerald-900">Insufficient evidence</p>
                           <p className="mt-1 font-jakarta text-xs leading-relaxed text-emerald-900">
                             {result.evidenceCoverage.assessableDimensions}/{result.evidenceCoverage.totalDimensions} dimensions assessable
                           </p>
                         </>
                       ) : (
-                        <p className="font-bricolage text-4xl font-bold text-emerald-800">{result.project.overallScore}</p>
+                        <p className="font-jakarta text-4xl font-bold text-emerald-800">{result.project.overallScore}</p>
                       )}
                       <p className="mt-2 font-jakarta text-[11px] leading-relaxed text-emerald-900">{result.project.overallScore === null ? result.evidenceCoverage.summary : EVIDENCE_SCORE_DISCLAIMER}</p>
                     </div>
@@ -340,7 +340,7 @@ export default function EvidenceEnginePage() {
                       onClick={() => setActiveCategory(score.category)}
                       className={`min-w-0 rounded-2xl border p-3 text-left transition-colors ${activeCategory === score.category ? "border-emerald-300 bg-emerald-50" : "border-black/6 bg-white hover:bg-gray-50"}`}
                     >
-                      <p className="font-bricolage text-lg font-bold text-gray-950">{score.score === null ? "Unscored" : score.score}</p>
+                      <p className="font-jakarta text-lg font-bold text-gray-950">{score.score === null ? "Unscored" : score.score}</p>
                       <p className="mt-1 font-jakarta text-[11px] leading-tight text-gray-500">{score.label}</p>
                       {score.score === null && <p className="mt-1 font-jakarta text-[10px] leading-tight text-amber-700">Insufficient evidence</p>}
                     </button>
@@ -352,12 +352,12 @@ export default function EvidenceEnginePage() {
                 <section id="assumptions" className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <ClipboardList size={14} className="text-amber-700" />
-                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Claim-to-evidence map</h3>
+                    <h3 className="font-jakarta text-sm font-bold text-gray-900">Claim-to-evidence map</h3>
                   </div>
                   <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-2">
                     {activeScore.assumptions.map((assumption) => (
                       <div key={assumption} className="surface-inset p-4">
-                        <p className="font-bricolage text-xs font-bold text-gray-900">Assumption</p>
+                        <p className="font-jakarta text-xs font-bold text-gray-900">Assumption</p>
                         <p className="mt-1 font-jakarta text-sm leading-relaxed text-gray-600">{assumption}</p>
                         <p className="mt-3 font-jakarta text-xs text-amber-700">Link this to customer research or an experiment result before raising confidence.</p>
                       </div>
@@ -368,7 +368,7 @@ export default function EvidenceEnginePage() {
                 <section className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <Database size={14} className="text-emerald-600" />
-                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Evidence used in this assessment</h3>
+                    <h3 className="font-jakarta text-sm font-bold text-gray-900">Evidence used in this assessment</h3>
                   </div>
                   <EvidenceProvenanceList result={result} score={activeScore} />
                   <div className="mt-4 grid grid-cols-1 gap-3">
@@ -379,7 +379,7 @@ export default function EvidenceEnginePage() {
                 <section className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <Activity size={14} className="text-blue-600" />
-                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Provider status</h3>
+                    <h3 className="font-jakarta text-sm font-bold text-gray-900">Provider status</h3>
                   </div>
                   <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-2">
                     {result.providerRuns.map((run) => <ProviderStatus key={`${run.providerName}-${run.status}`} run={run} />)}
@@ -389,7 +389,7 @@ export default function EvidenceEnginePage() {
                 <section id="experiments" className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <FlaskConical size={14} className="text-violet-600" />
-                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Recommended next validation actions</h3>
+                    <h3 className="font-jakarta text-sm font-bold text-gray-900">Recommended next validation actions</h3>
                   </div>
                   <RecommendedTestsList result={result} />
                 </section>
@@ -398,7 +398,7 @@ export default function EvidenceEnginePage() {
                   <div className="flex items-start gap-2">
                     <ClipboardList size={14} className="mt-0.5 text-amber-700" />
                     <div>
-                      <p className="font-bricolage text-xs font-bold text-amber-900">Limitations</p>
+                      <p className="font-jakarta text-xs font-bold text-amber-900">Limitations</p>
                       <ul className="mt-2 space-y-1">
                         {result.limitations.map((item) => <li key={item} className="font-jakarta text-xs leading-relaxed text-amber-800">{item}</li>)}
                       </ul>
@@ -409,7 +409,7 @@ export default function EvidenceEnginePage() {
                 <section className="surface-panel w-full max-w-full p-5">
                   <div className="mb-4 flex items-center gap-2">
                     <Clock3 size={14} className="text-gray-600" />
-                    <h3 className="font-bricolage text-sm font-bold text-gray-900">Project timeline</h3>
+                    <h3 className="font-jakarta text-sm font-bold text-gray-900">Project timeline</h3>
                   </div>
                   <div className="space-y-3">
                     <TimelineRow title="Assessment created" detail={`${result.evidenceItems.length} evidence item(s) collected and ${result.scores.length} score category summaries prepared.`} />
@@ -434,7 +434,7 @@ function AssessmentExplainability({ result }: { result: ValidationProjectResult 
       <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(260px,0.8fr)]">
         <div className="min-w-0">
           <p className="font-jakarta text-xs font-semibold text-emerald-700">Assessment summary</p>
-          <h3 id="assessment-summary-heading" className="mt-1 break-words font-bricolage text-lg font-bold text-gray-950">
+          <h3 id="assessment-summary-heading" className="mt-1 break-words font-jakarta text-lg font-bold text-gray-950">
             {insufficient ? "Insufficient evidence for a reliable market conclusion." : explanation.label}
           </h3>
           <p className="mt-2 break-words font-jakarta text-sm leading-relaxed text-gray-600">{explanation.summary}</p>
@@ -443,7 +443,7 @@ function AssessmentExplainability({ result }: { result: ValidationProjectResult 
           </p>
         </div>
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-          <h4 className="font-bricolage text-sm font-bold text-amber-950">Why confidence is currently {result.project.confidence}</h4>
+          <h4 className="font-jakarta text-sm font-bold text-amber-950">Why confidence is currently {result.project.confidence}</h4>
           <ul className="mt-3 space-y-2">
             {explanation.reasons.map((reason) => (
               <li key={reason} className="break-words font-jakarta text-xs leading-relaxed text-amber-900">{reason}</li>
@@ -471,7 +471,7 @@ function EvidenceProvenanceList({ result, score }: { result: ValidationProjectRe
         <article key={item.id} className="surface-inset min-w-0 p-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <h4 className="break-words font-bricolage text-sm font-bold text-gray-900">{item.title}</h4>
+              <h4 className="break-words font-jakarta text-sm font-bold text-gray-900">{item.title}</h4>
               <p className="mt-1 break-words font-jakarta text-xs text-gray-500">{item.attribution}</p>
             </div>
             <Badge variant={item.direction === "contradicts" ? "rose" : item.direction === "supports" ? "emerald" : "neutral"} size="sm" className="flex-shrink-0">{item.direction}</Badge>
@@ -501,7 +501,7 @@ function RecommendedTestsList({ result }: { result: ValidationProjectResult }) {
       {tests.map((test) => (
         <div key={test.hypothesis} className="surface-inset p-4">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-            <p className="min-w-0 font-bricolage text-sm font-bold text-gray-900">{test.test}</p>
+            <p className="min-w-0 font-jakarta text-sm font-bold text-gray-900">{test.test}</p>
             <Badge variant="violet" size="sm">{test.evidenceType}</Badge>
           </div>
           <p className="font-jakarta text-sm leading-relaxed text-gray-600">{test.hypothesis}</p>
@@ -525,7 +525,7 @@ function EvidenceCoveragePanel({ result }: { result: ValidationProjectResult }) 
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <ShieldCheck size={18} className="text-emerald-700" />
-            <h3 className="font-bricolage text-base font-bold text-gray-950">Assessment not yet evidence-backed</h3>
+            <h3 className="font-jakarta text-base font-bold text-gray-950">Assessment not yet evidence-backed</h3>
             <Badge variant="amber" size="sm">Insufficient evidence for scoring</Badge>
           </div>
           <p className="mt-2 max-w-2xl font-jakarta text-sm leading-relaxed text-gray-600">
@@ -570,7 +570,7 @@ function ScorePanel({ score }: { score: CategoryScore }) {
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="min-w-0 break-words font-bricolage text-lg font-bold text-gray-950">{score.label} Evidence Score</h3>
+            <h3 className="min-w-0 break-words font-jakarta text-lg font-bold text-gray-950">{score.label} Evidence Score</h3>
             <ConfidenceBadge confidence={score.confidence} />
             {metrics.insufficientEvidence && <Badge variant="amber" size="sm">Insufficient evidence</Badge>}
           </div>
@@ -580,12 +580,12 @@ function ScorePanel({ score }: { score: CategoryScore }) {
         <div className="w-full sm:max-w-xs sm:flex-shrink-0 sm:text-right">
           {score.score === null ? (
             <>
-              <p className="font-bricolage text-2xl font-bold text-amber-800">Insufficient evidence</p>
+              <p className="font-jakarta text-2xl font-bold text-amber-800">Insufficient evidence</p>
               <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{score.evidenceCoverage.qualifyingEvidenceCount} qualifying item(s)</p>
             </>
           ) : (
             <>
-              <p className="font-bricolage text-4xl font-bold text-emerald-700">{score.score}</p>
+              <p className="font-jakarta text-4xl font-bold text-emerald-700">{score.score}</p>
               <p className="mt-2 font-jakarta text-[11px] leading-relaxed text-gray-500">{EVIDENCE_SCORE_DISCLAIMER}</p>
             </>
           )}
@@ -612,7 +612,7 @@ function ScorePanel({ score }: { score: CategoryScore }) {
           aria-controls={calculationRegionId}
           data-analytics-event="calculation_details_opened"
           onClick={() => setCalculationOpen((open) => !open)}
-          className="focus-ring flex w-full items-center justify-between gap-3 text-left font-bricolage text-sm font-bold text-gray-900"
+          className="focus-ring flex w-full items-center justify-between gap-3 text-left font-jakarta text-sm font-bold text-gray-900"
         >
           <span>How this was calculated</span>
           <span aria-hidden="true" className="text-xs text-gray-500">{calculationOpen ? "Hide" : "Show"}</span>
@@ -625,7 +625,7 @@ function ScorePanel({ score }: { score: CategoryScore }) {
                 <div key={item.componentName} className="rounded-lg border border-black/6 bg-white p-3">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
-                      <p className="break-words font-bricolage text-sm font-bold text-gray-900">{item.componentName}</p>
+                      <p className="break-words font-jakarta text-sm font-bold text-gray-900">{item.componentName}</p>
                       <p className="mt-1 break-words font-jakarta text-xs leading-relaxed text-gray-500">{item.purpose}</p>
                     </div>
                     <Badge variant="neutral" size="sm" className="flex-shrink-0">Weight {item.weightPercent}%</Badge>
@@ -666,7 +666,7 @@ function ScorePanel({ score }: { score: CategoryScore }) {
 function ManualEntry({ title, detail }: { title: string; detail: string }) {
   return (
     <MagicBentoCard className="rounded-lg border border-black/8 bg-[#fffefa] p-3">
-      <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
+      <p className="font-jakarta text-xs font-bold text-gray-900">{title}</p>
       <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
     </MagicBentoCard>
   );
@@ -675,7 +675,7 @@ function ManualEntry({ title, detail }: { title: string; detail: string }) {
 function EmptyHint({ title, detail }: { title: string; detail: string }) {
   return (
     <div className="surface-inset p-3">
-      <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
+      <p className="font-jakarta text-xs font-bold text-gray-900">{title}</p>
       <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
     </div>
   );
@@ -684,7 +684,7 @@ function EmptyHint({ title, detail }: { title: string; detail: string }) {
 function TimelineRow({ title, detail }: { title: string; detail: string }) {
   return (
     <div className="surface-inset relative p-4">
-      <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
+      <p className="font-jakarta text-xs font-bold text-gray-900">{title}</p>
       <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
     </div>
   );
@@ -818,7 +818,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
     <section className="surface-panel w-full max-w-full p-5">
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h3 className="font-bricolage text-sm font-bold text-gray-900">Persisted workflow</h3>
+          <h3 className="font-jakarta text-sm font-bold text-gray-900">Persisted workflow</h3>
           <p className="font-jakarta text-xs text-gray-500">Add evidence, record interviews, log experiments, and keep real project activity.</p>
         </div>
         {message && <Badge variant={message.startsWith("Could") ? "rose" : "emerald"} size="sm" className="max-w-full whitespace-normal leading-snug">{message}</Badge>}
@@ -826,10 +826,10 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
 
       <div className="grid min-w-0 grid-cols-1 gap-3 xl:grid-cols-2 2xl:grid-cols-3">
         <details className="surface-inset min-w-0 p-4">
-          <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-900">Add evidence</summary>
+          <summary className="cursor-pointer list-none font-jakarta text-sm font-bold text-gray-900">Add evidence</summary>
           <div className="mt-4 space-y-3">
             <label className="block min-w-0">
-              <span className="font-bricolage text-[11px] font-bold uppercase tracking-wide text-gray-600">Evidence source</span>
+              <span className="font-jakarta text-[11px] font-bold uppercase tracking-wide text-gray-600">Evidence source</span>
               <select
                 value={evidenceSource}
                 onChange={(event) => {
@@ -875,9 +875,9 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
                       <Badge variant="blue" size="sm">Public source - founder selected</Badge>
                       {publicPreview.duplicate && <Badge variant="amber" size="sm">Duplicate source detected</Badge>}
                     </div>
-                    <p className="break-words font-bricolage text-sm font-bold text-gray-900">{publicPreview.metadata.pageTitle || "Page title unavailable"}</p>
+                    <p className="break-words font-jakarta text-sm font-bold text-gray-900">{publicPreview.metadata.pageTitle || "Page title unavailable"}</p>
                     <p className="mt-1 break-words font-jakarta text-xs text-gray-600">{publicPreview.metadata.publisher || publicPreview.metadata.hostname}</p>
-                    <a href={publicPreview.metadata.canonicalUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex max-w-full items-center gap-1 break-all font-bricolage text-[11px] font-bold text-emerald-700">
+                    <a href={publicPreview.metadata.canonicalUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex max-w-full items-center gap-1 break-all font-jakarta text-[11px] font-bold text-emerald-700">
                       {publicPreview.metadata.canonicalUrl} <ExternalLink size={11} aria-hidden="true" />
                     </a>
                     <p className="mt-3 break-words font-jakarta text-xs leading-relaxed text-gray-600">{publicPreview.metadata.description || "Description unavailable"}</p>
@@ -936,7 +936,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
         </details>
 
         <details className="surface-inset min-w-0 p-4">
-          <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-900">Record interview</summary>
+          <summary className="cursor-pointer list-none font-jakarta text-sm font-bold text-gray-900">Record interview</summary>
           <form className="mt-4 space-y-3" onSubmit={(e) => { e.preventDefault(); submit(`/api/evidence-projects/${projectId}/interviews`, new FormData(e.currentTarget)); e.currentTarget.reset(); }}>
             <MiniInput name="participant_segment" label="Participant segment" required />
             <MiniInput name="interview_date" label="Interview date" type="date" required />
@@ -956,7 +956,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
         </details>
 
         <details className="surface-inset min-w-0 p-4">
-          <summary className="cursor-pointer list-none font-bricolage text-sm font-bold text-gray-900">Track experiment</summary>
+          <summary className="cursor-pointer list-none font-jakarta text-sm font-bold text-gray-900">Track experiment</summary>
           <form className="mt-4 space-y-3" onSubmit={(e) => { e.preventDefault(); submit(`/api/evidence-projects/${projectId}/experiments`, new FormData(e.currentTarget)); e.currentTarget.reset(); }}>
             <MiniTextarea name="hypothesis" label="Hypothesis" required />
             <MiniInput name="experiment_type" label="Experiment type" required />
@@ -982,7 +982,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
             <div key={item.id} className="min-w-0 rounded-lg border border-black/6 bg-gray-50 p-3">
               <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="break-words font-bricolage text-xs font-bold text-gray-900">{item.title}</p>
+                  <p className="break-words font-jakarta text-xs font-bold text-gray-900">{item.title}</p>
                   <p className="mt-1 break-words font-jakarta text-xs text-gray-500">{item.claim || item.summary}</p>
                   <p className="mt-1 break-words font-jakarta text-[11px] capitalize text-gray-400">{item.evidence_type.replaceAll("_", " ")} - {item.source_quality} quality - {item.confidence} confidence</p>
                 </div>
@@ -990,7 +990,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
                   <button
                     type="button"
                     onClick={() => setEditingEvidenceId((current) => current === item.id ? null : item.id)}
-                    className="focus-ring inline-flex h-7 items-center rounded-md border border-black/10 bg-white px-2.5 font-bricolage text-[11px] font-bold leading-none text-emerald-700 whitespace-nowrap hover:border-emerald-200 hover:bg-emerald-50"
+                    className="focus-ring inline-flex h-7 items-center rounded-md border border-black/10 bg-white px-2.5 font-jakarta text-[11px] font-bold leading-none text-emerald-700 whitespace-nowrap hover:border-emerald-200 hover:bg-emerald-50"
                     aria-expanded={editingEvidenceId === item.id}
                     aria-controls={`edit-evidence-${item.id}`}
                   >
@@ -1000,7 +1000,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
                     type="button"
                     onClick={() => deleteEvidence(item.id)}
                     disabled={busy === item.id}
-                    className="focus-ring inline-flex h-7 items-center rounded-md border border-rose-200 bg-white px-2.5 font-bricolage text-[11px] font-bold leading-none text-rose-600 whitespace-nowrap hover:bg-rose-50 disabled:opacity-50"
+                    className="focus-ring inline-flex h-7 items-center rounded-md border border-rose-200 bg-white px-2.5 font-jakarta text-[11px] font-bold leading-none text-rose-600 whitespace-nowrap hover:bg-rose-50 disabled:opacity-50"
                   >
                     Delete
                   </button>
@@ -1016,7 +1016,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
                     <MiniSelect name="source_quality" label="Quality" options={["low", "medium", "high"]} defaultValue={item.source_quality} />
                     <MiniSelect name="confidence" label="Confidence" options={["low", "medium", "high"]} defaultValue={item.confidence} />
                   </div>
-                  <button disabled={busy !== ""} className="focus-ring h-8 rounded-lg bg-gray-900 px-3 font-bricolage text-[11px] font-bold text-white disabled:opacity-50">Save edit</button>
+                  <button disabled={busy !== ""} className="focus-ring h-8 rounded-lg bg-gray-900 px-3 font-jakarta text-[11px] font-bold text-white disabled:opacity-50">Save edit</button>
                 </form>
                 </div>
               )}
@@ -1026,7 +1026,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
         <PersistedList title="Interview history" empty="No customer interviews recorded yet.">
           {workflow?.interviews?.map((item) => (
             <div key={item.id} className="rounded-lg border border-black/6 bg-gray-50 p-3">
-              <p className="font-bricolage text-xs font-bold text-gray-900">{item.participant_segment}</p>
+              <p className="font-jakarta text-xs font-bold text-gray-900">{item.participant_segment}</p>
               <p className="mt-1 font-jakarta text-xs text-gray-500">{item.interview_date} - pain severity {item.pain_severity}/5</p>
             </div>
           ))}
@@ -1034,7 +1034,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
         <PersistedList title="Experiment history" empty="No experiments recorded yet.">
           {workflow?.experiments?.map((item) => (
             <div key={item.id} className="rounded-lg border border-black/6 bg-gray-50 p-3">
-              <p className="font-bricolage text-xs font-bold text-gray-900">{item.experiment_type}</p>
+              <p className="font-jakarta text-xs font-bold text-gray-900">{item.experiment_type}</p>
               <p className="mt-1 font-jakarta text-xs text-gray-500">{item.status}{item.outcome ? ` - ${item.outcome}` : ""}</p>
               {item.status !== "closed" && (
                 <button
@@ -1043,7 +1043,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
                     fd.set("status", item.status === "planned" ? "active" : "closed");
                     submit(`/api/evidence-projects/${projectId}/experiments/${item.id}`, fd, "PATCH");
                   }}
-                  className="mt-2 font-bricolage text-[11px] font-bold text-emerald-700"
+                  className="mt-2 font-jakarta text-[11px] font-bold text-emerald-700"
                 >
                   {item.status === "planned" ? "Start it" : "Close it"}
                 </button>
@@ -1056,7 +1056,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
       <PersistedList title="Activity history" empty="No persisted activity yet." className="mt-5">
         {workflow?.activity?.map((item) => (
           <div key={item.id} className="rounded-lg border border-black/6 bg-gray-50 p-3">
-            <p className="font-bricolage text-xs font-bold text-gray-900">{item.title}</p>
+            <p className="font-jakarta text-xs font-bold text-gray-900">{item.title}</p>
             <p className="mt-1 font-jakarta text-xs text-gray-500">{new Date(item.created_at).toLocaleString()}</p>
           </div>
         ))}
@@ -1068,7 +1068,7 @@ function PersistedWorkflowPanel({ projectId, workflow, onRefresh }: { projectId:
 function MiniInput({ label, name, type = "text", required = false, defaultValue = "" }: { label: string; name: string; type?: string; required?: boolean; defaultValue?: string }) {
   return (
     <label className="block min-w-0">
-      <span className="font-bricolage text-[11px] font-bold uppercase tracking-wide text-gray-600">{label}</span>
+      <span className="font-jakarta text-[11px] font-bold uppercase tracking-wide text-gray-600">{label}</span>
       <input name={name} type={type} required={required} defaultValue={defaultValue} className="mt-1 h-9 w-full min-w-0 rounded-lg border border-black/10 bg-white px-3 font-jakarta text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20" />
     </label>
   );
@@ -1077,7 +1077,7 @@ function MiniInput({ label, name, type = "text", required = false, defaultValue 
 function MiniTextarea({ label, name, required = false, defaultValue = "" }: { label: string; name: string; required?: boolean; defaultValue?: string }) {
   return (
     <label className="block min-w-0">
-      <span className="font-bricolage text-[11px] font-bold uppercase tracking-wide text-gray-600">{label}</span>
+      <span className="font-jakarta text-[11px] font-bold uppercase tracking-wide text-gray-600">{label}</span>
       <textarea name={name} required={required} rows={3} defaultValue={defaultValue} className="mt-1 w-full min-w-0 rounded-lg border border-black/10 bg-white px-3 py-2 font-jakarta text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20" />
     </label>
   );
@@ -1086,7 +1086,7 @@ function MiniTextarea({ label, name, required = false, defaultValue = "" }: { la
 function MiniSelect({ label, name, options, defaultValue }: { label: string; name: string; options: string[]; defaultValue?: string }) {
   return (
     <label className="block min-w-0">
-      <span className="font-bricolage text-[11px] font-bold uppercase tracking-wide text-gray-600">{label}</span>
+      <span className="font-jakarta text-[11px] font-bold uppercase tracking-wide text-gray-600">{label}</span>
       <select name={name} defaultValue={defaultValue} className="mt-1 h-9 w-full min-w-0 rounded-lg border border-black/10 bg-white px-3 font-jakarta text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
         {options.map((option) => <option key={option} value={option}>{option.replaceAll("_", " ")}</option>)}
       </select>
@@ -1098,7 +1098,7 @@ function PersistedList({ title, empty, children, className = "" }: { title: stri
   const hasItems = Array.isArray(children) ? children.length > 0 : Boolean(children);
   return (
     <div className={`min-w-0 ${className}`}>
-      <p className="mb-2 font-bricolage text-xs font-bold uppercase tracking-wide text-gray-500">{title}</p>
+      <p className="mb-2 font-jakarta text-xs font-bold uppercase tracking-wide text-gray-500">{title}</p>
       <div className="space-y-2">
         {hasItems ? children : <div className="rounded-lg border border-dashed border-black/10 bg-[#fbfaf7] p-3 font-jakarta text-xs text-gray-500">{empty}</div>}
       </div>
@@ -1109,8 +1109,8 @@ function PersistedList({ title, empty, children, className = "" }: { title: stri
 function MetricBlock({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 rounded-xl border border-black/6 bg-gray-50 p-3">
-      <p className="font-bricolage text-[10px] font-bold uppercase tracking-wide text-gray-500">{label}</p>
-      <p className="mt-1 break-words font-bricolage text-sm font-bold capitalize text-gray-900">{value}</p>
+      <p className="font-jakarta text-[10px] font-bold uppercase tracking-wide text-gray-500">{label}</p>
+      <p className="mt-1 break-words font-jakarta text-sm font-bold capitalize text-gray-900">{value}</p>
     </div>
   );
 }
@@ -1118,7 +1118,7 @@ function MetricBlock({ label, value }: { label: string; value: string }) {
 function TextBlock({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="min-w-0 rounded-xl border border-black/6 bg-gray-50 p-3">
-      <p className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-600">{title}</p>
+      <p className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-600">{title}</p>
       <ul className="mt-2 space-y-1.5">
         {items.map((item) => <li key={item} className="break-words font-jakarta text-xs leading-relaxed text-gray-600">{item}</li>)}
       </ul>

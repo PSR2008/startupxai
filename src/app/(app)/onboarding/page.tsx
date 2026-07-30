@@ -164,11 +164,11 @@ export default function OnboardingPage() {
           <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
             <Compass size={18} className="text-emerald-600" />
           </div>
-          <span className="font-bricolage text-xs font-bold text-emerald-600 uppercase tracking-widest">
+          <span className="font-jakarta text-xs font-bold text-emerald-600 uppercase tracking-widest">
             Founder setup
           </span>
         </div>
-        <h1 className="font-bricolage text-3xl font-bold text-gray-900 mb-2">Set up your evidence workspace</h1>
+        <h1 className="font-jakarta text-3xl font-bold text-gray-900 mb-2">Set up your evidence workspace</h1>
         <p className="font-jakarta text-sm text-gray-500 max-w-2xl">
           Tell us what you are building once. We will prefill assessment tools and tune the dashboard around your startup context.
         </p>
@@ -236,7 +236,7 @@ export default function OnboardingPage() {
           ].map(({ icon: Icon, title, text }) => (
             <div key={title} className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
               <Icon size={16} className="text-emerald-600 mb-3" />
-              <p className="font-bricolage text-sm font-bold text-gray-900 mb-1">{title}</p>
+              <p className="font-jakarta text-sm font-bold text-gray-900 mb-1">{title}</p>
               <p className="font-jakarta text-xs text-gray-500 leading-relaxed">{text}</p>
             </div>
           ))}

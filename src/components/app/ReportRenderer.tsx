@@ -60,7 +60,7 @@ function renderValue(value: unknown): ReactNode {
 function renderGeneratedSection(section: FounderReportContent["sections"][number]) {
   return (
     <section key={section.title} className="surface-panel break-inside-avoid p-5">
-      <h2 className="font-bricolage text-base font-bold text-gray-950 mb-2">{section.title}</h2>
+      <h2 className="font-jakarta text-base font-bold text-gray-950 mb-2">{section.title}</h2>
       {section.body && (
         <p className="font-jakarta text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{section.body}</p>
       )}
@@ -123,7 +123,7 @@ function renderEvidenceAssessmentSummary(output: Record<string, unknown>): React
   return (
     <div className="mb-5 space-y-4 rounded-xl border border-amber-200 bg-amber-50/70 p-4">
       <div>
-        <h3 className="font-bricolage text-sm font-bold text-amber-950">Evidence assessment transparency</h3>
+        <h3 className="font-jakarta text-sm font-bold text-amber-950">Evidence assessment transparency</h3>
         <p className="mt-1 font-jakarta text-xs leading-relaxed text-amber-900">{EVIDENCE_SCORE_DISCLAIMER}</p>
       </div>
       <div className="space-y-3">
@@ -154,7 +154,7 @@ export default function ReportRenderer({ report }: { report: RenderableReport })
             <p className="mb-1 font-jakarta text-xs font-semibold text-emerald-700">
               {ENGINE_LABELS[report.engine_type] ?? report.engine_type}
             </p>
-            <h1 className="font-bricolage text-2xl sm:text-3xl font-bold text-gray-950 mb-2">{getReportTitle(report)}</h1>
+            <h1 className="font-jakarta text-2xl sm:text-3xl font-bold text-gray-950 mb-2">{getReportTitle(report)}</h1>
             <p className="font-jakarta text-sm text-gray-500 flex items-center gap-1.5">
               <CalendarDays size={13} />
               {new Date(report.created_at).toLocaleString("en-US", {
@@ -172,12 +172,12 @@ export default function ReportRenderer({ report }: { report: RenderableReport })
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)]">
         <section className="surface-panel h-fit p-5">
-          <h2 className="font-bricolage text-sm font-bold text-gray-950 mb-4">Input</h2>
+          <h2 className="font-jakarta text-sm font-bold text-gray-950 mb-4">Input</h2>
           {renderObject(report.input_data)}
         </section>
 
         <section className="surface-panel min-w-0 p-5">
-          <h2 className="font-bricolage text-sm font-bold text-gray-950 mb-4">Report Output</h2>
+          <h2 className="font-jakarta text-sm font-bold text-gray-950 mb-4">Report Output</h2>
           {evidenceSummary}
           {renderObject(report.output_data)}
         </section>
@@ -201,7 +201,7 @@ export function GeneratedReportRenderer({ report }: { report: GeneratedReport })
             <p className="mb-2 font-jakarta text-xs font-semibold text-emerald-700">
               StartupX AI
             </p>
-            <h1 className="font-bricolage text-3xl sm:text-4xl font-bold text-gray-950 tracking-tight">
+            <h1 className="font-jakarta text-3xl sm:text-4xl font-bold text-gray-950 tracking-tight">
               {content.title}
             </h1>
             <p className="font-jakarta text-sm text-gray-500 mt-3 max-w-2xl">{content.subtitle}</p>
@@ -235,7 +235,7 @@ export function GeneratedReportRenderer({ report }: { report: GeneratedReport })
 
       {content.startup.summary && (
         <section className="surface-panel break-inside-avoid p-5">
-          <h2 className="font-bricolage text-base font-bold text-gray-900 mb-2">One-Line Concept Summary</h2>
+          <h2 className="font-jakarta text-base font-bold text-gray-900 mb-2">One-Line Concept Summary</h2>
           <p className="font-jakarta text-sm text-gray-600 leading-relaxed">{content.startup.summary}</p>
         </section>
       )}
@@ -246,7 +246,7 @@ export function GeneratedReportRenderer({ report }: { report: GeneratedReport })
 
       {content.nextActions.length > 0 && (
         <section className="break-inside-avoid rounded-xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
-          <h2 className="font-bricolage text-base font-bold text-emerald-900 mb-3">Recommended Next Seven Actions</h2>
+          <h2 className="font-jakarta text-base font-bold text-emerald-900 mb-3">Recommended Next Seven Actions</h2>
           <ol className="space-y-2">
             {content.nextActions.map((action, index) => (
               <li key={index} className="font-jakarta text-sm text-emerald-800 leading-relaxed">

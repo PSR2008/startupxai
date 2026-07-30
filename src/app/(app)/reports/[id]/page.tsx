@@ -168,7 +168,7 @@ export default function ReportDetailPage() {
           <ArrowLeft size={14} /> Back to dashboard
         </Link>
         <div className="rounded-xl border border-rose-200 bg-rose-50 p-8">
-          <p className="font-bricolage text-sm font-bold text-rose-700">Report unavailable</p>
+          <p className="font-jakarta text-sm font-bold text-rose-700">Report unavailable</p>
           <p className="font-jakarta text-sm text-rose-600 mt-1">{error || "This report could not be found."}</p>
         </div>
       </div>
@@ -228,7 +228,7 @@ export default function ReportDetailPage() {
       <div className="surface-panel no-print mb-5 p-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <p className="font-bricolage text-sm font-bold text-gray-900">Founder report outputs</p>
+            <p className="font-jakarta text-sm font-bold text-gray-900">Founder report outputs</p>
             <p className="font-jakarta text-xs text-gray-500 mt-1">
               Turn this saved analysis into a polished founder document, investor memo, or slide-ready summary.
             </p>
@@ -243,7 +243,7 @@ export default function ReportDetailPage() {
                 key={type}
                 onClick={() => generateReport(type)}
                 disabled={Boolean(generating)}
-                className="h-9 px-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-bricolage text-xs font-bold hover:bg-emerald-100 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                className="h-9 px-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-jakarta text-xs font-bold hover:bg-emerald-100 disabled:opacity-50 transition-colors flex items-center gap-1.5"
               >
                 {generating === type ? <Loader2 size={13} className="animate-spin" /> : <Icon size={13} />}
                 {label}
@@ -261,7 +261,7 @@ export default function ReportDetailPage() {
             <button
               key={value}
               onClick={() => setExpiresIn(value as ShareExpiryOption)}
-              className={`h-7 px-2.5 rounded-lg border font-bricolage text-[11px] font-bold transition-colors ${
+              className={`h-7 px-2.5 rounded-lg border font-jakarta text-[11px] font-bold transition-colors ${
                 expiresIn === value
                   ? "border-emerald-300 bg-emerald-50 text-emerald-700"
                   : "border-black/8 bg-gray-50 text-gray-500 hover:bg-white"

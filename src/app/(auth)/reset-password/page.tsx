@@ -49,11 +49,11 @@ export default function ResetPasswordPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25">
               <Zap size={16} className="text-white" strokeWidth={2.5} />
             </div>
-            <span className="font-bricolage text-lg font-bold text-gray-900">
+            <span className="font-jakarta text-lg font-bold text-gray-900">
               StartupX <span className="text-gradient-brand">AI</span>
             </span>
           </Link>
-          <h1 className="font-bricolage text-2xl font-bold text-gray-900 mb-1.5">Choose a new password</h1>
+          <h1 className="font-jakarta text-2xl font-bold text-gray-900 mb-1.5">Choose a new password</h1>
           <p className="font-jakarta text-sm text-gray-500">Use at least 8 characters.</p>
         </div>
 
@@ -64,7 +64,7 @@ export default function ResetPasswordPage() {
                 <CheckCircle2 size={24} className="text-emerald-600" />
               </div>
               <div>
-                <p className="font-bricolage text-base font-bold text-gray-900">Password updated</p>
+                <p className="font-jakarta text-base font-bold text-gray-900">Password updated</p>
                 <p className="mt-1 font-jakarta text-sm text-gray-500">Taking you back to the dashboard.</p>
               </div>
             </div>

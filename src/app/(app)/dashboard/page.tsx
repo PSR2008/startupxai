@@ -94,7 +94,7 @@ export default function DashboardPage() {
               <Badge variant="emerald" size="sm" dot>Founder operating system</Badge>
               <Badge variant={usage.plan === "free" ? "neutral" : "blue"} size="sm">{usage.plan} plan</Badge>
             </div>
-            <h1 className="font-bricolage text-3xl font-bold tracking-tight text-gray-950">
+            <h1 className="font-jakarta text-3xl font-bold tracking-tight text-gray-950">
               {profile?.startup_idea ? profile.startup_idea : "Evidence workspace"}
             </h1>
             <p className="mt-2 max-w-2xl font-jakarta text-sm leading-relaxed text-gray-600">
@@ -121,7 +121,7 @@ export default function DashboardPage() {
           <section className="surface-panel p-5">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <p className="font-bricolage text-sm font-bold text-gray-900">Current project</p>
+                <p className="font-jakarta text-sm font-bold text-gray-900">Current project</p>
                 <p className="font-jakarta text-xs text-gray-500">Your active founder context and next evidence step.</p>
               </div>
               <SearchCheck size={18} className="text-emerald-700" />
@@ -132,7 +132,7 @@ export default function DashboardPage() {
               <ProjectField label="Stage" value={profile?.founder_stage} fallback="No stage recorded" />
             </div>
             <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-              <p className="font-bricolage text-xs font-bold text-amber-900">Next recommended action</p>
+              <p className="font-jakarta text-xs font-bold text-amber-900">Next recommended action</p>
               <p className="mt-1 font-jakarta text-sm leading-relaxed text-amber-800">
                 {profile ? "Create or update the Evidence Score, then add customer research before treating the assessment as reliable." : "Complete founder setup so evidence, reports, and recommendations have the right context."}
               </p>
@@ -143,11 +143,11 @@ export default function DashboardPage() {
         <StaggerItem>
           <section className="h-full rounded-xl border border-emerald-200/10 bg-[#10201b] p-5 text-white shadow-sm">
             <div className="mb-5 flex items-center justify-between">
-              <p className="font-bricolage text-sm font-bold">Workspace health</p>
+              <p className="font-jakarta text-sm font-bold">Workspace health</p>
               <ShieldCheck size={17} className="text-emerald-300" />
             </div>
             <div className="mb-4 flex items-end gap-2">
-              <span className="font-bricolage text-4xl font-bold">{setupComplete}</span>
+              <span className="font-jakarta text-4xl font-bold">{setupComplete}</span>
               <span className="pb-1 font-jakarta text-sm text-white/55">/ {setupItems.length} ready</span>
             </div>
             <div className="space-y-2">
@@ -166,10 +166,10 @@ export default function DashboardPage() {
         <section className="surface-panel p-5">
           <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="font-bricolage text-sm font-bold text-gray-900">Quick actions</p>
+              <p className="font-jakarta text-sm font-bold text-gray-900">Quick actions</p>
               <p className="font-jakarta text-xs text-gray-500">Move from uncertainty to recorded evidence.</p>
             </div>
-            <Link href="/evidence-engine" className="font-bricolage text-xs font-bold text-emerald-700 hover:text-emerald-800">
+            <Link href="/evidence-engine" className="font-jakarta text-xs font-bold text-emerald-700 hover:text-emerald-800">
               Open Evidence Engine
             </Link>
           </div>
@@ -182,7 +182,7 @@ export default function DashboardPage() {
                     <Icon size={16} className="text-gray-700" />
                     <Badge variant={action.tone} size="sm">Open</Badge>
                   </div>
-                  <p className="font-bricolage text-sm font-bold text-gray-950">{action.title}</p>
+                  <p className="font-jakarta text-sm font-bold text-gray-950">{action.title}</p>
                   <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{action.description}</p>
                 </Link>
               );
@@ -196,7 +196,7 @@ export default function DashboardPage() {
           <section className="surface-panel h-full p-5">
             <div className="mb-4 flex items-center gap-2">
               <FlaskConical size={15} className="text-amber-600" />
-              <p className="font-bricolage text-sm font-bold text-gray-900">Experiments in progress</p>
+              <p className="font-jakarta text-sm font-bold text-gray-900">Experiments in progress</p>
             </div>
             <EmptyPanel
               title="No experiments recorded yet."
@@ -211,11 +211,11 @@ export default function DashboardPage() {
           <section className="surface-panel h-full p-5">
             <div className="mb-4 flex items-center gap-2">
               <ClipboardList size={15} className="text-blue-700" />
-              <p className="font-bricolage text-sm font-bold text-gray-900">Open assumptions</p>
+              <p className="font-jakarta text-sm font-bold text-gray-900">Open assumptions</p>
             </div>
             {profile?.primary_goal ? (
               <div className="rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
-                <p className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-500">Founder goal</p>
+                <p className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-500">Founder goal</p>
                 <p className="mt-1 font-jakarta text-sm leading-relaxed text-gray-700">{profile.primary_goal}</p>
                 <p className="mt-3 font-jakarta text-xs leading-relaxed text-gray-500">
                   Convert this into a testable assumption in the Evidence Engine so it can be tied to sources or experiment results.
@@ -251,7 +251,7 @@ export default function DashboardPage() {
               clickEffect
             >
               <Icon size={15} className="mb-3 text-gray-600" />
-              <p className="font-bricolage text-sm font-bold text-gray-900">{tool.title}</p>
+              <p className="font-jakarta text-sm font-bold text-gray-900">{tool.title}</p>
             </MagicBentoCard>
           );
         })}
@@ -278,9 +278,9 @@ function ProjectField({ label, value, fallback }: { label: string; value?: strin
 function EmptyPanel({ title, description, href, action }: { title: string; description: string; href: string; action: string }) {
   return (
     <div className="rounded-lg border border-dashed border-black/12 bg-[#f8f6f0] p-5">
-      <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
+      <p className="font-jakarta text-sm font-bold text-gray-900">{title}</p>
       <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-500">{description}</p>
-      <Link href={href} className="mt-4 inline-flex items-center gap-1.5 font-bricolage text-xs font-bold text-emerald-700 hover:text-emerald-800">
+      <Link href={href} className="mt-4 inline-flex items-center gap-1.5 font-jakarta text-xs font-bold text-emerald-700 hover:text-emerald-800">
         {action} <ArrowRight size={12} />
       </Link>
     </div>

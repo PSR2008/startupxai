@@ -68,7 +68,7 @@ export default function AppTopbar() {
         {current && (
           <div className="flex min-w-0 items-center gap-2">
             <current.icon size={15} className={cn(current.color, "flex-shrink-0")} />
-            <span className="truncate font-bricolage text-sm font-bold text-gray-950">
+            <span className="truncate font-jakarta text-sm font-bold text-gray-950">
               {current.label}
             </span>
           </div>
@@ -80,7 +80,7 @@ export default function AppTopbar() {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600">
             <Zap size={13} className="text-white" strokeWidth={2.5} />
           </div>
-          <span className="font-bricolage text-sm font-bold text-gray-900">
+          <span className="font-jakarta text-sm font-bold text-gray-900">
             StartupX <span className="text-gradient-brand">AI</span>
           </span>
         </Link>

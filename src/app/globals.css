@@ -43,7 +43,7 @@
   --radius-xl: 20px;
   --container-max: 1280px;
   --container-padding: 1.5rem;
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader", ui-serif, Georgia, serif;
   --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 }
@@ -56,7 +56,7 @@ body{background:radial-gradient(circle at top left,rgba(16,185,129,0.045),transp
 ::-webkit-scrollbar-track{background:#eef0f8}
 ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,0.2)}
-h1,h2,h3,h4,h5,h6{font-family:var(--font-display);font-weight:700;line-height:1.14;letter-spacing:-0.018em;color:var(--color-text-primary)}
+h1,h2,h3,h4,h5,h6{font-family:var(--font-body);font-weight:650;line-height:1.16;letter-spacing:0;color:var(--color-text-primary)}
 
 .glass{background:rgba(255,254,250,0.9);border:1px solid var(--color-border-subtle)}
 .glass-strong{background:rgba(255,254,250,0.96);border:1px solid var(--color-border-subtle)}
@@ -116,7 +116,7 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
 
 .output-prose p{margin-bottom:0.75rem;color:var(--color-text-secondary);font-size:0.9375rem;line-height:1.7}
 .output-prose ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:0.5rem}
-.output-prose ul li::before{content:'→';color:#059669;margin-right:0.5rem;font-weight:700}
+.output-prose ul li::before{content:'â†’';color:#059669;margin-right:0.5rem;font-weight:700}
 
 .editorial-section{position:relative;border-top:1px solid rgba(15,17,23,0.08)}
 .editorial-section::before{content:"";position:absolute;top:-1px;left:0;width:5rem;height:1px;background:#059669}
@@ -247,12 +247,12 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   width:min(100%,76rem);
   margin:0;
   color:#fff;
-  font-family:var(--font-horror),var(--font-display);
-  font-size:clamp(4.35rem,9.2vw,9.35rem);
-  font-weight:400;
-  line-height:0.86;
-  letter-spacing:clamp(0.03rem,0.48vw,0.42rem);
-  text-transform:uppercase;
+  font-family:var(--font-display);
+  font-size:clamp(4.2rem,9vw,9rem);
+  font-weight:600;
+  line-height:0.9;
+  letter-spacing:clamp(0.01rem,0.22vw,0.2rem);
+  text-transform:none;
   text-wrap:balance;
   background:none;
   -webkit-background-clip:text;
@@ -261,7 +261,7 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   font-feature-settings:"kern" 1;
   text-shadow:0 3px 18px rgba(0,0,0,0.55),0 14px 38px rgba(0,0,0,0.26);
 }
-.resadex-title span:last-child{letter-spacing:clamp(0.03rem,0.52vw,0.42rem)}
+.resadex-title span:last-child{letter-spacing:clamp(0.01rem,0.24vw,0.2rem)}
 .resadex-subtitle{
   width:min(100%,42rem);
   margin:1.4rem auto 0;
@@ -323,7 +323,7 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
 @media(max-width:900px){
   .resadex-hero{padding-top:6.75rem}
   .resadex-copy{padding-bottom:5rem}
-  .resadex-title{font-size:clamp(3.6rem,12vw,6.6rem);letter-spacing:clamp(0.03rem,0.72vw,0.48rem);gap:clamp(0.72rem,1.9vw,1.7rem)}
+  .resadex-title{font-size:clamp(3.6rem,12vw,6.6rem);letter-spacing:clamp(0.01rem,0.26vw,0.2rem);gap:clamp(0.72rem,1.9vw,1.7rem)}
 }
 
 @media(max-width:640px){
@@ -333,8 +333,8 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   .resadex-copy::before{bottom:1rem;width:30rem;height:24rem;filter:blur(14px)}
   .resadex-kicker{letter-spacing:0.2em;font-size:0.6rem}
   .resadex-example-label{margin-bottom:0.72rem;font-size:0.68rem}
-  .resadex-title{flex-direction:column;gap:0.36rem;font-size:clamp(3.75rem,16vw,4.65rem);letter-spacing:0.03rem;line-height:0.88}
-  .resadex-title span:last-child{letter-spacing:0.03rem}
+  .resadex-title{flex-direction:column;gap:0.36rem;font-size:clamp(3.6rem,15vw,4.45rem);letter-spacing:0.01rem;line-height:0.92}
+  .resadex-title span:last-child{letter-spacing:0.01rem}
   .resadex-subtitle{width:min(100%,22rem);margin-top:1.2rem;font-size:0.98rem}
   .resadex-actions{flex-direction:column;width:min(100%,17.5rem);margin-left:auto;margin-right:auto}
   .resadex-actions a{width:100%}

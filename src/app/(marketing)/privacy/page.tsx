@@ -100,10 +100,10 @@ export default function PrivacyPage() {
     <div className="pt-28 pb-20 px-5">
       <div className="max-w-3xl mx-auto">
         <AnimatedSection className="mb-12">
-          <p className="font-bricolage text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4">
+          <p className="font-jakarta text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4">
             Legal
           </p>
-          <h1 className="font-bricolage text-4xl sm:text-5xl font-bold text-gray-800 tracking-tight mb-4">
+          <h1 className="font-display text-4xl sm:text-5xl font-bold text-gray-800 tracking-tight mb-4">
             Privacy Policy
           </h1>
           <p className="font-jakarta text-sm text-gray-500">
@@ -111,7 +111,7 @@ export default function PrivacyPage() {
           </p>
           <div className="mt-5 p-4 rounded-xl border border-emerald-200 bg-emerald-50">
             <p className="font-jakarta text-sm text-gray-600 leading-relaxed">
-              <strong className="text-gray-900 font-bricolage">TL;DR:</strong>{" "}
+              <strong className="text-gray-900 font-jakarta">TL;DR:</strong>{" "}
               We do not sell your data. Your startup ideas stay private. We use minimal tracking, and you can request deletion of your data.
             </p>
           </div>
@@ -121,7 +121,7 @@ export default function PrivacyPage() {
           {sections.map((section, i) => (
             <AnimatedSection key={section.title} delay={i * 0.04}>
               <div className="rounded-2xl border border-black/6 bg-white p-6 sm:p-8 shadow-sm">
-                <h2 className="font-bricolage text-lg font-bold text-gray-800 mb-4">
+                <h2 className="font-display text-lg font-bold text-gray-800 mb-4">
                   {section.title}
                 </h2>
                 <div className="font-jakarta text-sm text-gray-500 leading-relaxed whitespace-pre-line">

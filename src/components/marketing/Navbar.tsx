@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -62,7 +62,7 @@ export default function Navbar() {
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-shadow">
                 <Zap size={15} className="text-white" strokeWidth={2.5} />
               </div>
-              <span className={cn("font-[var(--font-display)] text-base font-bold tracking-[-0.01em]", useLightNavText ? "text-white" : "text-gray-900")}>
+              <span className={cn("font-[var(--font-body)] text-base font-bold tracking-normal", useLightNavText ? "text-white" : "text-gray-900")}>
                 StartupX{" "}
                 <span className="text-gradient-brand">AI</span>
               </span>
@@ -75,7 +75,7 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "px-4 py-2 rounded-xl font-[var(--font-body)] text-sm font-medium tracking-[-0.005em] transition-all duration-150",
+                    "px-4 py-2 rounded-xl font-[var(--font-body)] text-sm font-medium tracking-normal transition-all duration-150",
                     pathname === link.href
                       ? useLightNavText ? "text-white bg-white/10" : "text-slate-950 bg-white/35"
                       : useLightNavText ? "text-white/[0.78] hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-950 hover:bg-white/35"
@@ -91,7 +91,7 @@ export default function Navbar() {
               <Link
                 href="/signin"
                 className={cn(
-                  "font-[var(--font-body)] text-sm font-medium tracking-[-0.005em] transition-colors",
+                  "font-[var(--font-body)] text-sm font-medium tracking-normal transition-colors",
                   useLightNavText ? "text-white/[0.78] hover:text-white" : "text-slate-700 hover:text-slate-950"
                 )}
               >
@@ -102,7 +102,7 @@ export default function Navbar() {
                   size="sm"
                   icon={<ChevronRight size={14} />}
                   iconPosition="right"
-                  className="font-[var(--font-body)] text-[0.8125rem] font-semibold tracking-[-0.005em]"
+                  className="font-[var(--font-body)] text-[0.8125rem] font-semibold tracking-normal"
                 >
                   Start assessment
                 </Button>
@@ -149,7 +149,7 @@ export default function Navbar() {
                   <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
                     <Zap size={13} className="text-white" strokeWidth={2.5} />
                   </div>
-                  <span className="font-[var(--font-display)] text-sm font-bold tracking-[-0.01em] text-gray-900">
+                  <span className="font-[var(--font-body)] text-sm font-bold tracking-normal text-gray-900">
                     StartupX <span className="text-gradient-brand">AI</span>
                   </span>
                 </Link>
@@ -171,7 +171,7 @@ export default function Navbar() {
                   >
                     <Link
                       href={link.href}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-[var(--font-body)] text-sm font-medium tracking-[-0.005em] text-gray-600 hover:text-gray-900 hover:bg-black/4 transition-all"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-[var(--font-body)] text-sm font-medium tracking-normal text-gray-600 hover:text-gray-900 hover:bg-black/4 transition-all"
                       onClick={() => setMobileOpen(false)}
                     >
                       {link.label}
@@ -189,7 +189,7 @@ export default function Navbar() {
                 <Link
                   href="/signin"
                   onClick={() => setMobileOpen(false)}
-                  className="block text-center font-[var(--font-body)] text-sm font-medium tracking-[-0.005em] text-gray-500 hover:text-gray-900 transition-colors py-1"
+                  className="block text-center font-[var(--font-body)] text-sm font-medium tracking-normal text-gray-500 hover:text-gray-900 transition-colors py-1"
                 >
                   Sign In
                 </Link>

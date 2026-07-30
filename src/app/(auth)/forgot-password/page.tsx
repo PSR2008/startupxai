@@ -50,11 +50,11 @@ export default function ForgotPasswordPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25">
               <Zap size={16} className="text-white" strokeWidth={2.5} />
             </div>
-            <span className="font-bricolage text-lg font-bold text-gray-900">
+            <span className="font-jakarta text-lg font-bold text-gray-900">
               StartupX <span className="text-gradient-brand">AI</span>
             </span>
           </Link>
-          <h1 className="font-bricolage text-2xl font-bold text-gray-900 mb-1.5">Reset your password</h1>
+          <h1 className="font-jakarta text-2xl font-bold text-gray-900 mb-1.5">Reset your password</h1>
           <p className="font-jakarta text-sm text-gray-500">We&apos;ll send you a secure reset link.</p>
         </div>
 
@@ -65,10 +65,10 @@ export default function ForgotPasswordPage() {
                 <CheckCircle2 size={24} className="text-emerald-600" />
               </div>
               <div>
-                <p className="font-bricolage text-base font-bold text-gray-900">Check your inbox</p>
+                <p className="font-jakarta text-base font-bold text-gray-900">Check your inbox</p>
                 <p className="mt-1 font-jakarta text-sm text-gray-500">If an account exists for {email}, a reset link is on the way.</p>
               </div>
-              <Link href="/signin" className="inline-flex items-center gap-2 font-bricolage text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+              <Link href="/signin" className="inline-flex items-center gap-2 font-jakarta text-sm font-semibold text-emerald-600 hover:text-emerald-700">
                 Back to sign in <ArrowRight size={14} />
               </Link>
             </div>

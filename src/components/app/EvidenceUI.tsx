@@ -19,7 +19,7 @@ export function ProviderStatus({ run }: { run: ProviderRunStatus }) {
   return (
     <div className="surface-inset min-w-0 p-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="min-w-0 break-words font-bricolage text-xs font-bold text-gray-900">{run.providerName}</p>
+        <p className="min-w-0 break-words font-jakarta text-xs font-bold text-gray-900">{run.providerName}</p>
         <Badge variant={variant} size="sm" className="flex-shrink-0">{label}</Badge>
       </div>
       <p className="mt-2 break-words font-jakarta text-xs leading-relaxed text-gray-500">{run.message}</p>
@@ -38,7 +38,7 @@ export function EvidenceCard({ item }: { item: EvidenceItem }) {
     <article className="surface-panel min-w-0 max-w-full p-4">
       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="break-words font-bricolage text-sm font-bold text-gray-900">{item.title}</p>
+          <p className="break-words font-jakarta text-sm font-bold text-gray-900">{item.title}</p>
           <p className="mt-1 break-words font-jakarta text-xs text-gray-400">{item.sourceName} - {classifyEvidenceItem(item)}</p>
         </div>
         <SourceBadge item={item} />
@@ -49,7 +49,7 @@ export function EvidenceCard({ item }: { item: EvidenceItem }) {
       )}
       {isPublicUrl && (
         <div className="mt-3 rounded-xl border border-blue-200 bg-blue-50/70 p-3">
-          <p className="font-bricolage text-xs font-bold text-blue-900">Public source attribution</p>
+          <p className="font-jakarta text-xs font-bold text-blue-900">Public source attribution</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <Badge variant="blue" size="sm">Public URL</Badge>
             {hostname && <Badge variant="neutral" size="sm">{hostname}</Badge>}
@@ -67,7 +67,7 @@ export function EvidenceCard({ item }: { item: EvidenceItem }) {
         <Badge variant="neutral" size="sm">relevance {item.relevanceScore}/100</Badge>
         <Badge variant="neutral" size="sm">reliability {item.reliabilityScore}/100</Badge>
         {item.sourceUrl && (
-          <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex max-w-full items-center gap-1 break-all font-bricolage text-[11px] font-bold text-emerald-700 hover:text-emerald-800" aria-label="Open source in a new tab">
+          <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex max-w-full items-center gap-1 break-all font-jakarta text-[11px] font-bold text-emerald-700 hover:text-emerald-800" aria-label="Open source in a new tab">
             Open source <ExternalLink size={11} aria-hidden="true" />
           </a>
         )}
@@ -91,10 +91,10 @@ export function ScoreBreakdown({ score }: { score: CategoryScore }) {
         <div key={component.componentName} className="surface-inset min-w-0 p-3">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="break-words font-bricolage text-xs font-bold text-gray-800">{component.componentName}</p>
+              <p className="break-words font-jakarta text-xs font-bold text-gray-800">{component.componentName}</p>
               <p className="mt-1 break-words font-jakarta text-[11px] text-gray-400">{component.evidenceKind.replace("_", " ")} signal - weight {component.weight}</p>
             </div>
-            <p className="flex-shrink-0 font-bricolage text-sm font-bold text-gray-900">{component.normalizedValue}/100</p>
+            <p className="flex-shrink-0 font-jakarta text-sm font-bold text-gray-900">{component.normalizedValue}/100</p>
           </div>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-200">
             <div className={`h-full rounded-full ${componentTone(component.evidenceKind)}`} style={{ width: `${component.normalizedValue}%` }} />
@@ -108,7 +108,7 @@ export function ScoreBreakdown({ score }: { score: CategoryScore }) {
 export function MethodologyDrawer({ score }: { score: CategoryScore }) {
   return (
     <details className="surface-inset group min-w-0 p-3">
-      <summary className="flex cursor-pointer list-none items-center gap-2 font-bricolage text-xs font-bold text-gray-700">
+      <summary className="flex cursor-pointer list-none items-center gap-2 font-jakarta text-xs font-bold text-gray-700">
         <Info size={13} className="text-emerald-600" />
         How this score was calculated
       </summary>
@@ -131,7 +131,7 @@ export function ValidationDecisionPanel({ overallScore, confidence }: { overallS
         {overallScore >= 50 ? <ShieldCheck size={18} className="mt-1 text-emerald-700" /> : <AlertTriangle size={18} className="mt-1 text-amber-700" />}
         <div className="min-w-0">
           <p className="font-jakarta text-xs font-semibold text-emerald-800">Evidence assessment</p>
-          <h3 className="mt-1 break-words font-bricolage text-xl font-bold text-gray-950">{recommendation}</h3>
+          <h3 className="mt-1 break-words font-jakarta text-xl font-bold text-gray-950">{recommendation}</h3>
           <p className="mt-2 break-words font-jakarta text-sm leading-relaxed text-gray-600">
             Current evidence supports this recommendation with {confidence} confidence. Treat it as an assessment, not a prediction of business outcomes.
           </p>

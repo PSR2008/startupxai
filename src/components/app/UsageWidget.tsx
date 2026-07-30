@@ -130,7 +130,7 @@ export default function UsageWidget() {
           )}
           <div>
             <div className="flex items-center gap-2">
-              <p className="font-bricolage text-sm font-bold text-gray-900">{isFree ? "Starter Plan" : `${getPlanLabel(data.plan)} Plan`}</p>
+              <p className="font-jakarta text-sm font-bold text-gray-900">{isFree ? "Starter Plan" : `${getPlanLabel(data.plan)} Plan`}</p>
               {!isFree && (
                 <span className="flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-100 px-1.5 py-0.5">
                   <span className="w-1 h-1 rounded-full bg-emerald-500" />
@@ -155,10 +155,10 @@ export default function UsageWidget() {
       <div className="mb-3">
         <div className="flex items-end justify-between mb-2">
           <div>
-            <span className="font-bricolage text-2xl font-bold text-gray-900">{data.analyses_used}</span>
+            <span className="font-jakarta text-2xl font-bold text-gray-900">{data.analyses_used}</span>
             <span className="font-jakarta text-sm text-gray-400"> / {data.monthly_limit}</span>
           </div>
-          <span className={`font-bricolage text-xs font-bold ${atLimit ? "text-rose-500" : nearLimit ? "text-amber-500" : "text-gray-500"}`}>{pct}% used</span>
+          <span className={`font-jakarta text-xs font-bold ${atLimit ? "text-rose-500" : nearLimit ? "text-amber-500" : "text-gray-500"}`}>{pct}% used</span>
         </div>
 
         <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
@@ -180,7 +180,7 @@ export default function UsageWidget() {
           <div key={item.label} className="surface-inset px-3 py-2.5">
             <p className="metadata-text truncate">{item.label}</p>
             <p className="font-jakarta text-xs text-gray-700 mt-1">
-              <span className="font-bricolage font-bold text-gray-900">{item.used}</span> / {item.limit}
+              <span className="font-jakarta font-bold text-gray-900">{item.used}</span> / {item.limit}
             </p>
           </div>
         ))}
@@ -190,7 +190,7 @@ export default function UsageWidget() {
         <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="font-jakarta text-xs text-amber-700 mb-2">You&apos;re approaching your free limit.</p>
           <Link href="/payment?plan=founder&billing=monthly">
-            <button className="font-bricolage text-xs font-bold text-amber-700 hover:text-amber-900 transition-colors">Upgrade to Founder - 50 analyses/month</button>
+            <button className="font-jakarta text-xs font-bold text-amber-700 hover:text-amber-900 transition-colors">Upgrade to Founder - 50 analyses/month</button>
           </Link>
         </div>
       )}
@@ -199,7 +199,7 @@ export default function UsageWidget() {
         <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-3">
           <p className="font-jakarta text-xs text-rose-700 mb-2">You&apos;ve used all {data.monthly_limit} free analyses this month.</p>
           <Link href="/payment?plan=founder&billing=monthly">
-            <button className="font-bricolage text-xs font-bold text-rose-700 hover:text-rose-900 transition-colors">Upgrade to Founder - $5/mo, 50 analyses</button>
+            <button className="font-jakarta text-xs font-bold text-rose-700 hover:text-rose-900 transition-colors">Upgrade to Founder - $5/mo, 50 analyses</button>
           </Link>
         </div>
       )}

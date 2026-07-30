@@ -207,7 +207,7 @@ export default function CompetitorPage() {
           <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50 space-y-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="font-bricolage text-base font-bold text-gray-900">Competitive context</h3>
+                <h3 className="font-jakarta text-base font-bold text-gray-900">Competitive context</h3>
                 <p className="mt-1 font-jakarta text-xs text-gray-500">Give the engine a clear view of what you are building.</p>
               </div>
               <Badge variant="peach" size="sm">
@@ -266,7 +266,7 @@ export default function CompetitorPage() {
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50">
                   <Swords size={22} className="text-amber-600" />
                 </div>
-                <p className="mt-4 font-bricolage text-base font-bold text-gray-900">Ready to map the market</p>
+                <p className="mt-4 font-jakarta text-base font-bold text-gray-900">Ready to map the market</p>
                 <p className="mt-2 max-w-sm font-jakarta text-sm leading-relaxed text-gray-500">
                   Enter your idea to generate a competitor map, positioning gaps, white-space opportunities, and a focused action plan.
                 </p>
@@ -304,8 +304,8 @@ export default function CompetitorPage() {
                 <div className="rounded-2xl border border-black/6 bg-white p-6 shadow-sm shadow-gray-200/50">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="font-bricolage text-[11px] font-bold uppercase tracking-[0.18em] text-amber-700">Competitive report</p>
-                      <h3 className="mt-1 font-bricolage text-xl font-bold text-gray-950">{form.idea || "Competitor map"}</h3>
+                      <p className="font-jakarta text-[11px] font-bold uppercase tracking-[0.18em] text-amber-700">Competitive report</p>
+                      <h3 className="mt-1 font-jakarta text-xl font-bold text-gray-950">{form.idea || "Competitor map"}</h3>
                     </div>
                     <div className="flex flex-wrap gap-2 no-print">
                       <Button variant="outline" size="sm" onClick={() => setStatus("idle")}>Edit inputs</Button>
@@ -319,11 +319,11 @@ export default function CompetitorPage() {
 
                   <div className="mt-5 space-y-4">
                     <div>
-                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-500">Landscape Summary</h4>
+                      <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-500">Landscape Summary</h4>
                       <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-650">{result.comparisonSummary}</p>
                     </div>
                     <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-                      <p className="font-bricolage text-xs font-bold text-amber-800">Your Strategic Advantage</p>
+                      <p className="font-jakarta text-xs font-bold text-amber-800">Your Strategic Advantage</p>
                       <p className="mt-1.5 font-jakarta text-sm leading-relaxed text-gray-650">{result.strategicAdvantage}</p>
                     </div>
                   </div>
@@ -331,7 +331,7 @@ export default function CompetitorPage() {
 
                 {result.directCompetitors.length > 0 && (
                   <section className="space-y-3">
-                    <h4 className="flex items-center gap-2 font-bricolage text-xs font-bold uppercase tracking-widest text-gray-400">
+                    <h4 className="flex items-center gap-2 font-jakarta text-xs font-bold uppercase tracking-widest text-gray-400">
                       <ShieldAlert size={13} className="text-rose-500" /> Direct Competitors
                     </h4>
                     {result.directCompetitors.map((competitor) => (
@@ -342,7 +342,7 @@ export default function CompetitorPage() {
 
                 {result.indirectCompetitors.length > 0 && (
                   <section className="space-y-3">
-                    <h4 className="flex items-center gap-2 font-bricolage text-xs font-bold uppercase tracking-widest text-gray-400">
+                    <h4 className="flex items-center gap-2 font-jakarta text-xs font-bold uppercase tracking-widest text-gray-400">
                       <Target size={13} className="text-blue-600" /> Indirect Competitors
                     </h4>
                     {result.indirectCompetitors.map((competitor) => (
@@ -355,7 +355,7 @@ export default function CompetitorPage() {
                   <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                     <div className="mb-3 flex items-center gap-2">
                       <TrendingUp size={14} className="text-emerald-600" />
-                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">Positioning Gaps</h4>
+                      <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">Positioning Gaps</h4>
                     </div>
                     <div className="space-y-2">
                       {result.positioningGaps.map((gap, index) => (
@@ -369,7 +369,7 @@ export default function CompetitorPage() {
                   <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                     <div className="mb-3 flex items-center gap-2">
                       <Zap size={14} className="text-amber-700" />
-                      <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">White Space Opportunities</h4>
+                      <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">White Space Opportunities</h4>
                     </div>
                     <div className="space-y-2">
                       {result.whiteSpaceOpportunities.map((opportunity, index) => (
@@ -384,12 +384,12 @@ export default function CompetitorPage() {
                 <div className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm shadow-gray-200/50">
                   <div className="mb-3 flex items-center gap-2">
                     <Swords size={14} className="text-teal-600" />
-                    <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-700">How to Beat Them</h4>
+                    <h4 className="font-jakarta text-xs font-bold uppercase tracking-wide text-gray-700">How to Beat Them</h4>
                   </div>
                   <div className="space-y-2">
                     {result.howToBeatThem.map((strategy, index) => (
                       <div key={index} className="flex items-start gap-2.5 rounded-xl border border-teal-200 bg-teal-50 p-3">
-                        <span className="mt-0.5 font-bricolage text-xs font-bold text-teal-700">{String(index + 1).padStart(2, "0")}</span>
+                        <span className="mt-0.5 font-jakarta text-xs font-bold text-teal-700">{String(index + 1).padStart(2, "0")}</span>
                         <p className="font-jakarta text-sm leading-relaxed text-gray-650">{strategy}</p>
                       </div>
                     ))}
@@ -425,7 +425,7 @@ function CompetitorErrorState({
         <ShieldAlert size={20} className="text-rose-500" />
       </div>
       <div className="mt-4 space-y-2">
-        <p className="font-bricolage text-base font-bold text-gray-950">{code === "PROVIDER_TIMEOUT" ? "Analysis took too long" : "Analysis could not be completed"}</p>
+        <p className="font-jakarta text-base font-bold text-gray-950">{code === "PROVIDER_TIMEOUT" ? "Analysis took too long" : "Analysis could not be completed"}</p>
         <p className="mx-auto max-w-md font-jakarta text-sm leading-relaxed text-gray-600">
           {detail || "The analysis provider returned an unexpected response. Your input was not lost. Please try again."}
         </p>
@@ -456,7 +456,7 @@ function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; tit
     <MagicBentoCard className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>{icon}</div>
       <div>
-        <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
+        <p className="font-jakarta text-sm font-bold text-gray-900">{title}</p>
         <p className="mt-0.5 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
       </div>
     </MagicBentoCard>
@@ -471,7 +471,7 @@ function CompetitorCard({ competitor, variant }: { competitor: Competitor; varia
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-bricolage text-base font-bold text-gray-950">{competitor.name}</span>
+            <span className="font-jakarta text-base font-bold text-gray-950">{competitor.name}</span>
             {competitor.url && (
               <a href={competitor.url} target="_blank" rel="noopener noreferrer" className="text-gray-400 transition-colors hover:text-gray-700" aria-label={`Open ${competitor.name}`}>
                 <ExternalLink size={13} />
@@ -487,7 +487,7 @@ function CompetitorCard({ competitor, variant }: { competitor: Competitor; varia
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 p-3">
-          <p className="mb-2 font-bricolage text-[10px] font-bold uppercase text-emerald-700">Strengths</p>
+          <p className="mb-2 font-jakarta text-[10px] font-bold uppercase text-emerald-700">Strengths</p>
           {competitor.strengths.map((strength, index) => (
             <p key={index} className="mb-1 flex gap-1.5 font-jakarta text-xs leading-relaxed text-gray-600">
               <span className="text-emerald-700">+</span>
@@ -497,7 +497,7 @@ function CompetitorCard({ competitor, variant }: { competitor: Competitor; varia
         </div>
 
         <div className="rounded-xl border border-rose-100 bg-rose-50/70 p-3">
-          <p className="mb-2 font-bricolage text-[10px] font-bold uppercase text-rose-600">Weaknesses</p>
+          <p className="mb-2 font-jakarta text-[10px] font-bold uppercase text-rose-600">Weaknesses</p>
           {competitor.weaknesses.map((weakness, index) => (
             <p key={index} className="mb-1 flex gap-1.5 font-jakarta text-xs leading-relaxed text-gray-600">
               <span style={{ color }}>-</span>

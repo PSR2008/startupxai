@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -92,11 +92,11 @@ export default function SigninPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25">
               <Zap size={16} className="text-white" strokeWidth={2.5} />
             </div>
-            <span className="font-bricolage text-lg font-bold text-gray-900">
+            <span className="font-jakarta text-lg font-bold text-gray-900">
               StartupX <span className="text-gradient-brand">AI</span>
             </span>
           </Link>
-          <h1 className="font-bricolage text-2xl font-bold text-gray-900 mb-1.5">Welcome back</h1>
+          <h1 className="font-jakarta text-2xl font-bold text-gray-900 mb-1.5">Welcome back</h1>
           <p className="font-jakarta text-sm text-gray-500">
             Don&apos;t have an account?{" "}
             <Link href={`/signup?next=${encodeURIComponent(nextPath)}`} className="text-emerald-600 hover:text-emerald-700 transition-colors font-semibold">

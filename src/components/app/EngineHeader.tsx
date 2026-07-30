@@ -39,7 +39,7 @@ export default function EngineHeader({
               initial={{ opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.05 }}
-              className="font-bricolage text-[1.35rem] font-bold leading-tight text-gray-950"
+              className="font-jakarta text-[1.35rem] font-bold leading-tight text-gray-950"
             >
               {title}
             </motion.h1>

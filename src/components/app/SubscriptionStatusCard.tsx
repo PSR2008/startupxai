@@ -88,7 +88,7 @@ export default function SubscriptionStatusCard() {
 
       <div className="flex items-center gap-2.5 mb-5">
         <motion.div animate={isPaid && data.active ? { opacity: [0.7, 1, 0.7] } : {}} transition={{ repeat: Infinity, duration: 3 }} className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${isPaid && data.active ? "bg-emerald-500" : "bg-gray-300"}`} />
-        <p className={`font-bricolage text-lg font-bold ${isPaid && data.active ? "text-gray-900" : "text-gray-500"}`}>
+        <p className={`font-jakarta text-lg font-bold ${isPaid && data.active ? "text-gray-900" : "text-gray-500"}`}>
           {isFree ? "Starter Plan" : data.isExpired ? "Expired" : data.active ? "Active" : "Inactive"}
         </p>
       </div>
@@ -125,7 +125,7 @@ function InfoRow({ icon, title, subtitle }: { icon: React.ReactNode; title: stri
     <div className="flex items-center gap-2.5">
       <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border border-black/8 bg-[#f8f6f0]">{icon}</div>
       <div>
-        <p className="font-bricolage text-xs font-bold text-gray-700">{title}</p>
+        <p className="font-jakarta text-xs font-bold text-gray-700">{title}</p>
         <p className="font-jakarta text-[11px] text-gray-400">{subtitle}</p>
       </div>
     </div>
