@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import { ArrowLeft, LogOut, Zap } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
@@ -49,6 +50,7 @@ export default function StaggeredAppMenu() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [toggleLines, setToggleLines] = useState(["Menu", "Close"]);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const panelRef = useRef<HTMLElement | null>(null);
@@ -71,7 +73,13 @@ export default function StaggeredAppMenu() {
     }, {});
   }, []);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useLayoutEffect(() => {
+    if (!mounted) return;
+
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     reducedMotionRef.current = reducedMotion.matches;
 
@@ -98,7 +106,7 @@ export default function StaggeredAppMenu() {
       reducedMotion.removeEventListener("change", onMotionChange);
       ctx.revert();
     };
-  }, []);
+  }, [mounted]);
 
   const animateToggleText = useCallback((opening: boolean) => {
     const inner = toggleTextRef.current;
@@ -277,19 +285,13 @@ export default function StaggeredAppMenu() {
 
   return (
     <div ref={wrapperRef} className="staggered-app-menu" data-open={open || undefined}>
-      <div ref={preLayersRef} className="staggered-app-menu__prelayers" aria-hidden="true">
-        {LAYER_COLORS.map((color) => (
-          <div key={color} className="staggered-app-menu__prelayer" style={{ background: color }} />
-        ))}
-      </div>
-
       <button
         ref={toggleButtonRef}
         type="button"
         className="staggered-app-menu__toggle focus-ring"
         aria-label={open ? "Close app navigation" : "Open app navigation"}
         aria-expanded={open}
-        aria-controls="staggered-app-menu-panel"
+        aria-controls="staggered-menu-panel"
         onClick={toggleMenu}
       >
         <span className="staggered-app-menu__toggle-text-wrap" aria-hidden="true">
@@ -307,66 +309,87 @@ export default function StaggeredAppMenu() {
         </span>
       </button>
 
-      {open && <div className="staggered-app-menu__scrim" aria-hidden="true" />}
-
-      <aside
-        id="staggered-app-menu-panel"
-        ref={panelRef}
-        className="staggered-app-menu__panel"
-        aria-hidden={!open}
-        aria-label="Authenticated application navigation"
-      >
-        <div className="staggered-app-menu__inner">
-          <div className="staggered-app-menu__brand">
-            <div className="staggered-app-menu__mark">
-              <Zap size={15} strokeWidth={2.5} />
+      {mounted &&
+        createPortal(
+          <div className="sx-staggered-menu-root" data-open={open || undefined} aria-hidden={!open}>
+            {open && <div className="staggered-app-menu__scrim" aria-hidden="true" onClick={closeMenu} />}
+            {open && (
+              <button
+                type="button"
+                className="staggered-app-menu__close focus-ring"
+                aria-label="Close app navigation"
+                onClick={closeMenu}
+              >
+                Close
+                <span className="staggered-app-menu__close-icon" aria-hidden="true" />
+              </button>
+            )}
+            <div ref={preLayersRef} className="staggered-app-menu__prelayers" aria-hidden="true">
+              {LAYER_COLORS.map((color) => (
+                <div key={color} className="staggered-app-menu__prelayer" style={{ background: color }} />
+              ))}
             </div>
-            <div>
-              <p>StartupX AI</p>
-              <span>Founder workspace</span>
-            </div>
-          </div>
+            <aside
+              id="staggered-menu-panel"
+              ref={panelRef}
+              className="staggered-app-menu__panel"
+              aria-hidden={!open}
+              aria-label="Authenticated application navigation"
+            >
+              <div className="staggered-app-menu__inner">
+                <div className="staggered-app-menu__brand">
+                  <div className="staggered-app-menu__mark">
+                    <Zap size={15} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <p>StartupX AI</p>
+                    <span>Founder workspace</span>
+                  </div>
+                </div>
 
-          <nav className="staggered-app-menu__nav" aria-label="Application routes">
-            {Object.entries(groupedItems).map(([group, items]) => (
-              <section key={group} className="staggered-app-menu__group">
-                <p className="staggered-app-menu__group-label">{group}</p>
-                <ul className="staggered-app-menu__list" role="list" data-numbering>
-                  {items.map((item) => {
-                    const active = isRouteActive(pathname, item.href);
-                    return (
-                      <li key={item.href} className="staggered-app-menu__item-wrap">
-                        <Link
-                          href={item.href}
-                          aria-label={item.ariaLabel ?? `Open ${item.label}`}
-                          aria-current={active ? "page" : undefined}
-                          className="staggered-app-menu__item"
-                          data-active={active || undefined}
-                          onClick={handleNavigate}
-                        >
-                          <span className="staggered-app-menu__item-label">{item.label}</span>
-                          {item.badge && <span className="staggered-app-menu__badge">{item.badge}</span>}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            ))}
-          </nav>
+                <nav className="staggered-app-menu__nav" aria-label="Application routes">
+                  {Object.entries(groupedItems).map(([group, items]) => (
+                    <section key={group} className="staggered-app-menu__group">
+                      <p className="staggered-app-menu__group-label">{group}</p>
+                      <ul className="staggered-app-menu__list" role="list" data-numbering>
+                        {items.map((item) => {
+                          const active = isRouteActive(pathname, item.href);
+                          return (
+                            <li key={item.href} className="staggered-app-menu__item-wrap">
+                              <Link
+                                href={item.href}
+                                aria-label={item.ariaLabel ?? `Open ${item.label}`}
+                                aria-current={active ? "page" : undefined}
+                                className="staggered-app-menu__item"
+                                data-active={active || undefined}
+                                onClick={handleNavigate}
+                              >
+                                <span className="staggered-app-menu__item-label">{item.label}</span>
+                                {item.badge && <span className="staggered-app-menu__badge">{item.badge}</span>}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </section>
+                  ))}
+                </nav>
 
-          <div className="staggered-app-menu__utilities" aria-label="Account actions">
-            <Link href="/" className="staggered-app-menu__utility" onClick={handleNavigate}>
-              <ArrowLeft size={15} />
-              Back to landing
-            </Link>
-            <button type="button" className="staggered-app-menu__utility staggered-app-menu__utility--danger" onClick={handleLogout}>
-              <LogOut size={15} />
-              Sign out
-            </button>
-          </div>
-        </div>
-      </aside>
+                <div className="staggered-app-menu__utilities" aria-label="Account actions">
+                  <Link href="/" className="staggered-app-menu__utility" onClick={handleNavigate}>
+                    <ArrowLeft size={15} />
+                    Back to landing
+                  </Link>
+                  <button type="button" className="staggered-app-menu__utility staggered-app-menu__utility--danger" onClick={handleLogout}>
+                    <LogOut size={15} />
+                    Sign out
+                  </button>
+                </div>
+              </div>
+            </aside>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

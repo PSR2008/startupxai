@@ -82,8 +82,17 @@ test("StaggeredAppMenu uses React Bits staggered GSAP interaction without contin
 });
 
 test("StaggeredAppMenu opens from the left, numbers items, tracks active route and closes after navigation", () => {
+  assert.match(menu, /createPortal/);
+  assert.match(menu, /document\.body/);
+  assert.match(menu, /className="sx-staggered-menu-root"/);
+  assert.match(menuCss, /\.sx-staggered-menu-root[\s\S]+position: fixed/);
+  assert.match(menuCss, /\.sx-staggered-menu-root[\s\S]+height: 100dvh/);
+  assert.match(menuCss, /\.sx-staggered-menu-root[\s\S]+z-index: 1000/);
+  assert.match(menuCss, /\.sx-staggered-menu-root[\s\S]+overflow: hidden/);
   assert.match(menuCss, /\.staggered-app-menu__panel[\s\S]+inset: 0 auto 0 0/);
+  assert.match(menuCss, /\.staggered-app-menu__panel[\s\S]+height: 100dvh/);
   assert.match(menuCss, /\.staggered-app-menu__prelayers[\s\S]+inset: 0 auto 0 0/);
+  assert.match(menuCss, /\.staggered-app-menu__prelayers[\s\S]+height: 100dvh/);
   assert.match(menuCss, /counter\(appMenuItem, decimal-leading-zero\)/);
   assert.match(menu, /aria-current=\{active \? "page" : undefined\}/);
   assert.match(menu, /data-active=\{active \|\| undefined\}/);
@@ -97,11 +106,14 @@ test("StaggeredAppMenu keeps branding, accessibility and reduced-motion safeguar
   assert.match(menu, /StartupX AI/);
   assert.match(menu, /Founder workspace/);
   assert.match(menu, /aria-expanded=\{open\}/);
-  assert.match(menu, /aria-controls="staggered-app-menu-panel"/);
+  assert.match(menu, /aria-controls="staggered-menu-panel"/);
+  assert.match(menu, /id="staggered-menu-panel"/);
   assert.match(menu, /aria-label="Authenticated application navigation"/);
+  assert.match(menu, /aria-label="Close app navigation"/);
   assert.match(menu, /prefers-reduced-motion: reduce/);
   assert.match(menuCss, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(menuCss, /html\.app-menu-open/);
+  assert.match(menuCss, /html\.app-menu-open body/);
 });
 
 test("public homepage navigation and protected business logic remain untouched", () => {
