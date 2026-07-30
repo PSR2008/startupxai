@@ -313,17 +313,6 @@ export default function StaggeredAppMenu() {
         createPortal(
           <div className="sx-staggered-menu-root" data-open={open || undefined} aria-hidden={!open}>
             {open && <div className="staggered-app-menu__scrim" aria-hidden="true" onClick={closeMenu} />}
-            {open && (
-              <button
-                type="button"
-                className="staggered-app-menu__close focus-ring"
-                aria-label="Close app navigation"
-                onClick={closeMenu}
-              >
-                Close
-                <span className="staggered-app-menu__close-icon" aria-hidden="true" />
-              </button>
-            )}
             <div ref={preLayersRef} className="staggered-app-menu__prelayers" aria-hidden="true">
               {LAYER_COLORS.map((color) => (
                 <div key={color} className="staggered-app-menu__prelayer" style={{ background: color }} />
@@ -337,13 +326,25 @@ export default function StaggeredAppMenu() {
               aria-label="Authenticated application navigation"
             >
               <div className="staggered-app-menu__inner">
-                <div className="staggered-app-menu__brand">
-                  <div className="staggered-app-menu__mark">
-                    <Zap size={15} strokeWidth={2.5} />
-                  </div>
-                  <div>
-                    <p>StartupX AI</p>
-                    <span>Founder workspace</span>
+                <div className="staggered-app-menu__panel-header">
+                  <button
+                    type="button"
+                    className="staggered-app-menu__close focus-ring"
+                    aria-label="Close app navigation"
+                    onClick={closeMenu}
+                  >
+                    <span>Close</span>
+                    <span className="staggered-app-menu__close-icon" aria-hidden="true" />
+                  </button>
+
+                  <div className="staggered-app-menu__brand">
+                    <div className="staggered-app-menu__mark">
+                      <Zap size={15} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <p>StartupX AI</p>
+                      <span>Founder workspace</span>
+                    </div>
                   </div>
                 </div>
 

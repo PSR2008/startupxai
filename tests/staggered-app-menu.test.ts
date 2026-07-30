@@ -8,6 +8,7 @@ const appLayout = readFileSync(join(root, "src/app/(app)/layout.tsx"), "utf8");
 const topbar = readFileSync(join(root, "src/components/app/AppTopbar.tsx"), "utf8");
 const menu = readFileSync(join(root, "src/components/app-navigation/StaggeredAppMenu.tsx"), "utf8");
 const menuCss = readFileSync(join(root, "src/components/app-navigation/StaggeredAppMenu.css"), "utf8");
+const closeButtonCss = menuCss.match(/\.staggered-app-menu__close\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
 const exportsFile = readFileSync(join(root, "src/components/app-navigation/index.ts"), "utf8");
 const homepageNavbar = readFileSync(join(root, "src/components/marketing/Navbar.tsx"), "utf8");
 const packageJson = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as {
@@ -93,6 +94,11 @@ test("StaggeredAppMenu opens from the left, numbers items, tracks active route a
   assert.match(menuCss, /\.staggered-app-menu__panel[\s\S]+height: 100dvh/);
   assert.match(menuCss, /\.staggered-app-menu__prelayers[\s\S]+inset: 0 auto 0 0/);
   assert.match(menuCss, /\.staggered-app-menu__prelayers[\s\S]+height: 100dvh/);
+  assert.match(menu, /staggered-app-menu__panel-header/);
+  assert.match(menu, /className="staggered-app-menu__close focus-ring"/);
+  assert.match(menuCss, /\.staggered-app-menu__close[\s\S]+position: relative/);
+  assert.doesNotMatch(closeButtonCss, /right:/);
+  assert.doesNotMatch(closeButtonCss, /position: absolute/);
   assert.match(menuCss, /counter\(appMenuItem, decimal-leading-zero\)/);
   assert.match(menu, /aria-current=\{active \? "page" : undefined\}/);
   assert.match(menu, /data-active=\{active \|\| undefined\}/);
