@@ -5,6 +5,7 @@ import test from "node:test";
 
 const root = process.cwd();
 const page = readFileSync(join(root, "src/app/page.tsx"), "utf8");
+const footer = readFileSync(join(root, "src/components/marketing/Footer.tsx"), "utf8");
 const galaxy = readFileSync(join(root, "src/components/marketing/Galaxy.tsx"), "utf8");
 const galaxyCss = readFileSync(join(root, "src/components/marketing/Galaxy.css"), "utf8");
 const scrollState = readFileSync(join(root, "src/components/marketing/HomepageScrollState.tsx"), "utf8");
@@ -27,7 +28,7 @@ test("homepage renders one Galaxy canvas stage only after the Lightfall hero", (
   assert.match(page, /<HomepageScrollState \/>/);
   assert.equal((page.match(/<Galaxy/g) ?? []).length, 1, "homepage should render exactly one Galaxy component");
   assert.match(page, /<Galaxy[\s\S]+<div className="homepage-galaxy-content">[\s\S]+<ProductScrollStackSection \/>/);
-  assert.match(page, /<CTASection \/>\s*<Footer \/>/);
+  assert.match(page, /<CTASection \/>\s*<Footer variant="homepage" \/>/);
 });
 
 test("Galaxy implementation uses the supplied OGL shader approach with cleanup and accessibility safeguards", () => {
@@ -69,7 +70,7 @@ test("Galaxy background continues behind all post-hero homepage sections and foo
   const stage = page.slice(page.indexOf('className="homepage-galaxy-stage"'));
   let last = -1;
   for (const component of postHeroOrder) {
-    const index = stage.indexOf(`<${component} />`);
+    const index = component === "Footer" ? stage.indexOf('<Footer variant="homepage" />') : stage.indexOf(`<${component} />`);
     assert.ok(index > last, `${component} should remain inside the continuous Galaxy stage`);
     last = index;
   }
@@ -79,12 +80,22 @@ test("Galaxy styling replaces post-hero section backgrounds without affecting th
   assert.match(galaxyCss, /\.homepage-galaxy-stage/);
   assert.match(galaxyCss, /\.homepage-galaxy-stage \.editorial-section[\s\S]+background: transparent !important/);
   assert.match(galaxyCss, /\.homepage-galaxy-stage section\.border-y[\s\S]+background: rgba\(3, 6, 14, 0\.56\) !important/);
-  assert.match(galaxyCss, /\.homepage-galaxy-stage footer[\s\S]+background: rgba\(3, 6, 14, 0\.72\) !important/);
+  assert.match(galaxyCss, /\.homepage-galaxy-stage \.homepage-footer[\s\S]+linear-gradient/);
   assert.match(galaxyCss, /\.homepage-galaxy-content[\s\S]+z-index: 2/);
   assert.match(galaxyCss, /\.homepage-galaxy-stage > \.homepage-galaxy-canvas[\s\S]+position: sticky/);
   assert.match(galaxyCss, /\.homepage-galaxy-stage > \.homepage-galaxy-canvas[\s\S]+height: 100svh/);
   assert.doesNotMatch(galaxyCss, /backdrop-filter/);
   assert.equal(galaxyCss.includes("lightfall-hero"), false, "Galaxy CSS should not change the Lightfall hero");
+});
+
+test("homepage footer uses compact editorial spacing without full-section sizing", () => {
+  assert.match(footer, /variant\?: "default" \| "homepage"/);
+  assert.match(footer, /homepage-footer/);
+  assert.match(footer, /pt-\[52px\] pb-\[22px\]/);
+  assert.match(footer, /md:grid-cols-\[1\.35fr_0\.8fr_0\.8fr_0\.78fr_0\.78fr\]/);
+  assert.match(footer, /All systems operational/);
+  assert.match(footer, /aria-label=\{`StartupX AI on \$\{label\}`\}/);
+  assert.doesNotMatch(footer, /min-h-screen|min-height:\s*100vh|min-h-\[100vh\]|h-screen/);
 });
 
 test("Galaxy is throttled, freezes during page scroll, and renders static frames for mobile or reduced motion", () => {

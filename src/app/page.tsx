@@ -71,7 +71,7 @@ export default function LandingPage() {
           <TestimonialsSection />
           <PricingSection />
           <CTASection />
-          <Footer />
+          <Footer variant="homepage" />
         </div>
       </div>
     </div>

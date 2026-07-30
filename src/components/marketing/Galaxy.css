@@ -104,22 +104,24 @@
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.42);
 }
 
-.homepage-galaxy-stage footer {
-  background: rgba(3, 6, 14, 0.72) !important;
+.homepage-galaxy-stage .homepage-footer {
+  background:
+    linear-gradient(180deg, rgba(3, 6, 14, 0.36) 0%, rgba(3, 6, 14, 0.78) 28%, rgba(2, 5, 12, 0.9) 100%) !important;
   border-top-color: rgba(255, 255, 255, 0.11) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.homepage-galaxy-stage footer .text-gray-900,
-.homepage-galaxy-stage footer .text-gray-700 {
+.homepage-galaxy-stage .homepage-footer .text-gray-900,
+.homepage-galaxy-stage .homepage-footer .text-gray-700 {
   color: rgba(248, 250, 252, 0.94) !important;
 }
 
-.homepage-galaxy-stage footer .text-gray-500,
-.homepage-galaxy-stage footer .text-gray-400 {
+.homepage-galaxy-stage .homepage-footer .text-gray-500,
+.homepage-galaxy-stage .homepage-footer .text-gray-400 {
   color: rgba(203, 213, 225, 0.7) !important;
 }
 
-.homepage-galaxy-stage footer a:hover {
+.homepage-galaxy-stage .homepage-footer a:hover {
   color: #ffffff !important;
 }
 
@@ -148,6 +150,6 @@
 }
 
 .homepage-galaxy-stage .editorial-section:not(.scroll-stack-section),
-.homepage-galaxy-stage footer {
+.homepage-galaxy-stage .homepage-footer {
   contain: layout paint;
 }
