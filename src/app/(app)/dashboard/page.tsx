@@ -19,6 +19,7 @@ import UsageWidget from "@/components/app/UsageWidget";
 import SubscriptionStatusCard from "@/components/app/SubscriptionStatusCard";
 import RecentReports from "@/components/app/RecentReports";
 import Badge from "@/components/ui/Badge";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import { getAuthHeaders } from "@/lib/auth-headers-client";
 
 interface FounderProfile {
@@ -237,17 +238,24 @@ export default function DashboardPage() {
         <SubscriptionStatusCard />
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <MagicBentoGrid className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4" preset="app" glowColor="16, 185, 129">
         {secondaryTools.map((tool) => {
           const Icon = tool.icon;
           return (
-            <Link key={tool.href} href={tool.href} className="surface-panel focus-ring p-4 transition-all hover:-translate-y-px hover:shadow-md">
+            <MagicBentoCard
+              key={tool.href}
+              href={tool.href}
+              interactive
+              className="surface-panel focus-ring p-4 transition-all hover:-translate-y-px hover:shadow-md"
+              enableTilt
+              clickEffect
+            >
               <Icon size={15} className="mb-3 text-gray-600" />
               <p className="font-bricolage text-sm font-bold text-gray-900">{tool.title}</p>
-            </Link>
+            </MagicBentoCard>
           );
         })}
-      </div>
+      </MagicBentoGrid>
 
       <AnimatedSection delay={0.14}>
         <RecentReports />

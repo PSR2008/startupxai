@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import Button from "@/components/ui/Button";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import { PLANS } from "@/lib/plans";
 
 // ============================================
@@ -88,19 +89,19 @@ export function EvidenceEntrySection() {
           </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" staggerDelay={0.06}>
+        <MagicBentoGrid className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" preset="marketing" glowColor="16, 185, 129">
           {evidenceEntryCards.map((card) => (
             <StaggerItem key={card.title}>
-              <div className="surface-panel h-full p-6">
+              <MagicBentoCard className="surface-panel h-full p-6" enableStars enableTilt>
                 <span className="mb-5 inline-flex rounded-md border border-black/8 bg-[#f8f6f0] px-2.5 py-1 font-mono text-[10px] font-semibold text-gray-600">
                   {card.label}
                 </span>
                 <h3 className="mb-2 font-bricolage text-base font-bold text-gray-900">{card.title}</h3>
                 <p className="font-jakarta text-sm leading-relaxed text-gray-500">{card.description}</p>
-              </div>
+              </MagicBentoCard>
             </StaggerItem>
           ))}
-        </StaggerContainer>
+        </MagicBentoGrid>
 
         <AnimatedSection delay={0.1} className="mt-6">
           <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-5">
@@ -427,67 +428,65 @@ export function EnginesSection() {
           </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-16" staggerDelay={0.07}>
+        <MagicBentoGrid className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-16" preset="marketing" glowColor="16, 185, 129">
           {engines.map((engine) => {
             const Icon = engine.icon;
             return (
               <StaggerItem key={engine.href}>
-                <motion.div
-                  whileHover={{ y: -4, scale: 1.01 }}
-                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                  className="h-full"
+                <MagicBentoCard
+                  href={engine.href}
+                  interactive
+                  className="group flex h-full cursor-pointer flex-col gap-4 rounded-xl border bg-[#fffefa] p-6 shadow-sm transition-all duration-200 hover:-translate-y-px hover:shadow-md"
+                  style={{ borderColor: engine.border }}
+                  glowColor="16, 185, 129"
+                  enableTilt
+                  enableMagnetism
+                  clickEffect
                 >
-                  <Link href={engine.href} className="block h-full">
-                    <div
-                      className="group flex h-full cursor-pointer flex-col gap-4 rounded-xl border bg-[#fffefa] p-6 shadow-sm transition-all duration-200 hover:-translate-y-px hover:shadow-md"
-                      style={{ borderColor: engine.border }}
-                    >
-                      <div
-                        className="flex h-10 w-10 items-center justify-center rounded-lg"
-                        style={{ background: engine.bg, border: `1px solid ${engine.border}` }}
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-lg"
+                    style={{ background: engine.bg, border: `1px solid ${engine.border}` }}
+                  >
+                    <Icon size={18} style={{ color: engine.color }} />
+                  </div>
+
+                  <div className="flex-1">
+                    <h3 className="font-bricolage text-base font-bold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                      {engine.title}
+                    </h3>
+                    <p className="font-jakarta text-sm text-gray-500 leading-relaxed">
+                      {engine.description}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {engine.outputs.map((output) => (
+                      <span
+                        key={output}
+                        className="rounded-md border px-2 py-0.5 font-jakarta text-[10px] font-semibold"
+                        style={{
+                          color: engine.color,
+                          borderColor: `${engine.color}30`,
+                          background: engine.bg,
+                        }}
                       >
-                        <Icon size={18} style={{ color: engine.color }} />
-                      </div>
+                        {output}
+                      </span>
+                    ))}
+                  </div>
 
-                      <div className="flex-1">
-                        <h3 className="font-bricolage text-base font-bold text-gray-900 mb-2 group-hover:text-black transition-colors">
-                          {engine.title}
-                        </h3>
-                        <p className="font-jakarta text-sm text-gray-500 leading-relaxed">
-                          {engine.description}
-                        </p>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1.5">
-                        {engine.outputs.map((output) => (
-                          <span
-                            key={output}
-                            className="rounded-md border px-2 py-0.5 font-jakarta text-[10px] font-semibold"
-                            style={{
-                              color: engine.color,
-                              borderColor: `${engine.color}30`,
-                              background: engine.bg,
-                            }}
-                          >
-                            {output}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div
-                        className="flex items-center gap-1.5 font-jakarta text-sm font-semibold transition-all group-hover:gap-2.5"
-                        style={{ color: engine.color }}
-                      >
-                        Review findings
-                        <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
+                  <div
+                    className="flex items-center gap-1.5 font-jakarta text-sm font-semibold transition-all group-hover:gap-2.5"
+                    style={{ color: engine.color }}
+                  >
+                    Review findings
+                    <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                  </div>
+                </MagicBentoCard>
               </StaggerItem>
             );
           })}
-        </StaggerContainer>
+        </MagicBentoGrid>
 
         <AnimatedSection delay={0.1}>
           <div className="separator mb-10" />
@@ -565,12 +564,12 @@ export function FeaturesSection() {
           </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" staggerDelay={0.06}>
+        <MagicBentoGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" preset="marketing" glowColor="16, 185, 129">
           {features.map((f) => {
             const Icon = f.icon;
             return (
               <StaggerItem key={f.title}>
-                <div className="surface-inset h-full p-6 transition-all duration-200 hover:-translate-y-px hover:border-black/12 hover:bg-white hover:shadow-sm">
+                <MagicBentoCard className="surface-inset h-full p-6 transition-all duration-200 hover:-translate-y-px hover:border-black/12 hover:bg-white hover:shadow-sm" enableTilt>
                   <div
                     className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
                     style={{ background: `${f.color}10`, border: `1px solid ${f.color}25` }}
@@ -579,11 +578,11 @@ export function FeaturesSection() {
                   </div>
                   <h3 className="font-bricolage text-sm font-bold text-gray-900 mb-2">{f.title}</h3>
                   <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{f.description}</p>
-                </div>
+                </MagicBentoCard>
               </StaggerItem>
             );
           })}
-        </StaggerContainer>
+        </MagicBentoGrid>
       </div>
     </section>
   );
@@ -629,12 +628,12 @@ export function HowItWorksSection() {
           </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-5" staggerDelay={0.1}>
+        <MagicBentoGrid className="grid grid-cols-1 md:grid-cols-3 gap-5" preset="marketing" glowColor="16, 185, 129">
           {workflow.map((step, i) => {
             const Icon = step.icon;
             return (
               <StaggerItem key={step.title}>
-                <div className="surface-panel h-full p-7">
+                <MagicBentoCard className="surface-panel h-full p-7" enableTilt>
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50">
                       <Icon size={18} className="text-emerald-600" />
@@ -643,11 +642,11 @@ export function HowItWorksSection() {
                   </div>
                   <h3 className="font-bricolage text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
                   <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{step.description}</p>
-                </div>
+                </MagicBentoCard>
               </StaggerItem>
             );
           })}
-        </StaggerContainer>
+        </MagicBentoGrid>
       </div>
     </section>
   );
@@ -765,20 +764,20 @@ export function TrustSection() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <MagicBentoGrid className="grid grid-cols-1 sm:grid-cols-2 gap-4" preset="marketing" glowColor="16, 185, 129">
             {trustItems.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="surface-panel p-6">
+                <MagicBentoCard key={item.title} className="surface-panel p-6" enableTilt>
                   <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-black/8 bg-[#f8f6f0]">
                     <Icon size={16} className="text-emerald-600" />
                   </div>
                   <h3 className="font-bricolage text-sm font-bold text-gray-900 mb-2">{item.title}</h3>
                   <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{item.description}</p>
-                </div>
+                </MagicBentoCard>
               );
             })}
-          </div>
+          </MagicBentoGrid>
         </AnimatedSection>
       </div>
     </section>
@@ -840,19 +839,19 @@ export function TestimonialsSection() {
           </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid grid-cols-1 gap-5 md:grid-cols-2" staggerDelay={0.08}>
+        <MagicBentoGrid className="grid grid-cols-1 gap-5 md:grid-cols-2" preset="marketing" glowColor="16, 185, 129">
           {methodologyItems.map((item) => (
             <StaggerItem key={item.title}>
-              <div className="surface-panel h-full p-6">
+              <MagicBentoCard className="surface-panel h-full p-6" enableTilt>
                 <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50">
                   <CheckCircle2 size={16} className="text-emerald-700" />
                 </div>
                 <p className="font-bricolage text-sm font-bold text-gray-900">{item.title}</p>
                 <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-500">{item.detail}</p>
-              </div>
+              </MagicBentoCard>
             </StaggerItem>
           ))}
-        </StaggerContainer>
+        </MagicBentoGrid>
 
         <AnimatedSection delay={0.12} className="mt-10">
           <div className="surface-panel p-6">
