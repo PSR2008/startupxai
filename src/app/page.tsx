@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
 import HeroSection from "@/components/marketing/HeroSection";
+import ProductScrollStackSection from "@/components/marketing/ProductScrollStackSection";
 import {
   CapabilitiesSection,
   DifferentiationSection,
   EvidenceEntrySection,
   LogoMarquee,
-  EnginesSection,
-  FeaturesSection,
   RealWorkflowSection,
   RecurringEvidenceSection,
   HowItWorksSection,
@@ -36,11 +35,10 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[var(--color-bg-primary)] overflow-x-hidden">
       <Navbar />
       <HeroSection />
+      <ProductScrollStackSection />
       <RealWorkflowSection />
       <EvidenceEntrySection />
       <LogoMarquee />
-      <EnginesSection />
-      <FeaturesSection />
       <DifferentiationSection />
       <RecurringEvidenceSection />
       <HowItWorksSection />
