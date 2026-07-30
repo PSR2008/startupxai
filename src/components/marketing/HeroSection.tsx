@@ -1,15 +1,32 @@
 import Link from "next/link";
+import Lightfall from "./Lightfall";
+
+const LIGHTFALL_COLORS = ["#A6C8FF", "#5227FF", "#FF9FFC"] as const;
 
 export default function HeroSection() {
   return (
     <section className="resadex-hero relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden">
-      <div className="resadex-liquid-field" aria-hidden="true">
-        <div className="resadex-ring resadex-ring-one" />
-        <div className="resadex-ring resadex-ring-two" />
-        <div className="resadex-ring resadex-ring-three" />
-        <div className="resadex-ring resadex-ring-four" />
+      <div className="lightfall-hero-bg" aria-hidden="true">
+        <Lightfall
+          className="absolute inset-0"
+          colors={LIGHTFALL_COLORS}
+          backgroundColor="#0A29FF"
+          speed={1}
+          streakCount={8}
+          streakWidth={1}
+          streakLength={1}
+          glow={1}
+          density={1}
+          twinkle={1}
+          zoom={2}
+          backgroundGlow={1}
+          opacity={1}
+          mouseInteraction={true}
+          mouseStrength={1}
+          mouseRadius={0.6}
+        />
       </div>
-      <div className="resadex-center-bead" aria-hidden="true" />
+      <div className="lightfall-hero-scrim" aria-hidden="true" />
 
       <div className="resadex-copy relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-6 text-center">
         <p className="resadex-kicker">
