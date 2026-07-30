@@ -150,8 +150,10 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   inset:0;
   z-index:1;
   background:
-    radial-gradient(circle at 50% 42%,rgba(255,255,255,0.05),rgba(4,11,62,0.18) 31rem,rgba(1,5,28,0.58) 70%),
-    linear-gradient(90deg,rgba(1,6,30,0.58),rgba(3,14,75,0.08) 40%,rgba(1,6,30,0.48));
+    radial-gradient(circle at 50% 67%,rgba(2,6,28,0.38),rgba(2,6,28,0.18) 24rem,transparent 42rem),
+    linear-gradient(180deg,rgba(1,5,24,0.46),rgba(1,5,24,0.08) 28%,rgba(1,5,24,0.34) 67%,rgba(1,5,24,0.54)),
+    radial-gradient(circle at 50% 42%,rgba(255,255,255,0.04),rgba(4,11,62,0.16) 31rem,rgba(1,5,28,0.5) 70%),
+    linear-gradient(90deg,rgba(1,6,30,0.5),rgba(3,14,75,0.04) 40%,rgba(1,6,30,0.42));
   pointer-events:none;
 }
 .resadex-hero::after{
@@ -182,8 +184,9 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   z-index:1;
   pointer-events:none;
   background:
-    linear-gradient(180deg,rgba(1,5,24,0.22),rgba(1,5,24,0.04) 42%,rgba(1,5,24,0.42)),
-    radial-gradient(circle at 50% 47%,transparent 0 22rem,rgba(1,5,24,0.18) 40rem,rgba(0,2,12,0.58) 100%);
+    radial-gradient(ellipse at 50% 70%,rgba(0,0,0,0.42),rgba(0,0,0,0.22) 21rem,transparent 38rem),
+    linear-gradient(180deg,rgba(1,5,24,0.3),rgba(1,5,24,0.06) 34%,rgba(1,5,24,0.45)),
+    radial-gradient(circle at 50% 47%,transparent 0 20rem,rgba(1,5,24,0.2) 39rem,rgba(0,2,12,0.56) 100%);
 }
 .resadex-copy{
   position:absolute;
@@ -194,7 +197,22 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   justify-content:flex-end;
   padding:0 1.5rem 5.2rem;
   pointer-events:none;
-  text-shadow:0 18px 42px rgba(0,0,0,0.18);
+  isolation:isolate;
+  text-shadow:0 3px 18px rgba(0,0,0,0.44);
+}
+.resadex-copy::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:1.25rem;
+  z-index:-1;
+  width:min(54rem,92vw);
+  height:25rem;
+  border-radius:999px;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,0.58),rgba(0,0,0,0.34) 42%,rgba(0,0,0,0.14) 68%,transparent 100%);
+  filter:blur(18px);
+  transform:translateX(-50%);
+  pointer-events:none;
 }
 .resadex-kicker{
   margin:0 0 0.55rem;
@@ -204,7 +222,9 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   line-height:1.2;
   letter-spacing:0.42em;
   text-transform:uppercase;
-  color:rgba(240,247,255,0.68);
+  color:rgba(255,255,255,0.9);
+  font-weight:650;
+  text-shadow:0 2px 12px rgba(0,0,0,0.58);
 }
 .resadex-example-label{
   margin:0 0 0.85rem;
@@ -212,7 +232,7 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   border-radius:999px;
   background:rgba(4,12,42,0.2);
   padding:0.3rem 0.72rem;
-  color:rgba(248,251,255,0.72);
+  color:rgba(255,255,255,0.86);
   font-family:var(--font-body);
   font-size:0.72rem;
   font-weight:600;
@@ -226,7 +246,7 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   gap:clamp(0.95rem,2.7vw,3.1rem);
   width:min(100%,76rem);
   margin:0;
-  color:transparent;
+  color:#fff;
   font-family:var(--font-horror),var(--font-display);
   font-size:clamp(4.35rem,9.2vw,9.35rem);
   font-weight:400;
@@ -234,21 +254,23 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   letter-spacing:clamp(0.03rem,0.48vw,0.42rem);
   text-transform:uppercase;
   text-wrap:balance;
-  background:linear-gradient(180deg,#ffffff 0%,#eef5ff 44%,#bfd1ea 100%);
+  background:none;
   -webkit-background-clip:text;
   background-clip:text;
+  -webkit-text-fill-color:#fff;
   font-feature-settings:"kern" 1;
-  filter:drop-shadow(0 22px 52px rgba(2,8,30,0.42));
+  text-shadow:0 3px 18px rgba(0,0,0,0.55),0 14px 38px rgba(0,0,0,0.26);
 }
 .resadex-title span:last-child{letter-spacing:clamp(0.03rem,0.52vw,0.42rem)}
 .resadex-subtitle{
   width:min(100%,42rem);
   margin:1.4rem auto 0;
-  color:rgba(236,244,255,0.8);
+  color:rgba(255,255,255,0.88);
   font-family:var(--font-body);
   font-size:clamp(1rem,1.45vw,1.2rem);
-  font-weight:450;
+  font-weight:550;
   line-height:1.55;
+  text-shadow:0 3px 16px rgba(0,0,0,0.56);
 }
 .resadex-actions{
   display:flex;
@@ -277,10 +299,10 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   box-shadow:0 18px 48px rgba(0,0,0,0.3);
 }
 .resadex-actions a:nth-child(2){
-  border:1px solid rgba(255,255,255,0.28);
-  background:rgba(255,255,255,0.12);
-  color:rgba(248,251,255,0.88);
-  backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.4);
+  background:rgba(7,11,32,0.32);
+  color:rgba(255,255,255,0.94);
+  backdrop-filter:blur(18px);
 }
 .resadex-actions a:hover{transform:translateY(-1px)}
 .resadex-actions a:focus-visible{outline:2px solid #dbeafe;outline-offset:3px}
@@ -306,8 +328,9 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
 
 @media(max-width:640px){
   .resadex-hero{padding:6rem 1rem 3.5rem}
-  .lightfall-hero-scrim{background:linear-gradient(180deg,rgba(1,5,24,0.28),rgba(1,5,24,0.08) 42%,rgba(1,5,24,0.62))}
+  .lightfall-hero-scrim{background:radial-gradient(ellipse at 50% 72%,rgba(0,0,0,0.5),rgba(0,0,0,0.3) 18rem,transparent 30rem),linear-gradient(180deg,rgba(1,5,24,0.34),rgba(1,5,24,0.1) 42%,rgba(1,5,24,0.66))}
   .resadex-copy{left:0;right:0;width:100vw;overflow:hidden;padding:0 1rem 4.45rem}
+  .resadex-copy::before{bottom:1rem;width:30rem;height:24rem;filter:blur(14px)}
   .resadex-kicker{letter-spacing:0.2em;font-size:0.6rem}
   .resadex-example-label{margin-bottom:0.72rem;font-size:0.68rem}
   .resadex-title{flex-direction:column;gap:0.36rem;font-size:clamp(3.75rem,16vw,4.65rem);letter-spacing:0.03rem;line-height:0.88}

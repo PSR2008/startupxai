@@ -19,6 +19,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const isDarkNav = !isHomePage && !scrolled;
+  const useLightNavText = isHomePage || isDarkNav;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -52,7 +53,7 @@ export default function Navbar() {
             className={cn(
               "flex items-center justify-between",
               isHomePage
-                ? "pointer-events-auto mx-auto h-[4.25rem] w-[calc(100vw-3rem)] max-w-[980px] rounded-[1.35rem] border border-white/55 bg-white/35 px-4 shadow-[0_18px_50px_rgba(33,50,71,0.16),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-2xl sm:w-full sm:px-5"
+                ? "pointer-events-auto mx-auto h-[4.25rem] w-[calc(100vw-3rem)] max-w-[980px] rounded-[1.35rem] border border-white/[0.22] bg-[rgba(8,10,30,0.58)] px-4 shadow-[0_18px_50px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-[18px] sm:w-full sm:px-5"
                 : "h-16"
             )}
           >
@@ -61,7 +62,7 @@ export default function Navbar() {
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-shadow">
                 <Zap size={15} className="text-white" strokeWidth={2.5} />
               </div>
-              <span className={cn("font-[var(--font-display)] text-base font-bold tracking-[-0.01em]", isDarkNav ? "text-white" : "text-gray-900")}>
+              <span className={cn("font-[var(--font-display)] text-base font-bold tracking-[-0.01em]", useLightNavText ? "text-white" : "text-gray-900")}>
                 StartupX{" "}
                 <span className="text-gradient-brand">AI</span>
               </span>
@@ -76,8 +77,8 @@ export default function Navbar() {
                   className={cn(
                     "px-4 py-2 rounded-xl font-[var(--font-body)] text-sm font-medium tracking-[-0.005em] transition-all duration-150",
                     pathname === link.href
-                      ? isDarkNav ? "text-white bg-white/10" : "text-slate-950 bg-white/35"
-                      : isDarkNav ? "text-slate-300 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-950 hover:bg-white/35"
+                      ? useLightNavText ? "text-white bg-white/10" : "text-slate-950 bg-white/35"
+                      : useLightNavText ? "text-white/[0.78] hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-950 hover:bg-white/35"
                   )}
                 >
                   {link.label}
@@ -91,7 +92,7 @@ export default function Navbar() {
                 href="/signin"
                 className={cn(
                   "font-[var(--font-body)] text-sm font-medium tracking-[-0.005em] transition-colors",
-                  isDarkNav ? "text-slate-300 hover:text-white" : "text-slate-700 hover:text-slate-950"
+                  useLightNavText ? "text-white/[0.78] hover:text-white" : "text-slate-700 hover:text-slate-950"
                 )}
               >
                 Sign In
@@ -113,7 +114,7 @@ export default function Navbar() {
               onClick={() => setMobileOpen(!mobileOpen)}
               className={cn(
                 "md:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all",
-                isDarkNav ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-950 hover:bg-white/35"
+                useLightNavText ? "text-white/[0.82] hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-950 hover:bg-white/35"
               )}
               aria-label="Toggle menu"
             >

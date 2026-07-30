@@ -79,3 +79,29 @@ test("hero keeps approved copy and CTA routes above the WebGL layer", () => {
   assert.match(globals, /\.lightfall-hero-scrim[\s\S]*z-index:1/);
   assert.match(globals, /\.resadex-copy[\s\S]*z-index:3/);
 });
+
+test("homepage hero readability uses transparent overlays without changing Lightfall", () => {
+  const hero = readFileSync(heroPath, "utf8");
+  const globals = readFileSync(globalsPath, "utf8");
+
+  assert.match(globals, /\.lightfall-hero-scrim[\s\S]*radial-gradient\(ellipse at 50% 70%/);
+  assert.match(globals, /\.resadex-copy::before/);
+  assert.match(globals, /\.resadex-copy::before[\s\S]*radial-gradient\(ellipse at center,rgba\(0,0,0,0\.58\)/);
+  assert.match(globals, /\.resadex-title[\s\S]*color:#fff/);
+  assert.match(globals, /\.resadex-title[\s\S]*-webkit-text-fill-color:#fff/);
+  assert.match(globals, /\.resadex-title[\s\S]*text-shadow:0 3px 18px rgba\(0,0,0,0\.55\)/);
+  assert.match(globals, /\.resadex-subtitle[\s\S]*color:rgba\(255,255,255,0\.88\)/);
+  assert.match(hero, /backgroundColor="#0A29FF"/);
+  assert.match(hero, /colors=\{LIGHTFALL_COLORS\}/);
+});
+
+test("homepage navbar uses a dark translucent readability surface over Lightfall", () => {
+  const navbar = readFileSync(join(root, "src/components/marketing/Navbar.tsx"), "utf8");
+
+  assert.match(navbar, /useLightNavText = isHomePage \|\| isDarkNav/);
+  assert.match(navbar, /bg-\[rgba\(8,10,30,0\.58\)\]/);
+  assert.match(navbar, /border-white\/\[0\.22\]/);
+  assert.match(navbar, /backdrop-blur-\[18px\]/);
+  assert.match(navbar, /text-white\/\[0\.78\]/);
+  assert.match(navbar, /hover:text-white/);
+});
