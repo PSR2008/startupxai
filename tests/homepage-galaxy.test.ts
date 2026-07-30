@@ -6,6 +6,7 @@ import test from "node:test";
 const root = process.cwd();
 const page = readFileSync(join(root, "src/app/page.tsx"), "utf8");
 const footer = readFileSync(join(root, "src/components/marketing/Footer.tsx"), "utf8");
+const engines = readFileSync(join(root, "src/components/marketing/EnginesSection.tsx"), "utf8");
 const galaxy = readFileSync(join(root, "src/components/marketing/Galaxy.tsx"), "utf8");
 const galaxyCss = readFileSync(join(root, "src/components/marketing/Galaxy.css"), "utf8");
 const scrollState = readFileSync(join(root, "src/components/marketing/HomepageScrollState.tsx"), "utf8");
@@ -91,11 +92,17 @@ test("Galaxy styling replaces post-hero section backgrounds without affecting th
 test("homepage footer uses compact editorial spacing without full-section sizing", () => {
   assert.match(footer, /variant\?: "default" \| "homepage"/);
   assert.match(footer, /homepage-footer/);
-  assert.match(footer, /pt-\[52px\] pb-\[22px\]/);
-  assert.match(footer, /md:grid-cols-\[1\.35fr_0\.8fr_0\.8fr_0\.78fr_0\.78fr\]/);
+  assert.match(footer, /homepageFooterLinks/);
+  assert.match(footer, /const linkGroups = isHomepage \? homepageFooterLinks : footerLinks/);
+  assert.match(footer, /container-custom pt-7 pb-7/);
+  assert.match(footer, /md:grid-cols-\[1\.15fr_repeat\(4,minmax\(0,0\.72fr\)\)\]/);
+  assert.match(footer, /space-y-1\.5/);
   assert.match(footer, /All systems operational/);
+  assert.match(footer, /&copy; \{new Date\(\)\.getFullYear\(\)\}/);
   assert.match(footer, /aria-label=\{`StartupX AI on \$\{label\}`\}/);
-  assert.doesNotMatch(footer, /min-h-screen|min-height:\s*100vh|min-h-\[100vh\]|h-screen/);
+  assert.doesNotMatch(footer, /pt-\[52px\]|py-16"\s*:\s*"container-custom|min-h-screen|min-height:\s*100vh|min-h-\[100vh\]|h-screen/);
+  assert.match(engines, /homepage-final-cta[\s\S]+pt-24 pb-8/);
+  assert.doesNotMatch(engines, /homepage-final-cta[\s\S]+py-24/);
 });
 
 test("Galaxy is throttled, freezes during page scroll, and renders static frames for mobile or reduced motion", () => {

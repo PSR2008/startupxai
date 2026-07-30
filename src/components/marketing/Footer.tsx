@@ -29,6 +29,34 @@ const footerLinks = {
   ],
 };
 
+const homepageFooterLinks = {
+  Workspace: [
+    { label: "Evidence Engine", href: "/evidence-engine" },
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Reports", href: "/reports" },
+    { label: "Pricing", href: "/pricing" },
+  ],
+  Assessments: [
+    { label: "Idea & Market", href: "/idea-engine" },
+    { label: "Competitors", href: "/competitor-intelligence" },
+    { label: "Revenue", href: "/revenue-engine" },
+    { label: "Growth", href: "/growth-engine" },
+    { label: "Founder Decision", href: "/founder-decision" },
+  ],
+  Tools: [
+    { label: "User Psychology", href: "/user-psychology" },
+    { label: "ColdDM", href: "/cold-dm" },
+    { label: "BrandForge", href: "/brand-forge" },
+    { label: "Create account", href: "/signup" },
+  ],
+  Company: [
+    { label: "Privacy", href: "/privacy" },
+    { label: "Support", href: "/support" },
+    { label: "Contact", href: "/support#contact" },
+    { label: "Sign in", href: "/signin" },
+  ],
+};
+
 const socialLinks = [
   { Icon: Twitter, href: "#", label: "Twitter" },
   { Icon: Linkedin, href: "#", label: "LinkedIn" },
@@ -41,6 +69,7 @@ type FooterProps = {
 
 export default function Footer({ variant = "default" }: FooterProps) {
   const isHomepage = variant === "homepage";
+  const linkGroups = isHomepage ? homepageFooterLinks : footerLinks;
 
   return (
     <footer
@@ -50,11 +79,11 @@ export default function Footer({ variant = "default" }: FooterProps) {
           : "border-t border-black/8 bg-[#fffefa]"
       }
     >
-      <div className={isHomepage ? "container-custom pt-[52px] pb-[22px]" : "container-custom py-16"}>
+      <div className={isHomepage ? "container-custom pt-7 pb-7" : "container-custom py-16"}>
         <div
           className={
             isHomepage
-              ? "grid grid-cols-2 gap-x-8 gap-y-8 md:grid-cols-[1.35fr_0.8fr_0.8fr_0.78fr_0.78fr] lg:gap-x-10 mb-9"
+              ? "grid grid-cols-2 gap-x-6 gap-y-7 md:grid-cols-[1.15fr_repeat(4,minmax(0,0.72fr))] lg:gap-x-8 mb-6"
               : "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-14"
           }
         >
@@ -76,11 +105,11 @@ export default function Footer({ variant = "default" }: FooterProps) {
             <p
               className={
                 isHomepage
-                  ? "font-jakarta text-sm text-slate-300/[0.78] leading-relaxed max-w-56 mb-4"
+                  ? "font-jakarta text-sm text-slate-300/[0.78] leading-relaxed max-w-64 mb-3"
                   : "font-jakarta text-sm text-gray-500 leading-relaxed max-w-48 mb-5"
               }
             >
-              Evidence-backed assessment workflows for early founder decisions.
+              Evidence-backed assessment workflows for founder decisions.
             </p>
             <div className="flex gap-2">
               {socialLinks.map(({ Icon, href, label }) => (
@@ -100,7 +129,7 @@ export default function Footer({ variant = "default" }: FooterProps) {
             </div>
           </div>
 
-          {Object.entries(footerLinks).map(([section, links]) => (
+          {Object.entries(linkGroups).map(([section, links]) => (
             <div key={section}>
               <p
                 className={
@@ -111,14 +140,14 @@ export default function Footer({ variant = "default" }: FooterProps) {
               >
                 {section}
               </p>
-              <ul className={isHomepage ? "space-y-2" : "space-y-2.5"}>
+              <ul className={isHomepage ? "space-y-1.5" : "space-y-2.5"}>
                 {links.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
                       className={
                         isHomepage
-                          ? "font-jakarta text-sm text-slate-300/70 hover:text-white transition-colors"
+                          ? "font-jakarta text-[0.83rem] leading-5 text-slate-300/70 hover:text-white transition-colors"
                           : "font-jakarta text-sm text-gray-500 hover:text-gray-900 transition-colors"
                       }
                     >
@@ -134,12 +163,12 @@ export default function Footer({ variant = "default" }: FooterProps) {
         <div
           className={
             isHomepage
-              ? "border-t border-white/10 pt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+              ? "border-t border-white/12 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
               : "border-t border-black/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4"
           }
         >
           <p className={isHomepage ? "font-jakarta text-xs text-slate-400" : "font-jakarta text-xs text-gray-400"}>
-            © {new Date().getFullYear()} StartupX AI. All rights reserved.
+            &copy; {new Date().getFullYear()} StartupX AI. All rights reserved.
           </p>
           <div
             className={

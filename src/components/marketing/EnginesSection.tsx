@@ -1002,7 +1002,7 @@ export function PricingSection() {
 // ============================================
 export function CTASection() {
   return (
-    <section className="editorial-section bg-[var(--color-bg-primary)] px-5 py-24">
+    <section className="editorial-section homepage-final-cta bg-[var(--color-bg-primary)] px-5 pt-24 pb-8">
       <div className="container-custom">
         <AnimatedSection>
           <div className="relative overflow-hidden rounded-2xl">
