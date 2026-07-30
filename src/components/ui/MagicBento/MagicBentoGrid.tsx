@@ -13,6 +13,7 @@ type MagicBentoGridProps = {
   enableSpotlight?: boolean;
   disableAnimations?: boolean;
   spotlightRadius?: number;
+  spotlightOpacity?: number;
 };
 
 export default function MagicBentoGrid({
@@ -23,9 +24,11 @@ export default function MagicBentoGrid({
   enableSpotlight = true,
   disableAnimations = false,
   spotlightRadius = 300,
+  spotlightOpacity = 0.13,
 }: MagicBentoGridProps) {
   const gridRef = useRef<HTMLDivElement | null>(null);
   const [motionDisabled, setMotionDisabled] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -45,6 +48,21 @@ export default function MagicBentoGrid({
     };
   }, [disableAnimations]);
 
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(Boolean(entry?.isIntersecting)),
+      { rootMargin: "160px" },
+    );
+
+    observer.observe(grid);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div
       ref={gridRef}
@@ -54,10 +72,11 @@ export default function MagicBentoGrid({
     >
       <MagicBentoSpotlight
         gridRef={gridRef}
-        enabled={enableSpotlight}
         disabled={motionDisabled}
+        enabled={enableSpotlight && isVisible}
         glowColor={glowColor}
         spotlightRadius={spotlightRadius}
+        spotlightOpacity={spotlightOpacity}
       />
       {children}
     </div>

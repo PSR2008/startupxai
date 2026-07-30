@@ -92,7 +92,7 @@ export function EvidenceEntrySection() {
         <MagicBentoGrid className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" preset="marketing" glowColor="16, 185, 129">
           {evidenceEntryCards.map((card) => (
             <StaggerItem key={card.title}>
-              <MagicBentoCard className="surface-panel h-full p-6" enableStars enableTilt>
+              <MagicBentoCard className="surface-panel h-full p-6" enableStars particleCount={6} enableTilt>
                 <span className="mb-5 inline-flex rounded-md border border-black/8 bg-[#f8f6f0] px-2.5 py-1 font-mono text-[10px] font-semibold text-gray-600">
                   {card.label}
                 </span>
@@ -939,10 +939,10 @@ export function PricingSection() {
           </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 max-w-7xl mx-auto" staggerDelay={0.1}>
+        <MagicBentoGrid className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 max-w-7xl mx-auto" preset="marketing" glowColor="16, 185, 129" spotlightOpacity={0.06}>
           {plans.map((plan) => (
             <StaggerItem key={plan.name}>
-              <div
+              <MagicBentoCard
                 className={`relative flex h-full flex-col rounded-xl border p-7 transition-all duration-200 ${
                   plan.highlighted
                     ? "border-emerald-300 bg-gradient-to-b from-emerald-50 to-white shadow-md shadow-emerald-100"
@@ -982,10 +982,10 @@ export function PricingSection() {
                     {plan.cta}
                   </Button>
                 </Link>
-              </div>
+              </MagicBentoCard>
             </StaggerItem>
           ))}
-        </StaggerContainer>
+        </MagicBentoGrid>
 
         <AnimatedSection delay={0.2} className="text-center mt-10">
           <p className="font-jakarta text-sm text-gray-400">

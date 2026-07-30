@@ -31,6 +31,8 @@ type MagicBentoCardProps = {
   particleCount?: number;
   glowColor?: string;
   style?: CSSProperties;
+  maxTilt?: number;
+  magnetismStrength?: number;
   as?: "article" | "section" | "div";
 };
 
@@ -83,6 +85,8 @@ export default function MagicBentoCard({
   particleCount = DEFAULT_PARTICLE_COUNT,
   glowColor = DEFAULT_GLOW_COLOR,
   style,
+  maxTilt = 2,
+  magnetismStrength = 3,
   as = "article",
 }: MagicBentoCardProps) {
   const cardRef = useRef<HTMLElement | null>(null);
@@ -117,8 +121,8 @@ export default function MagicBentoCard({
       const y = event.clientY - rect.top;
 
       if (enableTilt) {
-        const rotateX = ((y / rect.height) - 0.5) * -6;
-        const rotateY = ((x / rect.width) - 0.5) * 6;
+        const rotateX = ((y / rect.height) - 0.5) * -maxTilt;
+        const rotateY = ((x / rect.width) - 0.5) * maxTilt;
         gsap.to(card, {
           rotateX,
           rotateY,
@@ -131,8 +135,8 @@ export default function MagicBentoCard({
 
       if (enableMagnetism && isInteractive) {
         gsap.to(card, {
-          x: (x - rect.width / 2) * 0.035,
-          y: (y - rect.height / 2) * 0.035,
+          x: Math.max(-magnetismStrength, Math.min(magnetismStrength, (x - rect.width / 2) * 0.03)),
+          y: Math.max(-magnetismStrength, Math.min(magnetismStrength, (y - rect.height / 2) * 0.03)),
           duration: 0.45,
           ease: "power2.out",
           overwrite: "auto",
@@ -211,6 +215,8 @@ export default function MagicBentoCard({
     enableTilt,
     glowColor,
     isInteractive,
+    magnetismStrength,
+    maxTilt,
     motionDisabled,
     particleCount,
   ]);

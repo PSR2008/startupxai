@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { gsap } from "gsap";
 
 const DEFAULT_GLOW_COLOR = "16, 185, 129";
@@ -36,6 +36,7 @@ type MagicBentoSpotlightProps = {
   disabled?: boolean;
   glowColor?: string;
   spotlightRadius?: number;
+  spotlightOpacity?: number;
 };
 
 export default function MagicBentoSpotlight({
@@ -44,16 +45,18 @@ export default function MagicBentoSpotlight({
   disabled = false,
   glowColor = DEFAULT_GLOW_COLOR,
   spotlightRadius = DEFAULT_SPOTLIGHT_RADIUS,
+  spotlightOpacity = 0.13,
 }: MagicBentoSpotlightProps) {
+  const spotlightRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    if (!enabled || disabled || !gridRef.current) {
+    const grid = gridRef.current;
+    const spotlight = spotlightRef.current;
+    if (!enabled || disabled || !grid || !spotlight) {
       return;
     }
 
-    const spotlight = document.createElement("div");
-    spotlight.className = "magic-bento-spotlight";
-    spotlight.style.background = `radial-gradient(circle, rgba(${glowColor}, 0.13) 0%, rgba(${glowColor}, 0.06) 32%, transparent 68%)`;
-    document.body.appendChild(spotlight);
+    spotlight.style.background = `radial-gradient(circle, rgba(${glowColor}, ${spotlightOpacity}) 0%, rgba(${glowColor}, ${spotlightOpacity * 0.45}) 32%, transparent 68%)`;
 
     const resetCards = () => {
       const cards = gridRef.current?.querySelectorAll<HTMLElement>(".magic-bento-card") ?? [];
@@ -61,27 +64,13 @@ export default function MagicBentoSpotlight({
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      const grid = gridRef.current;
-      if (!grid) {
-        return;
-      }
-
       const rect = grid.getBoundingClientRect();
-      const inside =
-        event.clientX >= rect.left &&
-        event.clientX <= rect.right &&
-        event.clientY >= rect.top &&
-        event.clientY <= rect.bottom;
-
-      if (!inside) {
-        gsap.to(spotlight, { opacity: 0, duration: 0.22, overwrite: true });
-        resetCards();
-        return;
-      }
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
 
       gsap.to(spotlight, {
-        left: event.clientX,
-        top: event.clientY,
+        left: x,
+        top: y,
         opacity: 1,
         duration: 0.18,
         ease: "power2.out",
@@ -107,16 +96,19 @@ export default function MagicBentoSpotlight({
       resetCards();
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseleave", handleMouseLeave);
+    grid.addEventListener("mousemove", handleMouseMove);
+    grid.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseleave", handleMouseLeave);
+      grid.removeEventListener("mousemove", handleMouseMove);
+      grid.removeEventListener("mouseleave", handleMouseLeave);
       gsap.killTweensOf(spotlight);
-      spotlight.remove();
     };
-  }, [disabled, enabled, glowColor, gridRef, spotlightRadius]);
+  }, [disabled, enabled, glowColor, gridRef, spotlightOpacity, spotlightRadius]);
 
-  return null;
+  if (!enabled || disabled) {
+    return null;
+  }
+
+  return <div ref={spotlightRef} aria-hidden="true" className="magic-bento-spotlight" />;
 }

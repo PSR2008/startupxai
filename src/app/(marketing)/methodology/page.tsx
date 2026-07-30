@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 
 export const metadata: Metadata = {
   title: "Assessment Methodology - StartupX AI",
@@ -68,30 +69,30 @@ export default function MethodologyPage() {
           </p>
         </section>
 
-        <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <MagicBentoGrid className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2" preset="marketing" glowColor="16, 185, 129" spotlightOpacity={0.07}>
           {principles.map((item) => (
-            <div key={item.title} className="surface-panel p-6">
+            <MagicBentoCard key={item.title} className="surface-panel p-6">
               <h2 className="mb-2 font-bricolage text-lg font-bold text-gray-900">
                 {item.title}
               </h2>
               <p className="font-jakarta text-sm leading-relaxed text-gray-600">
                 {item.body}
               </p>
-            </div>
+            </MagicBentoCard>
           ))}
-        </section>
+        </MagicBentoGrid>
 
         <section className="mb-8 surface-panel p-6">
           <h2 className="mb-4 font-bricolage text-2xl font-bold tracking-tight text-gray-950">
             Verified, unverified and missing evidence
           </h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <MagicBentoGrid className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3" preset="marketing" glowColor="16, 185, 129" spotlightOpacity={0.06}>
             {labels.map((label) => (
-              <div key={label} className="rounded-lg border border-black/8 bg-[#f8f6f0] px-3 py-2">
+              <MagicBentoCard key={label} className="rounded-lg border border-black/8 bg-[#f8f6f0] px-3 py-2">
                 <span className="font-mono text-[11px] font-semibold text-gray-600">{label}</span>
-              </div>
+              </MagicBentoCard>
             ))}
-          </div>
+          </MagicBentoGrid>
           <p className="mt-5 font-jakarta text-sm leading-relaxed text-gray-600">
             AI-assisted suggestions are treated as generated assessments until a founder links real evidence. If evidence is weak, absent or one-sided, the product shows insufficient evidence and recommends the next validation action instead of presenting a precise conclusion.
           </p>

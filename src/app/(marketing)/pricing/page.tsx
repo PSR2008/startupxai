@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { CheckCircle2, X, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
-import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
+import AnimatedSection, { StaggerItem } from "@/components/shared/AnimatedSection";
 import { PLANS } from "@/lib/plans";
 
 export const metadata: Metadata = {
@@ -165,10 +166,10 @@ export default function PricingPage() {
         </AnimatedSection>
 
         {/* Plans */}
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-20 max-w-7xl mx-auto" staggerDelay={0.1}>
+        <MagicBentoGrid className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-20 max-w-7xl mx-auto" preset="marketing" glowColor="16, 185, 129" spotlightOpacity={0.06}>
           {plans.map((plan) => (
             <StaggerItem key={plan.name}>
-              <div
+              <MagicBentoCard
                 className={`relative h-full flex flex-col rounded-2xl border p-7 ${
                   plan.highlighted
                     ? "border-sage-700/50 bg-gradient-to-b from-sage-950/30 to-transparent shadow-2xl shadow-sage-900/20"
@@ -239,10 +240,10 @@ export default function PricingPage() {
                     {plan.cta}
                   </Button>
                 </Link>
-              </div>
+              </MagicBentoCard>
             </StaggerItem>
           ))}
-        </StaggerContainer>
+        </MagicBentoGrid>
 
         <AnimatedSection delay={0.15} className="text-center -mt-10 mb-20">
           <p className="font-jakarta text-sm text-gray-400">

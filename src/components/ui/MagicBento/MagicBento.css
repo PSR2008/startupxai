@@ -1,5 +1,6 @@
 .magic-bento-grid {
   --magic-bento-glow-color: 16, 185, 129;
+  --magic-bento-spotlight-opacity: 0.13;
   position: relative;
   isolation: isolate;
 }
@@ -67,6 +68,11 @@
   z-index: 2;
 }
 
+.magic-bento-card:focus-visible {
+  outline: 2px solid rgba(var(--magic-bento-glow-color), 0.72);
+  outline-offset: 3px;
+}
+
 .magic-bento-particle {
   position: absolute;
   width: 3px;
@@ -84,12 +90,12 @@
 }
 
 .magic-bento-spotlight {
-  position: fixed;
+  position: absolute;
   width: 720px;
   height: 720px;
   border-radius: 999px;
   pointer-events: none;
-  z-index: 60;
+  z-index: 1;
   opacity: 0;
   transform: translate(-50%, -50%);
   mix-blend-mode: screen;

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CalendarDays, FileText, History, Loader2, Lock, Trash2, Trophy } from "lucide-react";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
 interface ReportSummary {
@@ -192,23 +193,23 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
         </div>
       ) : (
         <div className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <MagicBentoGrid className="grid grid-cols-1 sm:grid-cols-3 gap-3" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.06}>
             {[
               { icon: FileText, label: "Total reports", value: String(stats.totalReports) },
               { icon: Trophy, label: "Top engine", value: stats.mostUsedEngine ? ENGINE_LABELS[stats.mostUsedEngine] ?? stats.mostUsedEngine : "Not enough data" },
               { icon: CalendarDays, label: "Last run", value: stats.lastAnalysisAt ? formatDate(stats.lastAnalysisAt) : "Not yet" },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="surface-inset p-4">
+              <MagicBentoCard key={label} className="surface-inset p-4">
                 <Icon size={14} className="text-emerald-600 mb-2" />
                 <p className="metadata-text">{label}</p>
                 <p className="font-jakarta text-sm text-gray-800 truncate">{value}</p>
-              </div>
+              </MagicBentoCard>
             ))}
-          </div>
+          </MagicBentoGrid>
 
-          <div className="space-y-2">
+          <MagicBentoGrid className="space-y-2" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.06}>
             {reports.map((report) => (
-              <div key={report.id} className="group rounded-lg border border-black/8 bg-[#f8f6f0] px-4 py-3 transition-all hover:bg-white hover:shadow-sm">
+              <MagicBentoCard key={report.id} className="group rounded-lg border border-black/8 bg-[#f8f6f0] px-4 py-3 transition-all hover:bg-white hover:shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <Link href={`/reports/${report.id}`} className="min-w-0 flex-1">
                     <p className="font-bricolage text-sm font-bold text-gray-900 truncate">
@@ -232,9 +233,9 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </MagicBentoCard>
             ))}
-          </div>
+          </MagicBentoGrid>
         </div>
       )}
     </div>

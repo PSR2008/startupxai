@@ -22,6 +22,7 @@ import Button from "@/components/ui/Button";
 import ScoreRing from "@/components/ui/ScoreRing";
 import Badge from "@/components/ui/Badge";
 import ExportPdfButton from "@/components/ui/ExportPdfButton";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { IdeaEngineOutput } from "@/types";
 import { getScoreColor } from "@/lib/utils";
@@ -263,19 +264,19 @@ export default function IdeaEnginePage() {
         accentColor="#10b981"
       />
 
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <MagicBentoGrid className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.07}>
         {[
           { icon: Compass, label: "Market read", text: "Demand, ICP, and category signals" },
           { icon: ShieldAlert, label: "Risk map", text: "Failure points before you build" },
           { icon: Rocket, label: "Next moves", text: "Positioning and execution direction" },
         ].map(({ icon: Icon, label, text }) => (
-          <div key={label} className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
+          <MagicBentoCard key={label} className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
             <Icon size={16} className="text-emerald-600 mb-2" />
             <p className="font-bricolage text-xs font-bold text-gray-900">{label}</p>
             <p className="font-jakarta text-xs text-gray-400 mt-1">{text}</p>
-          </div>
+          </MagicBentoCard>
         ))}
-      </div>
+      </MagicBentoGrid>
 
       <div className="mt-8 space-y-8">
         <div className={status === "idle" ? "mx-auto max-w-4xl space-y-5" : "hidden"}>

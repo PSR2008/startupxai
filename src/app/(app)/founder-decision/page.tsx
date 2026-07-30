@@ -20,6 +20,7 @@ import { Input, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import ExportPdfButton from "@/components/ui/ExportPdfButton";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { DecisionEngineOutput } from "@/types";
 import { logUsageClient } from "@/lib/usage-client";
@@ -116,11 +117,11 @@ export default function DecisionEnginePage() {
         accentColor="#7c3aed"
       />
 
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <MagicBentoGrid className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3" preset="app" glowColor="124, 58, 237" spotlightOpacity={0.07}>
         <ContextCard icon={<Compass size={16} />} title="Strategic interpretation" detail="Generated from supplied context" tone="violet" />
         <ContextCard icon={<ClipboardCheck size={16} />} title="Action hierarchy" detail="One primary test, then two follow-ups" tone="emerald" />
         <ContextCard icon={<ShieldAlert size={16} />} title="Risk framing" detail="Assumptions to investigate" tone="rose" />
-      </div>
+      </MagicBentoGrid>
 
       <div className="mt-8 space-y-8">
         <div className={status === "idle" ? "mx-auto max-w-4xl space-y-5" : "hidden"}>
@@ -283,14 +284,16 @@ export default function DecisionEnginePage() {
                   <p className="font-jakarta text-sm leading-relaxed text-gray-650">{calibrateDecisionText(result.founderSummary)}</p>
                 </div>
 
-                <ActionCard title="Primary action - next 48 hours" action={hierarchy.primary} tone="emerald" />
+                <MagicBentoGrid className="grid grid-cols-1" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.06}>
+                  <ActionCard title="Primary action - next 48 hours" action={hierarchy.primary} tone="emerald" />
+                </MagicBentoGrid>
 
                 {hierarchy.secondary.length > 0 && (
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <MagicBentoGrid className="grid grid-cols-1 gap-4 lg:grid-cols-2" preset="app" glowColor="37, 99, 235" spotlightOpacity={0.06}>
                     {hierarchy.secondary.slice(0, 2).map((action, index) => (
                       <ActionCard key={`${action.exactAction}-${index}`} title={`Secondary action - next 14 days ${index + 1}`} action={action} tone="blue" />
                     ))}
-                  </div>
+                  </MagicBentoGrid>
                 )}
 
                 {hierarchy.laterParked.length > 0 && (
@@ -399,13 +402,13 @@ function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; tit
   };
 
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
+    <MagicBentoCard className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>{icon}</div>
       <div>
         <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
         <p className="mt-0.5 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
       </div>
-    </div>
+    </MagicBentoCard>
   );
 }
 
@@ -443,7 +446,7 @@ function BriefBasis({ title, items }: { title: string; items: string[] }) {
 function ActionCard({ title, action, tone }: { title: string; action: { objective: string; exactAction: string; targetAudience: string; metric: string; completionCondition: string }; tone: "emerald" | "blue" }) {
   const toneClasses = tone === "emerald" ? "border-emerald-200 bg-emerald-50" : "border-blue-200 bg-blue-50";
   return (
-    <div className={`rounded-2xl border p-5 ${toneClasses}`}>
+    <MagicBentoCard className={`rounded-2xl border p-5 ${toneClasses}`}>
       <h4 className="font-bricolage text-xs font-bold uppercase tracking-wide text-gray-800">{title}</h4>
       <p className="mt-3 font-bricolage text-sm font-bold text-gray-950">{action.objective}</p>
       <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-650">{action.exactAction}</p>
@@ -453,7 +456,7 @@ function ActionCard({ title, action, tone }: { title: string; action: { objectiv
         <MiniFact label="Completion condition" value={action.completionCondition} />
       </div>
       <p className="mt-3 font-jakarta text-[11px] font-semibold text-gray-500">AI-assisted recommendation</p>
-    </div>
+    </MagicBentoCard>
   );
 }
 

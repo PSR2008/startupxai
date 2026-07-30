@@ -7,6 +7,7 @@ import EngineHeader from "@/components/app/EngineHeader";
 import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import { ConfidenceBadge, DataFreshnessBadge, EvidenceCard, ProviderStatus, ValidationDecisionPanel } from "@/components/app/EvidenceUI";
 import { getAuthHeaders } from "@/lib/auth-headers-client";
@@ -208,20 +209,20 @@ export default function EvidenceEnginePage() {
         accentColor="#059669"
       />
 
-      <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-4">
+      <MagicBentoGrid className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-4" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.08}>
         {[
           { icon: Database, title: "Evidence first", detail: "Claims, verified sources, and unavailable data are separated." },
           { icon: BarChart3, title: "Transparent scores", detail: "Every Evidence Score shows components, confidence, and missing inputs." },
           { icon: FlaskConical, title: "Experiments", detail: "Weak assumptions become practical tests." },
           { icon: ShieldCheck, title: "No fake sources", detail: "Missing provider data is shown as unavailable." },
         ].map(({ icon: Icon, title, detail }) => (
-          <div key={title} className="surface-panel p-4">
+          <MagicBentoCard key={title} className="surface-panel p-4">
             <Icon size={16} className="text-emerald-600" />
             <p className="mt-2 font-bricolage text-sm font-bold text-gray-900">{title}</p>
             <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
-          </div>
+          </MagicBentoCard>
         ))}
-      </div>
+      </MagicBentoGrid>
 
       <div className="mt-8 space-y-8">
         <div className={status === "idle" ? "mx-auto max-w-4xl space-y-5" : "hidden"}>
@@ -249,11 +250,11 @@ export default function EvidenceEnginePage() {
               <NotebookPen size={15} className="text-emerald-700" />
               <h3 className="font-bricolage text-sm font-bold text-gray-900">Manual evidence entry</h3>
             </div>
-            <div className="space-y-3">
+            <MagicBentoGrid className="space-y-3" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.07}>
               <ManualEntry title="Add a source" detail="Paste a customer quote, public URL, support message, or research note after the assessment runs." />
               <ManualEntry title="Record interview" detail="Capture who was interviewed, what changed, and which assumption it supports or contradicts." />
               <ManualEntry title="Log experiment" detail="Record the metric, sample size, pass threshold, result, and decision impact." />
-            </div>
+            </MagicBentoGrid>
           </section>
 
           <Button size="lg" fullWidth onClick={submit} loading={status === "loading"} icon={<ArrowRight size={16} />} iconPosition="right">
@@ -664,10 +665,10 @@ function ScorePanel({ score }: { score: CategoryScore }) {
 
 function ManualEntry({ title, detail }: { title: string; detail: string }) {
   return (
-    <div className="rounded-lg border border-black/8 bg-[#fffefa] p-3">
+    <MagicBentoCard className="rounded-lg border border-black/8 bg-[#fffefa] p-3">
       <p className="font-bricolage text-xs font-bold text-gray-900">{title}</p>
       <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
-    </div>
+    </MagicBentoCard>
   );
 }
 

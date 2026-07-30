@@ -20,6 +20,7 @@ import { Input, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import ExportPdfButton from "@/components/ui/ExportPdfButton";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import { AnalysisLoading } from "@/components/ui/States";
 import type { Competitor, CompetitorEngineOutput } from "@/types";
 import { logUsageClient } from "@/lib/usage-client";
@@ -195,11 +196,11 @@ export default function CompetitorPage() {
         accentColor="#f59e0b"
       />
 
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <MagicBentoGrid className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3" preset="app" glowColor="245, 158, 11" spotlightOpacity={0.07}>
         <ContextCard icon={<Radar size={16} />} title="Landscape map" detail="Direct and indirect competitor view" tone="amber" />
         <ContextCard icon={<Compass size={16} />} title="Positioning gaps" detail="Where the market is under-served" tone="blue" />
         <ContextCard icon={<Swords size={16} />} title="Battle plan" detail="How to compete with focus" tone="teal" />
-      </div>
+      </MagicBentoGrid>
 
       <div className="mt-8 space-y-8">
         <div className={status === "idle" ? "mx-auto max-w-4xl space-y-5" : "hidden"}>
@@ -452,13 +453,13 @@ function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; tit
   };
 
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
+    <MagicBentoCard className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>{icon}</div>
       <div>
         <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
         <p className="mt-0.5 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
       </div>
-    </div>
+    </MagicBentoCard>
   );
 }
 

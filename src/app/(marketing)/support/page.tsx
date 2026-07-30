@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { Mail, MessageSquare, BookOpen, Zap, Send, CheckCircle2 } from "lucide-react";
 import { Input, Textarea, Select } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
-import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
+import AnimatedSection, { StaggerItem } from "@/components/shared/AnimatedSection";
 import toast from "react-hot-toast";
 import { getAuthHeaders } from "@/lib/auth-headers-client";
 
@@ -117,12 +118,12 @@ export default function SupportPage() {
         </AnimatedSection>
 
         {/* Support channels */}
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16" staggerDelay={0.08}>
+        <MagicBentoGrid className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16" preset="marketing" glowColor="16, 185, 129" spotlightOpacity={0.07}>
           {supportChannels.map((ch) => {
             const Icon = ch.icon;
             return (
               <StaggerItem key={ch.title}>
-                <div className="rounded-2xl border border-black/6 bg-gray-50 p-6 h-full">
+                <MagicBentoCard className="rounded-2xl border border-black/6 bg-gray-50 p-6 h-full">
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
                     style={{ background: `${ch.color}15`, border: `1px solid ${ch.color}25` }}
@@ -141,11 +142,11 @@ export default function SupportPage() {
                   <p className="font-jakarta text-xs text-gray-500 mt-1">
                     {ch.response}
                   </p>
-                </div>
+                </MagicBentoCard>
               </StaggerItem>
             );
           })}
-        </StaggerContainer>
+        </MagicBentoGrid>
 
         {/* Contact form */}
         <AnimatedSection id="contact">

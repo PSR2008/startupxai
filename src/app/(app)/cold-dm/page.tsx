@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import CopyButton from "@/components/ui/CopyButton";
 import Badge from "@/components/ui/Badge";
 import ExportPdfButton from "@/components/ui/ExportPdfButton";
+import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import { AnalysisLoading, ErrorState } from "@/components/ui/States";
 import type { ColdDMOutput, ColdEmailMessage, ColdMessage } from "@/types";
 import { cn } from "@/lib/utils";
@@ -159,11 +160,11 @@ export default function ColdDMPage() {
         accentColor="#10b981"
       />
 
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <MagicBentoGrid className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.07}>
         <ContextCard icon={<Target size={16} />} title="Audience fit" detail="Messages shaped to buyer pain" tone="emerald" />
         <ContextCard icon={<MessageSquare size={16} />} title="Platform variants" detail="WhatsApp, LinkedIn, email" tone="blue" />
         <ContextCard icon={<ArrowRight size={16} />} title="Follow-up system" detail="Replies without sounding pushy" tone="amber" />
-      </div>
+      </MagicBentoGrid>
 
       <div className="mt-8 space-y-8">
         <div className={status === "idle" ? "mx-auto max-w-4xl space-y-5" : "hidden"}>
@@ -352,13 +353,13 @@ function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; tit
   };
 
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
+    <MagicBentoCard className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>{icon}</div>
       <div>
         <p className="font-bricolage text-sm font-bold text-gray-900">{title}</p>
         <p className="mt-0.5 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
       </div>
-    </div>
+    </MagicBentoCard>
   );
 }
 
