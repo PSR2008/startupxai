@@ -216,21 +216,26 @@ export default function Galaxy({
   const reducedMotionRef = useRef(false);
   const shouldRenderRef = useRef(true);
   const frameRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+  const lastRenderTimeRef = useRef(0);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mobileMedia = window.matchMedia("(max-width: 768px), (pointer: coarse)");
     reducedMotionRef.current = media.matches;
     shouldRenderRef.current = !document.hidden;
+    const isStaticDevice = () => reducedMotionRef.current || mobileMedia.matches || disableAnimation;
 
     const renderer = new Renderer({
-      dpr: dpr ?? Math.min(window.devicePixelRatio || 1, 1.5),
+      dpr: dpr ?? Math.min(window.devicePixelRatio || 1, mobileMedia.matches ? 1 : 1.25),
       alpha: transparent,
       premultipliedAlpha: false,
-      antialias: true,
-    });
+      antialias: false,
+      powerPreference: "low-power",
+    } as ConstructorParameters<typeof Renderer>[0] & { powerPreference: WebGLPowerPreference });
     const gl = renderer.gl;
     const canvas = gl.canvas;
 
@@ -276,13 +281,13 @@ export default function Galaxy({
       uStarSpeed: { value: 0 },
       uDensity: { value: density },
       uHueShift: { value: hueShift },
-      uSpeed: { value: reducedMotionRef.current ? speed * 0.08 : speed },
+      uSpeed: { value: isStaticDevice() ? 0 : speed },
       uMouse: { value: new Float32Array([0.5, 0.5]) },
       uGlowIntensity: { value: glowIntensity },
       uSaturation: { value: saturation },
       uMouseRepulsion: { value: mouseRepulsion },
-      uTwinkleIntensity: { value: reducedMotionRef.current ? 0 : twinkleIntensity },
-      uRotationSpeed: { value: reducedMotionRef.current ? 0 : rotationSpeed },
+      uTwinkleIntensity: { value: isStaticDevice() ? 0 : twinkleIntensity },
+      uRotationSpeed: { value: isStaticDevice() ? 0 : rotationSpeed },
       uRepulsionStrength: { value: repulsionStrength },
       uMouseActiveFactor: { value: 0 },
       uAutoCenterRepulsion: { value: autoCenterRepulsion },
@@ -340,12 +345,16 @@ export default function Galaxy({
 
     const onVisibilityChange = () => {
       shouldRenderRef.current = !document.hidden;
+      if (shouldRenderRef.current) scheduleNextFrame();
+      else stopLoop();
     };
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     const intersectionObserver = new IntersectionObserver(
       ([entry]) => {
         shouldRenderRef.current = entry.isIntersecting && !document.hidden;
+        if (shouldRenderRef.current) scheduleNextFrame();
+        else stopLoop();
       },
       { threshold: 0.02 },
     );
@@ -353,17 +362,78 @@ export default function Galaxy({
 
     const onMotionChange = (event: MediaQueryListEvent) => {
       reducedMotionRef.current = event.matches;
-      uniforms.uSpeed.value = event.matches ? speed * 0.08 : speed;
-      uniforms.uTwinkleIntensity.value = event.matches ? 0 : twinkleIntensity;
-      uniforms.uRotationSpeed.value = event.matches ? 0 : rotationSpeed;
+      uniforms.uSpeed.value = isStaticDevice() ? 0 : speed;
+      uniforms.uTwinkleIntensity.value = isStaticDevice() ? 0 : twinkleIntensity;
+      uniforms.uRotationSpeed.value = isStaticDevice() ? 0 : rotationSpeed;
       uniforms.uMouseActiveFactor.value = 0;
       if (event.matches) detachPointerListeners();
       else attachPointerListeners();
+      renderStaticFrame();
+      if (!isStaticDevice()) scheduleNextFrame();
     };
     media.addEventListener("change", onMotionChange);
 
+    const onMobileChange = () => {
+      uniforms.uSpeed.value = isStaticDevice() ? 0 : speed;
+      uniforms.uTwinkleIntensity.value = isStaticDevice() ? 0 : twinkleIntensity;
+      uniforms.uRotationSpeed.value = isStaticDevice() ? 0 : rotationSpeed;
+      uniforms.uMouseActiveFactor.value = 0;
+      if (mobileMedia.matches) detachPointerListeners();
+      else attachPointerListeners();
+      renderStaticFrame();
+      if (!isStaticDevice()) scheduleNextFrame();
+    };
+    mobileMedia.addEventListener("change", onMobileChange);
+
+    const pageIsScrolling = () => document.documentElement.classList.contains("homepage-is-scrolling");
+
+    const stopLoop = () => {
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+      frameRef.current = null;
+      timeoutRef.current = null;
+    };
+
+    const scheduleNextFrame = (delay = 0) => {
+      if (frameRef.current !== null || timeoutRef.current !== null || isStaticDevice() || !shouldRenderRef.current) return;
+      const request = () => {
+        timeoutRef.current = null;
+        frameRef.current = requestAnimationFrame(render);
+      };
+      if (delay > 0) timeoutRef.current = window.setTimeout(request, delay);
+      else request();
+    };
+
+    const renderStaticFrame = () => {
+      stopLoop();
+      uniforms.uTime.value = 0.001;
+      uniforms.uStarSpeed.value = 0;
+      uniforms.uMouseActiveFactor.value = 0;
+      renderer.render({ scene: mesh });
+    };
+
     const render = (time: number) => {
-      frameRef.current = requestAnimationFrame(render);
+      frameRef.current = null;
+      if (!shouldRenderRef.current) return;
+
+      if (isStaticDevice()) {
+        renderStaticFrame();
+        return;
+      }
+
+      if (pageIsScrolling()) {
+        scheduleNextFrame(190);
+        return;
+      }
+
+      const minFrameMs = 1000 / 24;
+      const elapsed = time - lastRenderTimeRef.current;
+      if (lastRenderTimeRef.current && elapsed < minFrameMs) {
+        scheduleNextFrame(minFrameMs - elapsed);
+        return;
+      }
+      lastRenderTimeRef.current = time;
+
       if (disableAnimation || reducedMotionRef.current) {
         uniforms.uTime.value = 0.001;
         uniforms.uStarSpeed.value = 0;
@@ -384,14 +454,19 @@ export default function Galaxy({
       if (shouldRenderRef.current) {
         renderer.render({ scene: mesh });
       }
+
+      scheduleNextFrame(1000 / 24);
     };
-    frameRef.current = requestAnimationFrame(render);
+
+    renderStaticFrame();
+    if (!isStaticDevice()) scheduleNextFrame();
 
     return () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      stopLoop();
       detachPointerListeners();
       document.removeEventListener("visibilitychange", onVisibilityChange);
       media.removeEventListener("change", onMotionChange);
+      mobileMedia.removeEventListener("change", onMobileChange);
       intersectionObserver.disconnect();
       resizeObserver.disconnect();
       if (canvas.parentElement === container) {

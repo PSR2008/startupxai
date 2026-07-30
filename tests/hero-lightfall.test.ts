@@ -55,6 +55,9 @@ test("Lightfall canvas is decorative, bounded, and cleanup-safe", () => {
   assert.match(source, /prefers-reduced-motion: reduce/);
   assert.match(source, /document\.addEventListener\("visibilitychange"/);
   assert.match(source, /new IntersectionObserver/);
+  assert.match(source, /startLoop/);
+  assert.match(source, /stopLoop/);
+  assert.match(source, /if \(!shouldRenderRef\.current\) return/);
   assert.match(source, /pointerListenerAttached/);
   assert.match(source, /removeEventListener\("pointermove"/);
   assert.match(source, /cancelAnimationFrame/);

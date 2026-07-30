@@ -68,7 +68,7 @@ test("homepage live static grids use MagicBento while hero and ScrollStack stay 
   assert.match(marketing, /<MagicBentoGrid className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"/);
   assert.match(marketing, /<MagicBentoGrid className="grid grid-cols-1 md:grid-cols-3 gap-5"/);
   assert.match(marketing, /<MagicBentoGrid className="grid grid-cols-1 sm:grid-cols-2 gap-4"/);
-  assert.match(marketing, /particleCount=\{6\}/);
+  assert.doesNotMatch(marketing, /enableStars|particleCount=\{6\}/);
   assert.match(dashboard, /<MagicBentoGrid className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4"/);
 
   for (const file of [
@@ -79,6 +79,18 @@ test("homepage live static grids use MagicBento while hero and ScrollStack stay 
     const source = readFileSync(join(root, file), "utf8");
     assert.equal(source.includes("MagicBento"), false, `${file} should remain unchanged by MagicBento`);
   }
+});
+
+test("MagicBento suspends hover motion and particles during homepage scroll", () => {
+  assert.match(card, /homepage-is-scrolling/);
+  assert.match(card, /startupx:homepage-scroll-start/);
+  assert.match(card, /resetCardTransform/);
+  assert.match(card, /if \(!enableStars \|\| isHomepageScrolling\(\)\)/);
+  assert.match(spotlight, /homepage-is-scrolling/);
+  assert.match(spotlight, /startupx:homepage-scroll-start/);
+  assert.match(spotlight, /handleHomepageScrollStart/);
+  assert.match(styles, /html\.homepage-is-scrolling \.magic-bento-spotlight/);
+  assert.match(styles, /html\.homepage-is-scrolling \.magic-bento-card/);
 });
 
 test("pricing uses restrained MagicBento without particles, tilt, or false card links", () => {

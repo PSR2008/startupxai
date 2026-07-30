@@ -30,6 +30,10 @@ export function updateCardGlowProperties(
   card.style.setProperty("--glow-radius", `${radius}px`);
 }
 
+function isHomepageScrolling() {
+  return document.documentElement.classList.contains("homepage-is-scrolling");
+}
+
 type MagicBentoSpotlightProps = {
   gridRef: RefObject<HTMLElement | null>;
   enabled?: boolean;
@@ -64,6 +68,13 @@ export default function MagicBentoSpotlight({
     };
 
     const handleMouseMove = (event: MouseEvent) => {
+      if (isHomepageScrolling()) {
+        gsap.killTweensOf(spotlight);
+        spotlight.style.opacity = "0";
+        resetCards();
+        return;
+      }
+
       const rect = grid.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
@@ -96,12 +107,20 @@ export default function MagicBentoSpotlight({
       resetCards();
     };
 
+    const handleHomepageScrollStart = () => {
+      gsap.killTweensOf(spotlight);
+      spotlight.style.opacity = "0";
+      resetCards();
+    };
+
     grid.addEventListener("mousemove", handleMouseMove);
     grid.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("startupx:homepage-scroll-start", handleHomepageScrollStart);
 
     return () => {
       grid.removeEventListener("mousemove", handleMouseMove);
       grid.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("startupx:homepage-scroll-start", handleHomepageScrollStart);
       gsap.killTweensOf(spotlight);
     };
   }, [disabled, enabled, glowColor, gridRef, spotlightOpacity, spotlightRadius]);

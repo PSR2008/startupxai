@@ -349,12 +349,16 @@ const Lightfall = ({
 
     const onVisibilityChange = () => {
       shouldRenderRef.current = !document.hidden;
+      if (shouldRenderRef.current) startLoop();
+      else stopLoop();
     };
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     const io = new IntersectionObserver(
       ([entry]) => {
         shouldRenderRef.current = entry.isIntersecting && !document.hidden;
+        if (shouldRenderRef.current) startLoop();
+        else stopLoop();
       },
       { threshold: 0.05 }
     );
@@ -377,8 +381,20 @@ const Lightfall = ({
 
     const renderOnce = () => renderer.render({ scene: mesh });
 
-    const loop = (t: number) => {
-      rafRef.current = requestAnimationFrame(loop);
+    const stopLoop = () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    };
+
+    const startLoop = () => {
+      if (!rafRef.current && shouldRenderRef.current) {
+        rafRef.current = requestAnimationFrame(loop);
+      }
+    };
+
+    function loop(t: number) {
+      rafRef.current = null;
+      if (!shouldRenderRef.current) return;
       if (reducedMotionRef.current) {
         if (uniforms.iTime.value === 0) renderOnce();
         uniforms.iTime.value = 0.001;
@@ -402,11 +418,14 @@ const Lightfall = ({
       if (!paused && shouldRenderRef.current && programRef.current && meshRef.current) {
         renderer.render({ scene: mesh });
       }
-    };
-    rafRef.current = requestAnimationFrame(loop);
+      if (!paused && shouldRenderRef.current) {
+        rafRef.current = requestAnimationFrame(loop);
+      }
+    }
+    startLoop();
 
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      stopLoop();
       if (pointerListenerAttached) canvas.removeEventListener("pointermove", onPointerMove);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       media.removeEventListener("change", onMotionChange);

@@ -92,7 +92,7 @@ export function EvidenceEntrySection() {
         <MagicBentoGrid className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" preset="marketing" glowColor="16, 185, 129">
           {evidenceEntryCards.map((card) => (
             <StaggerItem key={card.title}>
-              <MagicBentoCard className="surface-panel h-full p-6" enableStars particleCount={6} enableTilt>
+              <MagicBentoCard className="surface-panel h-full p-6" enableTilt>
                 <span className="mb-5 inline-flex rounded-md border border-black/8 bg-[#f8f6f0] px-2.5 py-1 font-mono text-[10px] font-semibold text-gray-600">
                   {card.label}
                 </span>

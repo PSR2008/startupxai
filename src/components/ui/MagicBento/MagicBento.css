@@ -102,6 +102,16 @@
   will-change: left, top, opacity;
 }
 
+html.homepage-is-scrolling .magic-bento-spotlight,
+html.homepage-is-scrolling .magic-bento-particle,
+html.homepage-is-scrolling .magic-bento-ripple {
+  display: none !important;
+}
+
+html.homepage-is-scrolling .magic-bento-card {
+  transform: none !important;
+}
+
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .magic-bento-card {
     transform: none !important;

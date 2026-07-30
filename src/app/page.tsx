@@ -3,6 +3,7 @@ import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
 import Galaxy from "@/components/marketing/Galaxy";
 import HeroSection from "@/components/marketing/HeroSection";
+import HomepageScrollState from "@/components/marketing/HomepageScrollState";
 import ProductScrollStackSection from "@/components/marketing/ProductScrollStackSection";
 import {
   CapabilitiesSection,
@@ -37,20 +38,24 @@ export default function LandingPage() {
       <Navbar />
       <HeroSection />
       <div className="homepage-galaxy-stage">
+        <HomepageScrollState />
         <Galaxy
           className="homepage-galaxy-canvas"
           focal={[0.5, 0.18]}
           rotation={[0.92, 0.18]}
-          starSpeed={0.42}
-          density={1.34}
+          starSpeed={0.28}
+          density={0.85}
+          speed={0.45}
           hueShift={174}
-          glowIntensity={0.36}
-          saturation={0.34}
-          twinkleIntensity={0.24}
-          rotationSpeed={0.045}
-          repulsionStrength={1.35}
+          glowIntensity={0.22}
+          saturation={0.5}
+          twinkleIntensity={0.1}
+          rotationSpeed={0.012}
+          mouseInteraction={false}
+          mouseRepulsion={false}
+          repulsionStrength={1.2}
           autoCenterRepulsion={0.08}
-          transparent={false}
+          transparent={true}
         />
         <div className="homepage-galaxy-content">
           <ProductScrollStackSection />

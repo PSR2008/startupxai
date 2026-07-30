@@ -10,6 +10,9 @@ const stack = readFileSync(join(root, "src/components/marketing/ScrollStack.tsx"
 const stackCss = readFileSync(join(root, "src/components/marketing/ScrollStack.css"), "utf8");
 const hero = readFileSync(join(root, "src/components/marketing/HeroSection.tsx"), "utf8");
 const navbar = readFileSync(join(root, "src/components/marketing/Navbar.tsx"), "utf8");
+const packageJson = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as {
+  dependencies: Record<string, string>;
+};
 
 test("homepage renders one ScrollStack product introduction after the Lightfall hero", () => {
   assert.match(page, /import ProductScrollStackSection/);
@@ -87,13 +90,18 @@ test("ScrollStack copy avoids invented validation claims and keeps evidence sema
   assert.match(section, /not guaranteed acquisition paths/);
 });
 
-test("ScrollStack implementation scopes card lookup and owns one Lenis lifecycle", () => {
+test("ScrollStack implementation scopes card lookup and uses native passive scroll scheduling", () => {
   assert.match(stack, /scroller\.querySelectorAll<HTMLElement>\("\.scroll-stack-card"\)/);
   assert.doesNotMatch(stack, /document\.querySelectorAll\('\.scroll-stack-card'\)/);
   assert.doesNotMatch(stack, /document\.querySelectorAll\("\.scroll-stack-card"\)/);
-  assert.equal((stack.match(/new Lenis/g) ?? []).length, 2, "window and non-window paths should be the only Lenis constructors");
-  assert.match(stack, /lenisRef\.current\?\.destroy\(\)/);
-  assert.match(stack, /cancelAnimationFrame\(animationFrameRef\.current\)/);
+  assert.doesNotMatch(stack, /Lenis|new Lenis|lenis\.raf|smoothWheel|syncTouch/);
+  assert.equal(packageJson.dependencies.lenis, undefined, "Lenis should be removed when ScrollStack uses native scroll");
+  assert.match(stack, /addEventListener\("scroll", onScroll, \{ passive: true \}\)/);
+  assert.match(stack, /scheduledFrameRef\.current = requestAnimationFrame\(updateCardTransforms\)/);
+  assert.doesNotMatch(stack, /requestAnimationFrame\(raf\)/);
+  assert.match(stack, /cancelAnimationFrame\(scheduledFrameRef\.current\)/);
+  assert.match(stack, /recalculateGeometry/);
+  assert.match(stack, /ResizeObserver/);
   assert.match(stack, /new IntersectionObserver/);
 });
 

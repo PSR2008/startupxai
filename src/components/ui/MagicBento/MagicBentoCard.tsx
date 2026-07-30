@@ -70,6 +70,10 @@ function useMotionDisabled(disabled?: boolean) {
   return motionDisabled;
 }
 
+function isHomepageScrolling() {
+  return document.documentElement.classList.contains("homepage-is-scrolling");
+}
+
 export default function MagicBentoCard({
   children,
   className,
@@ -115,7 +119,18 @@ export default function MagicBentoCard({
       return;
     }
 
+    const resetCardTransform = () => {
+      gsap.killTweensOf(card);
+      gsap.set(card, { x: 0, y: 0, rotateX: 0, rotateY: 0 });
+      clearParticles();
+    };
+
     const handleMouseMove = (event: MouseEvent) => {
+      if (isHomepageScrolling()) {
+        resetCardTransform();
+        return;
+      }
+
       const rect = card.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
@@ -158,7 +173,7 @@ export default function MagicBentoCard({
     };
 
     const handleMouseEnter = () => {
-      if (!enableStars) {
+      if (!enableStars || isHomepageScrolling()) {
         return;
       }
 
@@ -199,11 +214,13 @@ export default function MagicBentoCard({
     card.addEventListener("mousemove", handleMouseMove);
     card.addEventListener("mouseenter", handleMouseEnter);
     card.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("startupx:homepage-scroll-start", resetCardTransform);
 
     return () => {
       card.removeEventListener("mousemove", handleMouseMove);
       card.removeEventListener("mouseenter", handleMouseEnter);
       card.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("startupx:homepage-scroll-start", resetCardTransform);
       gsap.killTweensOf(card);
       clearParticles();
     };
@@ -222,7 +239,7 @@ export default function MagicBentoCard({
   ]);
 
   const handleClick = (event: ReactMouseEvent<HTMLElement>) => {
-    if (!clickEffect || motionDisabled || disabled || !cardRef.current) {
+    if (!clickEffect || motionDisabled || disabled || !cardRef.current || isHomepageScrolling()) {
       return;
     }
 

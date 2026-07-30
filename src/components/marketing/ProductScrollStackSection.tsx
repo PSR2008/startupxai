@@ -325,7 +325,7 @@ export default function ProductScrollStackSection() {
         baseScale={0.88}
         scaleDuration={0.5}
         rotationAmount={0}
-        blurAmount={0.35}
+        blurAmount={0}
         useWindowScroll={true}
       >
         {stackCards.map((card) => {

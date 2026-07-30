@@ -1,6 +1,5 @@
 .galaxy-container {
   position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -55,6 +54,18 @@
   z-index: 2;
 }
 
+.homepage-galaxy-stage > .homepage-galaxy-canvas {
+  position: sticky;
+  top: 0;
+  display: block;
+  height: 100svh;
+  min-height: 100vh;
+  margin-bottom: -100svh;
+  background:
+    radial-gradient(circle at 22% 16%, rgba(16, 185, 129, 0.12), transparent 32rem),
+    linear-gradient(180deg, #050912 0%, #03050b 100%);
+}
+
 .homepage-galaxy-stage .editorial-section {
   background: transparent !important;
   border-top-color: rgba(255, 255, 255, 0.1);
@@ -67,7 +78,6 @@
 .homepage-galaxy-stage section.border-y {
   background: rgba(3, 6, 14, 0.56) !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(2px);
 }
 
 .homepage-galaxy-stage section.border-y p {
@@ -97,7 +107,6 @@
 .homepage-galaxy-stage footer {
   background: rgba(3, 6, 14, 0.72) !important;
   border-top-color: rgba(255, 255, 255, 0.11) !important;
-  backdrop-filter: blur(10px);
 }
 
 .homepage-galaxy-stage footer .text-gray-900,
@@ -115,6 +124,11 @@
 }
 
 @media (max-width: 767px) {
+  .homepage-galaxy-stage > .homepage-galaxy-canvas {
+    height: 100vh;
+    margin-bottom: -100vh;
+  }
+
   .homepage-galaxy-stage::after {
     background-size: 58px 58px;
     opacity: 0.22;
@@ -131,4 +145,9 @@
   .galaxy-container canvas {
     transform: none !important;
   }
+}
+
+.homepage-galaxy-stage .editorial-section:not(.scroll-stack-section),
+.homepage-galaxy-stage footer {
+  contain: layout paint;
 }
