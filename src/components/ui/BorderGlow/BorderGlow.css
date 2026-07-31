@@ -1,0 +1,81 @@
+.border-glow {
+  --border-glow-color: 16, 185, 129;
+  --border-glow-strength: 0.42;
+  --border-glow-x: 50%;
+  --border-glow-y: 0%;
+  position: relative;
+  isolation: isolate;
+  border-radius: 18px;
+}
+
+.border-glow::before,
+.border-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.border-glow::before {
+  z-index: -2;
+  background:
+    radial-gradient(
+      260px circle at var(--border-glow-x) var(--border-glow-y),
+      rgba(var(--border-glow-color), calc(var(--border-glow-strength) * 0.36)),
+      transparent 58%
+    );
+  opacity: 0.72;
+  filter: blur(18px);
+}
+
+.border-glow::after {
+  z-index: 0;
+  padding: 1px;
+  background:
+    radial-gradient(
+      220px circle at var(--border-glow-x) var(--border-glow-y),
+      rgba(var(--border-glow-color), calc(var(--border-glow-strength) * 0.9)),
+      rgba(255, 255, 255, 0.18) 38%,
+      rgba(255, 255, 255, 0.08) 64%,
+      transparent 78%
+    );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.82;
+}
+
+.border-glow:hover::before,
+.border-glow:focus-within::before {
+  opacity: 0.95;
+}
+
+.border-glow:hover::after,
+.border-glow:focus-within::after {
+  opacity: 1;
+}
+
+.border-glow--recommended::before {
+  opacity: 1;
+  filter: blur(22px);
+}
+
+.border-glow--recommended::after {
+  opacity: 1;
+}
+
+.border-glow__content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  border-radius: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .border-glow,
+  .border-glow::before,
+  .border-glow::after {
+    transition: none;
+  }
+}

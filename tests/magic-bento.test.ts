@@ -93,14 +93,13 @@ test("MagicBento suspends hover motion and particles during homepage scroll", ()
   assert.match(styles, /html\.homepage-is-scrolling \.magic-bento-card/);
 });
 
-test("pricing uses restrained MagicBento without particles, tilt, or false card links", () => {
+test("pricing no longer combines MagicBento with pricing card interactions", () => {
   for (const source of [marketing, pricingPage]) {
-    assert.match(source, /<MagicBentoGrid[^>]+spotlightOpacity=\{0\.06\}/);
-    assert.match(source, /<MagicBentoCard[\s\S]+plan\.highlighted[\s\S]+<Link href=\{plan\.href\}>/);
+    const pricingSection = source.slice(source.indexOf("{plans.map"), source.indexOf("All plans"));
+    assert.equal(pricingSection.includes("MagicBentoGrid"), false);
+    assert.equal(pricingSection.includes("MagicBentoCard"), false);
     assert.equal(/<MagicBentoCard[^>]+href=\{plan\.href\}/.test(source), false);
   }
-  const pricingSection = pricingPage.slice(pricingPage.indexOf("{plans.map"), pricingPage.indexOf("{faqs.map"));
-  assert.equal(/enableStars|enableTilt|enableMagnetism/.test(pricingSection), false);
 });
 
 test("methodology and support compact cards use MagicBento while long copy and form sections stay static", () => {

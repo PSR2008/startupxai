@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import Button from "@/components/ui/Button";
+import { BorderGlow } from "@/components/ui/BorderGlow";
 import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import { PLANS } from "@/lib/plans";
 
@@ -892,53 +893,73 @@ export function PricingSection() {
           </p>
         </AnimatedSection>
 
-        <MagicBentoGrid className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 max-w-7xl mx-auto" preset="marketing" glowColor="16, 185, 129" spotlightOpacity={0.06}>
-          {plans.map((plan) => (
+        <div className="mx-auto grid max-w-7xl items-stretch gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {plans.map((plan, index) => (
             <StaggerItem key={plan.name}>
-              <MagicBentoCard
-                className={`relative flex h-full flex-col rounded-xl border p-7 transition-all duration-200 ${
-                  plan.highlighted
-                    ? "border-emerald-300 bg-gradient-to-b from-emerald-50 to-white shadow-md shadow-emerald-100"
-                    : "border-black/8 bg-[#f8f6f0] hover:bg-white hover:shadow-sm"
-                }`}
+              <BorderGlow
+                recommended={plan.name === "Growth"}
+                glowColor={plan.name === "Growth" ? "16, 185, 129" : "148, 163, 184"}
+                intensity={plan.name === "Growth" ? 0.58 : 0.28}
+                className="h-full"
               >
-                {plan.badge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="rounded-md bg-emerald-700 px-3 py-1 font-mono text-[10px] font-semibold text-white shadow-sm shadow-emerald-900/20">
-                      {plan.badge}
-                    </span>
-                  </div>
-                )}
-
-                <div className="mb-6">
-                  <p className="font-jakarta text-sm font-bold text-gray-500 mb-3">{plan.name}</p>
-                  <div className="flex items-end gap-1 mb-2">
-                    <span className="font-jakarta text-4xl font-bold text-gray-900">{plan.price}</span>
-                    {plan.period && (
-                      <span className="font-jakarta text-sm text-gray-400 mb-1.5">{plan.period}</span>
+                <article
+                  className={`flex h-full min-h-[520px] flex-col rounded-[18px] border p-6 shadow-[0_22px_70px_rgba(15,23,42,0.14)] backdrop-blur md:p-7 ${
+                    plan.name === "Growth"
+                      ? "border-emerald-300/55 bg-[#071511]/92 text-white"
+                      : "border-white/16 bg-[#101418]/88 text-white"
+                  }`}
+                >
+                  <div className="mb-5 flex min-h-7 items-center justify-between gap-3">
+                    <span className="font-mono text-[11px] font-semibold text-white/45">{String(index + 1).padStart(2, "0")}</span>
+                    {plan.badge ? (
+                      <span
+                        className={`rounded-full border px-3 py-1 font-mono text-[10px] font-semibold ${
+                          plan.name === "Growth"
+                            ? "border-emerald-300/40 bg-emerald-300/12 text-emerald-100"
+                            : "border-white/15 bg-white/8 text-white/70"
+                        }`}
+                      >
+                        {plan.badge}
+                      </span>
+                    ) : (
+                      <span className="h-px w-10 bg-white/14" />
                     )}
                   </div>
-                  <p className="font-jakarta text-sm text-gray-500">{plan.description}</p>
+
+                <div className="mb-6">
+                  <p className={`mb-3 font-jakarta text-sm font-bold ${plan.name === "Growth" ? "text-emerald-100" : "text-white/82"}`}>{plan.name}</p>
+                  <p className="min-h-[44px] font-jakarta text-sm leading-relaxed text-white/58">{plan.description}</p>
+                  <div className="mt-6 flex items-end gap-1 mb-2">
+                    <span className="font-jakarta text-4xl font-bold text-white">{plan.price}</span>
+                    {plan.period && (
+                      <span className="font-jakarta text-sm text-white/48 mb-1.5">{plan.period}</span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex-1 space-y-2.5 mb-7">
                   {plan.features.map((f) => (
                     <div key={f} className="relative pl-5">
-                      <span aria-hidden="true" className="absolute left-0 top-0 font-mono text-xs text-emerald-700">-</span>
-                      <span className="font-jakarta text-sm text-gray-600">{f}</span>
+                      <span aria-hidden="true" className="absolute left-0 top-0 font-mono text-xs text-emerald-300">-</span>
+                      <span className="font-jakarta text-sm leading-snug text-white/68">{f}</span>
                     </div>
                   ))}
                 </div>
 
-                <Link href={plan.href}>
-                  <Button fullWidth variant={plan.highlighted ? "primary" : "outline"}>
+                <Link href={plan.href} className="mt-auto block">
+                  <Button
+                    fullWidth
+                    variant={plan.name === "Growth" ? "primary" : "outline"}
+                    className={plan.name === "Growth" ? "" : "border-white/16 bg-white/6 text-white hover:bg-white/10 hover:text-white"}
+                  >
                     {plan.cta}
                   </Button>
                 </Link>
-              </MagicBentoCard>
+                </article>
+              </BorderGlow>
             </StaggerItem>
           ))}
-        </MagicBentoGrid>
+        </div>
 
         <AnimatedSection delay={0.2} className="text-center mt-10">
           <p className="font-jakarta text-sm text-gray-400">
