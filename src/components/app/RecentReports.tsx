@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CalendarDays, FileText, History, Loader2, Lock, Trash2, Trophy } from "lucide-react";
+import { ArrowRight, Loader2, Lock, Trash2 } from "lucide-react";
 import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
@@ -150,8 +150,7 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
   return (
     <div className="surface-panel h-full p-6">
       <div className="flex items-center justify-between gap-3 mb-5">
-        <div className="flex items-center gap-2">
-          <History size={15} className="text-emerald-600" />
+        <div>
           <h3 className="font-jakarta text-sm font-bold text-gray-900">Recent Reports</h3>
         </div>
         {reports.length > 0 && (
@@ -185,7 +184,6 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
         </div>
       ) : reports.length === 0 ? (
         <div className="rounded-lg border border-dashed border-black/10 bg-[#f8f6f0] p-5">
-          <FileText size={18} className="text-gray-300 mb-3" />
           <p className="font-jakarta text-sm font-bold text-gray-800 mb-1">No reports yet</p>
           <p className="font-jakarta text-xs text-gray-400 leading-relaxed">
             Run any engine while signed in and your reports will appear here.
@@ -195,12 +193,11 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
         <div className="space-y-5">
           <MagicBentoGrid className="grid grid-cols-1 sm:grid-cols-3 gap-3" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.06}>
             {[
-              { icon: FileText, label: "Total reports", value: String(stats.totalReports) },
-              { icon: Trophy, label: "Top engine", value: stats.mostUsedEngine ? ENGINE_LABELS[stats.mostUsedEngine] ?? stats.mostUsedEngine : "Not enough data" },
-              { icon: CalendarDays, label: "Last run", value: stats.lastAnalysisAt ? formatDate(stats.lastAnalysisAt) : "Not yet" },
-            ].map(({ icon: Icon, label, value }) => (
+              { label: "Total reports", value: String(stats.totalReports) },
+              { label: "Top engine", value: stats.mostUsedEngine ? ENGINE_LABELS[stats.mostUsedEngine] ?? stats.mostUsedEngine : "Not enough data" },
+              { label: "Last run", value: stats.lastAnalysisAt ? formatDate(stats.lastAnalysisAt) : "Not yet" },
+            ].map(({ label, value }) => (
               <MagicBentoCard key={label} className="surface-inset p-4">
-                <Icon size={14} className="text-emerald-600 mb-2" />
                 <p className="metadata-text">{label}</p>
                 <p className="font-jakarta text-sm text-gray-800 truncate">{value}</p>
               </MagicBentoCard>

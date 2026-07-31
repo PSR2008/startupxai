@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CalendarDays, FileText } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { EVIDENCE_SCORE_DISCLAIMER } from "@/lib/evidence-display";
 import type { FounderReportContent, GeneratedReport } from "@/lib/reporting";
 
@@ -146,10 +146,7 @@ export default function ReportRenderer({ report }: { report: RenderableReport })
       <div className="surface-panel mb-5 overflow-hidden p-0">
         <div className="h-1 bg-gradient-to-r from-emerald-700 via-emerald-500 to-amber-400" />
         <div className="p-6 sm:p-7">
-        <div className="flex items-start gap-4">
-          <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-            <FileText size={20} className="text-emerald-600" />
-          </div>
+        <div className="flex items-start">
           <div>
             <p className="mb-1 font-jakarta text-xs font-semibold text-emerald-700">
               {ENGINE_LABELS[report.engine_type] ?? report.engine_type}

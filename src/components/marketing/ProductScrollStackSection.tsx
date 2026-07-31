@@ -3,21 +3,6 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Brain,
-  CheckCircle2,
-  ClipboardList,
-  DollarSign,
-  FileText,
-  Flag,
-  FlaskConical,
-  Lightbulb,
-  MessageSquare,
-  Palette,
-  SearchCheck,
-  ShieldQuestion,
-  Swords,
-  Target,
-  TrendingUp,
 } from "lucide-react";
 import ScrollStack, { ScrollStackItem } from "./ScrollStack";
 
@@ -31,40 +16,33 @@ type StackCard = {
   trustNote: string;
   href: string;
   cta: string;
-  icon: typeof SearchCheck;
   accent: "emerald" | "teal" | "blue" | "indigo" | "violet" | "amber";
   markerId?: string;
 };
 
-const accentStyles: Record<StackCard["accent"], { badge: string; icon: string; line: string }> = {
+const accentStyles: Record<StackCard["accent"], { badge: string; line: string }> = {
   emerald: {
     badge: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    icon: "border-emerald-200 bg-emerald-50 text-emerald-700",
     line: "bg-emerald-500",
   },
   teal: {
     badge: "border-teal-200 bg-teal-50 text-teal-700",
-    icon: "border-teal-200 bg-teal-50 text-teal-700",
     line: "bg-teal-500",
   },
   blue: {
     badge: "border-blue-200 bg-blue-50 text-blue-700",
-    icon: "border-blue-200 bg-blue-50 text-blue-700",
     line: "bg-blue-500",
   },
   indigo: {
     badge: "border-indigo-200 bg-indigo-50 text-indigo-700",
-    icon: "border-indigo-200 bg-indigo-50 text-indigo-700",
     line: "bg-indigo-500",
   },
   violet: {
     badge: "border-violet-200 bg-violet-50 text-violet-700",
-    icon: "border-violet-200 bg-violet-50 text-violet-700",
     line: "bg-violet-500",
   },
   amber: {
     badge: "border-amber-200 bg-amber-50 text-amber-700",
-    icon: "border-amber-200 bg-amber-50 text-amber-700",
     line: "bg-amber-500",
   },
 };
@@ -84,7 +62,6 @@ const stackCards: StackCard[] = [
     trustNote: "Founder claims and generated suggestions are not treated as verified evidence.",
     href: "/evidence-engine",
     cta: "Explore Evidence Engine",
-    icon: SearchCheck,
     accent: "emerald",
     markerId: "features",
   },
@@ -102,7 +79,6 @@ const stackCards: StackCard[] = [
     trustNote: "An assumption remains provisional until relevant evidence supports or contradicts it.",
     href: "/evidence-engine",
     cta: "Review assumptions",
-    icon: ShieldQuestion,
     accent: "teal",
   },
   {
@@ -119,7 +95,6 @@ const stackCards: StackCard[] = [
     trustNote: "A planned experiment does not count as evidence until an outcome is recorded.",
     href: "/evidence-engine",
     cta: "Plan experiments",
-    icon: FlaskConical,
     accent: "blue",
   },
   {
@@ -136,7 +111,6 @@ const stackCards: StackCard[] = [
     trustNote: "Generated analysis is strategic assistance, not verified market truth.",
     href: "/competitor-intelligence",
     cta: "Explore competitors",
-    icon: Swords,
     accent: "teal",
   },
   {
@@ -153,7 +127,6 @@ const stackCards: StackCard[] = [
     trustNote: "Recommendations are interpretations; the founder remains responsible for the decision.",
     href: "/founder-decision",
     cta: "Review decisions",
-    icon: Flag,
     accent: "emerald",
   },
   {
@@ -170,7 +143,6 @@ const stackCards: StackCard[] = [
     trustNote: "Reports distinguish founder context from qualifying evidence.",
     href: "/reports",
     cta: "View reports",
-    icon: FileText,
     accent: "blue",
   },
   {
@@ -187,7 +159,6 @@ const stackCards: StackCard[] = [
     trustNote: "The output is an assessment framework, not proof of demand.",
     href: "/idea-engine",
     cta: "Open Idea & Market Engine",
-    icon: Lightbulb,
     accent: "indigo",
     markerId: "assessment-tools",
   },
@@ -205,7 +176,6 @@ const stackCards: StackCard[] = [
     trustNote: "Revenue potential remains hypothetical until purchase or payment evidence exists.",
     href: "/revenue-engine",
     cta: "Open Revenue Engine",
-    icon: DollarSign,
     accent: "amber",
   },
   {
@@ -222,7 +192,6 @@ const stackCards: StackCard[] = [
     trustNote: "Psychological interpretations should be validated through real customer behaviour.",
     href: "/user-psychology",
     cta: "Open User Psychology",
-    icon: Brain,
     accent: "violet",
   },
   {
@@ -239,7 +208,6 @@ const stackCards: StackCard[] = [
     trustNote: "Suggested channels are experiments, not guaranteed acquisition paths.",
     href: "/growth-engine",
     cta: "Open Growth Engine",
-    icon: TrendingUp,
     accent: "indigo",
   },
   {
@@ -256,7 +224,6 @@ const stackCards: StackCard[] = [
     trustNote: "Strategic interpretations are AI-assisted and based on the context supplied.",
     href: "/founder-decision",
     cta: "Open Founder Decision Engine",
-    icon: Target,
     accent: "violet",
   },
   {
@@ -273,7 +240,6 @@ const stackCards: StackCard[] = [
     trustNote: "Users must review accuracy and relevance before sending.",
     href: "/cold-dm",
     cta: "Open ColdDM",
-    icon: MessageSquare,
     accent: "blue",
   },
   {
@@ -290,7 +256,6 @@ const stackCards: StackCard[] = [
     trustNote: "Generated concepts should be reviewed for originality, trademarks and market fit.",
     href: "/brand-forge",
     cta: "Open BrandForge",
-    icon: Palette,
     accent: "indigo",
   },
 ];
@@ -300,8 +265,7 @@ export default function ProductScrollStackSection() {
     <section className="scroll-stack-section editorial-section bg-[var(--color-bg-primary)] px-5 py-24">
       <div className="container-custom">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
-            <ClipboardList size={12} className="text-emerald-600" />
+          <div className="mb-5 inline-flex items-center rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
             <span className="font-jakarta text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
               The StartupX AI workspace
             </span>
@@ -329,7 +293,6 @@ export default function ProductScrollStackSection() {
         useWindowScroll={true}
       >
         {stackCards.map((card) => {
-          const Icon = card.icon;
           const accent = accentStyles[card.accent];
 
           return (
@@ -348,9 +311,7 @@ export default function ProductScrollStackSection() {
                     </span>
                   </div>
 
-                  <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl border ${accent.icon}`}>
-                    <Icon size={20} strokeWidth={2.2} />
-                  </div>
+                  <div className={`mb-5 h-1.5 w-16 rounded-full ${accent.line}`} />
 
                   <h3 className="font-jakarta text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">
                     {card.title}
@@ -380,8 +341,7 @@ export default function ProductScrollStackSection() {
                   </p>
                   <ul className="space-y-3">
                     {card.capabilities.map((capability) => (
-                      <li key={capability} className="flex gap-3 font-jakarta text-sm leading-relaxed text-gray-700">
-                        <CheckCircle2 size={16} className="mt-0.5 flex-none text-emerald-600" />
+                      <li key={capability} className="relative pl-5 font-jakarta text-sm leading-relaxed text-gray-700 before:absolute before:left-0 before:top-0 before:text-emerald-700 before:content-['-']">
                         <span>{capability}</span>
                       </li>
                     ))}

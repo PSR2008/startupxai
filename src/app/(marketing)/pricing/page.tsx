@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CheckCircle2, X, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 import AnimatedSection, { StaggerItem } from "@/components/shared/AnimatedSection";
@@ -149,8 +148,7 @@ export default function PricingPage() {
       <div className="container-custom">
         {/* Header */}
         <AnimatedSection className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-sage-800/50 bg-sage-950/40 mb-6">
-            <Zap size={11} className="text-emerald-600" />
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full border border-sage-800/50 bg-sage-950/40 mb-6">
             <span className="font-jakarta text-xs font-semibold text-emerald-600">
               Simple, honest pricing
             </span>
@@ -214,11 +212,12 @@ export default function PricingPage() {
                 <div className="flex-1 space-y-3 mb-8">
                   {plan.features.map((f) => (
                     <div key={f.text} className="flex items-start gap-2.5">
-                      {f.included ? (
-                        <CheckCircle2 size={15} className="text-emerald-600 mt-0.5 flex-shrink-0" />
-                      ) : (
-                        <X size={15} className="text-gray-500 mt-0.5 flex-shrink-0" />
-                      )}
+                      <span
+                        aria-hidden="true"
+                        className={`mt-0.5 font-mono text-xs leading-none ${f.included ? "text-emerald-700" : "text-gray-400"}`}
+                      >
+                        {f.included ? "-" : "x"}
+                      </span>
                       <span
                         className={`font-jakarta text-sm leading-tight ${
                           f.included ? "text-gray-500" : "text-gray-500"

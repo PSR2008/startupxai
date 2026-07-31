@@ -2,46 +2,30 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { ElementType } from "react";
 import {
-  Activity,
-  Brain,
-  Compass,
-  Crown,
-  DollarSign,
-  FileText,
-  LayoutDashboard,
-  Lightbulb,
-  MessageSquare,
-  Palette,
-  SearchCheck,
-  Swords,
-  Target,
-  TrendingUp,
   UserCircle,
   Zap,
   LogOut,
 } from "lucide-react";
 import { StaggeredAppMenu } from "@/components/app-navigation";
-import { cn } from "@/lib/utils";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
-const routes: Record<string, { label: string; icon: ElementType; color: string }> = {
-  "/dashboard": { label: "Dashboard", icon: LayoutDashboard, color: "text-gray-600" },
-  "/onboarding": { label: "Founder Setup", icon: Compass, color: "text-emerald-600" },
-  "/reports": { label: "Reports", icon: FileText, color: "text-emerald-600" },
-  "/evidence-engine": { label: "Evidence Engine", icon: SearchCheck, color: "text-emerald-600" },
-  "/idea-engine": { label: "Idea & Market Engine", icon: Lightbulb, color: "text-emerald-600" },
-  "/competitor-intelligence": { label: "Competitor Intelligence", icon: Swords, color: "text-amber-600" },
-  "/revenue-engine": { label: "Revenue Engine", icon: DollarSign, color: "text-teal-600" },
-  "/user-psychology": { label: "User Psychology Engine", icon: Brain, color: "text-rose-500" },
-  "/growth-engine": { label: "Growth Engine", icon: TrendingUp, color: "text-blue-600" },
-  "/founder-decision": { label: "Founder Decision Engine", icon: Target, color: "text-violet-600" },
-  "/cold-dm": { label: "ColdDM", icon: MessageSquare, color: "text-emerald-600" },
-  "/brand-forge": { label: "BrandForge", icon: Palette, color: "text-violet-600" },
-  "/profile": { label: "Profile", icon: UserCircle, color: "text-emerald-600" },
-  "/internal": { label: "Diagnostics", icon: Activity, color: "text-blue-600" },
-  "/payment": { label: "Upgrade Plan", icon: Crown, color: "text-amber-600" },
+const routes: Record<string, { label: string }> = {
+  "/dashboard": { label: "Dashboard" },
+  "/onboarding": { label: "Founder Setup" },
+  "/reports": { label: "Reports" },
+  "/evidence-engine": { label: "Evidence Engine" },
+  "/idea-engine": { label: "Idea & Market Engine" },
+  "/competitor-intelligence": { label: "Competitor Intelligence" },
+  "/revenue-engine": { label: "Revenue Engine" },
+  "/user-psychology": { label: "User Psychology Engine" },
+  "/growth-engine": { label: "Growth Engine" },
+  "/founder-decision": { label: "Founder Decision Engine" },
+  "/cold-dm": { label: "ColdDM" },
+  "/brand-forge": { label: "BrandForge" },
+  "/profile": { label: "Profile" },
+  "/internal": { label: "Diagnostics" },
+  "/payment": { label: "Upgrade Plan" },
 };
 
 export default function AppTopbar() {
@@ -66,8 +50,7 @@ export default function AppTopbar() {
       <div className="flex min-w-0 items-center gap-3">
         <StaggeredAppMenu />
         {current && (
-          <div className="flex min-w-0 items-center gap-2">
-            <current.icon size={15} className={cn(current.color, "flex-shrink-0")} />
+          <div className="flex min-w-0 items-center">
             <span className="truncate font-jakarta text-sm font-bold text-gray-950">
               {current.label}
             </span>

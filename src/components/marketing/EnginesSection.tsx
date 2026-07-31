@@ -2,9 +2,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
-  Lightbulb, Swords, DollarSign, Brain, TrendingUp,
-  Target, MessageSquare, Palette, ArrowRight, CheckCircle2,
-  Shield, Zap, Globe, BarChart3, Users, SearchCheck, FileText, Lock, Scale,
+  ArrowRight,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import Button from "@/components/ui/Button";
@@ -77,8 +75,7 @@ export function EvidenceEntrySection() {
     <section className="editorial-section bg-[#fffefa] px-5 py-20">
       <div className="container-custom">
         <AnimatedSection className="mb-12 max-w-3xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
-            <SearchCheck size={12} className="text-emerald-600" />
+          <div className="mb-5 inline-flex items-center rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
             <span className="font-jakarta text-xs font-semibold text-emerald-700">Evidence intake</span>
           </div>
           <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
@@ -130,8 +127,7 @@ export function RealWorkflowSection() {
       <div className="container-custom">
         <AnimatedSection className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3.5 py-1.5">
-              <FileText size={12} className="text-blue-600" />
+            <div className="mb-5 inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-3.5 py-1.5">
               <span className="font-jakarta text-xs font-semibold text-blue-700">Product workflow</span>
             </div>
             <h2 className="mb-4 font-display text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
@@ -221,8 +217,8 @@ export function DifferentiationSection() {
                 <h3 className="mb-5 font-jakarta text-lg font-bold text-gray-900">{title}</h3>
                 <div className="space-y-3">
                   {items.map((item) => (
-                    <div key={item} className="flex items-start gap-3">
-                      <CheckCircle2 size={15} className="mt-1 flex-shrink-0 text-emerald-600" />
+                    <div key={item} className="relative pl-5">
+                      <span aria-hidden="true" className="absolute left-0 top-0 font-mono text-sm text-emerald-700">-</span>
                       <p className="font-jakarta text-sm leading-relaxed text-gray-600">{item}</p>
                     </div>
                   ))}
@@ -308,8 +304,8 @@ export function CapabilitiesSection() {
                 </span>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {items.map((item) => (
-                    <div key={item} className="flex items-start gap-2">
-                      <CheckCircle2 size={15} className="mt-1 flex-shrink-0 text-emerald-600" />
+                    <div key={item} className="relative pl-5">
+                      <span aria-hidden="true" className="absolute left-0 top-0 font-mono text-sm text-emerald-700">-</span>
                       <p className="font-jakarta text-sm leading-relaxed text-gray-600">{item}</p>
                     </div>
                   ))}
@@ -328,7 +324,6 @@ export function CapabilitiesSection() {
 // ============================================
 const engines = [
   {
-    icon: Lightbulb,
     title: "Idea & Market Engine",
     description: "Assess your idea's assumptions. Detect risks, missing evidence, and opportunities before investing weeks in the wrong workflow.",
     href: "/idea-engine",
@@ -338,7 +333,6 @@ const engines = [
     outputs: ["Evidence Score", "Risk Factors", "ICP Suggestions", "Differentiation"],
   },
   {
-    icon: Swords,
     title: "Competitor Intelligence",
     description: "Map competitors, review their positioning, and identify whitespace to investigate with better evidence.",
     href: "/competitor-intelligence",
@@ -348,7 +342,6 @@ const engines = [
     outputs: ["Direct Competitors", "Positioning Gaps", "Beat Strategy", "White Space Map"],
   },
   {
-    icon: DollarSign,
     title: "Revenue Engine",
     description: "Pressure-test monetization strategy with pricing tiers, conversion blockers, and recommended pricing experiments.",
     href: "/revenue-engine",
@@ -358,7 +351,6 @@ const engines = [
     outputs: ["Pricing Tiers", "Revenue Leaks", "Conversion Blockers", "Upsell Strategy"],
   },
   {
-    icon: Brain,
     title: "User Psychology Engine",
     description: "Review trust, UX, and copy. Identify likely friction points, weak proof, and what to fix first.",
     href: "/user-psychology",
@@ -368,7 +360,6 @@ const engines = [
     outputs: ["Trust Score", "Brutal Roast", "Friction Points", "UX Fixes"],
   },
   {
-    icon: TrendingUp,
     title: "Growth Engine",
     description: "Plan first-customer experiments with channel recommendations, outreach direction, and a step-by-step launch playbook.",
     href: "/growth-engine",
@@ -378,7 +369,6 @@ const engines = [
     outputs: ["10-Customer Plan", "Channel Stack", "Content Hooks", "Launch Steps"],
   },
   {
-    icon: Target,
     title: "Founder Decision Engine",
     description: "Prioritize founder decisions with context completeness, top risks, features to postpone, and traction experiments to test.",
     href: "/founder-decision",
@@ -391,7 +381,6 @@ const engines = [
 
 const revenueTools = [
   {
-    icon: MessageSquare,
     title: "ColdDM",
     description: "Draft outreach messages for WhatsApp, LinkedIn, and email. Short, medium, long variants with follow-ups included.",
     href: "/cold-dm",
@@ -399,7 +388,6 @@ const revenueTools = [
     badge: "HOT",
   },
   {
-    icon: Palette,
     title: "BrandForge",
     description: "Draft startup names, taglines, positioning lines, brand personality, and a color direction.",
     href: "/brand-forge",
@@ -413,8 +401,7 @@ export function EnginesSection() {
     <section id="engines" className="editorial-section bg-[var(--color-bg-primary)] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 mb-5">
-            <SearchCheck size={12} className="text-emerald-500" />
+          <div className="inline-flex items-center px-3.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 mb-5">
             <span className="font-jakarta text-xs font-semibold text-emerald-700">
               Evidence Workflow
             </span>
@@ -429,9 +416,7 @@ export function EnginesSection() {
         </AnimatedSection>
 
         <MagicBentoGrid className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-16" preset="marketing" glowColor="16, 185, 129">
-          {engines.map((engine) => {
-            const Icon = engine.icon;
-            return (
+          {engines.map((engine, index) => (
               <StaggerItem key={engine.href}>
                 <MagicBentoCard
                   href={engine.href}
@@ -443,11 +428,9 @@ export function EnginesSection() {
                   enableMagnetism
                   clickEffect
                 >
-                  <div
-                    className="flex h-10 w-10 items-center justify-center rounded-lg"
-                    style={{ background: engine.bg, border: `1px solid ${engine.border}` }}
-                  >
-                    <Icon size={18} style={{ color: engine.color }} />
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-gray-400">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="h-px w-10 bg-black/10" />
                   </div>
 
                   <div className="flex-1">
@@ -484,8 +467,7 @@ export function EnginesSection() {
                   </div>
                 </MagicBentoCard>
               </StaggerItem>
-            );
-          })}
+          ))}
         </MagicBentoGrid>
 
         <AnimatedSection delay={0.1}>
@@ -494,21 +476,14 @@ export function EnginesSection() {
             Revenue Tools
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
-            {revenueTools.map((tool) => {
-              const Icon = tool.icon;
-              return (
+            {revenueTools.map((tool, index) => (
                 <Link key={tool.href} href={tool.href}>
                   <motion.div
                     whileHover={{ y: -3 }}
                     className="group cursor-pointer rounded-xl border border-black/8 bg-[#fffefa] p-6 shadow-sm transition-all duration-200 hover:-translate-y-px hover:border-emerald-200 hover:shadow-md"
                   >
                     <div className="flex items-start gap-4">
-                      <div
-                        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg"
-                        style={{ background: `${tool.color}10`, border: `1px solid ${tool.color}25` }}
-                      >
-                        <Icon size={18} style={{ color: tool.color }} />
-                      </div>
+                      <span className="mt-0.5 font-mono text-xs font-bold text-gray-400">{String(index + 1).padStart(2, "0")}</span>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1.5">
                           <h3 className="font-jakarta text-base font-bold text-gray-900">
@@ -525,8 +500,7 @@ export function EnginesSection() {
                     </div>
                   </motion.div>
                 </Link>
-              );
-            })}
+            ))}
           </div>
         </AnimatedSection>
       </div>
@@ -538,12 +512,12 @@ export function EnginesSection() {
 // FEATURES SECTION
 // ============================================
 const features = [
-  { icon: SearchCheck, title: "Evidence collection", description: "Separate sources, founder notes, assumptions, and generated assessments before making decisions.", color: "#059669" },
-  { icon: Shield, title: "Security-hardened by design", description: "Rate limiting, input validation, secure API handling. Built like a real product.", color: "#10b981" },
-  { icon: Globe, title: "Regional context", description: "Assess market and customer context without treating broad market claims as proof.", color: "#2563eb" },
-  { icon: BarChart3, title: "Score transparency", description: "Review components, confidence, missing evidence, and what would improve each Evidence Score.", color: "#1f3a5f" },
-  { icon: Users, title: "Founder workspace", description: "Keep assumptions, notes, reports, and next actions in one calm operating view.", color: "#be6a2f" },
-  { icon: CheckCircle2, title: "Decision history", description: "Record what changed and keep a trail of why the next experiment matters.", color: "#059669" },
+  { title: "Evidence collection", description: "Separate sources, founder notes, assumptions, and generated assessments before making decisions." },
+  { title: "Security-hardened by design", description: "Rate limiting, input validation, secure API handling. Built like a real product." },
+  { title: "Regional context", description: "Assess market and customer context without treating broad market claims as proof." },
+  { title: "Score transparency", description: "Review components, confidence, missing evidence, and what would improve each Evidence Score." },
+  { title: "Founder workspace", description: "Keep assumptions, notes, reports, and next actions in one calm operating view." },
+  { title: "Decision history", description: "Record what changed and keep a trail of why the next experiment matters." },
 ];
 
 export function FeaturesSection() {
@@ -565,23 +539,18 @@ export function FeaturesSection() {
         </AnimatedSection>
 
         <MagicBentoGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" preset="marketing" glowColor="16, 185, 129">
-          {features.map((f) => {
-            const Icon = f.icon;
-            return (
+          {features.map((f, index) => (
               <StaggerItem key={f.title}>
                 <MagicBentoCard className="surface-inset h-full p-6 transition-all duration-200 hover:-translate-y-px hover:border-black/12 hover:bg-white hover:shadow-sm" enableTilt>
-                  <div
-                    className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg"
-                    style={{ background: `${f.color}10`, border: `1px solid ${f.color}25` }}
-                  >
-                    <Icon size={17} style={{ color: f.color }} />
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="font-mono text-xs font-bold text-gray-400">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="h-px w-10 bg-emerald-700/40" />
                   </div>
                   <h3 className="font-jakarta text-sm font-bold text-gray-900 mb-2">{f.title}</h3>
                   <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{f.description}</p>
                 </MagicBentoCard>
               </StaggerItem>
-            );
-          })}
+          ))}
         </MagicBentoGrid>
       </div>
     </section>
@@ -593,17 +562,14 @@ export function FeaturesSection() {
 // ============================================
 const workflow = [
   {
-    icon: FileText,
     title: "Share the startup context",
     description: "Add your idea, audience, market, current page, or offer. Each workflow asks only for the context it needs.",
   },
   {
-    icon: SearchCheck,
     title: "Run focused assessment tools",
     description: "Choose the workflow for the decision in front of you: evidence, market, competitors, revenue, psychology, growth, outreach, or brand.",
   },
   {
-    icon: CheckCircle2,
     title: "Review findings and gaps",
     description: "Get structured scores, risks, action steps, and messaging with clear limits instead of another blank chat.",
   },
@@ -614,8 +580,7 @@ export function HowItWorksSection() {
     <section id="workflow" className="editorial-section bg-[var(--color-bg-primary)] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-14">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
-            <Zap size={12} className="text-emerald-600" />
+          <div className="mb-5 inline-flex items-center rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
             <span className="font-jakarta text-xs font-semibold text-emerald-700">
               Workflow
             </span>
@@ -629,23 +594,18 @@ export function HowItWorksSection() {
         </AnimatedSection>
 
         <MagicBentoGrid className="grid grid-cols-1 md:grid-cols-3 gap-5" preset="marketing" glowColor="16, 185, 129">
-          {workflow.map((step, i) => {
-            const Icon = step.icon;
-            return (
+          {workflow.map((step, i) => (
               <StaggerItem key={step.title}>
                 <MagicBentoCard className="surface-panel h-full p-7" enableTilt>
                   <div className="flex items-center justify-between mb-8">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50">
-                      <Icon size={18} className="text-emerald-600" />
-                    </div>
                     <span className="font-mono text-xs font-bold text-gray-300">0{i + 1}</span>
+                    <span className="h-px w-12 bg-emerald-700/30" />
                   </div>
                   <h3 className="font-jakarta text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
                   <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{step.description}</p>
                 </MagicBentoCard>
               </StaggerItem>
-            );
-          })}
+          ))}
         </MagicBentoGrid>
       </div>
     </section>
@@ -671,8 +631,7 @@ export function ComparisonSection() {
     <section className="editorial-section bg-[#fffefa] px-5 py-24">
       <div className="container-custom">
         <AnimatedSection className="text-center mb-14">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3.5 py-1.5">
-            <Scale size={12} className="text-blue-600" />
+          <div className="mb-5 inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-3.5 py-1.5">
             <span className="font-jakarta text-xs font-semibold text-blue-700">
               Comparison
             </span>
@@ -702,7 +661,7 @@ export function ComparisonSection() {
                 {[startupx, consultants, chat].map((value, i) => (
                   <div key={i} className="p-4 flex items-center justify-center">
                     {value ? (
-                      <CheckCircle2 size={17} className="text-emerald-500" />
+                      <span className="font-jakarta text-xs font-semibold text-emerald-700">Yes</span>
                     ) : (
                       <span className="w-4 h-px bg-gray-200" />
                     )}
@@ -723,22 +682,18 @@ export function ComparisonSection() {
 // ============================================
 const trustItems = [
   {
-    icon: Lock,
     title: "Private founder workspace",
     description: "Your startup inputs are used for your own workspace and reports, not displayed publicly on the product.",
   },
   {
-    icon: Shield,
     title: "Authenticated dashboard",
     description: "Usage and subscription status are tied to your account through Supabase authentication.",
   },
   {
-    icon: Globe,
     title: "International pricing",
     description: "Founder is billed in USD with clear monthly and annual options.",
   },
   {
-    icon: BarChart3,
     title: "Transparent usage",
     description: "Your dashboard shows monthly usage, remaining quota, and subscription state.",
   },
@@ -750,8 +705,7 @@ export function TrustSection() {
       <div className="container-custom">
         <AnimatedSection className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
           <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
-              <Shield size={12} className="text-emerald-600" />
+            <div className="mb-5 inline-flex items-center rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5">
               <span className="font-jakarta text-xs font-semibold text-emerald-700">
                 Trust layer
               </span>
@@ -765,18 +719,16 @@ export function TrustSection() {
           </div>
 
           <MagicBentoGrid className="grid grid-cols-1 sm:grid-cols-2 gap-4" preset="marketing" glowColor="16, 185, 129">
-            {trustItems.map((item) => {
-              const Icon = item.icon;
-              return (
+            {trustItems.map((item, index) => (
                 <MagicBentoCard key={item.title} className="surface-panel p-6" enableTilt>
-                  <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-black/8 bg-[#f8f6f0]">
-                    <Icon size={16} className="text-emerald-600" />
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="font-mono text-xs font-bold text-gray-400">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="h-px w-10 bg-black/10" />
                   </div>
                   <h3 className="font-jakarta text-sm font-bold text-gray-900 mb-2">{item.title}</h3>
                   <p className="font-jakarta text-sm text-gray-500 leading-relaxed">{item.description}</p>
                 </MagicBentoCard>
-              );
-            })}
+            ))}
           </MagicBentoGrid>
         </AnimatedSection>
       </div>
@@ -840,11 +792,12 @@ export function TestimonialsSection() {
         </AnimatedSection>
 
         <MagicBentoGrid className="grid grid-cols-1 gap-5 md:grid-cols-2" preset="marketing" glowColor="16, 185, 129">
-          {methodologyItems.map((item) => (
+          {methodologyItems.map((item, index) => (
             <StaggerItem key={item.title}>
               <MagicBentoCard className="surface-panel h-full p-6" enableTilt>
-                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50">
-                  <CheckCircle2 size={16} className="text-emerald-700" />
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="font-mono text-xs font-bold text-gray-400">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="h-px w-10 bg-emerald-700/30" />
                 </div>
                 <p className="font-jakarta text-sm font-bold text-gray-900">{item.title}</p>
                 <p className="mt-2 font-jakarta text-sm leading-relaxed text-gray-500">{item.detail}</p>
@@ -970,8 +923,8 @@ export function PricingSection() {
 
                 <div className="flex-1 space-y-2.5 mb-7">
                   {plan.features.map((f) => (
-                    <div key={f} className="flex items-start gap-2.5">
-                      <CheckCircle2 size={14} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+                    <div key={f} className="relative pl-5">
+                      <span aria-hidden="true" className="absolute left-0 top-0 font-mono text-xs text-emerald-700">-</span>
                       <span className="font-jakarta text-sm text-gray-600">{f}</span>
                     </div>
                   ))}

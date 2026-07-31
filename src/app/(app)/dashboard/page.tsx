@@ -4,15 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  ClipboardList,
-  FileText,
-  FlaskConical,
-  Lightbulb,
-  MessageSquare,
-  SearchCheck,
-  Settings,
-  ShieldCheck,
-  Target,
 } from "lucide-react";
 import AnimatedSection, { StaggerContainer, StaggerItem } from "@/components/shared/AnimatedSection";
 import UsageWidget from "@/components/app/UsageWidget";
@@ -37,17 +28,17 @@ interface UsageSummary {
 }
 
 const primaryActions = [
-  { title: "Review evidence", description: "Open the core assessment workspace.", href: "/evidence-engine", icon: SearchCheck, tone: "emerald" as const },
-  { title: "Assess assumptions", description: "Pressure-test idea, ICP, and demand logic.", href: "/idea-engine", icon: Lightbulb, tone: "blue" as const },
-  { title: "Track an experiment", description: "Turn missing evidence into a measurable test.", href: "/evidence-engine#experiments", icon: FlaskConical, tone: "amber" as const },
-  { title: "Review findings", description: "Open saved reports and decision history.", href: "/reports", icon: FileText, tone: "neutral" as const },
+  { title: "Review evidence", description: "Open the core assessment workspace.", href: "/evidence-engine", tone: "emerald" as const },
+  { title: "Assess assumptions", description: "Pressure-test idea, ICP, and demand logic.", href: "/idea-engine", tone: "blue" as const },
+  { title: "Track an experiment", description: "Turn missing evidence into a measurable test.", href: "/evidence-engine#experiments", tone: "amber" as const },
+  { title: "Review findings", description: "Open saved reports and decision history.", href: "/reports", tone: "neutral" as const },
 ];
 
 const secondaryTools = [
-  { title: "Competitors", href: "/competitor-intelligence", icon: Target },
-  { title: "Decisions", href: "/founder-decision", icon: ClipboardList },
-  { title: "Outreach", href: "/cold-dm", icon: MessageSquare },
-  { title: "Settings", href: "/profile", icon: Settings },
+  { title: "Competitors", href: "/competitor-intelligence" },
+  { title: "Decisions", href: "/founder-decision" },
+  { title: "Outreach", href: "/cold-dm" },
+  { title: "Settings", href: "/profile" },
 ];
 
 export default function DashboardPage() {
@@ -124,7 +115,7 @@ export default function DashboardPage() {
                 <p className="font-jakarta text-sm font-bold text-gray-900">Current project</p>
                 <p className="font-jakarta text-xs text-gray-500">Your active founder context and next evidence step.</p>
               </div>
-              <SearchCheck size={18} className="text-emerald-700" />
+              <span className="h-px w-12 bg-emerald-700/35" />
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <ProjectField label="Audience" value={profile?.target_audience} fallback="No target customer recorded" />
@@ -144,7 +135,7 @@ export default function DashboardPage() {
           <section className="h-full rounded-xl border border-emerald-200/10 bg-[#10201b] p-5 text-white shadow-sm">
             <div className="mb-5 flex items-center justify-between">
               <p className="font-jakarta text-sm font-bold">Workspace health</p>
-              <ShieldCheck size={17} className="text-emerald-300" />
+              <span className="font-mono text-xs font-semibold text-emerald-200">{setupComplete}/{setupItems.length}</span>
             </div>
             <div className="mb-4 flex items-end gap-2">
               <span className="font-jakarta text-4xl font-bold">{setupComplete}</span>
@@ -174,19 +165,16 @@ export default function DashboardPage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {primaryActions.map((action) => {
-              const Icon = action.icon;
-              return (
+            {primaryActions.map((action, index) => (
                 <Link key={action.href} href={action.href} className="group rounded-lg border border-black/6 bg-[#fbfaf7] p-4 transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-sm focus-ring">
                   <div className="mb-3 flex items-center justify-between">
-                    <Icon size={16} className="text-gray-700" />
+                    <span className="font-mono text-xs font-bold text-gray-400">{String(index + 1).padStart(2, "0")}</span>
                     <Badge variant={action.tone} size="sm">Open</Badge>
                   </div>
                   <p className="font-jakarta text-sm font-bold text-gray-950">{action.title}</p>
                   <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{action.description}</p>
                 </Link>
-              );
-            })}
+            ))}
           </div>
         </section>
       </AnimatedSection>
@@ -194,9 +182,9 @@ export default function DashboardPage() {
       <div className="mb-6 grid grid-cols-1 gap-4 xl:grid-cols-[0.9fr_1.1fr]">
         <AnimatedSection delay={0.1}>
           <section className="surface-panel h-full p-5">
-            <div className="mb-4 flex items-center gap-2">
-              <FlaskConical size={15} className="text-amber-600" />
+            <div className="mb-4 flex items-center justify-between gap-2">
               <p className="font-jakarta text-sm font-bold text-gray-900">Experiments in progress</p>
+              <span className="h-px w-10 bg-amber-700/35" />
             </div>
             <EmptyPanel
               title="No experiments recorded yet."
@@ -209,9 +197,9 @@ export default function DashboardPage() {
 
         <AnimatedSection delay={0.12}>
           <section className="surface-panel h-full p-5">
-            <div className="mb-4 flex items-center gap-2">
-              <ClipboardList size={15} className="text-blue-700" />
+            <div className="mb-4 flex items-center justify-between gap-2">
               <p className="font-jakarta text-sm font-bold text-gray-900">Open assumptions</p>
+              <span className="h-px w-10 bg-blue-700/30" />
             </div>
             {profile?.primary_goal ? (
               <div className="rounded-lg border border-black/6 bg-[#fbfaf7] p-4">
@@ -239,9 +227,7 @@ export default function DashboardPage() {
       </div>
 
       <MagicBentoGrid className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4" preset="app" glowColor="16, 185, 129">
-        {secondaryTools.map((tool) => {
-          const Icon = tool.icon;
-          return (
+        {secondaryTools.map((tool, index) => (
             <MagicBentoCard
               key={tool.href}
               href={tool.href}
@@ -250,11 +236,10 @@ export default function DashboardPage() {
               enableTilt
               clickEffect
             >
-              <Icon size={15} className="mb-3 text-gray-600" />
+              <span className="mb-3 block font-mono text-xs font-bold text-gray-400">{String(index + 1).padStart(2, "0")}</span>
               <p className="font-jakarta text-sm font-bold text-gray-900">{tool.title}</p>
             </MagicBentoCard>
-          );
-        })}
+        ))}
       </MagicBentoGrid>
 
       <AnimatedSection delay={0.14}>

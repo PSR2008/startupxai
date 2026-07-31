@@ -471,16 +471,10 @@ export default function RevenueEnginePage() {
   );
 }
 
-function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; title: string; detail: string; tone: "emerald" | "amber" | "blue" }) {
-  const toneClasses = {
-    emerald: "border-teal-200 bg-teal-50 text-teal-700",
-    amber: "border-amber-200 bg-amber-50 text-amber-700",
-    blue: "border-blue-200 bg-blue-50 text-blue-700",
-  };
-
+function ContextCard({ title, detail }: { icon: React.ReactNode; title: string; detail: string; tone: "emerald" | "amber" | "blue" }) {
   return (
-    <MagicBentoCard className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
-      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>{icon}</div>
+    <MagicBentoCard className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
+      <div className="mb-3 h-px w-10 bg-emerald-700/35" />
       <div>
         <p className="font-jakarta text-sm font-bold text-gray-900">{title}</p>
         <p className="mt-0.5 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>

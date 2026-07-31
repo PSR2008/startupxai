@@ -394,16 +394,10 @@ export default function DecisionEnginePage() {
   );
 }
 
-function ContextCard({ icon, title, detail, tone }: { icon: React.ReactNode; title: string; detail: string; tone: "violet" | "emerald" | "rose" }) {
-  const toneClasses = {
-    violet: "border-violet-200 bg-violet-50 text-violet-700",
-    emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    rose: "border-rose-200 bg-rose-50 text-rose-600",
-  };
-
+function ContextCard({ title, detail }: { icon: React.ReactNode; title: string; detail: string; tone: "violet" | "emerald" | "rose" }) {
   return (
-    <MagicBentoCard className="flex items-start gap-3 rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
-      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClasses[tone]}`}>{icon}</div>
+    <MagicBentoCard className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm shadow-gray-200/40">
+      <div className="mb-3 h-px w-10 bg-emerald-700/35" />
       <div>
         <p className="font-jakarta text-sm font-bold text-gray-900">{title}</p>
         <p className="mt-0.5 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>

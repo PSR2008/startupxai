@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Activity, ArrowRight, BarChart3, ClipboardList, Clock3, Database, ExternalLink, FlaskConical, Link2, NotebookPen, SearchCheck, ShieldCheck } from "lucide-react";
+import { Activity, ArrowRight, ClipboardList, Clock3, Database, ExternalLink, FlaskConical, Link2, SearchCheck, ShieldCheck } from "lucide-react";
 import EngineHeader from "@/components/app/EngineHeader";
 import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
@@ -211,13 +211,13 @@ export default function EvidenceEnginePage() {
 
       <MagicBentoGrid className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-4" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.08}>
         {[
-          { icon: Database, title: "Evidence first", detail: "Claims, verified sources, and unavailable data are separated." },
-          { icon: BarChart3, title: "Transparent scores", detail: "Every Evidence Score shows components, confidence, and missing inputs." },
-          { icon: FlaskConical, title: "Experiments", detail: "Weak assumptions become practical tests." },
-          { icon: ShieldCheck, title: "No fake sources", detail: "Missing provider data is shown as unavailable." },
-        ].map(({ icon: Icon, title, detail }) => (
+          { title: "Evidence first", detail: "Claims, verified sources, and unavailable data are separated." },
+          { title: "Transparent scores", detail: "Every Evidence Score shows components, confidence, and missing inputs." },
+          { title: "Experiments", detail: "Weak assumptions become practical tests." },
+          { title: "No fake sources", detail: "Missing provider data is shown as unavailable." },
+        ].map(({ title, detail }, index) => (
           <MagicBentoCard key={title} className="surface-panel p-4">
-            <Icon size={16} className="text-emerald-600" />
+            <span className="font-mono text-xs font-bold text-gray-400">{String(index + 1).padStart(2, "0")}</span>
             <p className="mt-2 font-jakarta text-sm font-bold text-gray-900">{title}</p>
             <p className="mt-1 font-jakarta text-xs leading-relaxed text-gray-500">{detail}</p>
           </MagicBentoCard>
@@ -246,9 +246,9 @@ export default function EvidenceEnginePage() {
           </section>
 
           <section className="surface-inset p-5">
-            <div className="mb-4 flex items-center gap-2">
-              <NotebookPen size={15} className="text-emerald-700" />
+            <div className="mb-4 flex items-center justify-between gap-2">
               <h3 className="font-jakarta text-sm font-bold text-gray-900">Manual evidence entry</h3>
+              <span className="h-px w-10 bg-emerald-700/35" />
             </div>
             <MagicBentoGrid className="space-y-3" preset="app" glowColor="16, 185, 129" spotlightOpacity={0.07}>
               <ManualEntry title="Add a source" detail="Paste a customer quote, public URL, support message, or research note after the assessment runs." />
@@ -266,8 +266,7 @@ export default function EvidenceEnginePage() {
           <AnimatePresence mode="wait">
             {status === "idle" && (
               <motion.section key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-full rounded-xl border border-dashed border-black/10 bg-[#fffefa] p-6 text-center shadow-sm sm:p-10">
-                <SearchCheck size={30} className="mx-auto text-emerald-600" />
-                <h3 className="mt-4 font-jakarta text-lg font-bold text-gray-900">Ready for structured assessment</h3>
+                <h3 className="font-jakarta text-lg font-bold text-gray-900">Ready for structured assessment</h3>
                 <p className="mx-auto mt-2 max-w-md font-jakarta text-sm leading-relaxed text-gray-500">
                   This workflow will not invent source links, market size, search volume, or competitor facts. Unavailable evidence stays visibly unavailable.
                 </p>

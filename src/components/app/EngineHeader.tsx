@@ -11,7 +11,6 @@ interface EngineHeaderProps {
 }
 
 export default function EngineHeader({
-  icon,
   title,
   description,
   badge,
@@ -19,20 +18,7 @@ export default function EngineHeader({
 }: EngineHeaderProps) {
   return (
     <div className="editorial-section pb-6 pt-5">
-      <div className="flex items-start gap-4">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 border shadow-sm"
-          style={{
-            background: `${accentColor}10`,
-            borderColor: `${accentColor}22`,
-          }}
-        >
-          <span style={{ color: accentColor }}>{icon}</span>
-        </motion.div>
-
+      <div className="border-l border-black/10 pl-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2.5 flex-wrap mb-1.5">
             <motion.h1

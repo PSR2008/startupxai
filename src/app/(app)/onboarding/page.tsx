@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2, Compass, Globe, Lightbulb, Loader2, Target, Zap } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Input, Select, Textarea } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
@@ -160,10 +160,8 @@ export default function OnboardingPage() {
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-            <Compass size={18} className="text-emerald-600" />
-          </div>
+        <div className="mb-3 flex items-center gap-3">
+          <span className="h-px w-10 bg-emerald-700/35" />
           <span className="font-jakarta text-xs font-bold text-emerald-600 uppercase tracking-widest">
             Founder setup
           </span>
@@ -229,19 +227,18 @@ export default function OnboardingPage() {
 
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="space-y-4">
           {[
-            { icon: Lightbulb, title: "Prefilled assessment tools", text: "Evidence, Idea, Revenue, and Growth start with your context." },
-            { icon: Target, title: "Clearer findings", text: "Better baseline context means more specific reports." },
-            { icon: Globe, title: "Market awareness", text: "Region and stage help shape practical next moves." },
-            { icon: Zap, title: "Reusable setup", text: "Update this later from onboarding whenever your idea changes." },
-          ].map(({ icon: Icon, title, text }) => (
+            { title: "Prefilled assessment tools", text: "Evidence, Idea, Revenue, and Growth start with your context." },
+            { title: "Clearer findings", text: "Better baseline context means more specific reports." },
+            { title: "Market awareness", text: "Region and stage help shape practical next moves." },
+            { title: "Reusable setup", text: "Update this later from onboarding whenever your idea changes." },
+          ].map(({ title, text }, index) => (
             <div key={title} className="rounded-2xl border border-black/6 bg-white p-5 shadow-sm">
-              <Icon size={16} className="text-emerald-600 mb-3" />
+              <span className="mb-3 block font-mono text-xs font-bold text-gray-400">{String(index + 1).padStart(2, "0")}</span>
               <p className="font-jakarta text-sm font-bold text-gray-900 mb-1">{title}</p>
               <p className="font-jakarta text-xs text-gray-500 leading-relaxed">{text}</p>
             </div>
           ))}
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-            <CheckCircle2 size={17} className="text-emerald-700 mb-3" />
             <p className="font-jakarta text-xs text-emerald-700 leading-relaxed">
               You can still edit every workflow input before reviewing findings.
             </p>

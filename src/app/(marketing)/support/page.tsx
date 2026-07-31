@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, MessageSquare, BookOpen, Zap, Send, CheckCircle2 } from "lucide-react";
+import { Send, CheckCircle2 } from "lucide-react";
 import { Input, Textarea, Select } from "@/components/ui/FormFields";
 import Button from "@/components/ui/Button";
 import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
@@ -11,7 +11,6 @@ import { getAuthHeaders } from "@/lib/auth-headers-client";
 
 const supportChannels = [
   {
-    icon: Mail,
     title: "Email Support",
     description: "For account issues, billing, and general enquiries.",
     detail: "support@startupxai.in",
@@ -19,7 +18,6 @@ const supportChannels = [
     response: "Response within 24h",
   },
   {
-    icon: MessageSquare,
     title: "Live Chat",
     description: "Chat with our team directly inside the app dashboard.",
     detail: "Available Mon-Fri, 9am-6pm IST",
@@ -27,7 +25,6 @@ const supportChannels = [
     response: "Response within 2h",
   },
   {
-    icon: BookOpen,
     title: "Documentation",
     description: "Step-by-step guides for every engine and feature.",
     detail: "docs.startupxai.in",
@@ -102,8 +99,7 @@ export default function SupportPage() {
       <div className="container-custom max-w-5xl">
         {/* Header */}
         <AnimatedSection className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-sage-800/50 bg-sage-950/40 mb-6">
-            <Zap size={11} className="text-emerald-600" />
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full border border-sage-800/50 bg-sage-950/40 mb-6">
             <span className="font-jakarta text-xs font-semibold text-emerald-600">
               We&apos;re here to help
             </span>
@@ -119,16 +115,12 @@ export default function SupportPage() {
 
         {/* Support channels */}
         <MagicBentoGrid className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16" preset="marketing" glowColor="16, 185, 129" spotlightOpacity={0.07}>
-          {supportChannels.map((ch) => {
-            const Icon = ch.icon;
-            return (
+          {supportChannels.map((ch, index) => (
               <StaggerItem key={ch.title}>
                 <MagicBentoCard className="rounded-2xl border border-black/6 bg-gray-50 p-6 h-full">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
-                    style={{ background: `${ch.color}15`, border: `1px solid ${ch.color}25` }}
-                  >
-                    <Icon size={18} style={{ color: ch.color }} />
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="font-mono text-xs font-bold text-gray-400">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="h-px w-10 bg-emerald-700/35" />
                   </div>
                   <h3 className="font-jakarta text-sm font-bold text-gray-800 mb-1.5">
                     {ch.title}
@@ -144,8 +136,7 @@ export default function SupportPage() {
                   </p>
                 </MagicBentoCard>
               </StaggerItem>
-            );
-          })}
+          ))}
         </MagicBentoGrid>
 
         {/* Contact form */}

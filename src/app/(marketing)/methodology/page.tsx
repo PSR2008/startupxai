@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { MagicBentoCard, MagicBentoGrid } from "@/components/ui/MagicBento";
 
 export const metadata: Metadata = {
@@ -112,8 +112,8 @@ export default function MethodologyPage() {
               "completed experiment outcomes",
               "missing interviews, public sources or measured results",
             ].map((item) => (
-              <div key={item} className="flex items-start gap-3 p-4">
-                <CheckCircle2 size={16} className="mt-1 flex-shrink-0 text-emerald-600" />
+              <div key={item} className="relative p-4 pl-9">
+                <span aria-hidden="true" className="absolute left-4 top-4 font-mono text-sm text-emerald-700">-</span>
                 <p className="font-jakarta text-sm leading-relaxed text-gray-600">{item}</p>
               </div>
             ))}
