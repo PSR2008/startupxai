@@ -3,7 +3,6 @@ import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
 import Galaxy from "@/components/marketing/Galaxy";
 import HeroSection from "@/components/marketing/HeroSection";
-import HomepageScrollState from "@/components/marketing/HomepageScrollState";
 import ProductScrollStackSection from "@/components/marketing/ProductScrollStackSection";
 import {
   CapabilitiesSection,
@@ -38,7 +37,6 @@ export default function LandingPage() {
       <Navbar />
       <HeroSection />
       <div className="homepage-galaxy-stage">
-        <HomepageScrollState />
         <Galaxy
           className="homepage-galaxy-canvas"
           focal={[0.5, 0.18]}

@@ -31,7 +31,7 @@ test("Prism uses the supplied OGL shader basis as a reusable client component", 
   assert.match(prism, /uUseBaseWobble/);
   assert.match(prism, /uTimeScale/);
   assert.match(prism, /ResizeObserver/);
-  assert.match(prism, /cancelAnimationFrame/);
+  assert.match(prism, /renderStaticFrame/);
   assert.match(prism, /WEBGL_lose_context/);
   assert.match(prismExports, /AuthenticatedPrismBackground/);
   assert.match(prismExports, /PrismProps/);
@@ -57,13 +57,16 @@ test("Prism is fixed, pointer-transparent, decorative, and layered below app con
   assert.match(prism, /role="presentation"/);
 });
 
-test("Prism respects reduced motion and mobile performance constraints", () => {
-  assert.match(prism, /prefers-reduced-motion: reduce/);
+test("Prism renders a static frame with mobile performance constraints and no idle RAF", () => {
   assert.match(prism, /max-width: 768px\), \(pointer: coarse/);
   assert.match(prism, /mobile \? 1 : 1\.25|isMobile \? 1 : 1\.25/);
   assert.match(prism, /powerPreference: "low-power"/);
   assert.match(prism, /antialias: false/);
-  assert.match(prism, /const effectiveTimeScale = reducedMotion \? 0/);
+  assert.match(prism, /iTime: \{ value: 4\.25 \}/);
+  assert.match(prism, /uniforms\.iTime\.value = 4\.25/);
+  assert.match(prism, /uniforms\.uUseBaseWobble\.value = 0/);
+  assert.match(prism, /uniforms\.uTimeScale\.value = 0/);
+  assert.doesNotMatch(prism, /requestAnimationFrame|cancelAnimationFrame|IntersectionObserver|addEventListener\("scroll"|pointermove|onVisibilityChange/);
   assert.match(prismCss, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(prismCss, /@media \(max-width: 767px\)/);
 });

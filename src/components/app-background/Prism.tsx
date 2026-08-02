@@ -152,35 +152,10 @@ void main(){
 }
 `;
 
-const setMat3FromEuler = (
-  yawY: number,
-  pitchX: number,
-  rollZ: number,
-  out: Float32Array,
-) => {
-  const cy = Math.cos(yawY);
-  const sy = Math.sin(yawY);
-  const cx = Math.cos(pitchX);
-  const sx = Math.sin(pitchX);
-  const cz = Math.cos(rollZ);
-  const sz = Math.sin(rollZ);
-
-  out[0] = cy * cz + sy * sx * sz;
-  out[1] = cx * sz;
-  out[2] = -sy * cz + cy * sx * sz;
-  out[3] = -cy * sz + sy * sx * cz;
-  out[4] = cx * cz;
-  out[5] = sy * sz + cy * sx * cz;
-  out[6] = sy * cx;
-  out[7] = -sx;
-  out[8] = cy * cx;
-  return out;
-};
-
 export default function Prism({
   height = 3.5,
   baseWidth = 5.5,
-  animationType = "rotate",
+  animationType: _animationType = "rotate",
   glow = 1,
   offset = { x: 0, y: 0 },
   noise = 0.5,
@@ -188,11 +163,11 @@ export default function Prism({
   scale = 3.6,
   hueShift = 0,
   colorFrequency = 1,
-  hoverStrength = 2,
-  inertia = 0.05,
+  hoverStrength: _hoverStrength = 2,
+  inertia: _inertia = 0.05,
   bloom = 1,
-  suspendWhenOffscreen = false,
-  timeScale = 0.5,
+  suspendWhenOffscreen: _suspendWhenOffscreen = false,
+  timeScale: _timeScale = 0.5,
   className = "",
 }: PrismProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -201,11 +176,8 @@ export default function Prism({
     const container = containerRef.current;
     if (!container) return;
 
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const mobileMedia = window.matchMedia("(max-width: 768px), (pointer: coarse)");
-    const reducedMotion = media.matches;
     const isMobile = mobileMedia.matches;
-    const effectiveTimeScale = reducedMotion ? 0 : Math.max(0, timeScale || 0);
     const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.25);
 
     const H = Math.max(0.001, height);
@@ -215,8 +187,6 @@ export default function Prism({
     const saturation = transparent ? 1.5 : 1;
     const prismScale = Math.max(0.001, scale);
     const colorFreq = Math.max(0, colorFrequency || 1);
-    const hoverMax = Math.max(0, hoverStrength || 1);
-    const inertial = Math.max(0, Math.min(1, inertia || 0.12));
 
     const renderer = new Renderer({
       dpr,
@@ -269,14 +239,14 @@ export default function Prism({
       uTimeScale: Uniform<number>;
     } = {
       iResolution: { value: iResolution },
-      iTime: { value: 0 },
+      iTime: { value: 4.25 },
       uHeight: { value: H },
       uBaseHalf: { value: baseHalf },
-      uUseBaseWobble: { value: animationType === "rotate" && !reducedMotion ? 1 : 0 },
+      uUseBaseWobble: { value: 0 },
       uRot: { value: rot },
       uGlow: { value: Math.max(0, glow) },
       uOffsetPx: { value: offsetPx },
-      uNoise: { value: reducedMotion ? 0 : Math.max(0, noise) },
+      uNoise: { value: Math.max(0, noise) },
       uSaturation: { value: saturation },
       uScale: { value: prismScale },
       uHueShift: { value: hueShift || 0 },
@@ -287,7 +257,7 @@ export default function Prism({
       uInvHeight: { value: 1 / H },
       uMinAxis: { value: Math.min(baseHalf, H) },
       uPxScale: { value: 1 },
-      uTimeScale: { value: effectiveTimeScale },
+      uTimeScale: { value: 0 },
     };
 
     const geometry = new Triangle(gl);
@@ -300,6 +270,14 @@ export default function Prism({
     });
     const mesh = new Mesh(gl, { geometry, program });
 
+    const renderStaticFrame = () => {
+      uniforms.iTime.value = 4.25;
+      uniforms.uUseBaseWobble.value = 0;
+      uniforms.uTimeScale.value = 0;
+      uniforms.uRot.value = rot;
+      renderer.render({ scene: mesh });
+    };
+
     const resize = () => {
       const rect = container.getBoundingClientRect();
       renderer.setSize(rect.width || 1, rect.height || 1);
@@ -308,120 +286,16 @@ export default function Prism({
       offsetPx[0] = offsetX * dpr;
       offsetPx[1] = offsetY * dpr;
       uniforms.uPxScale.value = 1 / ((gl.drawingBufferHeight || 1) * 0.1 * prismScale);
+      renderStaticFrame();
     };
     resize();
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
 
-    let frame: number | null = null;
-    let visible = !document.hidden;
-    let yaw = 0;
-    let pitch = 0;
-    let roll = 0;
-    let targetYaw = 0;
-    let targetPitch = 0;
-    const pointer = { x: 0, y: 0, inside: false };
-    const start = performance.now();
-    const noiseIsZero = uniforms.uNoise.value < 1e-6;
-    const random = () => Math.random();
-    const wX = 0.3 + random() * 0.6;
-    const wY = 0.2 + random() * 0.7;
-    const wZ = 0.1 + random() * 0.5;
-    const phX = random() * Math.PI * 2;
-    const phZ = random() * Math.PI * 2;
-
-    const stopLoop = () => {
-      if (frame !== null) cancelAnimationFrame(frame);
-      frame = null;
-    };
-
-    const render = (time: number) => {
-      frame = null;
-      if (!visible) return;
-
-      const seconds = (time - start) * 0.001;
-      uniforms.iTime.value = seconds;
-      let shouldContinue = effectiveTimeScale > 1e-6;
-
-      if (animationType === "hover") {
-        const maxPitch = 0.6 * hoverMax;
-        const maxYaw = 0.6 * hoverMax;
-        targetYaw = (pointer.inside ? -pointer.x : 0) * maxYaw;
-        targetPitch = (pointer.inside ? pointer.y : 0) * maxPitch;
-        yaw += (targetYaw - yaw) * inertial;
-        pitch += (targetPitch - pitch) * inertial;
-        roll += (0 - roll) * 0.1;
-        uniforms.uRot.value = setMat3FromEuler(yaw, pitch, roll, rot);
-        shouldContinue = !noiseIsZero || Math.abs(yaw - targetYaw) > 1e-4 || Math.abs(pitch - targetPitch) > 1e-4 || Math.abs(roll) > 1e-4;
-      } else if (animationType === "3drotate") {
-        const scaled = seconds * effectiveTimeScale;
-        yaw = scaled * wY;
-        pitch = Math.sin(scaled * wX + phX) * 0.6;
-        roll = Math.sin(scaled * wZ + phZ) * 0.5;
-        uniforms.uRot.value = setMat3FromEuler(yaw, pitch, roll, rot);
-      } else {
-        uniforms.uRot.value = rot;
-      }
-
-      renderer.render({ scene: mesh });
-      if (shouldContinue) {
-        frame = requestAnimationFrame(render);
-      }
-    };
-
-    const startLoop = () => {
-      if (frame === null && visible) frame = requestAnimationFrame(render);
-    };
-
-    const handlePointerMove = (event: PointerEvent) => {
-      if (animationType !== "hover") return;
-      pointer.x = Math.max(-1, Math.min(1, (event.clientX - window.innerWidth * 0.5) / (window.innerWidth * 0.5)));
-      pointer.y = Math.max(-1, Math.min(1, (event.clientY - window.innerHeight * 0.5) / (window.innerHeight * 0.5)));
-      pointer.inside = true;
-      startLoop();
-    };
-
-    const handlePointerLeave = () => {
-      pointer.inside = false;
-      startLoop();
-    };
-
-    if (animationType === "hover" && !reducedMotion) {
-      window.addEventListener("pointermove", handlePointerMove, { passive: true });
-      window.addEventListener("mouseleave", handlePointerLeave);
-      window.addEventListener("blur", handlePointerLeave);
-    }
-
-    const onVisibilityChange = () => {
-      visible = !document.hidden;
-      if (visible) startLoop();
-      else stopLoop();
-    };
-    document.addEventListener("visibilitychange", onVisibilityChange);
-
-    let intersectionObserver: IntersectionObserver | null = null;
-    if (suspendWhenOffscreen) {
-      intersectionObserver = new IntersectionObserver(
-        ([entry]) => {
-          visible = entry.isIntersecting && !document.hidden;
-          if (visible) startLoop();
-          else stopLoop();
-        },
-        { threshold: 0.02 },
-      );
-      intersectionObserver.observe(container);
-    }
-
-    startLoop();
+    renderStaticFrame();
 
     return () => {
-      stopLoop();
       resizeObserver.disconnect();
-      intersectionObserver?.disconnect();
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("mouseleave", handlePointerLeave);
-      window.removeEventListener("blur", handlePointerLeave);
       if (canvas.parentElement === container) {
         container.removeChild(canvas);
       }
@@ -434,7 +308,6 @@ export default function Prism({
   }, [
     height,
     baseWidth,
-    animationType,
     glow,
     offset?.x,
     offset?.y,
@@ -443,11 +316,7 @@ export default function Prism({
     scale,
     hueShift,
     colorFrequency,
-    hoverStrength,
-    inertia,
     bloom,
-    suspendWhenOffscreen,
-    timeScale,
   ]);
 
   return (

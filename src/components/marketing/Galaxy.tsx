@@ -190,18 +190,18 @@ void main() {
 export default function Galaxy({
   focal = [0.5, 0.5],
   rotation = [1.0, 0.0],
-  starSpeed = 0.5,
+  starSpeed = 0.18,
   density = 1,
   hueShift = 140,
-  disableAnimation = false,
-  speed = 1.0,
-  mouseInteraction = true,
+  disableAnimation: _disableAnimation = false,
+  speed: _speed = 1.0,
+  mouseInteraction: _mouseInteraction = true,
   glowIntensity = 0.3,
   saturation = 0.0,
-  mouseRepulsion = true,
-  repulsionStrength = 2,
-  twinkleIntensity = 0.3,
-  rotationSpeed = 0.1,
+  mouseRepulsion: _mouseRepulsion = true,
+  repulsionStrength: _repulsionStrength = 2,
+  twinkleIntensity: _twinkleIntensity = 0.3,
+  rotationSpeed: _rotationSpeed = 0.1,
   autoCenterRepulsion = 0,
   transparent = true,
   dpr,
@@ -209,25 +209,12 @@ export default function Galaxy({
   ...rest
 }: GalaxyProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const targetMousePos = useRef({ x: 0.5, y: 0.5 });
-  const smoothMousePos = useRef({ x: 0.5, y: 0.5 });
-  const targetMouseActive = useRef(0);
-  const smoothMouseActive = useRef(0);
-  const reducedMotionRef = useRef(false);
-  const shouldRenderRef = useRef(true);
-  const frameRef = useRef<number | null>(null);
-  const timeoutRef = useRef<number | null>(null);
-  const lastRenderTimeRef = useRef(0);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const mobileMedia = window.matchMedia("(max-width: 768px), (pointer: coarse)");
-    reducedMotionRef.current = media.matches;
-    shouldRenderRef.current = !document.hidden;
-    const isStaticDevice = () => reducedMotionRef.current || mobileMedia.matches || disableAnimation;
 
     const renderer = new Renderer({
       dpr: dpr ?? Math.min(window.devicePixelRatio || 1, mobileMedia.matches ? 1 : 1.25),
@@ -274,21 +261,21 @@ export default function Galaxy({
       uAutoCenterRepulsion: Uniform<number>;
       uTransparent: Uniform<boolean>;
     } = {
-      uTime: { value: 0 },
+      uTime: { value: 4.25 },
       uResolution: { value: [gl.drawingBufferWidth, gl.drawingBufferHeight, 1] },
       uFocal: { value: new Float32Array(focal) },
       uRotation: { value: new Float32Array(rotation) },
-      uStarSpeed: { value: 0 },
+      uStarSpeed: { value: starSpeed },
       uDensity: { value: density },
       uHueShift: { value: hueShift },
-      uSpeed: { value: isStaticDevice() ? 0 : speed },
+      uSpeed: { value: 0 },
       uMouse: { value: new Float32Array([0.5, 0.5]) },
       uGlowIntensity: { value: glowIntensity },
       uSaturation: { value: saturation },
-      uMouseRepulsion: { value: mouseRepulsion },
-      uTwinkleIntensity: { value: isStaticDevice() ? 0 : twinkleIntensity },
-      uRotationSpeed: { value: isStaticDevice() ? 0 : rotationSpeed },
-      uRepulsionStrength: { value: repulsionStrength },
+      uMouseRepulsion: { value: false },
+      uTwinkleIntensity: { value: 0 },
+      uRotationSpeed: { value: 0 },
+      uRepulsionStrength: { value: 0 },
       uMouseActiveFactor: { value: 0 },
       uAutoCenterRepulsion: { value: autoCenterRepulsion },
       uTransparent: { value: transparent },
@@ -305,169 +292,30 @@ export default function Galaxy({
     const mesh = new Mesh(gl, { geometry, program });
     container.appendChild(canvas);
 
+    const renderStaticFrame = () => {
+      uniforms.uTime.value = 4.25;
+      uniforms.uStarSpeed.value = starSpeed;
+      uniforms.uSpeed.value = 0;
+      uniforms.uTwinkleIntensity.value = 0;
+      uniforms.uRotationSpeed.value = 0;
+      uniforms.uMouseActiveFactor.value = 0;
+      renderer.render({ scene: mesh });
+    };
+
     const resize = () => {
       const rect = container.getBoundingClientRect();
       renderer.setSize(rect.width, rect.height);
       uniforms.uResolution.value = [gl.drawingBufferWidth, gl.drawingBufferHeight, gl.drawingBufferWidth / Math.max(gl.drawingBufferHeight, 1)];
+      renderStaticFrame();
     };
     resize();
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
 
-    const handlePointerMove = (event: PointerEvent) => {
-      const rect = container.getBoundingClientRect();
-      targetMousePos.current = {
-        x: (event.clientX - rect.left) / Math.max(rect.width, 1),
-        y: 1 - (event.clientY - rect.top) / Math.max(rect.height, 1),
-      };
-      targetMouseActive.current = 1;
-    };
-
-    const handlePointerLeave = () => {
-      targetMouseActive.current = 0;
-    };
-
-    let pointerListenersAttached = false;
-    const attachPointerListeners = () => {
-      if (pointerListenersAttached || !mouseInteraction || reducedMotionRef.current) return;
-      container.addEventListener("pointermove", handlePointerMove);
-      container.addEventListener("pointerleave", handlePointerLeave);
-      pointerListenersAttached = true;
-    };
-    const detachPointerListeners = () => {
-      if (!pointerListenersAttached) return;
-      container.removeEventListener("pointermove", handlePointerMove);
-      container.removeEventListener("pointerleave", handlePointerLeave);
-      pointerListenersAttached = false;
-    };
-    attachPointerListeners();
-
-    const onVisibilityChange = () => {
-      shouldRenderRef.current = !document.hidden;
-      if (shouldRenderRef.current) scheduleNextFrame();
-      else stopLoop();
-    };
-    document.addEventListener("visibilitychange", onVisibilityChange);
-
-    const intersectionObserver = new IntersectionObserver(
-      ([entry]) => {
-        shouldRenderRef.current = entry.isIntersecting && !document.hidden;
-        if (shouldRenderRef.current) scheduleNextFrame();
-        else stopLoop();
-      },
-      { threshold: 0.02 },
-    );
-    intersectionObserver.observe(container);
-
-    const onMotionChange = (event: MediaQueryListEvent) => {
-      reducedMotionRef.current = event.matches;
-      uniforms.uSpeed.value = isStaticDevice() ? 0 : speed;
-      uniforms.uTwinkleIntensity.value = isStaticDevice() ? 0 : twinkleIntensity;
-      uniforms.uRotationSpeed.value = isStaticDevice() ? 0 : rotationSpeed;
-      uniforms.uMouseActiveFactor.value = 0;
-      if (event.matches) detachPointerListeners();
-      else attachPointerListeners();
-      renderStaticFrame();
-      if (!isStaticDevice()) scheduleNextFrame();
-    };
-    media.addEventListener("change", onMotionChange);
-
-    const onMobileChange = () => {
-      uniforms.uSpeed.value = isStaticDevice() ? 0 : speed;
-      uniforms.uTwinkleIntensity.value = isStaticDevice() ? 0 : twinkleIntensity;
-      uniforms.uRotationSpeed.value = isStaticDevice() ? 0 : rotationSpeed;
-      uniforms.uMouseActiveFactor.value = 0;
-      if (mobileMedia.matches) detachPointerListeners();
-      else attachPointerListeners();
-      renderStaticFrame();
-      if (!isStaticDevice()) scheduleNextFrame();
-    };
-    mobileMedia.addEventListener("change", onMobileChange);
-
-    const pageIsScrolling = () => document.documentElement.classList.contains("homepage-is-scrolling");
-
-    const stopLoop = () => {
-      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
-      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
-      frameRef.current = null;
-      timeoutRef.current = null;
-    };
-
-    const scheduleNextFrame = (delay = 0) => {
-      if (frameRef.current !== null || timeoutRef.current !== null || isStaticDevice() || !shouldRenderRef.current) return;
-      const request = () => {
-        timeoutRef.current = null;
-        frameRef.current = requestAnimationFrame(render);
-      };
-      if (delay > 0) timeoutRef.current = window.setTimeout(request, delay);
-      else request();
-    };
-
-    const renderStaticFrame = () => {
-      stopLoop();
-      uniforms.uTime.value = 0.001;
-      uniforms.uStarSpeed.value = 0;
-      uniforms.uMouseActiveFactor.value = 0;
-      renderer.render({ scene: mesh });
-    };
-
-    const render = (time: number) => {
-      frameRef.current = null;
-      if (!shouldRenderRef.current) return;
-
-      if (isStaticDevice()) {
-        renderStaticFrame();
-        return;
-      }
-
-      if (pageIsScrolling()) {
-        scheduleNextFrame(190);
-        return;
-      }
-
-      const minFrameMs = 1000 / 24;
-      const elapsed = time - lastRenderTimeRef.current;
-      if (lastRenderTimeRef.current && elapsed < minFrameMs) {
-        scheduleNextFrame(minFrameMs - elapsed);
-        return;
-      }
-      lastRenderTimeRef.current = time;
-
-      if (disableAnimation || reducedMotionRef.current) {
-        uniforms.uTime.value = 0.001;
-        uniforms.uStarSpeed.value = 0;
-      } else {
-        const seconds = time * 0.001;
-        uniforms.uTime.value = seconds;
-        uniforms.uStarSpeed.value = (seconds * starSpeed) / 10;
-      }
-
-      const lerpFactor = reducedMotionRef.current ? 1 : 0.05;
-      smoothMousePos.current.x += (targetMousePos.current.x - smoothMousePos.current.x) * lerpFactor;
-      smoothMousePos.current.y += (targetMousePos.current.y - smoothMousePos.current.y) * lerpFactor;
-      smoothMouseActive.current += (targetMouseActive.current - smoothMouseActive.current) * lerpFactor;
-      uniforms.uMouse.value[0] = smoothMousePos.current.x;
-      uniforms.uMouse.value[1] = smoothMousePos.current.y;
-      uniforms.uMouseActiveFactor.value = reducedMotionRef.current ? 0 : smoothMouseActive.current;
-
-      if (shouldRenderRef.current) {
-        renderer.render({ scene: mesh });
-      }
-
-      scheduleNextFrame(1000 / 24);
-    };
-
     renderStaticFrame();
-    if (!isStaticDevice()) scheduleNextFrame();
 
     return () => {
-      stopLoop();
-      detachPointerListeners();
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      media.removeEventListener("change", onMotionChange);
-      mobileMedia.removeEventListener("change", onMobileChange);
-      intersectionObserver.disconnect();
       resizeObserver.disconnect();
       if (canvas.parentElement === container) {
         container.removeChild(canvas);
@@ -484,15 +332,8 @@ export default function Galaxy({
     starSpeed,
     density,
     hueShift,
-    disableAnimation,
-    speed,
-    mouseInteraction,
     glowIntensity,
     saturation,
-    mouseRepulsion,
-    repulsionStrength,
-    twinkleIntensity,
-    rotationSpeed,
     autoCenterRepulsion,
     transparent,
     dpr,

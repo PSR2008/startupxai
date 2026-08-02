@@ -81,16 +81,12 @@ test("homepage live static grids use MagicBento while hero and ScrollStack stay 
   }
 });
 
-test("MagicBento suspends hover motion and particles during homepage scroll", () => {
-  assert.match(card, /homepage-is-scrolling/);
-  assert.match(card, /startupx:homepage-scroll-start/);
-  assert.match(card, /resetCardTransform/);
-  assert.match(card, /if \(!enableStars \|\| isHomepageScrolling\(\)\)/);
-  assert.match(spotlight, /homepage-is-scrolling/);
-  assert.match(spotlight, /startupx:homepage-scroll-start/);
-  assert.match(spotlight, /handleHomepageScrollStart/);
-  assert.match(styles, /html\.homepage-is-scrolling \.magic-bento-spotlight/);
-  assert.match(styles, /html\.homepage-is-scrolling \.magic-bento-card/);
+test("MagicBento avoids homepage scroll listeners and uses transform-based spotlight movement", () => {
+  assert.doesNotMatch(card, /homepage-is-scrolling|startupx:homepage-scroll|window\.addEventListener\("scroll"/);
+  assert.doesNotMatch(spotlight, /homepage-is-scrolling|startupx:homepage-scroll|window\.addEventListener\("scroll"|left: x|top: y/);
+  assert.doesNotMatch(styles, /html\.homepage-is-scrolling|will-change: left|will-change: top/);
+  assert.match(spotlight, /gsap\.to\(spotlight, \{[\s\S]+x,[\s\S]+y,/);
+  assert.match(styles, /\.magic-bento-spotlight[\s\S]+left: 0;[\s\S]+top: 0;[\s\S]+transform: translate\(-50%, -50%\)/);
 });
 
 test("pricing no longer combines MagicBento with pricing card interactions", () => {

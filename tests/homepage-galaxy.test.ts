@@ -9,7 +9,6 @@ const footer = readFileSync(join(root, "src/components/marketing/Footer.tsx"), "
 const engines = readFileSync(join(root, "src/components/marketing/EnginesSection.tsx"), "utf8");
 const galaxy = readFileSync(join(root, "src/components/marketing/Galaxy.tsx"), "utf8");
 const galaxyCss = readFileSync(join(root, "src/components/marketing/Galaxy.css"), "utf8");
-const scrollState = readFileSync(join(root, "src/components/marketing/HomepageScrollState.tsx"), "utf8");
 const packageJson = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as {
   dependencies: Record<string, string>;
 };
@@ -24,9 +23,8 @@ const walk = (dir: string): string[] => {
 
 test("homepage renders one Galaxy canvas stage only after the Lightfall hero", () => {
   assert.match(page, /import Galaxy from "@\/components\/marketing\/Galaxy"/);
-  assert.match(page, /import HomepageScrollState from "@\/components\/marketing\/HomepageScrollState"/);
   assert.match(page, /<HeroSection \/>\s*<div className="homepage-galaxy-stage">/);
-  assert.match(page, /<HomepageScrollState \/>/);
+  assert.doesNotMatch(page, /HomepageScrollState|homepage-is-scrolling|startupx:homepage-scroll/);
   assert.equal((page.match(/<Galaxy/g) ?? []).length, 1, "homepage should render exactly one Galaxy component");
   assert.match(page, /<Galaxy[\s\S]+<div className="homepage-galaxy-content">[\s\S]+<ProductScrollStackSection \/>/);
   assert.match(page, /<CTASection \/>\s*<Footer variant="homepage" \/>/);
@@ -40,10 +38,7 @@ test("Galaxy implementation uses the supplied OGL shader approach with cleanup a
   assert.match(galaxy, /uMouseRepulsion/);
   assert.match(galaxy, /uAutoCenterRepulsion/);
   assert.match(galaxy, /ResizeObserver/);
-  assert.match(galaxy, /IntersectionObserver/);
-  assert.match(galaxy, /prefers-reduced-motion: reduce/);
   assert.match(galaxy, /max-width: 768px\), \(pointer: coarse/);
-  assert.match(galaxy, /cancelAnimationFrame/);
   assert.match(galaxy, /container\.removeChild\(canvas\)/);
   assert.match(galaxy, /WEBGL_lose_context/);
   assert.match(galaxy, /aria-hidden="true"/);
@@ -105,7 +100,7 @@ test("homepage footer uses compact editorial spacing without full-section sizing
   assert.doesNotMatch(engines, /homepage-final-cta[\s\S]+py-24/);
 });
 
-test("Galaxy is throttled, freezes during page scroll, and renders static frames for mobile or reduced motion", () => {
+test("Galaxy renders one deterministic static frame and does not install animation or scroll loops", () => {
   assert.match(page, /starSpeed=\{0\.28\}/);
   assert.match(page, /density=\{0\.85\}/);
   assert.match(page, /speed=\{0\.45\}/);
@@ -116,22 +111,16 @@ test("Galaxy is throttled, freezes during page scroll, and renders static frames
   assert.match(page, /mouseInteraction=\{false\}/);
   assert.match(page, /mouseRepulsion=\{false\}/);
   assert.match(page, /transparent=\{true\}/);
-  assert.match(galaxy, /1000 \/ 24/);
-  assert.match(galaxy, /pageIsScrolling\(\)/);
-  assert.match(galaxy, /scheduleNextFrame\(190\)/);
   assert.match(galaxy, /renderStaticFrame/);
+  assert.match(galaxy, /uTime: \{ value: 4\.25 \}/);
+  assert.match(galaxy, /uniforms\.uTime\.value = 4\.25/);
+  assert.match(galaxy, /uniforms\.uSpeed\.value = 0/);
+  assert.match(galaxy, /uniforms\.uTwinkleIntensity\.value = 0/);
+  assert.match(galaxy, /uniforms\.uRotationSpeed\.value = 0/);
   assert.match(galaxy, /mobileMedia\.matches \? 1 : 1\.25/);
   assert.match(galaxy, /antialias: false/);
   assert.match(galaxy, /powerPreference: "low-power"/);
-});
-
-test("homepage scroll state is shared through one passive listener and clears after inactivity", () => {
-  assert.match(scrollState, /const SCROLLING_CLASS = "homepage-is-scrolling"/);
-  assert.match(scrollState, /const STOP_DELAY_MS = 175/);
-  assert.match(scrollState, /addEventListener\("scroll", onScroll, \{ passive: true \}\)/);
-  assert.match(scrollState, /startupx:homepage-scroll-start/);
-  assert.match(scrollState, /startupx:homepage-scroll-stop/);
-  assert.match(scrollState, /removeEventListener\("scroll", onScroll\)/);
+  assert.doesNotMatch(galaxy, /requestAnimationFrame|cancelAnimationFrame|IntersectionObserver|addEventListener\("scroll"|pointermove|pageIsScrolling|scheduleNextFrame/);
 });
 
 test("Galaxy is homepage-only and does not enter app, auth, API, or marketing route pages", () => {
@@ -139,7 +128,6 @@ test("Galaxy is homepage-only and does not enter app, auth, API, or marketing ro
   const allowed = new Set([
     join(root, "src/app/page.tsx"),
     join(root, "src/components/marketing/Galaxy.tsx"),
-    join(root, "src/components/marketing/HomepageScrollState.tsx"),
   ]);
 
   for (const file of files) {

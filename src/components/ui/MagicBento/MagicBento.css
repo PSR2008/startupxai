@@ -91,6 +91,8 @@
 
 .magic-bento-spotlight {
   position: absolute;
+  left: 0;
+  top: 0;
   width: 720px;
   height: 720px;
   border-radius: 999px;
@@ -99,24 +101,12 @@
   opacity: 0;
   transform: translate(-50%, -50%);
   mix-blend-mode: screen;
-  will-change: left, top, opacity;
-}
-
-html.homepage-is-scrolling .magic-bento-spotlight,
-html.homepage-is-scrolling .magic-bento-particle,
-html.homepage-is-scrolling .magic-bento-ripple {
-  display: none !important;
-}
-
-html.homepage-is-scrolling .magic-bento-card {
-  transform: none !important;
 }
 
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .magic-bento-card {
     transform: none !important;
     filter: none !important;
-    will-change: auto !important;
   }
 
   .magic-bento-spotlight,

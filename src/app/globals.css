@@ -230,14 +230,13 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
   margin:0 0 0.85rem;
   border:1px solid rgba(255,255,255,0.28);
   border-radius:999px;
-  background:rgba(4,12,42,0.2);
+  background:rgba(4,12,42,0.42);
   padding:0.3rem 0.72rem;
   color:rgba(255,255,255,0.86);
   font-family:var(--font-body);
   font-size:0.72rem;
   font-weight:600;
   line-height:1;
-  backdrop-filter:blur(18px);
 }
 .resadex-title{
   display:flex;
@@ -300,9 +299,8 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
 }
 .resadex-actions a:nth-child(2){
   border:1px solid rgba(255,255,255,0.4);
-  background:rgba(7,11,32,0.32);
+  background:rgba(7,11,32,0.52);
   color:rgba(255,255,255,0.94);
-  backdrop-filter:blur(18px);
 }
 .resadex-actions a:hover{transform:translateY(-1px)}
 .resadex-actions a:focus-visible{outline:2px solid #dbeafe;outline-offset:3px}
