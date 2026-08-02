@@ -14,18 +14,11 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
-  const isDarkNav = !isHomePage && !scrolled;
+  const isDarkNav = false;
   const useLightNavText = isHomePage || isDarkNav;
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 

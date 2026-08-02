@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Zap, Twitter, Linkedin, Github } from "lucide-react";
+import { Zap } from "lucide-react";
 
 const footerLinks = {
   Product: [
@@ -38,9 +38,9 @@ const homepageFooterLinks = {
   ],
   Assessments: [
     { label: "Idea & Market", href: "/idea-engine" },
-    { label: "Competitors", href: "/competitor-intelligence" },
-    { label: "Revenue", href: "/revenue-engine" },
-    { label: "Growth", href: "/growth-engine" },
+    { label: "Competitor Intelligence", href: "/competitor-intelligence" },
+    { label: "Revenue Engine", href: "/revenue-engine" },
+    { label: "Growth Engine", href: "/growth-engine" },
     { label: "Founder Decision", href: "/founder-decision" },
   ],
   Tools: [
@@ -56,12 +56,6 @@ const homepageFooterLinks = {
     { label: "Sign in", href: "/signin" },
   ],
 };
-
-const socialLinks = [
-  { Icon: Twitter, href: "#", label: "Twitter" },
-  { Icon: Linkedin, href: "#", label: "LinkedIn" },
-  { Icon: Github, href: "#", label: "GitHub" },
-];
 
 type FooterProps = {
   variant?: "default" | "homepage";
@@ -111,22 +105,6 @@ export default function Footer({ variant = "default" }: FooterProps) {
             >
               Evidence-backed assessment workflows for founder decisions.
             </p>
-            <div className="flex gap-2">
-              {socialLinks.map(({ Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={`StartupX AI on ${label}`}
-                  className={
-                    isHomepage
-                      ? "w-8 h-8 rounded-lg border border-white/[0.12] bg-white/[0.06] flex items-center justify-center text-slate-300/[0.78] hover:text-white hover:border-emerald-300/[0.35] hover:bg-white/10 transition-all"
-                      : "w-8 h-8 rounded-lg border border-black/8 bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:border-black/14 hover:bg-gray-100 transition-all"
-                  }
-                >
-                  <Icon size={14} />
-                </a>
-              ))}
-            </div>
           </div>
 
           {Object.entries(linkGroups).map(([section, links]) => (

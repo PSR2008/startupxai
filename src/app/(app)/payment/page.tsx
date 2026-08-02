@@ -259,7 +259,7 @@ function PaymentPageContent() {
                           {option.name}
                         </p>
                         <p className="font-jakarta text-xs text-gray-400 mt-1">
-                          ${option.price}/mo Â· {option.features[0]}
+                          ${option.price}/mo - {option.features[0]}
                         </p>
                       </button>
                     );

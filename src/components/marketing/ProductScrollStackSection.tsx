@@ -116,8 +116,8 @@ const stackCards: StackCard[] = [
   {
     number: "05",
     category: "Core workflow",
-    title: "Founder Decisions",
-    positioning: "Record what was decidedâ€”and why.",
+    title: "Founder Decision",
+    positioning: "Record what was decided and why.",
     description: "Preserve decision context so the team can see how evidence changed the next move.",
     capabilities: [
       "Capture important founder decisions",
@@ -126,7 +126,7 @@ const stackCards: StackCard[] = [
     ],
     trustNote: "Recommendations are interpretations; the founder remains responsible for the decision.",
     href: "/founder-decision",
-    cta: "Review decisions",
+    cta: "Review Founder Decision",
     accent: "emerald",
   },
   {

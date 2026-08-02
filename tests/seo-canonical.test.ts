@@ -10,9 +10,11 @@ function source(file: string): string {
   return readFileSync(join(process.cwd(), file), "utf8");
 }
 
+const footer = source("src/components/marketing/Footer.tsx");
+
 test("homepage has preferred www metadata base and self-referencing canonical", () => {
-  const layout = source("src/app/layout.tsx");
-  const home = source("src/app/page.tsx");
+const layout = source("src/app/layout.tsx");
+const home = source("src/app/page.tsx");
   assert.equal(SEO_BASE_URL, "https://www.startupxai.in");
   assert.match(layout, /metadataBase:\s*new URL\(SEO_BASE_URL\)/);
   assert.match(home, /alternates:\s*\{[\s\S]*canonical:\s*"\/",?[\s\S]*\}/);
@@ -91,4 +93,13 @@ test("SEO canonical change does not touch application behavior surfaces", () => 
   assert.equal(changedSurface.includes("Razorpay"), false);
   assert.equal(changedSurface.includes("supabase"), false);
   assert.equal(changedSurface.includes("calculateEvidenceScores"), false);
+});
+
+test("footer links use real routes and canonical product names", () => {
+  assert.doesNotMatch(footer, /href:\s*"#"/);
+  assert.match(footer, /Competitor Intelligence/);
+  assert.match(footer, /Revenue Engine/);
+  assert.match(footer, /Growth Engine/);
+  assert.doesNotMatch(footer, /label:\s*"Competitors"/);
+  assert.doesNotMatch(footer, /label:\s*"Revenue"/);
 });

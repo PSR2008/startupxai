@@ -179,6 +179,12 @@ export default function PricingPage() {
                       ? "border-emerald-300/55 bg-[#071511]/92 text-white"
                       : "border-white/16 bg-[#101418]/88 text-white"
                   }`}
+                  style={{
+                    backgroundColor:
+                      plan.name === "Growth"
+                        ? "rgba(7, 21, 17, 0.94)"
+                        : "rgba(16, 20, 24, 0.92)",
+                  }}
                 >
                   <div className="mb-5 flex min-h-7 items-center justify-between gap-3">
                     <span className="font-mono text-[11px] font-semibold text-white/45">{String(index + 1).padStart(2, "0")}</span>

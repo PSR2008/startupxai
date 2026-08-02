@@ -441,7 +441,7 @@ export default function ProfilePage() {
                   <p className="font-jakarta text-xs font-bold text-gray-500 uppercase tracking-wide">{row.label}</p>
                   <p className="font-jakarta text-sm text-gray-700 mt-1">
                     <span className="font-jakarta font-bold text-gray-900">{row.used}</span> / {row.limit}
-                    <span className="text-gray-400"> Â· {row.remaining} left</span>
+                    <span className="text-gray-400"> - {row.remaining} left</span>
                   </p>
                 </div>
               ))}

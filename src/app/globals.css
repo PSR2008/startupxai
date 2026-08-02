@@ -116,7 +116,7 @@ textarea::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px}
 
 .output-prose p{margin-bottom:0.75rem;color:var(--color-text-secondary);font-size:0.9375rem;line-height:1.7}
 .output-prose ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:0.5rem}
-.output-prose ul li::before{content:'â†’';color:#059669;margin-right:0.5rem;font-weight:700}
+.output-prose ul li::before{content:'->';color:#059669;margin-right:0.5rem;font-weight:700}
 
 .editorial-section{position:relative;border-top:1px solid rgba(15,17,23,0.08)}
 .editorial-section::before{content:"";position:absolute;top:-1px;left:0;width:5rem;height:1px;background:#059669}

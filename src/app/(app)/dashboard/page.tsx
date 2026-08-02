@@ -35,8 +35,8 @@ const primaryActions = [
 ];
 
 const secondaryTools = [
-  { title: "Competitors", href: "/competitor-intelligence" },
-  { title: "Decisions", href: "/founder-decision" },
+  { title: "Competitor Intelligence", href: "/competitor-intelligence" },
+  { title: "Founder Decision", href: "/founder-decision" },
   { title: "Outreach", href: "/cold-dm" },
   { title: "Settings", href: "/profile" },
 ];

@@ -27,7 +27,7 @@ test("ScrollStack includes all 13 cards in the required order", () => {
     "Assumptions",
     "Experiments",
     "Competitor Intelligence",
-    "Founder Decisions",
+    "Founder Decision",
     "Reports",
     "Idea & Market Engine",
     "Revenue Engine",
@@ -85,6 +85,7 @@ test("ScrollStack copy avoids invented validation claims and keeps evidence sema
   }
 
   assert.match(section, /Founder claims and generated suggestions are not treated as verified evidence/);
+  assert.doesNotMatch(section, /Ã|Â|â|�/);
   assert.match(section, /not verified market truth/);
   assert.match(section, /not proof of demand/);
   assert.match(section, /not guaranteed acquisition paths/);

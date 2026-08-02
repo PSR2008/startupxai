@@ -94,7 +94,7 @@ test("homepage footer uses compact editorial spacing without full-section sizing
   assert.match(footer, /space-y-1\.5/);
   assert.match(footer, /All systems operational/);
   assert.match(footer, /&copy; \{new Date\(\)\.getFullYear\(\)\}/);
-  assert.match(footer, /aria-label=\{`StartupX AI on \$\{label\}`\}/);
+  assert.doesNotMatch(footer, /href:\s*"#"/);
   assert.doesNotMatch(footer, /pt-\[52px\]|py-16"\s*:\s*"container-custom|min-h-screen|min-height:\s*100vh|min-h-\[100vh\]|h-screen/);
   assert.match(engines, /homepage-final-cta[\s\S]+pt-24 pb-8/);
   assert.doesNotMatch(engines, /homepage-final-cta[\s\S]+py-24/);

@@ -228,3 +228,11 @@ test("protected-page return flow points sign-in next toward the requested app ro
   assert.match(gate, /signin\?next=/);
   assert.match(gate, /encodeURIComponent\(pathname\)/);
 });
+
+test("protected-page auth guard fails closed instead of leaving users on the spinner", () => {
+  const gate = readFileSync(join(process.cwd(), "src/components/app/AuthGate.tsx"), "utf8");
+  assert.match(gate, /SESSION_CHECK_TIMEOUT_MS\s*=\s*8000/);
+  assert.match(gate, /Promise\.race\(\[supabase\.auth\.getSession\(\), timeout\]\)/);
+  assert.match(gate, /catch\s*\{/);
+  assert.match(gate, /redirectToSignin\(\)/);
+});

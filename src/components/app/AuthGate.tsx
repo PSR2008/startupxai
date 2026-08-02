@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 
+const SESSION_CHECK_TIMEOUT_MS = 8000;
+
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -14,23 +16,42 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     let mounted = true;
 
     async function checkAuth() {
-      const supabase = getSupabaseBrowserClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session?.user) {
+      const redirectToSignin = () => {
         router.replace(`/signin?next=${encodeURIComponent(pathname)}`);
+      };
+
+      try {
+        const supabase = getSupabaseBrowserClient();
+        const timeout = new Promise<never>((_, reject) => {
+          window.setTimeout(() => reject(new Error("Auth session check timed out")), SESSION_CHECK_TIMEOUT_MS);
+        });
+        const {
+          data: { session },
+        } = await Promise.race([supabase.auth.getSession(), timeout]);
+
+        if (!mounted) {
+          return;
+        }
+
+        if (!session?.user) {
+          redirectToSignin();
+          return;
+        }
+
+        if (!session.user.email_confirmed_at) {
+          await supabase.auth.signOut();
+          router.replace("/signin?reason=confirm-email");
+          return;
+        }
+
+        setAllowed(true);
+      } catch {
+        if (!mounted) {
+          return;
+        }
+        redirectToSignin();
         return;
       }
-
-      if (!session.user.email_confirmed_at) {
-        await supabase.auth.signOut();
-        router.replace("/signin?reason=confirm-email");
-        return;
-      }
-
-      if (mounted) setAllowed(true);
     }
 
     checkAuth();

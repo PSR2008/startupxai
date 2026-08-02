@@ -90,7 +90,7 @@ export default function BrandForgePage() {
     if (!result) return "";
 
     return [
-      "StartupX AI - Brand Forge Identity Pack",
+      "StartupX AI - BrandForge Identity Pack",
       "",
       `Idea: ${form.idea}`,
       `Industry: ${form.industry}`,
