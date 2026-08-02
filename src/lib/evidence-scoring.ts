@@ -333,7 +333,7 @@ export function calculateEvidenceScores(input: EvidenceEngineInput, evidence: Ev
       sourceReferences: sourceRefs(qualifying),
       methodology: assessable
         ? `Calculated from qualifying ${rule.accepts.join(", ")} evidence using source quality, freshness, relevance, and supporting-versus-contradicting direction. Founder context and generated assessments have zero independent-evidence weight.`
-        : `Not calculated. ${rule.minimumRequired} Founder context, assumptions, planned experiments, and generated assessments do not increase the score.`,
+        : `Not calculated. At least ${rule.minimumRequired} qualifying evidence items are required. Founder context, assumptions, planned experiments, and generated assessments do not increase the score.`,
       recommendedNextAction: rule.nextAction,
       components,
       evidenceCoverage: {

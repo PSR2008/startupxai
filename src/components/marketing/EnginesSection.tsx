@@ -52,7 +52,7 @@ const evidenceEntryCards = [
   {
     title: "Founder-provided evidence",
     description: "Interview notes, surveys, observations and research.",
-    label: "Founder provided",
+    label: "Founder-provided",
   },
   {
     title: "Linked sources",
@@ -117,7 +117,7 @@ export function RealWorkflowSection() {
   const rows = [
     { label: "Assumption", value: "Operations leads urgently need better pricing review workflows.", status: "Unresolved claim" },
     { label: "Supporting evidence", value: "Interview note from founder discovery call", status: "Customer interview · supporting · May 2026" },
-    { label: "Contradicting evidence", value: "Two prospects said spreadsheets are still acceptable", status: "Founder provided · contradicting · May 2026" },
+    { label: "Contradicting evidence", value: "Two prospects said spreadsheets are still acceptable", status: "Founder-provided · contradicting · May 2026" },
     { label: "Source attribution", value: "Founder notes and imported competitor URL", status: "Imported source · reviewed" },
     { label: "Experiment", value: "Landing-page CTA test for pricing audit offer", status: "Experiment result · inconclusive" },
     { label: "Decision", value: "Interview five more buyers before changing pricing page", status: "Decision recorded" },
