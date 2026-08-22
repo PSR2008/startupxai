@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import { activatePaidPlan, normalizePaymentBilling } from "@/lib/payment-activation";
-import { getAllowedPaidAmounts, isPaidPlanKey } from "@/lib/plans";
-import { getPaymentCouponDiscountPercent } from "@/lib/payment-coupons";
+import { isPaidPlanKey } from "@/lib/plans";
+import { isExpectedRazorpayPlanAmount } from "@/lib/razorpay-plans";
 
 export const runtime = "nodejs";
 
@@ -73,9 +73,9 @@ export async function POST(req: NextRequest) {
     const billingCycle = normalizePaymentBilling(order.notes?.billing);
     const userId = typeof order.notes?.user_id === "string" ? order.notes.user_id : null;
     const orderAmount = typeof order.amount === "number" ? order.amount : Number(order.amount);
-    const currency = String(order.currency || payment.currency || "USD").toUpperCase();
+    const currency = String(order.currency || payment.currency || "INR").toUpperCase();
 
-    if (!userId || !orderPlan || currency !== "USD" || !getAllowedPaidAmounts(getPaymentCouponDiscountPercent()).includes(orderAmount)) {
+    if (!userId || !orderPlan || !isExpectedRazorpayPlanAmount(orderPlan, billingCycle, orderAmount, currency)) {
       return NextResponse.json(
         { success: false, message: "Webhook payment does not match an active plan" },
         { status: 400 }

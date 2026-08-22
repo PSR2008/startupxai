@@ -168,21 +168,3 @@ export function getGenerationLimit(plan: PlanKey, feature: GenerationFeature): n
 export function isPaidPlanKey(value: unknown): value is PaidPlanKey {
   return value === "founder" || value === "growth" || value === "scale";
 }
-
-export function getPlanPriceCents(plan: PaidPlanKey, billing: BillingCycle): number {
-  const price = billing === "yearly" ? PLANS[plan].yearlyPrice : PLANS[plan].monthlyPrice;
-  return price * 100;
-}
-
-export function getAllowedPaidAmounts(discountPercent = 20): number[] {
-  const amounts = (["founder", "growth", "scale"] as PaidPlanKey[]).flatMap((plan) =>
-    (["monthly", "yearly"] as BillingCycle[]).flatMap((billing) => {
-      const base = getPlanPriceCents(plan, billing);
-      const discounted = discountPercent > 0 && discountPercent < 100
-        ? Math.max(Math.round(base * ((100 - discountPercent) / 100)), 100)
-        : base;
-      return [base, discounted];
-    })
-  );
-  return Array.from(new Set(amounts));
-}

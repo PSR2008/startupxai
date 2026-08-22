@@ -692,7 +692,7 @@ const trustItems = [
   },
   {
     title: "International pricing",
-    description: "Founder is billed in USD with clear monthly and annual options.",
+    description: "Plans are displayed in USD with clear monthly and annual options.",
   },
   {
     title: "Transparent usage",
@@ -847,7 +847,7 @@ const plans = [
     description: "For solo founders running continuous customer discovery.",
     features: [`${PLANS.founder.analysesPerMonth} analyses/month`, "All assessment tools", "25 ColdDM generations", "25 BrandForge generations", "Investor memo + slide summary", "PDF exports", "Saved history"],
     cta: "Upgrade to Founder",
-    href: "/payment?plan=founder&billing=monthly",
+    href: "/payment?plan=founder",
     highlighted: true,
     badge: "Starter upgrade",
   },
@@ -858,7 +858,7 @@ const plans = [
     description: "For founders testing assumptions and experiments every week.",
     features: [`${PLANS.growth.analysesPerMonth} analyses/month`, "All assessment tools", "100 ColdDM generations", "100 BrandForge generations", "Investor memo + slide summary", "Shareable reports", "3 workspaces"],
     cta: "Upgrade to Growth",
-    href: "/payment?plan=growth&billing=monthly",
+    href: "/payment?plan=growth",
     highlighted: true,
     badge: "Most Popular",
   },
@@ -869,7 +869,7 @@ const plans = [
     description: "For teams managing multiple products, evidence sources and decisions.",
     features: [`${PLANS.scale.analysesPerMonth} analyses/month`, "All assessment tools", "300 ColdDM generations", "300 BrandForge generations", "Investor memo + slide summary", "Team-ready workspaces", "Priority processing"],
     cta: "Upgrade to Scale",
-    href: "/payment?plan=scale&billing=monthly",
+    href: "/payment?plan=scale",
     highlighted: false,
   },
 ];
@@ -963,7 +963,7 @@ export function PricingSection() {
 
         <AnimatedSection delay={0.2} className="text-center mt-10">
           <p className="font-jakarta text-sm text-gray-400">
-            All plans are billed in USD · Upgrade, downgrade, or cancel anytime · No hidden fees
+            Plans are shown in USD · Razorpay checkout uses INR equivalents · Upgrade, downgrade, or cancel anytime
           </p>
         </AnimatedSection>
       </div>

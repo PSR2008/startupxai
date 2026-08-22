@@ -62,7 +62,7 @@ const plans = [
       { text: "Shareable reports", included: false },
     ],
     cta: "Upgrade to Founder",
-    href: "/payment?plan=founder&billing=monthly",
+    href: "/payment?plan=founder",
     highlighted: true,
   },
   {
@@ -86,7 +86,7 @@ const plans = [
       { text: "Priority support", included: true },
     ],
     cta: "Upgrade to Growth",
-    href: "/payment?plan=growth&billing=monthly",
+    href: "/payment?plan=growth",
     highlighted: false,
   },
   {
@@ -110,7 +110,7 @@ const plans = [
       { text: "Priority processing", included: true },
     ],
     cta: "Upgrade to Scale",
-    href: "/payment?plan=scale&billing=monthly",
+    href: "/payment?plan=scale",
     highlighted: false,
   },
 ];
@@ -265,7 +265,7 @@ export default function PricingPage() {
 
         <AnimatedSection delay={0.15} className="text-center -mt-10 mb-20">
           <p className="font-jakarta text-sm text-gray-400">
-            All prices are in USD. Upgrade, downgrade, or cancel anytime.
+            Prices are shown in USD. Checkout uses INR equivalents.
           </p>
         </AnimatedSection>
 

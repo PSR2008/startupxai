@@ -176,7 +176,7 @@ export default function RecentReports({ limit = 6 }: { limit?: number }) {
           <p className="font-jakarta text-xs text-amber-700 leading-relaxed mb-3">
             Starter lets you explore the core engines. Upgrade to save reports, export PDFs, and use every intelligence engine.
           </p>
-          <Link href="/payment?plan=founder&billing=monthly">
+          <Link href="/payment?plan=founder">
             <button className="h-9 rounded-lg bg-amber-700 px-3.5 font-jakarta text-xs font-semibold text-white transition-colors hover:bg-amber-800">
               Upgrade to Founder
             </button>

@@ -3,8 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import { activatePaidPlan, normalizePaymentBilling } from "@/lib/payment-activation";
-import { getAllowedPaidAmounts, isPaidPlanKey } from "@/lib/plans";
-import { getPaymentCouponDiscountPercent } from "@/lib/payment-coupons";
+import { isPaidPlanKey } from "@/lib/plans";
+import { isExpectedRazorpayPlanAmount } from "@/lib/razorpay-plans";
 
 async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
   try {
@@ -82,9 +82,9 @@ export async function POST(req: NextRequest) {
     const orderBilling = normalizePaymentBilling(order.notes?.billing);
     const orderUserId = typeof order.notes?.user_id === "string" ? order.notes.user_id : null;
     const orderAmount = typeof order.amount === "number" ? order.amount : Number(order.amount);
-    const orderCurrency = String(order.currency || "USD").toUpperCase();
+    const orderCurrency = String(order.currency || "INR").toUpperCase();
 
-    if (!orderPlan || orderCurrency !== "USD" || !getAllowedPaidAmounts(getPaymentCouponDiscountPercent()).includes(orderAmount)) {
+    if (!orderPlan || !isExpectedRazorpayPlanAmount(orderPlan, orderBilling, orderAmount, orderCurrency)) {
       return NextResponse.json(
         { success: false, message: "Payment order does not match an active plan" },
         { status: 400 }

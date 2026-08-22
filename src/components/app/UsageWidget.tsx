@@ -143,7 +143,7 @@ export default function UsageWidget() {
         </div>
 
         {isFree && (
-          <Link href="/payment?plan=founder&billing=monthly">
+          <Link href="/payment?plan=founder">
             <button className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-emerald-700 px-3 py-1.5 font-jakarta text-xs font-semibold text-white shadow-sm shadow-emerald-900/15 transition-all hover:bg-emerald-800 hover:shadow-md">
               <Zap size={10} />
               Upgrade
@@ -189,7 +189,7 @@ export default function UsageWidget() {
       {isFree && nearLimit && !atLimit && (
         <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="font-jakarta text-xs text-amber-700 mb-2">You&apos;re approaching your free limit.</p>
-          <Link href="/payment?plan=founder&billing=monthly">
+          <Link href="/payment?plan=founder">
             <button className="font-jakarta text-xs font-bold text-amber-700 hover:text-amber-900 transition-colors">Upgrade to Founder - 50 analyses/month</button>
           </Link>
         </div>
@@ -198,7 +198,7 @@ export default function UsageWidget() {
       {isFree && atLimit && (
         <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-3">
           <p className="font-jakarta text-xs text-rose-700 mb-2">You&apos;ve used all {data.monthly_limit} free analyses this month.</p>
-          <Link href="/payment?plan=founder&billing=monthly">
+          <Link href="/payment?plan=founder">
             <button className="font-jakarta text-xs font-bold text-rose-700 hover:text-rose-900 transition-colors">Upgrade to Founder - $5/mo, 50 analyses</button>
           </Link>
         </div>

@@ -77,7 +77,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font-body);font-weight:650;line-height:1.16;
 
 @media print{
   body{background:#fff!important}
-  aside,header,button,a[href="/payment?plan=founder&billing=monthly"],.no-print{display:none!important}
+  aside,header,button,a[href="/payment?plan=founder"],.no-print{display:none!important}
   main{overflow:visible!important}
   .shadow-sm,.shadow-md,.shadow-lg,.shadow-xl,.shadow-2xl{box-shadow:none!important}
   .rounded-2xl,.rounded-xl{break-inside:avoid}

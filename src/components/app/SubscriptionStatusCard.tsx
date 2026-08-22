@@ -107,7 +107,7 @@ export default function SubscriptionStatusCard() {
 
       {isFree && (
         <div className="mt-5 pt-4 border-t border-black/5">
-          <Link href="/payment?plan=founder&billing=monthly">
+          <Link href="/payment?plan=founder">
             <button className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-700 py-2.5 font-jakarta text-xs font-semibold text-white shadow-sm shadow-emerald-900/15 transition-all hover:bg-emerald-800 hover:shadow-md">
               <Zap size={11} />
               Upgrade to Founder - $5/mo

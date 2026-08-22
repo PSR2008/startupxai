@@ -9,7 +9,8 @@ import {
 import Link from "next/link";
 import Script from "next/script";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
-import { PLANS, isPaidPlanKey, type PaidPlanKey } from "@/lib/plans";
+import { PLANS, isPaidPlanKey, type BillingCycle, type PaidPlanKey } from "@/lib/plans";
+import { getRazorpayPlanAmountRupees } from "@/lib/razorpay-plans";
 
 declare global {
   interface Window {
@@ -51,11 +52,10 @@ const plans = {
 
 const founderHighlights = [
   { icon: BarChart3, label: "Paid usage tiers", detail: "50, 150, or 400 analyses/month" },
-  { icon: Globe, label: "USD billing", detail: "Clear international pricing" },
+  { icon: Globe, label: "INR checkout", detail: "Razorpay charges fixed INR equivalents" },
   { icon: Shield, label: "Private dashboard", detail: "Usage and plan tied to your account" },
 ];
 
-type BillingCycle = "monthly" | "annual";
 type PayStatus = "idle" | "loading" | "success" | "error";
 
 function PaymentPageContent() {
@@ -68,16 +68,16 @@ function PaymentPageContent() {
 
   const billingParam = searchParams.get("billing");
   const initialBilling: BillingCycle =
-    billingParam === "annual" || billingParam === "yearly" ? "annual" : "monthly";
+    billingParam === "annual" || billingParam === "yearly" ? "yearly" : "monthly";
   const [billing, setBilling] = useState<BillingCycle>(initialBilling);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [coupon, setCoupon] = useState("");
   const [status, setStatus] = useState<PayStatus>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const price = billing === "annual" ? plan.annualPrice : plan.price;
+  const price = billing === "yearly" ? plan.annualPrice : plan.price;
   const annualSavings = plan.price * 12 - plan.annualPrice;
+  const razorpayPriceInr = getRazorpayPlanAmountRupees(planParam, billing);
 
   const selectPlan = (nextPlan: PaidPlanKey) => {
     const next = new URLSearchParams(searchParams.toString());
@@ -111,7 +111,7 @@ function PaymentPageContent() {
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders },
-        body: JSON.stringify({ plan: planParam, billing, coupon }),
+        body: JSON.stringify({ plan: planParam, billing }),
       });
 
       const orderData = await orderRes.json();
@@ -138,8 +138,6 @@ function PaymentPageContent() {
                 ...response,
                 plan: planParam,
                 billing,
-                amount: orderData.order.amount,
-                currency: orderData.order.currency,
               }),
             });
             const verifyData = await verifyRes.json();
@@ -272,7 +270,7 @@ function PaymentPageContent() {
                   Billing Cycle
                 </p>
                 <div className="flex gap-3">
-                  {(["monthly", "annual"] as BillingCycle[]).map((c) => (
+                  {(["monthly", "yearly"] as BillingCycle[]).map((c) => (
                     <button
                       key={c}
                       onClick={() => setBilling(c)}
@@ -283,14 +281,17 @@ function PaymentPageContent() {
                       }`}
                     >
                       {c === "monthly" ? "Monthly" : "Annual"}
-                      {c === "annual" && (
+                      {c === "yearly" && (
                         <span className="ml-2 text-xs font-bold text-emerald-600">Save ${annualSavings}/year</span>
                       )}
                     </button>
                   ))}
                 </div>
                 <p className="font-jakarta text-xs text-gray-400 mt-2">
-                  {`Annual billing is $${plan.annualPrice}/year. Monthly billing is $${plan.price}/month. Prices are shown in USD.`}
+                  {`Annual plan pricing is $${plan.annualPrice}/year. Monthly plan pricing is $${plan.price}/month.`}
+                </p>
+                <p className="font-jakarta text-xs text-gray-400 mt-1">
+                  Razorpay checkout charges ₹{razorpayPriceInr.toLocaleString("en-IN")} for this {billing === "yearly" ? "annual" : "monthly"} plan.
                 </p>
               </div>
 
@@ -336,27 +337,6 @@ function PaymentPageContent() {
                 </div>
               </div>
 
-              {/* Coupon */}
-              <div>
-                <label className="font-jakarta text-xs font-bold text-gray-700 uppercase tracking-wide block mb-1.5">
-                  Coupon Code{" "}
-                  <span className="text-gray-400 normal-case font-normal tracking-normal">(optional)</span>
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    value={coupon}
-                    onChange={(e) => setCoupon(e.target.value)}
-                    placeholder="Enter coupon code"
-                    className="flex-1 h-11 px-3.5 rounded-xl bg-white text-gray-900 border border-black/10 text-sm font-jakarta placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/15 focus:border-emerald-500 transition-all"
-                  />
-                </div>
-                {coupon.trim() && (
-                  <p className="font-jakarta text-xs text-gray-400 mt-1.5">
-                    If valid, your coupon will be applied securely at checkout.
-                  </p>
-                )}
-              </div>
-
               {status === "error" && (
                 <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3">
                   <p className="font-jakarta text-sm text-rose-700">{errorMsg}</p>
@@ -377,7 +357,7 @@ function PaymentPageContent() {
                 ) : (
                   <>
                     <Lock size={15} />
-                    Pay ${price} with Razorpay
+                    Pay ₹{razorpayPriceInr.toLocaleString("en-IN")} with Razorpay
                   </>
                 )}
               </button>
@@ -411,10 +391,10 @@ function PaymentPageContent() {
                 <div className="flex items-end gap-1.5 mb-1">
                   <span className="font-jakarta text-4xl font-bold text-gray-900">${price}</span>
                   <span className="font-jakarta text-sm text-gray-400 mb-2">
-                    {billing === "annual" ? "/year" : "/month"}
+                    {billing === "yearly" ? "/year" : "/month"}
                   </span>
                 </div>
-                {billing === "annual" && (
+                {billing === "yearly" && (
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 mb-4">
                     <CheckCircle2 size={10} className="text-emerald-600" />
                     <p className="font-jakarta text-xs font-semibold text-emerald-700">
@@ -447,11 +427,15 @@ function PaymentPageContent() {
                 <div className="space-y-2 font-jakarta text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-500">Subtotal</span>
-                    <span className="text-gray-800">${price}</span>
+                    <span className="text-gray-800">₹{razorpayPriceInr.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">USD plan price</span>
+                    <span className="text-gray-800">${price}{billing === "yearly" ? "/year" : "/month"}</span>
                   </div>
                   <div className="flex justify-between font-jakarta font-bold text-base pt-2 border-t border-black/5">
                     <span className="text-gray-700">Total</span>
-                    <span className="text-gray-900">${price}</span>
+                    <span className="text-gray-900">₹{razorpayPriceInr.toLocaleString("en-IN")}</span>
                   </div>
                 </div>
               </div>

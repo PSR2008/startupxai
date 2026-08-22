@@ -1,5 +1,5 @@
 import { getSupabaseAdminClient } from "./supabase";
-import type { PaidPlanKey } from "./plans";
+import { getPlanEntitlements, type PaidPlanKey } from "./plans";
 
 export type PaymentBillingCycle = "monthly" | "yearly";
 
@@ -35,6 +35,7 @@ export async function activatePaidPlan(params: PaymentActivation): Promise<void>
   const normalizedCurrency = params.currency.toUpperCase();
   const paidStatus = params.status ?? "paid";
   const expiresAt = getPlanExpiryDate(params.billingCycle);
+  const monthlyAnalysisLimit = getPlanEntitlements(params.plan).monthlyAnalyses;
 
   const { data: existingPayment } = await admin
     .from("payments")
@@ -65,6 +66,7 @@ export async function activatePaidPlan(params: PaymentActivation): Promise<void>
     billing_cycle: params.billingCycle,
     active: true,
     expires_at: expiresAt,
+    monthly_analysis_limit: monthlyAnalysisLimit,
     updated_at: new Date().toISOString(),
   });
 

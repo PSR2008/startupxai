@@ -34,14 +34,15 @@ test("homepage and public pricing cards use BorderGlow instead of MagicBento", (
   }
 });
 
-test("pricing values, plan names, badges, and payment routes remain unchanged", () => {
+test("pricing values, plan names, badges, and payment routes remain consistent", () => {
   for (const source of [homepagePricing, pricingPage]) {
     for (const expected of ["Starter", "Founder", "Growth", "Scale", "Most Popular"]) {
       assert.match(source, new RegExp(expected));
     }
     assert.match(source, /Starter upgrade/);
-    assert.match(source, /\/payment\?plan=founder&billing=monthly/);
-    assert.match(source, /\/payment\?plan=growth&billing=monthly/);
-    assert.match(source, /\/payment\?plan=scale&billing=monthly/);
+    assert.match(source, /\/payment\?plan=founder/);
+    assert.match(source, /\/payment\?plan=growth/);
+    assert.match(source, /\/payment\?plan=scale/);
+    assert.doesNotMatch(source, /\/payment\?plan=(founder|growth|scale)&billing=monthly/);
   }
 });

@@ -112,7 +112,7 @@ export function ErrorState({ message = "Something went wrong. Please try again."
           <p className="font-jakarta text-sm text-gray-500 max-w-sm">{message}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-2">
-          <Link href="/payment?plan=founder&billing=monthly">
+          <Link href="/payment?plan=founder">
             <Button size="sm" icon={<Crown size={13} />}>
               Upgrade plan
             </Button>
@@ -142,7 +142,7 @@ export function ErrorState({ message = "Something went wrong. Please try again."
           <p className="font-jakarta text-sm text-gray-500 max-w-sm">{message}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-2">
-          <Link href={isAuth ? "/signin" : "/payment?plan=founder&billing=monthly"}>
+          <Link href={isAuth ? "/signin" : "/payment?plan=founder"}>
             <Button size="sm" icon={isAuth ? <Lock size={13} /> : <Crown size={13} />}>
               {isAuth ? "Sign in" : "Upgrade plan"}
             </Button>

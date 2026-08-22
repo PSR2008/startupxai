@@ -43,7 +43,7 @@ export default function ExportPdfButton({
         return;
       }
 
-      window.location.href = "/payment?plan=founder&billing=monthly";
+      window.location.href = "/payment?plan=founder";
     } finally {
       setLoading(false);
     }

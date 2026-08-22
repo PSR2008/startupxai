@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { getUserIdFromRequest } from "@/lib/usage-limit";
-import { getPlanPriceCents, isPaidPlanKey, normalizeBillingCycle } from "@/lib/plans";
-import { getCouponDiscountCents } from "@/lib/payment-coupons";
+import { isPaidPlanKey, normalizeBillingCycle } from "@/lib/plans";
+import { getRazorpayPlanAmountPaise, RAZORPAY_CURRENCY } from "@/lib/razorpay-plans";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,24 +30,20 @@ export async function POST(req: NextRequest) {
     });
 
     const body = await req.json();
-    const { plan = "founder", billing = "monthly", coupon = "" } = body ?? {};
+    const { plan = "founder", billing = "monthly" } = body ?? {};
 
     const selectedPlan = isPaidPlanKey(plan) ? plan : "founder";
     const normalizedBilling = normalizeBillingCycle(billing);
-    const selectedBilling = normalizedBilling === "yearly" ? "annual" : "monthly";
-    const baseAmount = getPlanPriceCents(selectedPlan, normalizedBilling);
-    const discount = getCouponDiscountCents(baseAmount, coupon);
-    const amount = Math.max(baseAmount - discount, 100);
+    const amount = getRazorpayPlanAmountPaise(selectedPlan, normalizedBilling);
 
     const order = await razorpay.orders.create({
       amount,
-      currency: "USD",
-      receipt: `startupx_${selectedPlan}_${selectedBilling}_${Date.now()}`,
+      currency: RAZORPAY_CURRENCY,
+      receipt: `startupx_${selectedPlan}_${normalizedBilling}_${Date.now()}`,
       notes: {
         plan: selectedPlan,
-        billing: selectedBilling,
+        billing: normalizedBilling,
         user_id: userId,
-        coupon: discount > 0 ? "applied" : "",
       },
     });
 

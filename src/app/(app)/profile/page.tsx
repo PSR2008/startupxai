@@ -463,7 +463,7 @@ export default function ProfilePage() {
                 <span className="font-jakarta text-sm text-gray-700">Open dashboard</span>
                 <ArrowRight size={14} className="text-gray-400" />
               </Link>
-              <Link href="/payment?plan=founder&billing=monthly" className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 hover:bg-emerald-100 transition-colors">
+              <Link href="/payment?plan=founder" className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 hover:bg-emerald-100 transition-colors">
                 <span className="font-jakarta text-sm text-emerald-700">{isPaid ? "Manage plan" : hasInternalAccess ? "Internal access" : "Upgrade to Founder"}</span>
                 <Zap size={14} className="text-emerald-600" />
               </Link>
@@ -487,7 +487,7 @@ export default function ProfilePage() {
                 </p>
               </div>
             </div>
-            <Link href="/payment?plan=founder&billing=monthly" className="h-9 px-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-jakarta text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-100 transition-colors w-fit">
+            <Link href="/payment?plan=founder" className="h-9 px-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-jakarta text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-100 transition-colors w-fit">
               <Crown size={13} />
               {isPaid ? "Manage plan" : "Upgrade"}
             </Link>
