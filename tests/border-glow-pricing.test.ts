@@ -22,27 +22,37 @@ test("BorderGlow is a reusable client component with pointer-driven CSS variable
   assert.match(borderGlowExports, /BorderGlow/);
 });
 
-test("homepage and public pricing cards use BorderGlow instead of MagicBento", () => {
-  for (const source of [homepagePricing, pricingPage]) {
-    const pricingBlock = source.slice(source.indexOf("{plans.map"), source.indexOf("All plans"));
-    assert.match(source, /from "@\/components\/ui\/BorderGlow"/);
-    assert.match(pricingBlock, /<BorderGlow/);
-    assert.match(pricingBlock, /recommended=\{plan\.name === "Growth"\}/);
-    assert.match(pricingBlock, /min-h-\[/);
-    assert.match(pricingBlock, /mt-auto block/);
-    assert.doesNotMatch(pricingBlock, /absolute -top|MagicBentoGrid|MagicBentoCard/);
-  }
+test("homepage pricing cards use BorderGlow while public pricing page stays static", () => {
+  const homepagePricingBlock = homepagePricing.slice(homepagePricing.indexOf("{plans.map"), homepagePricing.indexOf("All plans"));
+  assert.match(homepagePricing, /from "@\/components\/ui\/BorderGlow"/);
+  assert.match(homepagePricingBlock, /<BorderGlow/);
+  assert.match(homepagePricingBlock, /recommended=\{plan\.name === "Growth"\}/);
+  assert.match(homepagePricingBlock, /min-h-\[/);
+  assert.match(homepagePricingBlock, /mt-auto block/);
+  assert.doesNotMatch(homepagePricingBlock, /absolute -top|MagicBentoGrid|MagicBentoCard/);
+
+  assert.match(pricingPage, /PricingPage\.module\.css/);
+  assert.match(pricingPage, /styles\.pricingGrid/);
+  assert.doesNotMatch(pricingPage, /BorderGlow|AnimatedSection|StaggerItem|framer-motion|MagicBento|canvas|WebGL|Lightfall|Galaxy/);
 });
 
 test("pricing values, plan names, badges, and payment routes remain consistent", () => {
   for (const source of [homepagePricing, pricingPage]) {
-    for (const expected of ["Starter", "Founder", "Growth", "Scale", "Most Popular"]) {
+    for (const expected of ["Starter", "Founder", "Growth", "Scale"]) {
       assert.match(source, new RegExp(expected));
     }
-    assert.match(source, /Starter upgrade/);
     assert.match(source, /\/payment\?plan=founder/);
     assert.match(source, /\/payment\?plan=growth/);
     assert.match(source, /\/payment\?plan=scale/);
     assert.doesNotMatch(source, /\/payment\?plan=(founder|growth|scale)&billing=monthly/);
   }
+  assert.match(homepagePricing, /Most Popular/);
+  assert.match(homepagePricing, /Starter upgrade/);
+  assert.match(pricingPage, /\$5\/month/);
+  assert.match(pricingPage, /\$49\/year/);
+  assert.match(pricingPage, /\$10\/month/);
+  assert.match(pricingPage, /\$99\/year/);
+  assert.match(pricingPage, /\$15\/month/);
+  assert.match(pricingPage, /\$149\/year/);
+  assert.match(pricingPage, /Most popular/);
 });

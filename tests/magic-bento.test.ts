@@ -31,8 +31,9 @@ test("MagicBento installs GSAP and exposes reusable components without demo card
 });
 
 test("EnginesSection render status is explicit and unused grids are not counted as live integration", () => {
-  assert.match(homepage, /<EvidenceEntrySection \/>/);
-  assert.match(homepage, /<PricingSection \/>/);
+  assert.match(homepage, /<WaitlistyHomepage \/>/);
+  assert.doesNotMatch(homepage, /<EvidenceEntrySection \/>/);
+  assert.doesNotMatch(homepage, /<PricingSection \/>/);
   assert.equal(homepage.includes("<EnginesSection />"), false, "homepage should not restore the old engines grid");
   assert.match(marketing, /export function EnginesSection\(\)/);
 });

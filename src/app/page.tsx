@@ -1,23 +1,5 @@
 import type { Metadata } from "next";
-import Navbar from "@/components/marketing/Navbar";
-import Footer from "@/components/marketing/Footer";
-import Galaxy from "@/components/marketing/Galaxy";
-import HeroSection from "@/components/marketing/HeroSection";
-import ProductScrollStackSection from "@/components/marketing/ProductScrollStackSection";
-import {
-  CapabilitiesSection,
-  DifferentiationSection,
-  EvidenceEntrySection,
-  LogoMarquee,
-  RealWorkflowSection,
-  RecurringEvidenceSection,
-  HowItWorksSection,
-  ComparisonSection,
-  TrustSection,
-  TestimonialsSection,
-  PricingSection,
-  CTASection,
-} from "@/components/marketing/EnginesSection";
+import WaitlistyHomepage from "@/components/marketing/waitlisty";
 
 export const metadata: Metadata = {
   title: "StartupX AI - Founder Intelligence Workspace",
@@ -32,46 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default function LandingPage() {
-  return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)] overflow-x-hidden">
-      <Navbar />
-      <HeroSection />
-      <div className="homepage-galaxy-stage">
-        <Galaxy
-          className="homepage-galaxy-canvas"
-          focal={[0.5, 0.18]}
-          rotation={[0.92, 0.18]}
-          starSpeed={0.28}
-          density={0.85}
-          speed={0.45}
-          hueShift={174}
-          glowIntensity={0.22}
-          saturation={0.5}
-          twinkleIntensity={0.1}
-          rotationSpeed={0.012}
-          mouseInteraction={false}
-          mouseRepulsion={false}
-          repulsionStrength={1.2}
-          autoCenterRepulsion={0.08}
-          transparent={true}
-        />
-        <div className="homepage-galaxy-content">
-          <ProductScrollStackSection />
-          <RealWorkflowSection />
-          <EvidenceEntrySection />
-          <LogoMarquee />
-          <DifferentiationSection />
-          <RecurringEvidenceSection />
-          <HowItWorksSection />
-          <CapabilitiesSection />
-          <ComparisonSection />
-          <TrustSection />
-          <TestimonialsSection />
-          <PricingSection />
-          <CTASection />
-          <Footer variant="homepage" />
-        </div>
-      </div>
-    </div>
-  );
+  return <WaitlistyHomepage />;
 }

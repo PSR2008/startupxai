@@ -14,9 +14,9 @@ const packageJson = JSON.parse(readFileSync(join(root, "package.json"), "utf8"))
   dependencies: Record<string, string>;
 };
 
-test("homepage renders one ScrollStack product introduction after the Lightfall hero", () => {
-  assert.match(page, /import ProductScrollStackSection/);
-  assert.match(page, /<HeroSection \/>\s*<div className="homepage-galaxy-stage">[\s\S]*<ProductScrollStackSection \/>/);
+test("homepage no longer renders the heavy ScrollStack product introduction", () => {
+  assert.doesNotMatch(page, /import ProductScrollStackSection|<ProductScrollStackSection \/>/);
+  assert.match(page, /WaitlistyHomepage/);
   assert.doesNotMatch(page, /<EnginesSection \/>/);
   assert.doesNotMatch(page, /<FeaturesSection \/>/);
 });

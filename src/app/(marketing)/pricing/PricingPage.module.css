@@ -1,0 +1,430 @@
+.page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 14% 8%, rgba(221, 214, 254, 0.8), transparent 28rem),
+    radial-gradient(circle at 86% 16%, rgba(204, 251, 241, 0.54), transparent 24rem),
+    radial-gradient(circle at 52% 92%, rgba(253, 230, 138, 0.26), transparent 30rem),
+    linear-gradient(135deg, #fbf7ef 0%, #f5efff 46%, #eef7ff 100%);
+  color: #151123;
+  font-family: var(--font-body);
+}
+
+.page,
+.page * {
+  box-sizing: border-box;
+}
+
+.shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 96px 0 34px;
+}
+
+.planCta,
+.noteCard a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0 18px;
+  text-decoration: none;
+  font-weight: 700;
+  line-height: 1;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.featuredCta,
+.noteCard a {
+  border: 1px solid #0f172a;
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+}
+
+.planCta:hover,
+.noteCard a:hover {
+  transform: translateY(-1px);
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 360px;
+  margin-top: 14px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: 42px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.54)),
+    radial-gradient(circle at 20% 18%, rgba(167, 139, 250, 0.26), transparent 24rem),
+    radial-gradient(circle at 82% 28%, rgba(45, 212, 191, 0.2), transparent 20rem),
+    rgba(255, 255, 255, 0.46);
+  box-shadow: 0 28px 80px rgba(74, 56, 120, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+.hero::before,
+.heroGlowOne,
+.heroGlowTwo {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.hero::before {
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(101, 78, 163, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(101, 78, 163, 0.07) 1px, transparent 1px);
+  background-size: 58px 58px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 78%);
+}
+
+.heroGlowOne {
+  top: -90px;
+  left: -54px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(196, 181, 253, 0.38);
+}
+
+.heroGlowTwo {
+  right: -80px;
+  bottom: -120px;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: rgba(153, 246, 228, 0.28);
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  width: min(820px, calc(100% - 32px));
+  padding: 52px 0;
+  text-align: center;
+}
+
+.badge,
+.planBadge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.badge {
+  margin: 0 0 18px;
+  border: 1px solid rgba(124, 58, 237, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 8px 14px;
+  color: rgba(67, 56, 101, 0.82);
+  font-size: 0.82rem;
+}
+
+.title {
+  max-width: 840px;
+  margin: 0 auto;
+  color: #141023;
+  font-size: clamp(2.55rem, 5.1vw, 4.8rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.subtitle {
+  max-width: 650px;
+  margin: 18px auto 0;
+  color: rgba(39, 32, 62, 0.76);
+  font-size: clamp(1rem, 1.45vw, 1.2rem);
+  font-weight: 500;
+  line-height: 1.62;
+}
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding: 28px 0 0;
+}
+
+.planCard {
+  display: flex;
+  min-height: 470px;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 22px;
+  box-shadow: 0 16px 42px rgba(74, 56, 120, 0.11);
+}
+
+.featuredPlan {
+  border-color: rgba(16, 185, 129, 0.34);
+  background:
+    linear-gradient(180deg, rgba(236, 253, 245, 0.86), rgba(255, 255, 255, 0.68)),
+    rgba(255, 255, 255, 0.68);
+  box-shadow: 0 20px 54px rgba(5, 150, 105, 0.16);
+}
+
+.planHeader {
+  min-height: 150px;
+}
+
+.planBadge {
+  margin-bottom: 16px;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  background: rgba(255, 255, 255, 0.58);
+  padding: 7px 11px;
+  color: rgba(67, 56, 101, 0.74);
+  font-size: 0.74rem;
+}
+
+.featuredPlan .planBadge {
+  border-color: rgba(5, 150, 105, 0.18);
+  color: #047857;
+}
+
+.planCard h2 {
+  margin: 0;
+  color: #141023;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.planCard p {
+  margin: 10px 0 0;
+  color: rgba(39, 32, 62, 0.66);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.priceBlock {
+  margin-top: 22px;
+}
+
+.priceBlock strong {
+  display: block;
+  color: #141023;
+  font-size: 2.05rem;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.priceBlock span,
+.usage {
+  color: rgba(39, 32, 62, 0.64);
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.usage {
+  margin-top: 14px;
+}
+
+.featureList {
+  display: grid;
+  gap: 10px;
+  margin: 22px 0 28px;
+  padding: 0;
+  list-style: none;
+}
+
+.featureList li {
+  position: relative;
+  padding-left: 17px;
+  color: rgba(39, 32, 62, 0.76);
+  font-size: 0.92rem;
+  line-height: 1.42;
+}
+
+.featureList li::before {
+  content: "-";
+  position: absolute;
+  left: 0;
+  color: #059669;
+  font-weight: 700;
+}
+
+.planCta {
+  margin-top: auto;
+  border: 1px solid rgba(39, 32, 62, 0.18);
+  background: rgba(255, 255, 255, 0.58);
+  color: #151123;
+}
+
+.planCta:hover {
+  border-color: rgba(39, 32, 62, 0.34);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.featuredCta:hover {
+  background: #111827;
+  color: #ffffff;
+}
+
+.comparison,
+.noteCard {
+  margin-top: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 16px 42px rgba(74, 56, 120, 0.09);
+}
+
+.comparison {
+  padding: 28px;
+}
+
+.sectionHeader {
+  max-width: 640px;
+  margin-bottom: 22px;
+}
+
+.sectionHeader p {
+  margin: 0 0 8px;
+  color: rgba(124, 58, 237, 0.78);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  color: #151123;
+  font-size: clamp(1.65rem, 3vw, 2.65rem);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.tableWrap table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+}
+
+.tableWrap th,
+.tableWrap td {
+  border-top: 1px solid rgba(39, 32, 62, 0.08);
+  padding: 15px 12px;
+  text-align: left;
+}
+
+.tableWrap th {
+  color: rgba(39, 32, 62, 0.52);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tableWrap td {
+  color: rgba(39, 32, 62, 0.78);
+  font-size: 0.94rem;
+  font-weight: 650;
+}
+
+.noteCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px;
+}
+
+.noteCard p {
+  margin: 0 0 6px;
+  color: #151123;
+  font-weight: 700;
+}
+
+.noteCard span {
+  color: rgba(39, 32, 62, 0.66);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 1040px) {
+  .pricingGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .shell {
+    width: min(calc(100% - 20px), 370px);
+    max-width: 370px;
+    margin-left: 10px;
+    margin-right: auto;
+    padding-top: 82px;
+  }
+
+  .hero {
+    min-height: auto;
+    margin-top: 10px;
+    border-radius: 28px;
+  }
+
+  .heroContent {
+    width: 100%;
+    padding: 38px 14px;
+  }
+
+  .title {
+    max-width: 310px;
+    font-size: clamp(2rem, 8.4vw, 2.35rem);
+    line-height: 1.08;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+
+  .subtitle {
+    max-width: 300px;
+    margin-top: 16px;
+    font-size: 0.96rem;
+  }
+
+  .pricingGrid {
+    grid-template-columns: 1fr;
+    padding-top: 20px;
+  }
+
+  .planCard {
+    min-height: auto;
+    border-radius: 22px;
+    padding: 18px;
+  }
+
+  .planHeader {
+    min-height: auto;
+  }
+
+  .comparison,
+  .noteCard {
+    margin-top: 24px;
+    border-radius: 22px;
+  }
+
+  .comparison {
+    padding: 18px;
+  }
+
+  .noteCard {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
