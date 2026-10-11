@@ -1,6 +1,19 @@
 # LaunchGate threat model
 
-Phase 1 establishes contracts; this document is a required implementation plan, not a claim that future controls exist. Protected assets: private source, tenant data, credentials, billing entitlements, runner capacity and the integrity of release decisions.
+Phase 1 establishes contracts; Phase 2 implements the bounded tenancy controls described below. This document also contains the future implementation plan, not a claim that all controls exist. Protected assets: private source, tenant data, credentials, billing entitlements, runner capacity and the integrity of release decisions.
+
+## Phase 2 implemented controls and residual risks
+
+- Forged browser organization IDs and missing application filters: caller-token RLS independently isolates every new tenant table. Real SQL and PostgREST tests deny outsider access, including unfiltered lists and guessed UUIDs.
+- Self-escalation and last-owner races: no direct browser DML; security-definer commands verify current identity/role under an organization lock. A trigger protects the last owner; concurrent demotion tests exercise the invariant. Disabled/removed memberships lose access. Legacy internal/admin roles grant no LaunchGate role.
+- Cross-tenant references: composite FKs bind projects to secret/retention rows, requests to tasks and actor membership to audit. Privileged fixture tests prove malformed references fail independently of RLS.
+- Service-role overuse: no service-role client in new routes; explicit table/command grant revocations. BYPASSRLS tests are separate from user tests. Migration identities/superusers remain trusted and can change the schema.
+- Audit forgery: security events are generated transactionally inside authorized commands, not browser inserts. Immutable snapshots and append-only permissions/trigger protect history. Denied-attempt telemetry and cryptographic tamper evidence remain future work.
+- Secret exposure: no secret material column or resolution route. Opaque backend locator is excluded from browser column grants. A future secret backend must validate authenticated leases, current scope and revocation; an interface alone does not implement these controls.
+- Deletion races: owner authorization/status/tasks/audit commit atomically; normal future access stops. Cleanup is not executed. External credential revocation, legal hold separation, exports, backups and worker retry/lease correctness remain unproven.
+- Resource abuse: body size and list results are bounded, but durable rate limits/organization creation quotas are not implemented. Harden these before opening public self-service at scale. Remaining build-tool advisories are tracked in dependency-audit.md.
+
+See [tenancy.md](tenancy.md) for exact grants, commands and test boundaries. Full hosted Supabase Auth verification and production schema/configuration inspection remain staging acceptance work. No customer database was used for tests.
 
 | Threat | Boundary / required control | Evidence required | Phase |
 | --- | --- | --- | --- |

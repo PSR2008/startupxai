@@ -1,0 +1,288 @@
+import { after, before, test } from "node:test";
+import assert from "node:assert/strict";
+import { spawn, spawnSync } from "node:child_process";
+import { readFileSync, readdirSync } from "node:fs";
+import { createHmac, randomUUID } from "node:crypto";
+
+// No connection string accepted: this suite creates its OWN isolated Docker database.
+// auth.uid() is the minimal Supabase SQL identity contract, not an Auth/JWT emulator.
+const docker = (args: string[], input?: string) => spawnSync("docker", args, { input, encoding: "utf8", timeout: 120000, windowsHide: true });
+const available = docker(["info", "--format", "{{.ServerVersion}}"]);
+const blocked = available.status !== 0;
+const container = `launchgate-rls-${randomUUID()}`;
+const postgresImage = "postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24";
+const restContainer = `${container}-rest`;
+const restImage = "postgrest/postgrest:v12.2.3@sha256:729bf65c733b73f5b52777f0e4b853f22ed73aa67a22d38269d289779b0a8401";
+// Ephemeral local-only signing key. Not a Supabase credential or integration claim.
+const testSigningKey = randomUUID() + randomUUID();
+let restStarted = false;
+let started = false;
+const uid = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
+const owner = uid(1), admin = uid(2), developer = uid(3), viewer = uid(4), outsider = uid(5), candidate = uid(6);
+const org = uid(100), other = uid(101), project = uid(200), otherProject = uid(201), correlation = uid(300);
+const bootstrap = `CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN BYPASSRLS;
+CREATE ROLE authenticator LOGIN NOINHERIT; GRANT anon,authenticated,service_role TO authenticator;
+CREATE SCHEMA auth; CREATE TABLE auth.users(id uuid PRIMARY KEY);
+CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT coalesce(nullif(current_setting('request.jwt.claim.sub',true),''),nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')::uuid $$;
+GRANT USAGE ON SCHEMA auth, public TO authenticated,anon,service_role;
+GRANT EXECUTE ON FUNCTION auth.uid() TO authenticated,anon,service_role;`;
+function raw(sql: string, database = "launchgate_test") {
+  return docker(["exec", "-i", container, "psql", "-X", "-qAt", "-v", "ON_ERROR_STOP=1", "-v", "VERBOSITY=verbose", "-U", "postgres", "-d", database], sql);
+}
+function execute(sql: string, database?: string) {
+  const result = raw(sql, database); assert.equal(result.status, 0, result.stderr); return result.stdout.trim();
+}
+function transaction(user: string, sql: string, role = "authenticated") {
+  return `BEGIN; SET LOCAL ROLE ${role}; SET LOCAL request.jwt.claim.sub='${user}'; ${sql}; ROLLBACK;`;
+}
+function query(user: string, sql: string, role?: string) { return execute(transaction(user, sql, role)); }
+function http(user: string, path: string, input?: unknown, single = false) {
+  const payload = Buffer.from(JSON.stringify({ sub: user, role: "authenticated", exp: Math.floor(Date.now()/1000)+300 })).toString("base64url");
+  const unsigned = `${Buffer.from('{"alg":"HS256","typ":"JWT"}').toString("base64url")}.${payload}`;
+  const token = `${unsigned}.${createHmac("sha256",testSigningKey).update(unsigned).digest("base64url")}`;
+  return docker(["exec",container,"wget","-qO-","--header",`Authorization: Bearer ${token}`,
+    ...(single ? ["--header","Accept: application/vnd.pgrst.object+json"] : []),
+    ...(input === undefined ? [] : ["--header","Content-Type: application/json","--post-data",JSON.stringify(input)]),`http://127.0.0.1:3000/${path}`]);
+}
+function denied(user: string, sql: string, code = "42501", role?: string) {
+  const result = raw(transaction(user, sql, role)); assert.notEqual(result.status, 0, result.stdout); assert.match(result.stderr, new RegExp(code));
+}
+const rpcMember = (action: string, membership: string | null, role: string | null, status = "ACTIVE", user = candidate) =>
+  `SELECT id FROM public.lg_manage_member('${org}','${action}','${user}',${membership ? `'${membership}'` : "NULL"},${role ? `'${role}'` : "NULL"},'${status}','${correlation}')`;
+const memberId = (n: number) => uid(400 + n);
+function dbtest(name: string, fn: () => void | Promise<void>) { test(name, { skip: blocked ? "BLOCKED_BY_ENVIRONMENT: Docker engine unavailable" : false }, fn); }
+
+before(async () => {
+  if (blocked) {
+    if (process.env.LAUNCHGATE_REQUIRE_DATABASE === "1") throw new Error("BLOCKED_BY_ENVIRONMENT: Docker engine unavailable");
+    return;
+  }
+  const run = docker(["run", "--detach", "--name", container, "--label", "launchgate.disposable=true", "--network", "none", "--env", "POSTGRES_HOST_AUTH_METHOD=trust", "--env", "POSTGRES_DB=launchgate_test", postgresImage]);
+  assert.equal(run.status, 0, run.stderr); started = true;
+  let ready = false;
+  for (let i = 0; i < 40; i++) {
+    if (docker(["exec", container, "pg_isready", "-U", "postgres"]).status === 0) { ready = true; break; }
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
+  assert.ok(ready, "disposable PostgreSQL did not start");
+  execute(bootstrap);
+  for (const file of readdirSync("migrations").filter(file => /^0(0|1[0-3])/.test(file) && file.endsWith(".sql")).sort()) execute(readFileSync(`migrations/${file}`, "utf8"));
+  execute(`INSERT INTO public.user_roles(user_id,role) VALUES('${outsider}','admin');
+    INSERT INTO public.analyses(user_id,session_id,engine_type,input_data) VALUES('${owner}','phase2-legacy','test','{"sentinel":true}');`);
+  execute(`CREATE TABLE public.test_legacy_policies AS SELECT * FROM pg_policies WHERE tablename NOT LIKE 'lg_%';`);
+  execute(readFileSync("migrations/014_launchgate_tenancy.sql", "utf8"));
+  execute(readFileSync("migrations/015_launchgate_commands.sql", "utf8"));
+  execute(`INSERT INTO auth.users(id) SELECT ('00000000-0000-4000-8000-'||lpad(n::text,12,'0'))::uuid FROM generate_series(1,6) n;
+    INSERT INTO public.lg_organizations(id,name,created_by) VALUES('${org}','Alpha','${owner}'),('${other}','Beta','${outsider}');
+    INSERT INTO public.lg_organization_memberships(id,organization_id,user_id,role) VALUES
+      ('${memberId(1)}','${org}','${owner}','OWNER'),('${memberId(2)}','${org}','${admin}','ADMIN'),
+      ('${memberId(3)}','${org}','${developer}','DEVELOPER'),('${memberId(4)}','${org}','${viewer}','VIEWER'),
+      ('${memberId(5)}','${other}','${outsider}','OWNER');
+    INSERT INTO public.lg_projects(id,organization_id,name,created_by) VALUES('${project}','${org}','Alpha project','${owner}'),('${otherProject}','${other}','Beta project','${outsider}');
+    INSERT INTO public.lg_secret_references(organization_id,project_id,kind,provider,backend_reference,purpose,created_by)
+      VALUES('${org}','${project}','PROVIDER_CREDENTIAL','MANAGED_SECRET_BACKEND','${uid(700)}','INTEGRATION','${owner}');`);
+  const rest = docker(["run","--detach","--name",restContainer,"--label","launchgate.disposable=true","--network",`container:${container}`,
+    "--env","PGRST_DB_URI=postgresql://authenticator@127.0.0.1:5432/launchgate_test","--env","PGRST_DB_SCHEMAS=public","--env","PGRST_DB_ANON_ROLE=anon","--env",`PGRST_JWT_SECRET=${testSigningKey}`,restImage]);
+  assert.equal(rest.status,0,rest.stderr); restStarted=true;
+  let restReady=false;
+  for (let i=0;i<40;i++) {
+    if (http(owner,"lg_organizations?select=id").status===0) { restReady=true; break; }
+    await new Promise(resolve=>setTimeout(resolve,250));
+  }
+  assert.ok(restReady,"local PostgREST did not start");
+});
+after(() => {
+  if (restStarted) assert.equal(docker(["rm","--force",restContainer]).status,0);
+  if (started) {
+    const label = docker(["inspect", "--format", '{{index .Config.Labels "launchgate.disposable"}}', container]);
+    assert.equal(label.stdout.trim(), "true");
+    assert.equal(docker(["rm", "--force", "--volumes", container]).status, 0);
+  }
+});
+
+dbtest("fresh LaunchGate schema applies independently of StartupX tables", () => {
+  execute("CREATE DATABASE launchgate_fresh");
+  // Roles are cluster-wide; only create per-database auth objects.
+  execute(bootstrap.slice(bootstrap.indexOf("CREATE SCHEMA auth")), "launchgate_fresh");
+  execute(readFileSync("migrations/014_launchgate_tenancy.sql", "utf8"), "launchgate_fresh");
+  execute(readFileSync("migrations/015_launchgate_commands.sql", "utf8"), "launchgate_fresh");
+  assert.equal(execute("SELECT count(*) FROM pg_tables WHERE schemaname='public' AND tablename LIKE 'lg_%'", "launchgate_fresh"), "8");
+});
+dbtest("upgrade preserves populated legacy data and every legacy policy", () => {
+  assert.equal(execute("SELECT input_data->>'sentinel' FROM analyses WHERE session_id='phase2-legacy'"), "true");
+  assert.equal(execute("SELECT count(*) FROM ((SELECT * FROM test_legacy_policies EXCEPT SELECT * FROM pg_policies WHERE tablename NOT LIKE 'lg_%') UNION ALL (SELECT * FROM pg_policies WHERE tablename NOT LIKE 'lg_%' EXCEPT SELECT * FROM test_legacy_policies)) d"), "0");
+});
+dbtest("all eight tenant tables force RLS", () => assert.equal(execute("SELECT count(*) FROM pg_class WHERE relname LIKE 'lg_%' AND relkind='r' AND relrowsecurity AND relforcerowsecurity"), "8"));
+dbtest("authenticated create atomically assigns OWNER and durable audit", () => {
+  const result = query(candidate, `SELECT id FROM lg_create_organization('New org','${correlation}'); SELECT role FROM lg_organization_memberships WHERE user_id='${candidate}'; SELECT operation||':'||actor_role FROM lg_audit_events WHERE actor_user_id='${candidate}'`);
+  assert.match(result, /OWNER\nORGANIZATION_CREATED:OWNER$/);
+});
+dbtest("anonymous cannot create organization", () => denied("", `SELECT lg_create_organization('No','${correlation}')`, "42501", "anon"));
+dbtest("missing authenticated identity cannot create organization", () => denied("", `SELECT lg_create_organization('No','${correlation}')`));
+dbtest("outsider guessed organization read returns no rows", () => assert.equal(query(outsider, `SELECT count(*) FROM lg_organizations WHERE id='${org}'`), "0"));
+dbtest("list without owner filter still isolates organizations", () => assert.equal(query(outsider, "SELECT name FROM lg_organizations"), "Beta"));
+for (const statement of [`UPDATE lg_organizations SET name='hijack' WHERE id='${org}'`, `DELETE FROM lg_organizations WHERE id='${org}'`, `INSERT INTO lg_organizations(name,created_by) VALUES('forged','${outsider}')`]) {
+  dbtest(`browser direct organization mutation denied: ${statement.split(" ")[0]}`, () => denied(outsider, statement));
+}
+dbtest("owner can add each allowed role with audit", () => {
+  for (const role of ["OWNER", "ADMIN", "DEVELOPER", "VIEWER"]) assert.match(query(owner, `${rpcMember("ADD", null, role)}; SELECT operation FROM lg_audit_events`), /MEMBER_ADDED$/);
+});
+dbtest("membership unique per org/user", () => denied(owner, rpcMember("ADD", null, "VIEWER", "ACTIVE", viewer), "23505"));
+dbtest("same user can belong to multiple organizations", () => assert.ok(query(owner, rpcMember("ADD", null, "VIEWER", "ACTIVE", outsider))));
+dbtest("viewer cannot add memberships", () => denied(viewer, rpcMember("ADD", null, "VIEWER")));
+dbtest("developer cannot promote self via RPC", () => denied(developer, rpcMember("UPDATE", memberId(3), "OWNER")));
+dbtest("admin cannot promote self to owner", () => denied(admin, rpcMember("UPDATE", memberId(2), "OWNER")));
+dbtest("admin cannot grant ownership to another user", () => denied(admin, rpcMember("ADD", null, "OWNER")));
+dbtest("admin can manage developer/viewer", () => assert.ok(query(admin, rpcMember("UPDATE", memberId(4), "DEVELOPER"))));
+dbtest("direct DB self escalation denied", () => denied(developer, `UPDATE lg_organization_memberships SET role='OWNER' WHERE user_id='${developer}'`));
+dbtest("last owner cannot be removed", () => denied(owner, rpcMember("REMOVE", memberId(1), null), "23514"));
+dbtest("last owner cannot be disabled or demoted", () => {
+  denied(owner, rpcMember("UPDATE", memberId(1), "OWNER", "DISABLED"), "23514");
+  denied(owner, rpcMember("UPDATE", memberId(1), "ADMIN"), "23514");
+});
+dbtest("ownership transfer promotes successor before demoting initiator", () => {
+  assert.match(query(owner, `${rpcMember("TRANSFER", memberId(2), null)}; SELECT role FROM lg_organization_memberships WHERE user_id='${owner}'; SELECT role FROM lg_organization_memberships WHERE user_id='${admin}'; SELECT actor_role FROM lg_audit_events WHERE operation='OWNERSHIP_TRANSFERRED'`), /ADMIN\nOWNER\nOWNER$/);
+});
+dbtest("disabled/removed membership immediately loses SQL and RPC access", () => {
+  for (const status of ["DISABLED", "REMOVED"]) {
+    const sql = transaction(owner, `${rpcMember("UPDATE", memberId(3), "DEVELOPER", status)}; SET LOCAL request.jwt.claim.sub='${developer}'; SELECT count(*) FROM lg_projects`);
+    assert.match(execute(sql), /\n0$/);
+    const result = raw(transaction(owner, `${rpcMember("UPDATE", memberId(3), "DEVELOPER", status)}; SET LOCAL request.jwt.claim.sub='${developer}'; SELECT lg_create_project('${org}','denied','${correlation}')`));
+    assert.match(result.stderr, /42501/);
+  }
+});
+dbtest("legacy StartupX admin does not authorize LaunchGate", () => denied(outsider, rpcMember("ADD", null, "OWNER")));
+dbtest("member can read project and developer can create", () => {
+  assert.equal(query(viewer, `SELECT name FROM lg_projects WHERE id='${project}'`), "Alpha project");
+  assert.match(query(developer, `SELECT name FROM lg_create_project('${org}','Created','${correlation}')`), /^Created$/);
+});
+dbtest("viewer cannot create projects", () => denied(viewer, `SELECT lg_create_project('${org}','No','${correlation}')`));
+dbtest("outsider cannot read, update, delete or create target project", () => {
+  assert.equal(query(outsider, `SELECT count(*) FROM lg_projects WHERE id='${project}'`), "0");
+  denied(outsider, `UPDATE lg_projects SET name='No' WHERE id='${project}'`);
+  denied(outsider, `DELETE FROM lg_projects WHERE id='${project}'`);
+  denied(outsider, `SELECT lg_create_project('${org}','No','${correlation}')`);
+});
+dbtest("retention composite FK rejects foreign project even through authorized RPC", () => denied(owner, `SELECT lg_set_retention('${org}','${otherProject}','ARTIFACTS',1,'${correlation}')`, "23503"));
+dbtest("retention durations constrained and shorter customer retention accepted", () => {
+  for (const days of [0, 3651]) denied(owner, `SELECT lg_set_retention('${org}',NULL,'ARTIFACTS',${days},'${correlation}')`, "23514");
+  assert.equal(query(owner, `SELECT duration_days FROM lg_set_retention('${org}','${project}','ARTIFACTS',1,'${correlation}')`), "1");
+});
+dbtest("developer cannot change security retention", () => denied(developer, `SELECT lg_set_retention('${org}',NULL,'ARTIFACTS',1,'${correlation}')`));
+dbtest("safe secret metadata is scoped; backend locator and plaintext unavailable", () => {
+  assert.equal(query(owner, "SELECT count(id) FROM lg_secret_references"), "1");
+  assert.equal(query(outsider, "SELECT count(id) FROM lg_secret_references"), "0");
+  assert.equal(query(developer, "SELECT count(id) FROM lg_secret_references"), "0");
+  denied(owner, "SELECT backend_reference FROM lg_secret_references");
+  assert.equal(execute("SELECT count(*) FROM information_schema.columns WHERE table_name='lg_secret_references' AND column_name IN ('secret','token','plaintext','ciphertext','password')"), "0");
+});
+dbtest("secret cross-org project FK rejected under privileged DB identity", () => {
+  const result = raw(`BEGIN; INSERT INTO lg_secret_references(organization_id,project_id,kind,provider,backend_reference,purpose,created_by) VALUES('${org}','${otherProject}','PROVIDER_CREDENTIAL','MANAGED_SECRET_BACKEND','${uid(800)}','INTEGRATION','${owner}'); ROLLBACK;`);
+  assert.match(result.stderr, /23503/);
+});
+dbtest("browser cannot insert secret references", () => denied(owner, `INSERT INTO lg_secret_references(organization_id,kind,provider,backend_reference,purpose,created_by) VALUES('${org}','PROVIDER_CREDENTIAL','MANAGED_SECRET_BACKEND','${uid(800)}','INTEGRATION','${owner}')`));
+dbtest("browser cannot forge, edit, or delete audit", () => {
+  denied(owner, `INSERT INTO lg_audit_events(organization_id,actor_user_id,actor_membership_id,actor_role,operation,target_type,target_id,correlation_id,outcome) VALUES('${org}','${owner}','${memberId(1)}','OWNER','PROJECT_CREATED','PROJECT','${project}','${correlation}','SUCCEEDED')`);
+  denied(owner, "UPDATE lg_audit_events SET actor_role='OWNER'"); denied(owner, "DELETE FROM lg_audit_events");
+});
+dbtest("audit read is role scoped and captures verified actor without submitted metadata", () => {
+  assert.match(query(owner, `SELECT lg_create_project('${org}','audit','${correlation}'); SELECT actor_user_id||':'||safe_metadata::text FROM lg_audit_events`), new RegExp(`${owner}:\\{\\}$`));
+  assert.equal(query(viewer, "SELECT count(*) FROM lg_audit_events"), "0");
+});
+dbtest("audit insertion failure rolls back business mutation", () => denied(owner, `SELECT lg_create_project('${org}','rollback',NULL)`, "23502"));
+dbtest("audit composite FK prevents cross-organization actor membership", () => {
+  const result=raw(`BEGIN; INSERT INTO lg_audit_events(organization_id,actor_user_id,actor_membership_id,actor_role,operation,target_type,target_id,correlation_id,outcome) VALUES('${org}','${outsider}','${memberId(5)}','OWNER','PROJECT_CREATED','PROJECT','${project}','${correlation}','SUCCEEDED'); ROLLBACK;`);
+  assert.match(result.stderr,/23503/);
+});
+dbtest("append-only audit trigger rejects even privileged row updates", () => {
+  const result=raw(`BEGIN; SET LOCAL request.jwt.claim.sub='${owner}'; SELECT lg_create_project('${org}','audit','${correlation}'); UPDATE lg_audit_events SET actor_role='VIEWER'; ROLLBACK;`);
+  assert.match(result.stderr,/42501/);
+});
+dbtest("outsider sees no populated memberships, retention or audit records", () => {
+  const result=query(owner,`SELECT lg_set_retention('${org}',NULL,'ARTIFACTS',1,'${correlation}'); SET LOCAL request.jwt.claim.sub='${outsider}'; SELECT count(*) FROM lg_organization_memberships WHERE organization_id='${org}'; SELECT count(*) FROM lg_retention_policies WHERE organization_id='${org}'; SELECT count(*) FROM lg_audit_events WHERE organization_id='${org}'`);
+  assert.match(result,/\n0\n0\n0$/);
+});
+dbtest("deletion is owner-only", () => {
+  for (const user of [admin, developer, viewer, outsider]) denied(user, `SELECT lg_request_deletion('${org}','${correlation}')`);
+});
+dbtest("deletion disables normal access and durably queues seven tasks", () => {
+  assert.match(query(owner, `SELECT state FROM lg_request_deletion('${org}','${correlation}'); SELECT count(*) FROM lg_organizations WHERE id='${org}'; SELECT count(*) FROM lg_projects; SELECT count(*) FROM lg_deletion_tasks; SELECT operation FROM lg_audit_events WHERE operation='DELETION_REQUESTED'`), /^AUTHORIZED\n0\n0\n7\nDELETION_REQUESTED$/);
+});
+dbtest("pending org denies new commands even for owner", () => denied(owner, `SELECT lg_request_deletion('${org}','${correlation}'); SELECT lg_create_project('${org}','No','${correlation}')`));
+dbtest("outsider cannot read populated deletion requests or cleanup tasks", () => {
+  const result=query(owner,`SELECT lg_request_deletion('${org}','${correlation}'); SET LOCAL request.jwt.claim.sub='${outsider}'; SELECT count(*) FROM lg_deletion_requests WHERE organization_id='${org}'; SELECT count(*) FROM lg_deletion_tasks WHERE organization_id='${org}'`);
+  assert.match(result,/\n0\n0$/);
+});
+dbtest("pending security read exposes only own permitted membership", () => {
+  assert.match(query(owner, `SELECT lg_request_deletion('${org}','${correlation}'); SELECT role FROM lg_read_security_membership('${org}')`), /\nOWNER$/);
+  assert.equal(query(outsider, `SELECT count(*) FROM lg_read_security_membership('${org}') WHERE id IS NOT NULL`), "0");
+});
+dbtest("browser cannot forge deletion states/tasks", () => {
+  denied(owner, "UPDATE lg_deletion_requests SET state='COMPLETED',completed_at=now()");
+  denied(owner, "UPDATE lg_deletion_tasks SET state='COMPLETED'");
+  denied(owner, `INSERT INTO lg_deletion_requests(organization_id,requested_by,state,authorized_at) VALUES('${org}','${owner}','AUTHORIZED',now())`);
+});
+dbtest("deletion state machine rejects jumping to completion", () => {
+  const result = raw(`BEGIN; SET LOCAL request.jwt.claim.sub='${owner}'; SELECT lg_request_deletion('${org}','${correlation}'); UPDATE lg_deletion_requests SET state='COMPLETED' WHERE organization_id='${org}'; ROLLBACK;`);
+  assert.match(result.stderr, /23514/);
+});
+dbtest("deletion task cross-tenant request FK rejected", () => {
+  const result = raw(`BEGIN; SET LOCAL request.jwt.claim.sub='${owner}'; SELECT lg_request_deletion('${org}','${correlation}'); INSERT INTO lg_deletion_tasks(organization_id,deletion_request_id,category) SELECT '${other}',id,'ARTIFACTS' FROM lg_deletion_requests WHERE organization_id='${org}'; ROLLBACK;`);
+  // unique category may fail first; use a new request and move its org instead below.
+  assert.notEqual(result.status, 0);
+  const fk = raw(`BEGIN; INSERT INTO lg_deletion_requests(id,organization_id,requested_by,state) VALUES('${uid(999)}','${org}','${owner}','REQUESTED'); INSERT INTO lg_deletion_tasks(organization_id,deletion_request_id,category) VALUES('${other}','${uid(999)}','ARTIFACTS'); ROLLBACK;`);
+  assert.match(fk.stderr, /23503/);
+});
+dbtest("future privileged worker must finish all cleanup before completion", () => {
+  const base = `BEGIN; SET LOCAL request.jwt.claim.sub='${owner}'; SELECT lg_request_deletion('${org}','${correlation}'); UPDATE lg_deletion_requests SET state='RUNNING' WHERE organization_id='${org}';`;
+  assert.match(raw(`${base} UPDATE lg_deletion_requests SET state='COMPLETED'; ROLLBACK;`).stderr, /23514/);
+  assert.match(execute(`${base} UPDATE lg_deletion_tasks SET state='RUNNING'; UPDATE lg_deletion_tasks SET state='COMPLETED'; UPDATE lg_deletion_requests SET state='COMPLETED'; SELECT status FROM lg_organizations WHERE id='${org}'; ROLLBACK;`), /\nDELETED$/);
+});
+dbtest("service role has no blanket table or command grants", () => {
+  denied(owner, "SELECT * FROM lg_organizations", "42501", "service_role");
+  denied(owner, `SELECT lg_create_organization('No','${correlation}')`, "42501", "service_role");
+});
+dbtest("service-role BYPASSRLS is tested separately and never mistaken for user RLS", () => {
+  assert.equal(execute(`BEGIN; GRANT SELECT ON lg_organizations TO service_role; SET LOCAL ROLE service_role; SELECT count(*) FROM lg_organizations; ROLLBACK;`), "2");
+});
+dbtest("RLS denies DML even if someone accidentally grants table write privileges", () => {
+  assert.equal(execute(`BEGIN; GRANT UPDATE ON lg_projects TO authenticated; SET LOCAL ROLE authenticated; SET LOCAL request.jwt.claim.sub='${outsider}'; UPDATE lg_projects SET name='hijack' WHERE id='${project}'; RESET ROLE; SELECT name FROM lg_projects WHERE id='${project}'; ROLLBACK;`), "Alpha project");
+  const result = raw(`BEGIN; GRANT INSERT ON lg_organizations TO authenticated; SET LOCAL ROLE authenticated; SET LOCAL request.jwt.claim.sub='${outsider}'; INSERT INTO lg_organizations(name,created_by) VALUES('No','${outsider}'); ROLLBACK;`);
+  assert.match(result.stderr, /42501/);
+});
+dbtest("private authorization/audit helpers cannot be called by browser", () => denied(owner, `SELECT launchgate_private.require_actor('${org}',ARRAY['OWNER'])`));
+dbtest("PostgREST honors user JWT and RLS on unfiltered lists", () => {
+  const response=http(outsider,"lg_organizations?select=id"); assert.equal(response.status,0,response.stderr);
+  assert.deepEqual(JSON.parse(response.stdout),[{id:other}]);
+});
+dbtest("PostgREST singleton RPC representation matches API command adapter", () => {
+  const response=http(candidate,"rpc/lg_create_organization",{p_name:"HTTP fixture",p_correlation:correlation},true);
+  assert.equal(response.status,0,response.stderr); const data=JSON.parse(response.stdout);
+  assert.equal(data.name,"HTTP fixture"); assert.equal(data.created_by,candidate); assert.ok(!Array.isArray(data));
+});
+dbtest("PostgREST security membership RPC supports a singular representation", () => {
+  const response=http(owner,"rpc/lg_read_security_membership",{p_organization:org},true);
+  assert.equal(response.status,0,response.stderr); assert.equal(JSON.parse(response.stdout).role,"OWNER");
+});
+dbtest("PostgREST direct browser membership insertion is forbidden", () => {
+  const response=http(developer,"lg_organization_memberships",{organization_id:org,user_id:candidate,role:"OWNER"});
+  assert.notEqual(response.status,0); assert.match(response.stderr,/403/);
+});
+dbtest("PostgREST exposes safe metadata but denies backend reference selection", () => {
+  const safe=http(owner,"lg_secret_references?select=id,kind,provider,purpose"); assert.equal(safe.status,0,safe.stderr);
+  assert.equal(JSON.parse(safe.stdout).length,1); assert.doesNotMatch(safe.stdout,/backend_reference|token|plaintext/);
+  const unsafe=http(owner,"lg_secret_references?select=*"); assert.notEqual(unsafe.status,0); assert.match(unsafe.stderr,/403/);
+});
+dbtest("concurrent owner demotions cannot remove every owner", async () => {
+  execute(`SET request.jwt.claim.sub='${owner}'; ${rpcMember("UPDATE", memberId(2), "OWNER")}`);
+  const run = (user: string, target: string) => new Promise<{ code: number | null; stderr: string }>(resolve => {
+    const child = spawn("docker", ["exec", "-i", container, "psql", "-X", "-qAt", "-v", "ON_ERROR_STOP=1", "-v", "VERBOSITY=verbose", "-U", "postgres", "-d", "launchgate_test"], { windowsHide: true });
+    let stderr = ""; child.stderr.on("data", data => { stderr += data; }); child.stdout.resume();
+    child.on("close", code => resolve({ code, stderr }));
+    child.stdin.end(`BEGIN; SET LOCAL ROLE authenticated; SET LOCAL request.jwt.claim.sub='${user}'; ${rpcMember("UPDATE", target, "ADMIN")}; SELECT pg_sleep(0.2); COMMIT;`);
+  });
+  const results = await Promise.all([run(owner, memberId(1)), run(admin, memberId(2))]);
+  assert.equal(results.filter(r => r.code === 0).length, 1);
+  assert.match(results.find(r => r.code !== 0)!.stderr, /23514/);
+  assert.equal(execute(`SELECT count(*) FROM lg_organization_memberships WHERE organization_id='${org}' AND role='OWNER' AND status='ACTIVE'`), "1");
+});

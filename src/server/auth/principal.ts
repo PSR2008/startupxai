@@ -7,6 +7,11 @@ export interface VerifiedPrincipal {
   readonly origin: "supabase_verified_bearer";
 }
 export type TokenVerifier = (token: string) => Promise<{ userId: string } | null>;
+const verifiedPrincipals = new WeakSet<object>();
+/** Runtime provenance: a JSON object with a userId is not a verified principal. */
+export function isVerifiedPrincipal(value: unknown): value is VerifiedPrincipal {
+  return typeof value === "object" && value !== null && verifiedPrincipals.has(value);
+}
 async function verifySupabaseToken(token: string): Promise<{ userId: string } | null> {
   const url = configuredValue("NEXT_PUBLIC_SUPABASE_URL");
   const key = configuredValue("NEXT_PUBLIC_SUPABASE_ANON_KEY");
@@ -21,6 +26,9 @@ export async function principalFromRequest(request: Pick<Request, "headers">, ve
   if (!match) return null;
   try {
     const identity = await verifier(match[1]);
-    return identity?.userId ? Object.freeze({ userId: identity.userId, origin: "supabase_verified_bearer" as const }) : null;
+    if (!identity?.userId) return null;
+    const principal = Object.freeze({ userId: identity.userId, origin: "supabase_verified_bearer" as const });
+    verifiedPrincipals.add(principal);
+    return principal;
   } catch { return null; }
 }

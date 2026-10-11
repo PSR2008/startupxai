@@ -1,6 +1,8 @@
 # LaunchGate architecture — Phase 1
 
-Status: foundation contracts only. StartupX remains the running product. No GitHub integration, migration, target testing, runner, artifact service, or attestation is implemented here.
+Status: Phase 2 adds the data/tenancy foundation alongside the Phase 1 verification contracts. StartupX remains the running product. No GitHub integration, target testing, runner, artifact service, or attestation is implemented here. [Tenancy implementation and operating contract](tenancy.md) describes the new migrations, role matrix, RLS, audit, secrets metadata and deletion lifecycle.
+
+Phase 2 implements eight prefixed public-schema tables, six narrow authenticated database commands, centralized server authorization and versioned APIs. It uses caller-token RLS for reads and atomically authorized/audited commands for writes; routine LaunchGate APIs never use the service role. Project access currently inherits organization membership. SQL/HTTP integration tests use disposable PostgreSQL/PostgREST, with no production credentials. Future lists below remain design direction, not implemented persistence.
 
 Mission: build trust infrastructure for AI-native software. LaunchGate is the first product, focused on business-invariant release assurance. Runtime monitoring, agent action gating, compliance evidence and assurance intelligence remain later product directions.
 

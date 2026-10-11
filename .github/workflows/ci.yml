@@ -20,6 +20,9 @@ jobs:
       - run: npm run type-check
       - run: npm run lint
       - run: npm run test
+      - run: npm run test:database
+        env:
+          LAUNCHGATE_REQUIRE_DATABASE: "1"
       - run: npm run build
       # Full advisory assessment is tracked in docs/launchgate/dependency-audit.md.
       # Known highs remain explicit; any critical advisory fails this job.

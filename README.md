@@ -12,6 +12,7 @@ npm.cmd run type-check
 npm.cmd run lint
 npm.cmd run test
 npm.cmd run test:launchgate
+npm.cmd run test:database
 npm.cmd run build
 npm.cmd run dev
 ```
@@ -30,7 +31,10 @@ Historical SQL migrations 001-013 live in `migrations/`. Do not use old README S
 
 ## LaunchGate
 
+Phase 2 adds organization tenancy, scoped authorization, RLS, security audit, secret/retention metadata and deletion tasks. Apply forward migrations 014/015 only after reviewing the deployed schema. [Tenancy setup, API and database testing](docs/launchgate/tenancy.md) documents the boundary. `test:database` creates disposable PostgreSQL/PostgREST containers and accepts no production connection string. Docker absence is reported as BLOCKED_BY_ENVIRONMENT; CI requires the suite to execute.
+
 - [Architecture and trust boundaries](docs/launchgate/architecture.md)
+- [Tenancy, roles, RLS and deletion](docs/launchgate/tenancy.md)
 - [Threat model](docs/launchgate/threat-model.md)
 - [V1 acceptance ledger](docs/launchgate/v1-acceptance.md)
 - [Reference Lab](docs/launchgate/reference-lab.md)

@@ -13,3 +13,11 @@ Confirm active customers, purchased periods, refunds, data ownership, export and
 Phase 1 intentionally changes only health semantics, server configuration validation, shared bearer-principal resolution and tooling/dependency foundations. Invalid/placeholding Supabase configuration now returns unavailable instead of making a useless network request. `/api/health` retains HTTP 200 for liveness, exposes aggregate configuration state, and no longer publishes individual provider-presence flags. `/internal` remains reachable but its legacy checks list is empty; UI modernization is deferred. No claim of integration connectivity is made.
 
 The old payment, quota, RLS and recovery defects from Phase 0 remain tracked. They need explicit remediation in later phases; the continued StartupX UI is not a production-security certification.
+
+## Phase 2 coexistence
+
+Phase 1 was already committed as `ef5f791` when Phase 2 began on a clean `launchgate-rebuild`. Phase 2 makes no commits or pushes. New migrations 014/015 create only LaunchGate-prefixed tables/functions and a private helper schema; historical migrations 001-013 are unchanged. New `/api/v1` endpoints coexist with all existing StartupX endpoints and pages. The shared principal helper now tracks runtime verification provenance without changing its existing user ID/origin response.
+
+Disposable database tests apply every historical migration, insert a representative analysis and legacy admin role, capture existing policies, then apply 014/015. They verify the row/policies survive and that the old admin role grants no LaunchGate access. This is synthetic upgrade evidence, not an assertion that every deployed README-era schema has been reconciled. Inspect staging schema/grants before applying the migrations to an existing Supabase project.
+
+No StartupX users are auto-enrolled, no billing state is repurposed, and no old evidence becomes trusted LaunchGate evidence. The new database path does not import the legacy admin client or rely on old owner filters. The inherited migration 007 RPC grants, payment replay/capture risks, usage accounting, recovery and fetch/rate-limit risks remain unresolved and must be addressed before production security claims.

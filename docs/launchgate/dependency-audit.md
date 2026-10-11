@@ -2,6 +2,16 @@
 
 Target: no **unassessed** critical/high exposure. This is not a zero-vulnerability declaration. `npm audit` still exits 1; none of these findings are hidden or declared harmless.
 
+## Phase 2 recheck - 2026-10-11
+
+Before Phase 2: **11 affected package entries: 0 critical, 8 high, 3 moderate**. After the compatible update: **11 entries: 0 critical, 8 high, 3 moderate**. Full `npm audit` still exits 1. No new critical or other advisory was introduced; the remaining paths and applicability assessments below still apply.
+
+`npm update postcss postcss-selector-parser postcss-nested braces` changed only root PostCSS **8.5.25 -> 8.5.29**, within the existing constraint. The registry currently offers no compatible fix for the locked braces/selector-parser chains. Next 15.5.27 still pins nested PostCSS 8.4.31; updating root PostCSS does not fix that copy. `npm outdated` confirms the Next 15 and Tailwind 3 lines are already at their allowed latest versions. No forced update, override, framework downgrade or breaking migration was used. Full install/typecheck/lint/unit/build and disposable database checks validate this lockfile.
+
+The Phase 1 remediation target for unresolved build-tool chains carries forward as a **release prerequisite before Phase 3 untrusted source ingestion**. Plan and test the Next/PostCSS, Tailwind/glob and ESLint parent upgrades separately, with isolated builds and no customer secrets. Phase 2 adds no repository ingestion or untrusted CSS processing. This deferral does not assert low severity or production safety. Docker PostgreSQL/PostgREST images are pinned test fixtures, not deployed application dependencies; production database/provider versions must be reviewed separately.
+
+The remaining sections preserve the Phase 1 before/after history and per-advisory assessment.
+
 Before: 19 affected package entries (1 critical, 15 high, 3 moderate).
 After compatible updates: 11 entries (0 critical, 8 high, 3 moderate). Counts include dependency-chain metapackages and are not counts of independent exploits.
 
