@@ -1,12 +1,14 @@
+import "server-only";
+import { configuredValue } from "@/server/env";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 // ============================================
 // SUPABASE ENV
 // ============================================
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = configuredValue("NEXT_PUBLIC_SUPABASE_URL");
+const supabaseAnonKey = configuredValue("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+const supabaseServiceRoleKey = configuredValue("SUPABASE_SERVICE_ROLE_KEY");
 
 // ============================================
 // CLIENT FACTORIES

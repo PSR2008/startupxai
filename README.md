@@ -1,222 +1,42 @@
-# StartupX AI 🚀
+# StartupX AI / LaunchGate foundation
 
-**Your AI Co-Founder for Market, Product, Pricing, Trust, and Growth**
+The running application remains StartupX AI. LaunchGate Phase 1 adds deterministic contracts and server foundations without replacing product pages, payments, migrations or integrations.
 
-A premium, production-grade SaaS platform that acts as a founder intelligence operating system. Powered by Claude (Anthropic), built with Next.js 15, Tailwind CSS, Framer Motion, Supabase, and Zod.
+## Local setup
 
----
+Use Node **24.19.0** (`.node-version`) and npm 11. This runtime passed the repository baseline and Phase 1 toolchain. Next 15.5.27 supports this Node family. Three private npm workspaces under `packages/` share TypeScript contracts; all commands run from this root.
 
-## ✨ Features
-
-### Assessment Tools
-| Engine | Purpose |
-|--------|---------|
-| **Idea & Market Engine** | Validate viability, score demand, uncover ICP & risks |
-| **Competitor Intelligence** | Map competitors, find gaps, build a beat strategy |
-| **Revenue Engine** | Pricing tiers, conversion blockers, monetization models |
-| **User Psychology Engine** | Trust score, UX roast, friction points, copy fixes |
-| **Growth Engine** | First 10 customers plan, channels, launch playbook |
-| **Founder Decision Engine** | Priorities, confidence score, strategic brief |
-
-### 2 Revenue Tools
-- **Evidence Engine** — Evidence Score, source labels, missing evidence, confidence, and next validation actions
-- **ColdDM** — WhatsApp, LinkedIn, email outreach with 3 variants + follow-ups
-- **BrandForge** — Names, taglines, positioning, brand personality, color direction
-
-### Infrastructure
-- Rate limiting (LRU cache — production: swap for Upstash Redis)
-- Strict Zod input validation on all endpoints
-- IP hashing for privacy
-- Supabase PostgreSQL persistence
-- Security headers (CSP, HSTS, X-Frame-Options)
-- Premium Framer Motion animations
-- Cormorant Garamond + Syne + DM Sans font system
-
----
-
-## 🛠 Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS |
-| Animations | Framer Motion |
-| AI | Anthropic Claude (claude-sonnet-4-20250514) |
-| Database | Supabase (PostgreSQL) |
-| Validation | Zod |
-| Deployment | Vercel |
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-- Anthropic API key
-- Supabase project (optional for DB persistence)
-
-### 1. Clone & Install
-
-```bash
-git clone https://github.com/yourusername/startupx-ai.git
-cd startupx-ai
-npm install
+```powershell
+npm.cmd install
+npm.cmd run type-check
+npm.cmd run lint
+npm.cmd run test
+npm.cmd run test:launchgate
+npm.cmd run build
+npm.cmd run dev
 ```
 
-### 2. Environment Variables
+CI uses `npm ci` from the committed lockfile, then typecheck, lint, tests and build. Unit/contract tests and build do not require provider credentials. The test runner uses `react-server` conditions for the genuine `server-only` import guard. Existing tests are preserved. ESLint now scans tests too; a pre-existing unused `describe` import is reported as a warning rather than hidden.
 
-```bash
-cp .env.example .env.local
-```
+Copy `.env.example` to `.env.local` only when setting up local configuration. Restore real credentials securely; do not commit them. Placeholders are classified separately from missing, malformed and structurally configured values. Configured does not mean the provider has accepted a credential. Browser Supabase configuration remains in its existing browser-safe helper; service secrets stay in server-only modules.
 
-Fill in your `.env.local`:
+`GET /api/health` is a public **liveness** endpoint. It returns an aggregate configuration state and explicitly says integrations are not probed and production readiness is not assessed. No individual provider flags or secret values are public. `/internal` remains, but its old provider-check list is intentionally empty.
 
-```env
-ANTHROPIC_API_KEY=sk-ant-your-key-here
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-IP_HASH_SALT=your-random-salt-min-32-chars
-```
+## Existing product
 
-### 3. Supabase Setup (optional but recommended)
+Next.js App Router, React, Tailwind, Supabase authentication/persistence, Anthropic analysis and Razorpay checkout. Founder tools, evidence workflows, reports/sharing, marketing and account pages remain. Builds do not prove live authentication, database, AI or payments work without credentials.
 
-Run this SQL in your Supabase SQL Editor:
+Historical SQL migrations 001-013 live in `migrations/`. Do not use old README SQL as an alternative schema: it differed in user ID types and could create an overly broad insert policy. Inspect deployed schema/grants and reconcile drift before applying future migrations. No migration is added or applied by Phase 1.
 
-```sql
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+## LaunchGate
 
-CREATE TABLE IF NOT EXISTS analyses (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  session_id TEXT NOT NULL,
-  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  engine_type TEXT NOT NULL,
-  input_data JSONB NOT NULL DEFAULT '{}',
-  output_data JSONB NOT NULL DEFAULT '{}',
-  ip_hash TEXT
-);
+- [Architecture and trust boundaries](docs/launchgate/architecture.md)
+- [Threat model](docs/launchgate/threat-model.md)
+- [V1 acceptance ledger](docs/launchgate/v1-acceptance.md)
+- [Reference Lab](docs/launchgate/reference-lab.md)
+- [Legacy transition](docs/launchgate/legacy-transition.md)
+- [Dependency triage](docs/launchgate/dependency-audit.md)
 
-ALTER TABLE analyses ENABLE ROW LEVEL SECURITY;
+Core outcomes are PASS, REPRODUCIBLE_FAILURE and INCONCLUSIVE. NOT_APPLICABLE is metadata. Release decisions are separate. Pure semantic tests are not customer verification, cryptographic evidence admission or signed attestations. The Phase 0 billing/quota/RLS/recovery risks remain pending explicit future work.
 
-CREATE POLICY "Anyone can insert analyses" ON analyses
-  FOR INSERT WITH CHECK (true);
-
-CREATE INDEX idx_analyses_session ON analyses(session_id);
-CREATE INDEX idx_analyses_engine ON analyses(engine_type);
-CREATE INDEX idx_analyses_created ON analyses(created_at DESC);
-```
-
-### 4. Run Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000)
-
----
-
-## 📁 Project Structure
-
-```
-startupx-ai/
-├── src/
-│   ├── app/
-│   │   ├── (marketing)/          # Public pages (Navbar + Footer)
-│   │   │   ├── pricing/
-│   │   │   ├── privacy/
-│   │   │   └── support/
-│   │   ├── (app)/                # App pages (Sidebar layout)
-│   │   │   ├── dashboard/
-│   │   │   ├── idea-engine/
-│   │   │   ├── competitor-intelligence/
-│   │   │   ├── revenue-engine/
-│   │   │   ├── user-psychology/
-│   │   │   ├── growth-engine/
-│   │   │   ├── founder-decision/
-│   │   │   ├── cold-dm/
-│   │   │   └── brand-forge/
-│   │   ├── api/
-│   │   │   ├── analyze/          # 6 engine API routes
-│   │   │   ├── generate/         # 2 generation routes
-│   │   │   └── health/
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx              # Landing page
-│   ├── components/
-│   │   ├── ui/                   # Button, ScoreRing, Badge, etc.
-│   │   ├── marketing/            # Navbar, Footer, sections
-│   │   ├── app/                  # Sidebar, EngineHeader, Topbar
-│   │   └── shared/               # AnimatedSection
-│   ├── lib/
-│   │   ├── ai.ts                 # All Anthropic API calls
-│   │   ├── rate-limit.ts         # LRU rate limiter
-│   │   ├── supabase.ts           # DB client & operations
-│   │   ├── utils.ts              # Utilities
-│   │   └── validation.ts         # Zod schemas
-│   └── types/
-│       └── index.ts              # All TypeScript types
-├── .env.example
-├── next.config.ts
-├── tailwind.config.ts
-├── tsconfig.json
-└── vercel.json
-```
-
----
-
-## 🔒 Security Architecture
-
-- **Rate Limiting**: LRU-based per-IP (10 req/min for analysis, 15 for generation)
-- **Input Validation**: Zod schemas on all API routes with length limits
-- **API Keys**: Server-side only via env vars — zero client exposure
-- **IP Privacy**: IPs are hashed (SHA-256 + salt) before storage
-- **Security Headers**: CSP, HSTS, X-Frame-Options, X-Content-Type-Options
-- **Error Safety**: No stack traces exposed to clients
-- **HTML Sanitization**: All user text sanitized before rendering
-
----
-
-## 🚢 Deploying to Vercel
-
-1. Push to GitHub
-2. Import project in [vercel.com](https://vercel.com)
-3. Add all environment variables from `.env.example`
-4. Deploy
-
-Custom domain: Set in Vercel Dashboard → Project → Domains
-
----
-
-## 📦 Scripts
-
-```bash
-npm run dev          # Start development server
-npm run build        # Production build
-npm run start        # Start production server
-npm run lint         # ESLint
-npm run type-check   # TypeScript check
-```
-
----
-
-## 🎨 Design System
-
-- **Fonts**: Cormorant Garamond (display), Syne (headings), DM Sans (body), JetBrains Mono (code)
-- **Colors**: Cocoa brown, sage green, forest green, midnight blue, dusty peach, ivory cream
-- **Motion**: Framer Motion — scroll reveals, stagger animations, 3D card hovers, parallax
-- **Theme**: Premium dark with warm earth tones
-
----
-
-## 📄 License
-
-MIT License — see LICENSE file.
-
----
-
-Built with ❤️ for serious founders. Ship fast, build smart.
+`startupxai-final` preserves the archived StartupX baseline. Development stays on `launchgate-rebuild`; do not modify main or rewrite migration history.

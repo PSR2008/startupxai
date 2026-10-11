@@ -1,0 +1,8 @@
+{
+  "name": "@launchgate/verification-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@launchgate/contracts": "0.1.0", "@launchgate/invariant-spec": "0.1.0", "zod": "^3.24.2" }
+}

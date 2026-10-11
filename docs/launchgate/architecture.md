@@ -1,0 +1,67 @@
+# LaunchGate architecture — Phase 1
+
+Status: foundation contracts only. StartupX remains the running product. No GitHub integration, migration, target testing, runner, artifact service, or attestation is implemented here.
+
+Mission: build trust infrastructure for AI-native software. LaunchGate is the first product, focused on business-invariant release assurance. Runtime monitoring, agent action gating, compliance evidence and assurance intelligence remain later product directions.
+
+## Trust and deployment boundaries
+
+| Boundary | Responsibility | Must not receive/do |
+| --- | --- | --- |
+| CONTROL PLANE | Next.js UI/API, verified identity, future organization authorization, policy confirmation, run scheduling, evidence review | Execute customer code, install customer dependencies, treat model output as evidence |
+| PostgreSQL | Durable metadata, transactional usage reservations, inbox/outbox, job leases, tenant constraints/RLS | Store unrestricted executable instructions or plaintext customer secrets |
+| ORCHESTRATOR | Trusted long-lived worker, authorization revalidation, sandbox creation, narrow credential leases, cleanup, retries | Execute customer code in its own process or trust unvalidated runner reports |
+| UNTRUSTED RUNNER | Ephemeral isolated execution of bounded source analysis and registered tests | Control-plane credentials, ambient cloud identity, host sockets, unrestricted egress |
+| CUSTOMER TARGET | Explicitly authorized preview/staging/sandbox deployment with synthetic users/data | Implicit authorization based on repository ownership or public availability |
+| EXTERNAL PROVIDER | GitHub, Vercel, Stripe/Razorpay, OpenAI/Anthropic under explicit provider adapters | Authority to decide invariant truth merely through model text or unsigned events |
+| Private artifact storage | Encrypted source snapshots, redacted observations, traces and manifests | Public buckets or unscoped signed URLs |
+| Secrets service | Managed encryption, short-lived scoped leases and rotation | Secrets in browser payloads, model prompts, source archives, logs or artifacts |
+
+The Next.js/Vercel application stays the control plane. Customer source, build scripts and test execution must run outside it. Start with PostgreSQL-backed durable jobs and one separately deployed orchestrator plus isolated microVM/managed sandboxes. Do not add Kafka, Kubernetes or Redis without measured need. Jobs use at-least-once delivery, idempotency keys, leases, heartbeats, fencing, bounded retries and a dead-letter workflow. Side effects require transactional ledgers/outboxes; “exactly once delivery” is not assumed.
+
+## Integration boundaries
+
+GitHub App installations are scoped to selected repositories: metadata/contents/PR reads and Checks write, deployment read where necessary. Optional remediation requires separately enabled Contents/PR write; no automatic merges, admin grants, secrets reads or workflow-write permission. OAuth state binds initiating user and organization. Signed webhook inboxes deduplicate deliveries. Installation tokens are short-lived and never exposed to customer code.
+
+Vercel previews bind repository, immutable commit SHA and deployment ID. Verify provider events and re-fetch metadata. Preview aliases are not stable candidate identities. Inject protection bypass only into requests to the authorized exact host; strip on redirects. Neither a deployment event nor GitHub access proves authorization to test.
+
+Stripe/Razorpay are both future verification adapters and potential LaunchGate billing adapters. Test customer business logic with safe modes and synthetic resources. LaunchGate's own billing uses organization accounts, event inboxes, authoritative provider reconciliation and transactional entitlement grants, not the current replay-sensitive StartupX activation helper.
+
+OpenAI/Anthropic support source interpretation and bounded remediation proposals. Repository content is untrusted data. Model output never becomes a test verdict, authorization, gate decision or attestation. Private source is not used for training by default; processing, minimization and provider retention must be disclosed.
+
+## Contracts now
+
+- `@launchgate/invariant-spec`: strict versioned schemas for bindings, preconditions, approved operation IDs, deterministic oracles, severity, provenance and confirmation.
+- `@launchgate/contracts`: candidates/runs, evidence, target authorizations and Reference Lab families.
+- `@launchgate/verification-core`: pure assertion recomputation and policy evaluation. No network, persistence, execution, signing or attestation issuance.
+- `src/server`: server-only environment, verified principal and safe API-error foundations.
+
+Package exports target TypeScript source and are private npm workspaces consumed by the existing TypeScript/Next.js toolchain. There is no repository-wide build framework. Future distributed services will require their own compiled deployment outputs.
+
+Decision scope includes organization, project, commit SHA, deployment, invariant version, policy ID/version and evidence scope. Approved-spec digest binds the complete plan; evidence digest binds admitted manifest contents. Unknown extra fields are rejected. Approved operations reference a finite registry, never generated shell, SQL, JavaScript or arbitrary URLs. Runtime adapters must enforce authorization and ceilings even for schema-valid operations.
+
+`PASS` means the bounded assertions held with working positive controls. `REPRODUCIBLE_FAILURE` requires deterministic original and separate reproduction attempts with matching scope, plan, fixture seed/reset state, observed failure signature and complete provenance. Every other state is `INCONCLUSIVE`. NOT_APPLICABLE is separately recorded metadata and contributes no pass. A policy with no required applicable tests cannot ship vacuously.
+
+The gate recomputes outcomes rather than trusting supplied verdict strings. SHIP requires all required applicable invariants to pass for the exact candidate. BLOCK requires a reproduced finding at a policy-blocking severity. An optional nonblocking failure may coexist with SHIP; a required nonblocking failure prevents SHIP but is not mislabeled BLOCK. Missing/duplicate submissions are incomplete. Coverage requirements and reproduced-failure checks must be published separately to GitHub; inconclusive coverage must not accidentally be mapped to a successful required check.
+
+### Evidence admission is a security boundary, not cryptography implemented here
+
+The default admission is UNTRUSTED. REFERENCE_LAB admission works only with REFERENCE_LAB scope. Customer evidence requires a trusted service's AUTHENTICATED_RUNNER admission bound to run ID and manifest digest. **This marker is not a cryptographic receipt**: JavaScript callers can construct it. Do not deserialize it from requests, model output or runner payloads. A later ingestion service must authenticate runner leases, fetch/check artifact bytes and hashes, verify authorization and provenance, then supply admission. Phase 1 does not provide that service and must not be deployed as a public gate API. Tests exercise that contract with synthetic data only. No VERIFIED state or attestation issuer exists.
+
+## Future layout and data model
+
+Keep `src/app` for application UI/APIs and `src/server` for trusted services. Add `services/orchestrator`, `services/runner`, `packages/cli` and provider/fixture adapters later. Shared contracts remain below all service layers. Reference Lab executable fixture applications will live under `reference-lab/`, never imported into production application code.
+
+Future organization-owned entities: memberships/invitations, projects/project access, integrations/repositories/source snapshots/architecture graphs, environments/deployments/authorization proofs, immutable invariant/policy versions, fixture sets/test identities/cleanup tasks, runs/attempts/leases, artifacts/manifests/observations, findings/replays/fix PRs/regressions, check runs/attestations/share links, billing accounts/subscriptions/purchases/refunds/usage reservations, job inbox/outbox, audit and deletion tasks. Composite tenant foreign keys and RLS complement API authorization. No migrations are created in Phase 1.
+
+Future web loop: connect → authorize → discover → confirm → provision → test → evidence → reproduce → fix PR → exact replay → regression → ship/block/inconclusive. Scope includes auth/session, tenant/role, billing/entitlement, replay/idempotency, AI cost/quota/concurrency, browser journeys and build/migration safety. Exact replay changes the candidate build but preserves logical fixture recipe and failure oracle, not expired credentials.
+
+Public CLI defaults to local/static analysis without uploading private code. Public repo assessment cannot authorize target requests or earn a dynamic verification badge. Future badges bind signed evidence, exact candidate and scope, expire and revoke; no universal security guarantee. LaunchGate billing supports Free, Launch Pass, Launch, Pro and Studio with organization budgets; final prices/limits require cost measurements.
+
+## Operational requirements (future)
+
+Use separate development/staging/production data, keys and provider accounts. Redact before log/artifact persistence. Correlate organization/project/run/job/attempt; monitor queue age, failed cleanup, lease expiry, artifact rejection, spend and provider failures. Validate disaster recovery (proposed RPO 24h/RTO 4h) and deletion across active data, artifacts, caches and backups. Proposed retention: source 24h, artifacts 30d, finding metadata 90d, audit 180d; customer configuration and legal retention remain unresolved. Revocation immediately stops new work; active runners must terminate within a measured 10s goal.
+
+## Toolchain
+
+Node 24.19.0 is the locally validated runtime, declared in `.node-version`; engines restrict to Node 24 (minimum 24.19) and npm 11. Next 15.5.27 declares Node >=20 support. Local root install/typecheck/lint/test/build validate this choice; no speculative downgrade. CI uses the same Node declaration. Unit tests use Node's `react-server` condition to load genuine `server-only` modules without replacing or mocking the boundary; Next's production compiler still enforces client import restrictions. Browser component tests will need a separate non-server test entrypoint later.

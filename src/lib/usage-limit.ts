@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { principalFromRequest } from "@/server/auth/principal";
 import {
   canUseEngine,
   getPlanEntitlements,
@@ -24,32 +24,7 @@ export interface FeatureAccess {
 }
 
 export async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
-  try {
-    const authHeader = req.headers.get("authorization") ?? "";
-    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-    if (!token) return null;
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseAnonKey) return null;
-
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    });
-
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser(token);
-
-    if (error || !user) return null;
-    return user.id;
-  } catch {
-    return null;
-  }
+  return (await principalFromRequest(req))?.userId ?? null;
 }
 
 function unauthenticatedAccess(): FeatureAccess {
