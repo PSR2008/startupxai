@@ -1,0 +1,57 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { createHmac,generateKeyPairSync,verify,randomUUID } from "node:crypto";
+import { GitHubProvider,appJwt } from "../src/server/github/provider";
+import { githubConfiguration,type GitHubConfig } from "../src/server/github/config";
+import { receiveWebhook,verifySignature } from "../src/server/github/webhook";
+import { type SourceStore } from "../src/server/github/store";
+import { gitHash,ingest } from "@launchgate/source-analysis";
+import { processSnapshot } from "../src/server/source-analysis/job";
+
+const keys=generateKeyPairSync("rsa",{modulusLength:2048});
+const config:GitHubConfig={appId:123,clientId:"fixture-client",clientSecret:"synthetic-oauth-secret-only",privateKey:keys.privateKey.export({type:"pkcs8",format:"pem"}).toString(),webhookSecret:"synthetic-local-webhook-secret-only-32",redirectUri:"https://local.test/callback"};
+const repo={id:789,owner:{login:"fixture"},name:"sample",private:true,default_branch:"main",permissions:{admin:true}};
+function provider(options:{visible?:boolean;selected?:boolean;admin?:boolean;suspended?:boolean;write?:boolean;rename?:string;blobMismatch?:boolean}={}) {
+ const requests:{url:string;body:unknown;authorization:string|null}[]=[];
+ const text=Buffer.from("export const tenantId='fixture';");const blob=gitHash(text),commit="a".repeat(40),tree="b".repeat(40);
+ const fetcher:typeof fetch=async(input,init)=>{
+  const url=String(input);const body=init?.body?JSON.parse(String(init.body)):undefined;requests.push({url,body,authorization:new Headers(init?.headers).get("authorization")});
+  assert.equal(init?.redirect,"error");assert.ok(init?.signal);assert.ok(["https://github.com","https://api.github.com"].includes(new URL(url).origin));
+  const path=new URL(url).pathname;let data:unknown;
+  if(path==="/login/oauth/access_token")data={access_token:"synthetic-transient-user-token"};
+  else if(path==="/user/installations")data={installations:options.visible===false?[]:[{id:456}]};
+  else if(path==="/app/installations/456")data={id:456,app_id:123,account:{id:12},suspended_at:options.suspended?new Date().toISOString():null,permissions:{metadata:"read",contents:options.write?"write":"read"}};
+  else if(path==="/user/installations/456/repositories")data={repositories:options.selected===false?[]:[repo]};
+  else if(path==="/repos/fixture/sample"||path==="/repositories/789")data={...repo,name:options.rename??repo.name,permissions:{admin:options.admin!==false}};
+  else if(path==="/app/installations/456/access_tokens")data={token:"synthetic-transient-installation-token",expires_at:new Date(Date.now()+3600000).toISOString()};
+  else if(path===`/repos/fixture/sample/git/commits/${commit}`)data={sha:commit,tree:{sha:tree}};
+  else if(path===`/repos/fixture/sample/git/trees/${tree}`)data={sha:tree,truncated:false,tree:[{path:"src/example.ts",type:"blob",mode:"100644",sha:blob,size:text.length}]};
+  else if(path===`/repos/fixture/sample/git/blobs/${blob}`)data={sha:blob,encoding:"base64",content:(options.blobMismatch?Buffer.from("tampered"):text).toString("base64"),size:options.blobMismatch?8:text.length};
+  else return new Response("not available",{status:404});
+  return Response.json(data);
+ };
+ return {provider:new GitHubProvider(config,fetcher),requests};
+}
+test("GitHub configuration missing/placeholder credentials fails safely",()=>{assert.throws(()=>githubConfiguration({}),{code:"CONFIGURATION_UNAVAILABLE"});});
+test("App JWT uses RSA signature and bounded lifetime",()=>{const token=appJwt(config);const [head,payload,signature]=token.split(".");assert.ok(verify("RSA-SHA256",Buffer.from(`${head}.${payload}`),keys.publicKey,Buffer.from(signature,"base64url")));const data=JSON.parse(Buffer.from(payload,"base64url").toString());assert.equal(data.iss,"123");assert.equal(data.exp-data.iat,540);});
+test("setup URL binds state and fixed callback without write scopes",()=>{const url=new URL(provider().provider.authorizationUrl("opaque-state"));assert.equal(url.searchParams.get("state"),"opaque-state");assert.equal(url.searchParams.get("redirect_uri"),config.redirectUri);assert.equal(url.searchParams.has("scope"),false);});
+test("verified repository result contains stable identity and no tokens",async()=>{const {provider:p}=provider();const result=await p.verifyConnection("fixture-code",456,789);assert.equal(result.repositoryId,789);assert.equal(result.installationId,456);assert.equal(result.appId,123);assert.doesNotMatch(JSON.stringify(result),/token|privateKey|synthetic-oauth/);});
+for(const [name,options]of Object.entries({guessedInstallation:{visible:false},unselectedRepository:{selected:false},insufficientGithubRole:{admin:false},suspendedInstallation:{suspended:true},overprivilegedApp:{write:true}}))test(`GitHub connection rejects ${name}`,async()=>{await assert.rejects(provider(options).provider.verifyConnection("fixture-code",456,789),{code:"ACCESS_DENIED"});});
+test("repository rename retains numeric identity",async()=>{const result=await provider({rename:"renamed"}).provider.verifyConnection("fixture-code",456,789);assert.equal(result.repositoryId,789);assert.equal(result.name,"renamed");});
+test("ingestion token is narrowed to selected repository and read permissions",async()=>{const {provider:p,requests}=provider();const result=await p.ingestCommit(456,789,"a".repeat(40),"");assert.equal(result.commitSha,"a".repeat(40));assert.equal(result.source.files.length,1);assert.deepEqual(requests.find(r=>r.url.endsWith("/access_tokens"))?.body,{repository_ids:[789],permissions:{contents:"read",metadata:"read"}});assert.doesNotMatch(JSON.stringify(result),/synthetic-transient|PRIVATE KEY/);});
+test("moving branch label cannot serve as immutable snapshot identity",async()=>{await assert.rejects(provider().provider.ingestCommit(456,789,"main",""));});
+test("tampered blob rejected despite provider metadata",async()=>{await assert.rejects(provider({blobMismatch:true}).provider.ingestCommit(456,789,"a".repeat(40),""),/BLOB_INTEGRITY/);});
+test("revoked installation fails before source reads",async()=>{const {provider:p,requests}=provider({suspended:true});await assert.rejects(p.ingestCommit(456,789,"a".repeat(40),""));assert.equal(requests.length,1);});
+test("local lease revocation stops subsequent GitHub source reads",async()=>{const {provider:p,requests}=provider();let checks=0;await assert.rejects(p.ingestCommit(456,789,"a".repeat(40),"",async()=>{if(++checks===3)throw new Error("revoked");}),/revoked/);assert.ok(!requests.some(r=>r.url.includes("/git/commits/")));});
+const webhookRequest=(body:string,signature?:string,event="installation",delivery=randomUUID())=>new Request("https://local/api/v1/webhooks/github",{method:"POST",headers:{"x-hub-signature-256":signature??`sha256=${createHmac("sha256",config.webhookSecret).update(body).digest("hex")}`,"x-github-event":event,"x-github-delivery":delivery},body});
+test("raw-body webhook HMAC accepts valid synthetic signature and rejects changes",()=>{const raw=Buffer.from("raw body");const signature=`sha256=${createHmac("sha256",config.webhookSecret).update(raw).digest("hex")}`;assert.ok(verifySignature(raw,signature,config.webhookSecret));assert.equal(verifySignature(Buffer.from("changed"),signature,config.webhookSecret),false);assert.equal(verifySignature(raw,"sha256=bad",config.webhookSecret),false);});
+test("invalid webhook signature never reaches durable store",async()=>{let calls=0;const store:SourceStore={async command(){calls++;return {};}};const response=await receiveWebhook(webhookRequest('{"action":"deleted","installation":{"id":456}}',"sha256="+"0".repeat(64)),config,store);assert.equal(response.status,403);assert.equal(calls,0);});
+test("valid webhook stores digest and scoped IDs without raw payload or credentials",async()=>{const records:unknown[]=[];const store:SourceStore={async command(action,data){records.push({action,data});return {duplicate:false};}};const response=await receiveWebhook(webhookRequest(JSON.stringify({action:"deleted",installation:{id:456},secret:"synthetic-secret-content"})),config,store);assert.equal(response.status,200);const serialized=JSON.stringify(records);assert.match(serialized,/REVOKE/);assert.doesNotMatch(serialized,/synthetic-secret-content|sha256=|webhook-secret/);});
+test("unknown signed events are ignored and cannot grant installation access",async()=>{let record:Record<string,unknown>={};const store:SourceStore={async command(_action,data){record=data;return {};}};assert.equal((await receiveWebhook(webhookRequest("{}",undefined,"unknown"),config,store)).status,200);assert.equal(record.event,"IGNORED");assert.equal(record.action,"IGNORE");});
+test("oversized webhook is rejected before persistence",async()=>{let calls=0;const store:SourceStore={async command(){calls++;return {};}};const response=await receiveWebhook(webhookRequest("x".repeat(262145)),config,store);assert.equal(response.status,422);assert.equal(calls,0);});
+test("malformed signed JSON fails safely",async()=>{const response=await receiveWebhook(webhookRequest("{"),config,{async command(){throw new Error("must not run");}});assert.equal(response.status,422);});
+test("job publishes static metadata only and is fenced by lease",async()=>{const snapshotId=randomUUID(),lease=randomUUID();const text=Buffer.from("export const role='viewer';");const blob=gitHash(text);const source=await ingest([{path:"x.ts",type:"blob",mode:"100644",sha:blob,size:text.length}],async()=>text);const writes:{action:string;data:Record<string,unknown>}[]=[];
+ const store:SourceStore={async command(action,data){writes.push({action,data});if(action==="CLAIM")return {snapshot:{id:snapshotId,commit_sha:"a".repeat(40),lease},connection:{application_root:""},repository:{repository_id:789},installation:{installation_id:456}};return {};}};
+ assert.deepEqual(await processSnapshot(snapshotId,{store,provider:{async ingestCommit(){return {commitSha:"a".repeat(40),treeSha:"b".repeat(40),source};}}}),{state:"COMPLETE"});
+ const published=writes.find(w=>w.action==="COMPLETE")!;assert.equal(published.data.lease,lease);assert.ok(!JSON.stringify(published.data.files).includes("text"));assert.doesNotMatch(JSON.stringify(published.data),/export const role/);
+});

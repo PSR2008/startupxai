@@ -35,6 +35,9 @@ Phase 2 adds organization tenancy, scoped authorization, RLS, security audit, se
 
 - [Architecture and trust boundaries](docs/launchgate/architecture.md)
 - [Tenancy, roles, RLS and deletion](docs/launchgate/tenancy.md)
+- [GitHub App backend and credential boundaries](docs/launchgate/github-integration.md)
+- [Bounded static source ingestion](docs/launchgate/source-ingestion.md)
+- [Architecture observations and invariant review](docs/launchgate/invariant-discovery.md)
 - [Threat model](docs/launchgate/threat-model.md)
 - [V1 acceptance ledger](docs/launchgate/v1-acceptance.md)
 - [Reference Lab](docs/launchgate/reference-lab.md)

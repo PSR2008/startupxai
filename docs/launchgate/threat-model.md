@@ -4,6 +4,19 @@ Phase 1 establishes contracts; Phase 2 implements the bounded tenancy controls d
 
 ## Phase 2 implemented controls and residual risks
 
+## Phase 3 source and provider controls
+
+- Installation hijacking: verified LaunchGate ADMIN/OWNER, principal/project-bound one-time state, GitHub user installation/repository intersection and repository admin check, then a global App/installation organization binding. Unknown or consumed state and cross-org rebinding are denied in the database.
+- Forged provider facts: browser DML and provider-command execution are denied. Raw-body HMAC verification precedes parsing; inbox uniqueness and revocation effects are transactional. Webhooks can revoke but cannot grant, reconnect or trust event ordering to restore access.
+- Malicious repositories: exact SHA/tree/blob verification, no checkout/archive extraction, bounded file/byte/path/depth/time budgets, symlink/submodule exclusion and fatal binary/UTF-8 classification. Import/config/package-script text is never executed or resolved.
+- Parser denial of service: file/total/AST/output ceilings plus a timed worker with memory limits; stalled blob reads terminate the ingestion promise. Worker threads are not a general-purpose hostile-code sandbox. No hostile code is intentionally executed.
+- Source exfiltration/prompt injection: parser receives bounded redacted source and an empty environment, with no model provider or outbound-network hook. Only paths/hashes/static enums and fixed proposal language are persisted. Redaction is heuristic; no promise of perfect secret detection is made.
+- Static false assurance: SQL is lexical evidence, symbol/helper matching is explicitly uncertain, and graph edges denote co-location only. Every proposal requires human confirmation; review creates an immutable version, never PASS/BLOCK/VERIFIED.
+- Stale authority: ingestion checks current lease/membership/connection/installation between source reads; publishing rechecks under database locks. Disconnect/provider revocation invalidates queued/running leases. In-flight network reads may finish, but subsequent reads/publication are denied.
+- Operational residuals: live GitHub OAuth/App setup is UNVERIFIED; callback UI bridge, production worker deployment/scheduling, distributed quotas, exact Supabase type generation and retention cleanup remain outstanding. Static processing does not authorize target traffic. Existing build advisories are unreachable from the supported source pipeline but remain assessed release risks.
+
+The Phase 2 controls below continue to apply.
+
 - Forged browser organization IDs and missing application filters: caller-token RLS independently isolates every new tenant table. Real SQL and PostgREST tests deny outsider access, including unfiltered lists and guessed UUIDs.
 - Self-escalation and last-owner races: no direct browser DML; security-definer commands verify current identity/role under an organization lock. A trigger protects the last owner; concurrent demotion tests exercise the invariant. Disabled/removed memberships lose access. Legacy internal/admin roles grant no LaunchGate role.
 - Cross-tenant references: composite FKs bind projects to secret/retention rows, requests to tasks and actor membership to audit. Privileged fixture tests prove malformed references fail independently of RLS.

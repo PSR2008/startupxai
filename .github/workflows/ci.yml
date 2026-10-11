@@ -27,3 +27,4 @@ jobs:
       # Full advisory assessment is tracked in docs/launchgate/dependency-audit.md.
       # Known highs remain explicit; any critical advisory fails this job.
       - run: npm audit --audit-level=critical
+      - run: npm audit --omit=dev --audit-level=critical

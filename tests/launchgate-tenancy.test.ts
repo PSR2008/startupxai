@@ -71,7 +71,7 @@ async function api(role: OrganizationRole = "OWNER", dbError: { code: string; me
     rpc(name: string, args: Record<string,unknown>) {
       calls.push({name,args});
       const response = { data: name === "lg_read_security_membership" ? membership(role) : {id:org}, error: dbError };
-      return { single: async () => response, maybeSingle: async () => response };
+      return { ...response, single: async () => response, maybeSingle: async () => response };
     },
   } as unknown as SupabaseClient;
   const verified = await principal();
@@ -142,4 +142,25 @@ test("new LaunchGate implementation cannot import legacy roles or service admin 
 test("type-only structural principal cannot bypass authorization service", async () => {
   const forged = {userId:user,origin:"supabase_verified_bearer"} as VerifiedPrincipal;
   await assert.rejects(requireProjectAccess(reader(),forged,project),{code:"AUTHENTICATION_REQUIRED"});
+});
+test("Phase 3 viewer cannot connect GitHub or request source snapshots",async()=>{
+  const {handler,calls}=await api("VIEWER");
+  assert.equal((await handler(request(`projects/${project}/github/setup`,"POST",{installationId:1,repositoryId:2}))).status,403);
+  assert.equal((await handler(request(`projects/${project}/repositories/${membershipId}/snapshots`,"POST",{commitSha:"a".repeat(40)}))).status,403);
+  assert.equal(calls.length,0);
+});
+test("Phase 3 source snapshot route only accepts immutable commit SHA",async()=>{
+  const {handler,calls}=await api("DEVELOPER");
+  assert.equal((await handler(request(`projects/${project}/repositories/${membershipId}/snapshots`,"POST",{commitSha:"main"}))).status,422);
+  assert.equal(calls.length,0);
+  assert.equal((await handler(request(`projects/${project}/repositories/${membershipId}/snapshots`,"POST",{commitSha:"a".repeat(40)}))).status,202);
+  assert.equal(calls[0].name,"lg_request_snapshot");
+});
+test("Phase 3 developer cannot confirm policy or submit fabricated provenance",async()=>{
+  const developer=await api("DEVELOPER");assert.equal((await developer.handler(request(`projects/${project}/invariant-proposals/${membershipId}/confirm`,"POST",{action:"CONFIRM",statement:"Policy",requestKey:org}))).status,403);
+  const owner=await api();assert.equal((await owner.handler(request(`projects/${project}/invariant-proposals/${membershipId}/confirm`,"POST",{action:"CONFIRM",statement:"Policy",requestKey:org,evidence:"forged"}))).status,422);
+});
+test("Phase 3 confirmation accepts explicit version action and rejects likely secret text",async()=>{
+ const {handler,calls}=await api();assert.equal((await handler(request(`projects/${project}/invariant-proposals/${membershipId}/confirm`,"POST",{action:"REFINE",statement:"Only owners may change membership.",requestKey:org}))).status,201);assert.equal(calls[0].name,"lg_review_invariant");
+ assert.equal((await handler(request(`projects/${project}/invariant-proposals/${membershipId}/confirm`,"POST",{action:"REFINE",statement:"sk-ant-syntheticsecret123456789",requestKey:org}))).status,422);
 });

@@ -1,6 +1,6 @@
 # Complete V1 acceptance ledger
 
-Status describes end-to-end V1 capability, not whether a type or foundation exists. Future criteria remain NOT_IMPLEMENTED; PARTIAL_PHASE_2 records bounded local data-foundation evidence without declaring the complete V1 criterion achieved. Completion requires recorded CI/integration/artifact evidence, not editing this status column alone.
+Status describes end-to-end V1 capability, not whether a type or foundation exists. Future criteria remain NOT_IMPLEMENTED; PARTIAL_PHASE_2 and PARTIAL_PHASE_3 record bounded local evidence without declaring the complete V1 criterion achieved. Completion requires recorded CI/integration/artifact evidence, not editing this status column alone.
 
 | ID | Description | Required evidence/test | Planned phase | Status |
 | --- | --- | --- | --- | --- |
@@ -10,10 +10,10 @@ Status describes end-to-end V1 capability, not whether a type or foundation exis
 | LG-03 | Fresh and upgraded database work | Empty DB and representative StartupX snapshot migration tests | 2 | PARTIAL_PHASE_2 |
 | LG-04 | All tenant surfaces isolated | Cross-org API/SQL/storage/jobs/streams/CLI/integration tests | 2, 10 | PARTIAL_PHASE_2 |
 | LG-05 | Member cannot promote itself or authorize targets | Role matrix and direct database/API adversarial tests | 2, 5 | PARTIAL_PHASE_2 |
-| LG-06 | GitHub connection is least privilege | Install/select/revoke/webhook/permission tests | 3 | NOT_IMPLEMENTED |
-| LG-07 | Repository ingestion cannot execute/escape | Hostile archive, symlink, path and install-script corpus | 3–4 | NOT_IMPLEMENTED |
-| LG-08 | Architecture discovery is attributable | Source SHA/file/line mapping against supported reference apps | 3 | NOT_IMPLEMENTED |
-| LG-09 | Ambiguous invariants require confirmation | Confirmation/version and policy-change browser/API tests | 3 | NOT_IMPLEMENTED |
+| LG-06 | GitHub connection is least privilege | Install/select/revoke/webhook/permission tests | 3 | PARTIAL_PHASE_3 |
+| LG-07 | Repository ingestion cannot execute/escape | Hostile archive, symlink, path and install-script corpus | 3–4 | PARTIAL_PHASE_3 |
+| LG-08 | Architecture discovery is attributable | Source SHA/file/line mapping against supported reference apps | 3 | PARTIAL_PHASE_3 |
+| LG-09 | Ambiguous invariants require confirmation | Confirmation/version and policy-change browser/API tests | 3 | PARTIAL_PHASE_3 |
 | LG-10 | Target testing requires current explicit authorization | Challenge/provider ownership, time/revocation, exact scope tests | 4 | NOT_IMPLEMENTED |
 | LG-11 | Public repo assessment never authorizes target requests | Network trace and denied dynamic-run tests | 3, 9 | NOT_IMPLEMENTED |
 | LG-12 | Synthetic setup and cleanup are bounded | Identity/data provisioning/reset/cleanup fault injection | 4 | NOT_IMPLEMENTED |
@@ -81,3 +81,33 @@ Local Windows/Node 24 validation: **289 application/unit tests passed**, zero fa
 | Scope/Git restrictions | PASS: launchgate-rebuild only; no commit/push/history change, UI redesign, integration or runner implementation |
 
 Limits: the Auth SQL contract and synthetic legacy row are local fixtures, not full hosted Supabase or a customer snapshot. Hosted token verification, real deployed grants/configuration, generated database types, production migration rehearsal, denied-attempt telemetry, distributed abuse controls, credential revocation, retention execution, legal-retention separation, backup expiry and end-to-end deletion remain outstanding. The integration suite does not claim these future capabilities are verified.
+
+## Phase 3 acceptance evidence - 2026-10-12
+
+Local validation: **359 application/unit tests passed**, zero failed/skipped; **80 disposable PostgreSQL/PostgREST tests passed**, zero failed/skipped. Total **439 passed**. The application total includes 44 static-source safety/detection/discovery cases, 22 GitHub/worker contract cases and four new API authorization cases. The database total includes the original 59 Phase 2 cases plus 21 Phase 3 cases. Earlier rehearsal ran the complete historical chain through 015 before schema expansion; the final suite also applies 016/017. Tests are not counted twice for repeated runs.
+
+Install, typecheck, lint, production build and diff whitespace checks passed. Lint retains the existing unused `describe` warning in `public-source.test.ts`; there are no new lint errors/warnings. Full audit remains 0 critical / 8 high / 3 moderate; omit-dev remains 0 critical / 1 high / 1 moderate. Both audit commands correctly return nonzero. All HIGH paths have a documented reachability assessment; none lies on the supported source-ingestion execution path. Remote CI has not run because no push was made.
+
+| Phase 3 completion criterion | Result / evidence |
+| --- | --- |
+| Customer code is never executed | PASS: pure blob ingestion and syntax parser; no customer install/build/test/emit/module resolution; side-effect sentinel stays absent |
+| Malicious repositories cannot escape supported boundaries | PASS: traversal/device/absolute/encoded/deep paths, symlinks, submodules, archives, binary/generated overload, byte/file/time limits and prompt-injection fixtures |
+| Immutable snapshot identity | PASS: full SHA required; commit/tree identities and Git blob bytes checked; unique connection/SHA/analysis version |
+| Architecture source provenance | PASS: file/blob/content digests and line ranges on graph observations, edges and integration evidence; strict publication validation |
+| Deterministic supported-stack detection | PASS: five stack fixtures plus SQL/client-boundary/Vercel observations; DETECTED/NOT_DETECTED/AMBIGUOUS |
+| Invariants carry evidence and uncertainty | PASS: all seven required families, explicit assumptions, mandatory confirmation, LOW/MEDIUM prioritization only |
+| Model/source text cannot create proof | PASS: no model provider invoked; strict report rejects verdict fields; no call into gate/evidence admission |
+| New entities are tenant isolated | PASS: RLS and composite tenant/project/snapshot FKs; browser provenance/inbox/lease forgery denied |
+| Webhook signatures and idempotency | PASS: raw HMAC contracts plus real durable inbox deduplication/revocation tests |
+| Installation ID cannot be hijacked | PASS: principal/project/selection-bound state, provider intersection/admin contracts, global installation/org uniqueness, real cross-org binding denial |
+| Revocation/disconnection stops new reads and publishing | PASS: current-authority checkpoints, database lease invalidation and revalidated fenced publication; already in-flight reads may finish |
+| No unassessed HIGH on ingestion runtime path | PASS for supported flow: audited parser/transport path; affected Next/CSS/glob processing is excluded, not declared fixed |
+| Existing StartupX remains green | PASS: all pre-existing application and Phase 2 database tests; historical migrations and UI preserved |
+| Human review is durable and versioned | PASS: ADMIN/OWNER confirmation/refinement/rejection/deferral, append-only versions and idempotency conflict tests |
+| Live GitHub installation/analysis | UNVERIFIED: App configuration absent; no successful live installation fabricated |
+| Exact Supabase type generation | BLOCKED_BY_ENVIRONMENT: CLI absent; real disposable PostgreSQL execution passed; narrow manual/runtime types retained |
+| Scheduling boundary | IMPLEMENTED INTERFACE: queue/lease/reclaim/check/publish entry point exists; Phase 4 must host/schedule it |
+
+Evidence files: `tests/launchgate-source-analysis.test.ts`, `tests/launchgate-github.test.ts`, `tests/launchgate-tenancy.test.ts`, `tests/database/launchgate-rls.test.ts`. The 44 source cases include five named stack fixtures and seven-family/ambiguous/provenance/SQL checks; these are included in the totals, not extra tests.
+
+Operational limitations remain explicit: OAuth callback UI bridge, production worker deployment/scheduling, hosted Supabase configuration validation, exact generated database types, distributed abuse quotas, source-metadata retention/deletion execution and full interprocedural/SQL semantic analysis are not implemented. Parser workers are resource bounds, not general customer-code sandboxes. Confirmed statements still need future fixture bindings and deterministic execution oracles. Live provider connectivity, dynamic assurance and Verified attestations remain unclaimed.

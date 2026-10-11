@@ -2,6 +2,20 @@
 
 Target: no **unassessed** critical/high exposure. This is not a zero-vulnerability declaration. `npm audit` still exits 1; none of these findings are hidden or declared harmless.
 
+## Phase 3 runtime-path assessment - 2026-10-12
+
+Before/after full audit: **11 affected package entries, 0 critical / 8 high / 3 moderate**. Before/after `npm audit --omit=dev`: **2 entries, 0 critical / 1 high / 1 moderate** (Next and its pinned PostCSS). Both commands return nonzero. The new private source-analysis workspace uses pinned TypeScript 5.9.3 at runtime; this was already installed for compilation and has no reported advisory in this audit. No forced upgrades or unsafe overrides were applied.
+
+| Affected package(s) | Classification in supported Phase 3 flow | Reachability and disposition |
+| --- | --- | --- |
+| braces, chokidar, micromatch, fast-glob, @next/eslint-plugin-next, eslint-config-next, tailwindcss | BUILD/DEV ONLY | Existing lint/Tailwind content scanning. Repository source never enters a glob, lint, build, watcher or Tailwind configuration evaluator. Parent/framework migrations remain a separate release task. |
+| postcss-selector-parser, postcss-nested | BUILD/DEV ONLY | Existing CSS compilation. The static analyzer does not parse customer CSS with these packages. Keep inaccessible to future customer-code build flows. |
+| next (inherited moderate), nested postcss (high) | CONTROL-PLANE RUNTIME package; affected path BUILD/DEV ONLY / NOT REACHABLE IN SUPPORTED FLOW | Next ships its pinned PostCSS under production dependencies, so omit-dev correctly still reports it. Local Next source places the relevant calls under `dist/build/webpack/config/blocks/css` and CSS loaders. Customer files remain in bounded memory buffers and never become Next inputs or files in the app directory. |
+
+**RUNTIME INGESTION PATH:** native Node crypto/fetch/worker threads, TypeScript syntax parser, Zod validation and scoped Supabase transport. No reported HIGH dependency is on the supported source-processing path. No advisory remains UNKNOWN on that path. The parser package has no imports of Next, PostCSS, Tailwind, glob libraries, filesystem, subprocess or networking; a regression test guards those capability imports. The GitHub adapter's only network authority is fixed GitHub API/OAuth URLs, never repository-supplied URLs.
+
+This addresses the Phase 2 prerequisite by **isolating the affected execution paths**, not by declaring the unresolved packages safe. No repository build/test/install/config evaluation exists. Any future customer-code execution, CSS processing, customer-controlled glob configuration or development-server exposure must reopen this assessment and resolve/isolate the affected dependencies first. The existing app still needs its planned framework/toolchain migration before broad production-security claims. Per-advisory links and impact analyses below remain applicable.
+
 ## Phase 2 recheck - 2026-10-11
 
 Before Phase 2: **11 affected package entries: 0 critical, 8 high, 3 moderate**. After the compatible update: **11 entries: 0 critical, 8 high, 3 moderate**. Full `npm audit` still exits 1. No new critical or other advisory was introduced; the remaining paths and applicability assessments below still apply.

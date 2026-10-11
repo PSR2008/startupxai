@@ -2,7 +2,7 @@ import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import { readFileSync, readdirSync } from "node:fs";
-import { createHmac, randomUUID } from "node:crypto";
+import { createHash, createHmac, randomUUID } from "node:crypto";
 
 // No connection string accepted: this suite creates its OWN isolated Docker database.
 // auth.uid() is the minimal Supabase SQL identity contract, not an Auth/JWT emulator.
@@ -285,4 +285,120 @@ dbtest("concurrent owner demotions cannot remove every owner", async () => {
   assert.equal(results.filter(r => r.code === 0).length, 1);
   assert.match(results.find(r => r.code !== 0)!.stderr, /23514/);
   assert.equal(execute(`SELECT count(*) FROM lg_organization_memberships WHERE organization_id='${org}' AND role='OWNER' AND status='ACTIVE'`), "1");
+});
+
+// Phase 3 runs AFTER the unchanged Phase 2 rehearsal and assertions above.
+const sourceOrg=uid(2000), foreignOrg=uid(2001), sourceProject=uid(2100), foreignProject=uid(2101);
+let connectionId="", snapshotId="", proposalId="";
+const literal=(value:unknown)=>`'${JSON.stringify(value).replace(/'/g,"''")}'::jsonb`;
+const serviceSql=(action:string,data:unknown)=>`SELECT public.lg_source_service('${action}',${literal(data)})`;
+const service=(action:string,data:unknown)=>JSON.parse(execute(`SET ROLE service_role; ${serviceSql(action,data)}`)||"null");
+function setupState(projectId=sourceProject,userId=owner,installation=456,repository=789) {
+ const stateHash=createHash("sha256").update(randomUUID()).digest("hex");
+ execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${userId}'; SELECT lg_github_setup('${projectId}','${stateHash}',${installation},${repository},'','${correlation}')`);
+ return {stateHash,actorId:userId,appId:123,installationId:installation,repositoryId:repository,accountId:12,owner:"fixture",name:"sample",visibility:"PRIVATE",defaultBranch:"main",correlationId:correlation};
+}
+dbtest("Phase 3 forward migrations apply over the complete rehearsed chain",()=>{
+ execute(readFileSync("migrations/016_launchgate_source_model.sql","utf8"));execute(readFileSync("migrations/017_launchgate_source_commands.sql","utf8"));
+ execute(`INSERT INTO lg_organizations(id,name,created_by) VALUES('${sourceOrg}','Source Alpha','${owner}'),('${foreignOrg}','Source Beta','${outsider}');
+ INSERT INTO lg_organization_memberships(organization_id,user_id,role) VALUES('${sourceOrg}','${owner}','OWNER'),('${sourceOrg}','${developer}','DEVELOPER'),('${sourceOrg}','${viewer}','VIEWER'),('${foreignOrg}','${outsider}','OWNER');
+ INSERT INTO lg_projects(id,organization_id,name,created_by) VALUES('${sourceProject}','${sourceOrg}','Source app','${owner}'),('${foreignProject}','${foreignOrg}','Foreign app','${outsider}');`);
+ connectionId=service("BIND",setupState()).connectionId;
+ snapshotId=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_request_snapshot('${sourceProject}','${connectionId}','${"a".repeat(40)}','${correlation}')`);
+ assert.ok(connectionId);assert.ok(snapshotId);
+});
+dbtest("all Phase 3 public tables and private nonce table force RLS",()=>{
+ assert.equal(execute("SELECT count(*) FROM pg_class WHERE relkind='r' AND relrowsecurity AND relforcerowsecurity AND (relname LIKE 'lg_%' OR relname='github_setup_states')"),"18");
+});
+dbtest("browser cannot call provider verification gateway or forge inbox",()=>{
+ denied(owner,serviceSql("BIND",{}));denied(owner,"INSERT INTO lg_integration_event_inbox(provider) VALUES('GITHUB')");
+ denied(owner,"SELECT * FROM launchgate_private.github_setup_states");
+});
+dbtest("viewer and developer cannot start integration setup",()=>{
+ for(const user of [viewer,developer])denied(user,`SELECT lg_github_setup('${sourceProject}','${"d".repeat(64)}',456,789,'','${correlation}')`);
+});
+dbtest("guessed or consumed setup state cannot bind an installation",()=>{
+ const bad=raw(`SET ROLE service_role; ${serviceSql("BIND",{...setupState(),stateHash:"f".repeat(64)})}`);assert.match(bad.stderr,/42501/);
+ const state=setupState();service("BIND",state);assert.match(raw(`SET ROLE service_role; ${serviceSql("BIND",state)}`).stderr,/42501/);
+});
+dbtest("setup nonce cannot be consumed by another principal",()=>{
+ const state=setupState();assert.match(raw(`SET ROLE service_role; ${serviceSql("READ_SETUP",{...state,actorId:outsider})}`).stderr,/42501/);
+});
+dbtest("installation binding cannot cross organizations even through service function",()=>{
+ const foreign=setupState(foreignProject,outsider);assert.match(raw(`SET ROLE service_role; ${serviceSql("BIND",foreign)}`).stderr,/42501/);
+});
+dbtest("selected repository ID must match setup authorization",()=>{
+ const state=setupState();assert.match(raw(`SET ROLE service_role; ${serviceSql("BIND",{...state,repositoryId:999})}`).stderr,/42501/);
+});
+dbtest("repository rename updates metadata without duplicating identity or connection",()=>{
+ const renamed=service("BIND",{...setupState(),name:"renamed"});assert.equal(renamed.connectionId,connectionId);
+ assert.equal(query(owner,`SELECT count(*) FROM lg_installation_repositories WHERE organization_id='${sourceOrg}'`),"1");
+ assert.equal(query(owner,`SELECT name FROM lg_installation_repositories WHERE organization_id='${sourceOrg}'`),"renamed");
+});
+dbtest("cross-org repository connections and snapshots are invisible",()=>{
+ assert.equal(query(outsider,`SELECT count(*) FROM lg_repository_connections WHERE id='${connectionId}'`),"0");
+ assert.equal(query(outsider,`SELECT count(id) FROM lg_repository_snapshots WHERE id='${snapshotId}'`),"0");
+ denied(outsider,`SELECT lg_request_snapshot('${sourceProject}','${connectionId}','${"b".repeat(40)}','${correlation}')`);
+});
+dbtest("cross-tenant project/connection FK fails under privileged identity",()=>{
+ const result=raw(`BEGIN; INSERT INTO lg_repository_snapshots(organization_id,project_id,connection_id,commit_sha,requested_by) VALUES('${foreignOrg}','${foreignProject}','${connectionId}','${"b".repeat(40)}','${outsider}'); ROLLBACK;`);assert.match(result.stderr,/23503/);
+});
+dbtest("snapshot request is idempotent and rejects moving refs",()=>{
+ assert.equal(query(owner,`SELECT lg_request_snapshot('${sourceProject}','${connectionId}','${"a".repeat(40)}','${correlation}')`),snapshotId);
+ denied(owner,`SELECT lg_request_snapshot('${sourceProject}','${connectionId}','main','${correlation}')`,"23514");
+});
+dbtest("browser cannot forge source, architecture or invariant provenance",()=>{
+ for(const table of ["lg_source_files","lg_architecture_snapshots","lg_invariant_proposals"])denied(owner,`INSERT INTO ${table}(organization_id) VALUES('${sourceOrg}')`);
+ denied(owner,`UPDATE lg_repository_snapshots SET tree_sha='${"f".repeat(40)}'`);
+ denied(owner,"SELECT lease FROM lg_repository_snapshots");
+});
+dbtest("analysis claims fence concurrent workers and stale completion",()=>{
+ const claim=service("CLAIM",{snapshotId});assert.equal(claim.snapshot.id,snapshotId);
+ assert.equal(service("CLAIM",{snapshotId}),null);
+ assert.match(raw(`SET ROLE service_role; ${serviceSql("COMPLETE",{snapshotId,lease:uid(9999)})}`).stderr,/42501/);
+ const report={kind:"STATIC_OBSERVATIONS",analysisVersion:"lg-static-1",proposals:[{id:"d".repeat(32),domain:"tenant_isolation",statement:"Members must not read another tenant's data.",status:"PROPOSED",confirmationRequired:true,evidence:[{path:"x.ts",digest:"c".repeat(64),blobSha:"e".repeat(40),startLine:1,endLine:1}],assumptions:["Policy confirmation required"],confidence:"LOW"}]};
+ service("COMPLETE",{snapshotId,lease:claim.snapshot.lease,commitSha:"a".repeat(40),treeSha:"b".repeat(40),sourceState:"COMPLETE",files:[{path:"x.ts",digest:"c".repeat(64),blobSha:"e".repeat(40),bytes:10,classification:"SOURCE"}],report,reportDigest:createHash("sha256").update(JSON.stringify(report)).digest("hex")});
+ proposalId=query(owner,`SELECT id FROM lg_invariant_proposals WHERE snapshot_id='${snapshotId}'`);
+ assert.ok(proposalId);assert.equal(service("CLAIM",{snapshotId}),null);
+});
+dbtest("architecture/proposals/source metadata remain tenant isolated",()=>{
+ for(const table of ["lg_architecture_snapshots","lg_invariant_proposals","lg_source_files"]){assert.equal(query(outsider,`SELECT count(*) FROM ${table} WHERE snapshot_id='${snapshotId}'`),"0");assert.equal(query(owner,`SELECT count(*) FROM ${table} WHERE snapshot_id='${snapshotId}'`),"1");}
+});
+dbtest("proposal confirmation requires project authorization and ADMIN role",()=>{
+ for(const user of [outsider,developer,viewer])denied(user,`SELECT lg_review_invariant('${sourceProject}','${proposalId}','CONFIRM','Policy','${randomUUID()}','${correlation}')`);
+});
+dbtest("confirmation retries deduplicate and refinement creates immutable versions",()=>{
+ const key=randomUUID();const command=`SELECT version FROM lg_review_invariant('${sourceProject}','${proposalId}','CONFIRM','Policy','${key}','${correlation}')`;
+ assert.equal(execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; ${command}`),"1");assert.equal(query(owner,command),"1");
+ assert.equal(execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT version FROM lg_review_invariant('${sourceProject}','${proposalId}','REFINE','Refined policy','${randomUUID()}','${correlation}')`),"2");
+ denied(owner,`UPDATE lg_invariant_confirmations SET statement='rewrite' WHERE proposal_id='${proposalId}'`);
+ denied(owner,`SELECT lg_review_invariant('${sourceProject}','${proposalId}','CONFIRM','Changed','${key}','${correlation}')`,"22023");
+ assert.equal(query(outsider,`SELECT count(*) FROM lg_invariant_confirmations WHERE proposal_id='${proposalId}'`),"0");
+});
+dbtest("webhook deduplication is durable, scoped and idempotent",()=>{
+ const data={appId:123,deliveryId:randomUUID(),installationId:456,event:"installation",action:"IGNORE",digest:"f".repeat(64)};
+ assert.equal(service("WEBHOOK",data).duplicate,false);assert.equal(service("WEBHOOK",data).duplicate,true);
+ assert.equal(service("WEBHOOK",{...data,appId:124}).duplicate,false);
+ assert.equal(query(owner,`SELECT count(*) FROM lg_integration_event_inbox WHERE delivery_id='${data.deliveryId}'`),"1");
+ assert.equal(query(outsider,"SELECT count(*) FROM lg_integration_event_inbox"),"0");
+});
+dbtest("webhook revocation blocks subsequent snapshot access until verified rebind",()=>{
+ service("WEBHOOK",{appId:123,deliveryId:randomUUID(),installationId:456,event:"installation",action:"REVOKE",digest:"a".repeat(64)});
+ denied(owner,`SELECT lg_request_snapshot('${sourceProject}','${connectionId}','${"c".repeat(40)}','${correlation}')`);
+ assert.match(raw(`SET ROLE service_role; ${serviceSql("CLAIM",{snapshotId})}`).stderr,/42501/);
+ service("BIND",setupState());
+});
+dbtest("explicit disconnect blocks subsequent snapshot requests",()=>{
+ const pending=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_request_snapshot('${sourceProject}','${connectionId}','${"d".repeat(40)}','${correlation}')`);
+ const lease=service("CLAIM",{snapshotId:pending}).snapshot.lease;
+ service("CHECK",{snapshotId:pending,lease});
+ execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_disconnect_repository('${sourceProject}','${connectionId}','${correlation}')`);
+ denied(owner,`SELECT lg_request_snapshot('${sourceProject}','${connectionId}','${"c".repeat(40)}','${correlation}')`);
+ denied(owner,`SELECT lg_retry_snapshot('${sourceProject}','${pending}','${correlation}')`);
+ assert.match(raw(`SET ROLE service_role; ${serviceSql("CHECK",{snapshotId:pending,lease})}`).stderr,/42501/);
+ assert.equal(query(owner,`SELECT state||':'||failure_code FROM lg_repository_snapshots WHERE id='${pending}'`),"FAILED:ACCESS_REVOKED");
+});
+dbtest("security-sensitive source operations create durable audit without token columns",()=>{
+ assert.equal(query(owner,`SELECT count(DISTINCT operation) FROM lg_audit_events WHERE organization_id='${sourceOrg}'`),"5");
+ assert.equal(execute("SELECT count(*) FROM information_schema.columns WHERE table_name IN ('lg_github_installations','lg_installation_repositories','lg_repository_connections','lg_repository_snapshots','lg_integration_event_inbox') AND column_name IN ('token','access_token','private_key','raw_body')"),"0");
 });
