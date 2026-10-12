@@ -19,7 +19,7 @@ export const scopeSchema = candidateSchema.extend({
 export type Scope = z.infer<typeof scopeSchema>;
 export const runSchema = z.object({
   id: identifierSchema, candidate: candidateSchema,
-  state: z.enum(["QUEUED", "PREPARING", "RUNNING", "CANCELLING", "COMPLETED", "CANCELLED", "ERROR"]),
+  state: z.enum(["QUEUED", "PREPARING", "RUNNING", "CANCELLING", "COMPLETED", "CANCELLED", "FAILED_INFRASTRUCTURE", "ERROR"]),
   authorizationId: identifierSchema,
   createdAt: z.string().datetime(),
   idempotencyKey: identifierSchema,

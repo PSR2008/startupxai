@@ -47,3 +47,7 @@ Phase 2 adds organization tenancy, scoped authorization, RLS, security audit, se
 Core outcomes are PASS, REPRODUCIBLE_FAILURE and INCONCLUSIVE. NOT_APPLICABLE is metadata. Release decisions are separate. Pure semantic tests are not customer verification, cryptographic evidence admission or signed attestations. The Phase 0 billing/quota/RLS/recovery risks remain pending explicit future work.
 
 `startupxai-final` preserves the archived StartupX baseline. Development stays on `launchgate-rebuild`; do not modify main or rewrite migration history.
+
+### LaunchGate Phase 4
+
+Durable orchestration and target authorization now have PostgreSQL commands, a separate orchestrator/runner protocol, Vercel ownership contracts, SSRF-resistant transport and sealed infrastructure observations. Start with [the orchestration guide](docs/launchgate/orchestration.md). Provider credentials and a production isolated runner backend remain deployment requirements; no customer code or attack suites run in this phase.

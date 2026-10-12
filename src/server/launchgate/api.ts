@@ -8,6 +8,7 @@ import { requireAuthenticatedPrincipal, requireOrganizationMembership, requireOr
 import { authorizationReader, databaseError, userDatabase } from "./database";
 import { addMemberSchema, createOrganizationSchema, createProjectSchema, retentionSchema, transferSchema, updateMemberSchema, uuidSchema, secretPublicColumns, membershipSchema } from "./domain";
 import { sourceRoute } from "../github/api";
+import { executionRoute } from "../execution/api";
 
 type Session = { principal: VerifiedPrincipal; db: SupabaseClient };
 type SessionFactory = (request: Request) => Promise<Session>;
@@ -42,7 +43,7 @@ export function createLaunchGateHandler(sessionFactory: SessionFactory = session
       const url = new URL(request.url);
       const path = url.pathname.replace(/^\/api\/v1\//, "").split("/");
       const method = request.method;
-      if (path[0] === "projects" && path.length >= 3) return await sourceRoute(request, { principal, db }, path, correlationId);
+      if (path[0] === "projects" && path.length >= 3) return await (["environments","targets","runs","vercel"].includes(path[2]) ? executionRoute : sourceRoute)(request, { principal, db }, path, correlationId);
       const result = (data: unknown, status = 200) => Response.json({ ok: true, data, correlationId }, { status, headers });
       const rpc = async (name: string, args: Record<string, unknown>) => {
         const { data, error } = await db.rpc(name, { ...args, p_correlation: correlationId }).single(); databaseError(error); return data;

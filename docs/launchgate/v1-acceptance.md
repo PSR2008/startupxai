@@ -1,6 +1,6 @@
 # Complete V1 acceptance ledger
 
-Status describes end-to-end V1 capability, not whether a type or foundation exists. Future criteria remain NOT_IMPLEMENTED; PARTIAL_PHASE_2 and PARTIAL_PHASE_3 record bounded local evidence without declaring the complete V1 criterion achieved. Completion requires recorded CI/integration/artifact evidence, not editing this status column alone.
+Status describes end-to-end V1 capability, not whether a type or foundation exists. Future criteria remain NOT_IMPLEMENTED; PARTIAL_PHASE_2, PARTIAL_PHASE_3 and PARTIAL_PHASE_4 record bounded local evidence without declaring the complete V1 criterion achieved. Completion requires recorded CI/integration/artifact evidence, not editing this status column alone.
 
 | ID | Description | Required evidence/test | Planned phase | Status |
 | --- | --- | --- | --- | --- |
@@ -14,13 +14,13 @@ Status describes end-to-end V1 capability, not whether a type or foundation exis
 | LG-07 | Repository ingestion cannot execute/escape | Hostile archive, symlink, path and install-script corpus | 3–4 | PARTIAL_PHASE_3 |
 | LG-08 | Architecture discovery is attributable | Source SHA/file/line mapping against supported reference apps | 3 | PARTIAL_PHASE_3 |
 | LG-09 | Ambiguous invariants require confirmation | Confirmation/version and policy-change browser/API tests | 3 | PARTIAL_PHASE_3 |
-| LG-10 | Target testing requires current explicit authorization | Challenge/provider ownership, time/revocation, exact scope tests | 4 | NOT_IMPLEMENTED |
-| LG-11 | Public repo assessment never authorizes target requests | Network trace and denied dynamic-run tests | 3, 9 | NOT_IMPLEMENTED |
-| LG-12 | Synthetic setup and cleanup are bounded | Identity/data provisioning/reset/cleanup fault injection | 4 | NOT_IMPLEMENTED |
-| LG-13 | Runner isolation contains hostile code | Escape, metadata, filesystem, IPv4/IPv6, DNS/redirect fixtures | 4 | NOT_IMPLEMENTED |
-| LG-14 | Cancellation stops new work and terminates within 10s | Measured revocation/kill drill | 4 | NOT_IMPLEMENTED |
-| LG-15 | Retries and duplicates do not duplicate side effects | Worker crash, stale lease, webhook replay and outbox tests | 4, 6, 9 | NOT_IMPLEMENTED |
-| LG-16 | Evidence admission authenticates actual execution | Lease/signature/hash/origin tamper tests with stored artifacts | 4 | NOT_IMPLEMENTED |
+| LG-10 | Target testing requires current explicit authorization | Challenge/provider ownership, time/revocation, exact scope tests | 4 | PARTIAL_PHASE_4 |
+| LG-11 | Public repo assessment never authorizes target requests | Network trace and denied dynamic-run tests | 3, 9 | PARTIAL_PHASE_4 |
+| LG-12 | Synthetic setup and cleanup are bounded | Identity/data provisioning/reset/cleanup fault injection | 4 | PARTIAL_PHASE_4 |
+| LG-13 | Runner isolation contains hostile code | Escape, metadata, filesystem, IPv4/IPv6, DNS/redirect fixtures | 4 | PARTIAL_PHASE_4 |
+| LG-14 | Cancellation stops new work and terminates within 10s | Measured revocation/kill drill | 4 | PARTIAL_PHASE_4 |
+| LG-15 | Retries and duplicates do not duplicate side effects | Worker crash, stale lease, webhook replay and outbox tests | 4, 6, 9 | PARTIAL_PHASE_4 |
+| LG-16 | Evidence admission authenticates actual execution | Lease/signature/hash/origin tamper tests with stored artifacts | 4 | PARTIAL_PHASE_4 |
 | LG-17 | Models cannot mint failures, blocks or attestations | Phase 1 negative semantics plus end-to-end prompt injection tests | 1, 3–4, 9 | NOT_IMPLEMENTED |
 | LG-18 | Every blocking finding has deterministic reproduction | Original/replay artifacts, controls, matching oracle and scope | 5–8 | NOT_IMPLEMENTED |
 | LG-19 | Missing setup/control/credentials/timeouts are inconclusive | Phase 1 semantics plus runner failure scenarios | 1, 4–7 | NOT_IMPLEMENTED |
@@ -29,14 +29,14 @@ Status describes end-to-end V1 capability, not whether a type or foundation exis
 | LG-22 | Billing/entitlement lifecycle verified | Stripe AND Razorpay safe-mode success/failure/monthly/yearly/change/cancel/expiry/refund matrix | 6 | NOT_IMPLEMENTED |
 | LG-23 | Webhook signature/duplicate/replay/order safety verified | Concurrent/reordered provider test event matrix | 6 | NOT_IMPLEMENTED |
 | LG-24 | AI anonymous/paid/quota/cost boundaries verified | OpenAI/Anthropic adapter tests and bounded provider observations | 7 | NOT_IMPLEMENTED |
-| LG-25 | Budgets reserved before work under concurrency | Distributed race tests, crash/refund/finalization ledger | 2, 7 | NOT_IMPLEMENTED |
+| LG-25 | Budgets reserved before work under concurrency | Distributed race tests, crash/refund/finalization ledger | 2, 7 | PARTIAL_PHASE_4 |
 | LG-26 | Critical happy/unhappy browser paths verified | Playwright journeys on vulnerable/fixed revisions | 7 | NOT_IMPLEMENTED |
 | LG-27 | Build/configuration/migration safety verified | Disposable DB migration/build/environment fixtures | 7 | NOT_IMPLEMENTED |
 | LG-28 | Every major domain has Reference Lab triplets | Executable fixture apps; Phase 1 pure cases are partial evidence | 1, 5–7 | NOT_IMPLEMENTED |
 | LG-29 | Fix PRs stay within authorized scope | Patch validation, no merge/workflow privilege, PR tests | 8 | NOT_IMPLEMENTED |
 | LG-30 | Exact replay preserves oracle and fixture recipe | Vulnerable → fix build replay; adjacent positive controls | 8 | NOT_IMPLEMENTED |
 | LG-31 | Permanent regressions fail before and pass after fix | Same test on original/fixed revisions | 8 | NOT_IMPLEMENTED |
-| LG-32 | Commit/deployment A cannot approve or block B | Phase 1 scope tests plus real GitHub/Vercel integration tests | 1, 9 | NOT_IMPLEMENTED |
+| LG-32 | Commit/deployment A cannot approve or block B | Phase 1 scope tests plus real GitHub/Vercel integration tests | 1, 9 | PARTIAL_PHASE_4 |
 | LG-33 | Missing coverage cannot become successful required check | Branch protection/check conclusion integration tests | 9 | NOT_IMPLEMENTED |
 | LG-34 | Verified badge is scoped, expiring and revocable | Signing, stale candidate, expiry/revocation/publication tests | 9 | NOT_IMPLEMENTED |
 | LG-35 | CLI and public assessment operate self-service | Fresh machine local/no-upload and hosted auth/run flows | 9 | NOT_IMPLEMENTED |
@@ -111,3 +111,31 @@ Install, typecheck, lint, production build and diff whitespace checks passed. Li
 Evidence files: `tests/launchgate-source-analysis.test.ts`, `tests/launchgate-github.test.ts`, `tests/launchgate-tenancy.test.ts`, `tests/database/launchgate-rls.test.ts`. The 44 source cases include five named stack fixtures and seven-family/ambiguous/provenance/SQL checks; these are included in the totals, not extra tests.
 
 Operational limitations remain explicit: OAuth callback UI bridge, production worker deployment/scheduling, hosted Supabase configuration validation, exact generated database types, distributed abuse quotas, source-metadata retention/deletion execution and full interprocedural/SQL semantic analysis are not implemented. Parser workers are resource bounds, not general customer-code sandboxes. Confirmed statements still need future fixture bindings and deterministic execution oracles. Live provider connectivity, dynamic assurance and Verified attestations remain unclaimed.
+
+## Phase 4 evidence - 2026-10-12
+
+Local implementation validation: **434 application/unit tests + 111 real PostgreSQL/PostgREST tests = 545 passed**, zero failures, cancellations or skips. This includes the original 359 application and 80 database tests. New focused suites: orchestration 3, target safety 39, Vercel 12, runner/evidence 17; four additional API tests and 31 additional database cases. Focused suite counts are included in 545, not additional tests.
+
+`npm.cmd install`, typecheck, lint, production build (56 generated pages) and `git diff --check` passed. Lint has one pre-existing unused `describe` warning in `tests/public-source.test.ts`. Full audit changed from 8 HIGH/3 MODERATE to 7 HIGH/2 MODERATE (exit 1); production changed from 1 HIGH/1 MODERATE to zero (exit 0). See the current dependency assessment. No remote CI was triggered because no push was made.
+
+| Phase 4 acceptance requirement | Result and scope |
+|---|---|
+| Explicit scoped revocable authorization | PASS: OWNER/ADMIN, exact provider deployment/host, current proof, version/expiry and revocation; repository access alone is insufficient |
+| Immutable run provenance | PASS: snapshot/deployment commit and authorization version composite FKs, frozen invariant versions, policy/runner version and image digest placeholder |
+| Durable jobs, fencing and crash recovery | PASS: PostgreSQL transaction, leases, one-time grant start, monotonic fences, restart recovery, cleanup barrier and three-attempt dead letter |
+| Cancellation and cleanup | PASS in controlled tests: intent prevents requests/publication; heartbeat abort; provider termination/cleanup hooks; no release until cleanup confirms |
+| Ten-second controlled recognition | PASS: 1006 ms from blocked probe start to transport abort after the first rejected one-second heartbeat; not a cloud provider kill measurement |
+| Atomic budgets | PASS: simultaneous database claim transactions admit one two-slot reservation; organization-wide and per-authorization ceilings; request accounting before I/O and cleanup reconciliation |
+| Narrow authenticated runner authority | PASS: Ed25519 audience/expiry/JTI/attempt/fence; no DB/GitHub/account-wide Vercel/billing credentials; fixed environment specification |
+| Browser cannot forge trusted state | PASS: forced RLS, no DML or worker gateway grants, direct SQL/API denial tests, immediate member revocation |
+| Authenticated evidence ingestion | PASS for infrastructure observations: scope/schema/time/sequence/hash checks; immutable manifest; stale/cancelled publication denied; duplicate same-digest completion |
+| SSRF and exact allowlist | PASS: IPv4/IPv6/private/mapped/metadata checks, DNS pinning/rebinding fixtures, local synthetic server, redirect stop, no credential forwarding |
+| Live payment disallowed | PASS: only root resource.read; TEST_ONLY policy and zero spend; no payment adapter available |
+| Dependency security | PASS for implemented runner/target path: production audit zero; remaining build/dev exposures assessed and excluded from customer execution |
+| StartupX coexistence | PASS: all existing tests/build remain green, old routes/features and migrations 001�017 preserved |
+| Live Vercel E2E | UNVERIFIED: strict contract mocks only; credentials not used |
+| Production sandbox isolation | NOT CLAIMED: backend interface and sanitized launch spec exist; real isolation/egress/termination require provider deployment and validation |
+| Production orchestration hosting | NOT DEPLOYED: separate service loop/internal handler implemented; host supplies store, signing key, artifact adapter and runner backend |
+| Supabase exact generated types | BLOCKED_BY_ENVIRONMENT: CLI absent; real local SQL/PostgREST execution passed |
+
+Phase 4 is the bounded infrastructure foundation. The broader V1 ledger remains partial because there is no customer-code execution, full attack/browser suite, runnable invariant executor, public attestation, production backend or complete live-account onboarding flow. Phase 4 transport metadata never becomes a verified security finding. Source-analysis scheduling remains its existing separate worker entry point. Artifact expiration has an adapter method but needs host scheduling; production storage, key rotation and provider kill drills remain rollout work.

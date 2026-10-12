@@ -402,3 +402,125 @@ dbtest("security-sensitive source operations create durable audit without token 
  assert.equal(query(owner,`SELECT count(DISTINCT operation) FROM lg_audit_events WHERE organization_id='${sourceOrg}'`),"5");
  assert.equal(execute("SELECT count(*) FROM information_schema.columns WHERE table_name IN ('lg_github_installations','lg_installation_repositories','lg_repository_connections','lg_repository_snapshots','lg_integration_event_inbox') AND column_name IN ('token','access_token','private_key','raw_body')"),"0");
 });
+
+// Phase 4 runs after the unchanged Phase 2/3 assertions above.
+const executionSql=(action:string,data:unknown)=>`SELECT public.lg_execution_service('${action}',${literal(data)})`;
+const executionService=(action:string,data:unknown={})=>JSON.parse(execute(`SET ROLE service_role; ${executionSql(action,data)}`)||"null");
+const commandSql=(action:string,data:unknown,p=sourceProject)=>`SELECT public.lg_execution_command('${p}','${action}',${literal(data)},'${correlation}')`;
+const executionCommand=(action:string,data:unknown,user=owner)=>JSON.parse(execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${user}'; ${commandSql(action,data)}`));
+let environmentId:string,deploymentId:string,vercelId:string;
+function authorizeTarget(extra:Record<string,unknown>={}) {return executionCommand("AUTHORIZE",{deploymentId,requestKey:randomUUID(),expiresAt:new Date(Date.now()+1800000).toISOString(),requestLimit:10,concurrencyLimit:1,durationSeconds:60,...extra}).id;}
+function createRun(authorizationId=authorizeTarget(),extra:Record<string,unknown>={}) {return executionCommand("RUN",{authorizationId,snapshotId,requestKey:randomUUID(),invariants:[],...extra}).id;}
+function claimRun(){return executionService("CLAIM",{workerId:uid(8000)});}
+function attemptAuthority(c:ReturnType<typeof claimRun>){return {attemptId:c.attempt.id,fence:c.job.fence,grantId:c.attempt.grant_id,runnerId:c.attempt.runner_id};}
+function cleanupAttempt(){const c=executionService("CLEANUP_CLAIM",{workerId:uid(8000)});assert.ok(c);executionService("CLEANUP_DONE",{attemptId:c.attempt.id,fence:c.attempt.fence,workerId:uid(8000)});return c;}
+function stopAll(){execute(`UPDATE lg_verification_runs SET state='CANCELLING' WHERE state IN ('QUEUED','PREPARING','RUNNING');`);executionService("RECOVER");while(execute("SELECT count(*) FROM lg_jobs WHERE state='CLEANUP'")!=="0")cleanupAttempt();}
+
+dbtest("Phase 4 migrations apply forward after all Phase 3 tests",()=>{
+ execute(readFileSync("migrations/018_launchgate_execution_model.sql","utf8"));execute(readFileSync("migrations/019_launchgate_execution_commands.sql","utf8"));
+ service("BIND",setupState());
+ environmentId=executionCommand("ENVIRONMENT",{name:"Preview",type:"PREVIEW"}).id;
+ vercelId=executionService("CONNECT",{projectId:sourceProject,actorId:owner,accountId:"team_fixture",providerProjectId:"prj_fixture",credentialReference:uid(8001)}).id;
+ deploymentId=executionService("DEPLOYMENT",{projectId:sourceProject,actorId:owner,environmentId,connectionId:vercelId,repositoryConnectionId:connectionId,providerDeploymentId:"dpl_fixture",targetUrl:"https://fixture-hash.vercel.app/",commitSha:"a".repeat(40),proofDigest:"f".repeat(64)}).id;
+ assert.equal(execute("SELECT count(*) FROM pg_class WHERE relname IN ('lg_environments','lg_deployments','lg_target_authorizations','lg_runner_leases') AND relrowsecurity AND relforcerowsecurity"),"4");
+});
+for(const table of ["lg_environments","lg_deployments","lg_verification_runs","lg_artifacts","lg_evidence_manifests"])dbtest(`Phase 4 cross-tenant ${table} read denied`,()=>{
+ assert.equal(query(outsider,`SELECT count(*) FROM ${table} WHERE organization_id='${sourceOrg}'`),"0");
+});
+for(const table of ["lg_authorization_proofs","lg_deployments","lg_runner_leases","lg_artifacts","lg_evidence_manifests","lg_assertion_results","lg_jobs"])
+ dbtest(`browser cannot forge ${table}`,()=>denied(owner,`INSERT INTO ${table}(organization_id) VALUES('${sourceOrg}')`));
+dbtest("browser cannot claim/complete attempts or mint grants",()=>{for(const action of ["CLAIM","START","COMPLETE","CONNECT"])denied(owner,executionSql(action,{}));denied(owner,"SELECT * FROM lg_runner_leases");});
+dbtest("viewer cannot execute and developer cannot authorize",()=>{
+ denied(viewer,commandSql("RUN",{}));denied(developer,commandSql("AUTHORIZE",{deploymentId}));
+});
+dbtest("explicit authorization idempotency and exact deployment binding",()=>{
+ const request={deploymentId,requestKey:randomUUID(),expiresAt:new Date(Date.now()+1800000).toISOString(),requestLimit:10,concurrencyLimit:1,durationSeconds:60};
+ const a=executionCommand("AUTHORIZE",request);assert.deepEqual(executionCommand("AUTHORIZE",request),a);
+ denied(owner,commandSql("AUTHORIZE",{...request,requestLimit:11}),"22023");
+ assert.equal(query(owner,`SELECT hostname||':'||ports[1]||':'||operations[1] FROM lg_target_allowlists WHERE authorization_id='${a.id}'`),"fixture-hash.vercel.app:443:resource.read");
+});
+dbtest("run request deduplicates and binds snapshot/deployment/authorization",()=>{
+ const authorizationId=authorizeTarget();const request={authorizationId,snapshotId,requestKey:randomUUID(),invariants:[]};
+ const run=executionCommand("RUN",request,developer);assert.deepEqual(executionCommand("RUN",request,developer),run);
+ assert.equal(query(owner,`SELECT count(*) FROM lg_jobs WHERE run_id='${run.id}'`),"1");
+ denied(owner,commandSql("RUN",{...request,invariants:[{}]}),"22023");stopAll();
+});
+dbtest("commit mismatch and unconfirmed invariant are rejected",()=>{
+ const otherSnapshot=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_request_snapshot('${sourceProject}','${connectionId}','${"b".repeat(40)}','${correlation}')`);
+ denied(owner,commandSql("RUN",{authorizationId:authorizeTarget(),snapshotId:otherSnapshot,requestKey:randomUUID(),invariants:[]}),"23503");
+ denied(owner,commandSql("RUN",{authorizationId:authorizeTarget(),snapshotId,requestKey:randomUUID(),invariants:[{id:uid(9988),version:1}]}));
+});
+dbtest("worker crash requires cleanup before stale lease recovery and fences A",()=>{
+ const run=createRun();const a=claimRun();assert.equal(a.run.id,run);executionService("START",attemptAuthority(a));assert.equal(claimRun(),null);
+ execute(`UPDATE lg_runner_leases SET expires_at=now()-interval '1 second' WHERE attempt_id='${a.attempt.id}'`);executionService("RECOVER");
+ assert.equal(claimRun(),null);cleanupAttempt();execute(`UPDATE lg_jobs SET available_at=now() WHERE run_id='${run}'`);
+ const b=claimRun();assert.ok(b.job.fence>a.job.fence);assert.notEqual(b.attempt.id,a.attempt.id);
+ assert.match(raw(`SET ROLE service_role; ${executionSql("COMPLETE",attemptAuthority(a))}`).stderr,/42501/);stopAll();
+});
+dbtest("grant is one-time and foreign runner cannot start",()=>{
+ createRun();const c=claimRun();assert.match(raw(`SET ROLE service_role; ${executionSql("START",{...attemptAuthority(c),runnerId:uid(8899)})}`).stderr,/42501/);
+ executionService("START",attemptAuthority(c));assert.match(raw(`SET ROLE service_role; ${executionSql("START",attemptAuthority(c))}`).stderr,/42501/);stopAll();
+});
+dbtest("authorization revoked while queued prevents claim",()=>{
+ const a=authorizeTarget();createRun(a);executionCommand("REVOKE",{authorizationId:a});assert.equal(claimRun(),null);executionService("RECOVER");
+});
+dbtest("authorization revoked while running rejects request/evidence and releases after cleanup",()=>{
+ const a=authorizeTarget();createRun(a);const c=claimRun();executionService("START",attemptAuthority(c));executionCommand("REVOKE",{authorizationId:a});
+ for(const action of ["REQUEST","COMPLETE"])assert.match(raw(`SET ROLE service_role; ${executionSql(action,attemptAuthority(c))}`).stderr,/42501/);
+ executionService("RECOVER");cleanupAttempt();assert.equal(execute(`SELECT active||':'||reserved FROM lg_execution_budgets WHERE organization_id='${sourceOrg}'`),"0:0");
+});
+dbtest("cancel races cannot finalize success and cleanup persists across restart",()=>{
+ const run=createRun();const c=claimRun();executionService("START",attemptAuthority(c));executionCommand("CANCEL",{runId:run},developer);
+ assert.match(raw(`SET ROLE service_role; ${executionSql("COMPLETE",attemptAuthority(c))}`).stderr,/42501/);
+ executionService("RECOVER");const cleanup=executionService("CLEANUP_CLAIM",{workerId:uid(8000)});assert.ok(cleanup);
+ execute(`UPDATE lg_runner_leases SET cleanup_expires_at=now()-interval '1 second' WHERE attempt_id='${c.attempt.id}'`);cleanupAttempt();
+ assert.equal(query(owner,`SELECT state FROM lg_verification_runs WHERE id='${run}'`),"CANCELLED");
+});
+dbtest("request reservations enforce org concurrency and per-authorization ceilings",()=>{
+ const auth=authorizeTarget({concurrencyLimit:2,requestLimit:2});createRun(auth);createRun(auth);const c=claimRun();assert.equal(claimRun(),null);
+ executionService("START",attemptAuthority(c));executionService("REQUEST",attemptAuthority(c));
+ execute(`UPDATE lg_job_attempts SET next_request_at=now()-interval '1 second' WHERE id='${c.attempt.id}'`);executionService("REQUEST",attemptAuthority(c));
+ assert.match(raw(`SET ROLE service_role; ${executionSql("REQUEST",attemptAuthority(c))}`).stderr,/42501/);stopAll();
+});
+dbtest("expired lease cannot heartbeat or admit evidence",()=>{
+ createRun();const c=claimRun();executionService("START",attemptAuthority(c));execute(`UPDATE lg_runner_leases SET expires_at=now()-interval '1 second' WHERE attempt_id='${c.attempt.id}'`);
+ for(const action of ["CHECK","COMPLETE"])assert.match(raw(`SET ROLE service_role; ${executionSql(action,attemptAuthority(c))}`).stderr,/42501/);stopAll();
+});
+dbtest("sealed evidence, duplicate completion, immutable artifacts and cross-tenant metadata",()=>{
+ const run=createRun();const c=claimRun();executionService("START",attemptAuthority(c));executionService("REQUEST",attemptAuthority(c));
+ const data={...attemptAuthority(c),requests:1,digest:`sha256:${"e".repeat(64)}`,manifest:{runId:run,attemptId:c.attempt.id,commitSha:c.run.commit_sha,deploymentId,authorizationId:c.run.authorization_id,authorizationVersion:c.run.authorization_version,fence:c.job.fence,runnerId:c.attempt.runner_id},artifacts:[],observations:[]};
+ executionService("COMPLETE",data);assert.equal(executionService("COMPLETE",data).duplicate,true);
+ denied(owner,"UPDATE lg_evidence_manifests SET digest='forged'");assert.equal(query(outsider,`SELECT count(*) FROM lg_evidence_manifests WHERE run_id='${run}'`),"0");
+ cleanupAttempt();assert.equal(query(owner,`SELECT state||':'||result FROM lg_verification_runs WHERE id='${run}'`),"COMPLETED:UNOBSERVABLE");
+});
+dbtest("revoked member immediately loses run reads and execution",()=>{
+ const run=createRun();execute(`UPDATE lg_organization_memberships SET status='DISABLED' WHERE organization_id='${sourceOrg}' AND user_id='${developer}'`);
+ assert.equal(query(developer,`SELECT count(*) FROM lg_verification_runs WHERE id='${run}'`),"0");denied(developer,commandSql("CANCEL",{runId:run}));
+ execute(`UPDATE lg_organization_memberships SET status='ACTIVE' WHERE organization_id='${sourceOrg}' AND user_id='${developer}'`);stopAll();
+});
+dbtest("revoked Vercel connection cannot authorize a run",()=>{
+ const a=authorizeTarget();executionCommand("REVOKE_CONNECTION",{connectionId:vercelId});
+ denied(owner,commandSql("RUN",{authorizationId:a,snapshotId,requestKey:randomUUID(),invariants:[]}));
+});
+
+dbtest("parallel claim transactions atomically reserve organization capacity",async()=>{
+ execute(`UPDATE lg_vercel_connections SET status='ACTIVE' WHERE id='${vercelId}'`);
+ createRun(authorizeTarget({concurrencyLimit:2}));createRun(authorizeTarget({concurrencyLimit:2}));
+ const race=()=>new Promise<string>((resolve,reject)=>{
+  const child=spawn("docker",["exec","-i",container,"psql","-X","-qAt","-v","ON_ERROR_STOP=1","-U","postgres","-d","launchgate_test"],{windowsHide:true});let out="",err="";
+  child.stdout.on("data",d=>{out+=d;});child.stderr.on("data",d=>{err+=d;});child.on("close",code=>code===0?resolve(out.trim()):reject(new Error(err)));
+  child.stdin.end(`BEGIN; SET LOCAL ROLE service_role; ${executionSql("CLAIM",{workerId:randomUUID()})}; SELECT pg_sleep(0.2); COMMIT;`);
+ });
+ const results=await Promise.all([race(),race()]);assert.equal(results.filter(x=>x.includes('"attempt"')).length,1);
+ assert.equal(execute(`SELECT active FROM lg_execution_budgets WHERE organization_id='${sourceOrg}'`),"2");stopAll();
+});
+dbtest("three failed attempts dead-letter only after cleanup and release budgets",()=>{
+ const run=createRun();
+ for(let i=0;i<3;i++){const c=claimRun();assert.ok(c);executionService("START",attemptAuthority(c));executionService("FAIL",attemptAuthority(c));cleanupAttempt();execute(`UPDATE lg_jobs SET available_at=now() WHERE run_id='${run}'`);}
+ assert.equal(query(owner,`SELECT state FROM lg_verification_runs WHERE id='${run}'`),"FAILED_INFRASTRUCTURE");assert.equal(execute(`SELECT state FROM lg_jobs WHERE run_id='${run}'`),"DEAD");
+ assert.equal(execute(`SELECT active||':'||reserved FROM lg_execution_budgets WHERE organization_id='${sourceOrg}'`),"0:0");
+});
+dbtest("authorization/proof expiry and changed provider status deny execution",()=>{
+ const auth=authorizeTarget();createRun(auth);execute(`UPDATE lg_authorization_proofs SET revoked_at=now() WHERE deployment_id='${deploymentId}'`);assert.equal(claimRun(),null);executionService("RECOVER");
+ denied(owner,commandSql("AUTHORIZE",{deploymentId,requestKey:randomUUID(),expiresAt:new Date(Date.now()+100000).toISOString(),requestLimit:10,concurrencyLimit:1,durationSeconds:30}));
+});

@@ -60,3 +60,16 @@ Initial proposed safety ceilings: HTTPS 443, two requests/second, burst five, tw
 Schema-valid data is not authenticated evidence. A model can fabricate JSON and hashes. The future ingestion service—not a JSON field—must establish who executed a test and validate its bytes and scope. Runner code and customer targets cannot mint trusted admission. No Phase 1 function signs or issues a LaunchGate attestation.
 
 Current StartupX risks remain: replay-sensitive payment activation, missing capture validation, post-work usage accounting/non-atomic fallback, unrestricted usage RPC grants in migration 007, incomplete parent-ownership RLS, missing recovery-session handling, process-local rate limiting and incomplete fetch egress controls. Do not describe these as repaired by Phase 1 contracts. Historical migrations must not be edited; future repairs use new migrations and real database tests.
+
+## Phase 4 target, runner and evidence controls (2026-10-12)
+
+- Confused-deputy target access: verified repository access is insufficient; explicit ADMIN/OWNER deployment authorization and current provider proof are required.
+- SSRF and DNS rebinding: HTTPS/443 exact hostname, all-answer public-address validation, actual connection pinning, normal TLS verification, no proxy environment or redirect following. Tests use synthetic DNS/transport and one local server only.
+- Stolen or stale runner capability: Ed25519 audience/expiry/JTI/attempt/fence binding; single-use START; live database checks before requests, heartbeats and evidence publication. Capabilities must stay out of logs.
+- Crash/replay/budget races: organization locks, transactional job/reservation creation, monotonic attempts, duplicate digest handling, retry limits and durable cleanup. Reservations are not released merely because a lease expired.
+- Forged evidence or secret smuggling: strict bounded numeric transport metadata, canonical artifacts and verified hashes; arbitrary Phase 1 assertion evidence remains unavailable without an executor. Browser/model/source authority cannot publish trusted manifests.
+- Tenant confusion: forced RLS, no trusted-table DML grants, private leases/credential references, composite tenant/project/commit/version/attempt/run constraints. Current memberships are rechecked.
+- Cancellation: immediate durable intent and grant denial, one-second runner polling, bounded control request timeout, provider termination/cleanup hooks. In-flight effects cannot be undone.
+- Host compromise: service separation is not a sandbox. Production provider must enforce isolated execution and scoped egress independently. No customer code runs in Phase 4; no worker_threads/Docker sandbox guarantee is asserted.
+
+Residual risks: live Vercel field/permission validation is UNVERIFIED; proof freshness is bounded to one hour and explicit local revocation is immediate. No Vercel webhook revocation feed is implemented. Backend kill latency, real egress isolation, production storage encryption/retention and key rotation are not proven by local protocol tests. An authorized target can still have unsafe GET semantics; Phase 4 supports only explicitly authorized non-production deployment scopes.

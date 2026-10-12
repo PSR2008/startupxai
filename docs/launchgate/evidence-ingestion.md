@@ -1,0 +1,13 @@
+# Authenticated evidence ingestion
+
+Runner output is untrusted until the internal handler verifies its Ed25519 capability and strict envelope, then rechecks live authorization/lease/fence in PostgreSQL. Browser sessions, source repositories, models and legacy StartupX evidence are not accepted as runner authority.
+
+The Phase 4 envelope binds JTI, attempt/fence, authorization/version, completion time and monotonic single sequence. The trusted grant supplies run/job, organization/project, commit/snapshot, deployment, invariant versions, policy and runner identity. Timestamps cannot predate issuance or exceed bounded clock skew. Actual durable request consumption must match the submitted count. Cancellation, revocation, expiry or a newer attempt denies publication.
+
+The shared Phase 1 evidence schema is reused in the transport envelope, but nonempty verification evidence is deliberately rejected until a deterministic invariant executor exists. Phase 4 admits only INFRASTRUCTURE_OBSERVATION with numeric HTTP status. No PASS/BLOCK/Verified admission is produced and the Phase 1 gate is not fed fabricated security results. Selected invariant results are UNOBSERVABLE.
+
+Artifacts are private, immutable, addressed by attempt/artifact UUID and SHA-256 checked before persistence. Only canonical bounded transport-status metadata is admitted; claimed redaction cannot smuggle arbitrary text, secrets, response bodies, screenshots or traces. Individual artifacts are at most 1 MiB and the attempt total at most 4 MiB. Database rows contain hashes/size/classification/redaction/storage references/expiry, not large bytes.
+
+The local private adapter uses an operator-owned directory outside public web roots and exclusive file creation. Never use an untrusted/shared writable directory. Its seven-day expiry method must be scheduled by the service host; production requires private object storage with its own lifecycle and encryption. Failed-attempt temporary artifacts are removed during cleanup. A crash between file persistence and database publication leaves an untrusted orphan, reclaimed by cleanup or retention; it does not create admitted evidence.
+
+The sealed manifest is canonical JSON plus SHA-256, binding exact deployment/commit/authorization, tenant/run/attempt/fence, runner version/image placeholder, invariant/policy versions, observation/artifact hashes, sequence and creation time. Append-only database triggers prevent rewriting it. Duplicate completion must have the identical digest. This is a tamper-evident stored manifest, not a public attestation signature or Verified badge.

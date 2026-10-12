@@ -71,3 +71,11 @@ Use separate development/staging/production data, keys and provider accounts. Re
 ## Toolchain
 
 Node 24.19.0 is the locally validated runtime, declared in `.node-version`; engines restrict to Node 24 (minimum 24.19) and npm 11. Next 15.5.27 declares Node >=20 support. Local root install/typecheck/lint/test/build validate this choice; no speculative downgrade. CI uses the same Node declaration. Unit tests use Node's `react-server` condition to load genuine `server-only` modules without replacing or mocking the boundary; Next's production compiler still enforces client import restrictions. Browser component tests will need a separate non-server test entrypoint later.
+
+## Phase 4 execution foundation (2026-10-12)
+
+A browser-authorized command creates a provenance-bound run and PostgreSQL job transactionally. The separate orchestrator reserves shared budgets, leases an attempt with a monotonic fence, and signs narrowly scoped runner authority. The fixed runner performs only an authorized root GET; authenticated ingestion seals transport observations and the run remains UNOBSERVABLE as a verification result. Cleanup must confirm backend termination before retry or reservation release.
+
+See [orchestration](orchestration.md), [target authorization](target-authorization.md), [runner security](runner-security.md), [Vercel integration](vercel-integration.md) and [evidence ingestion](evidence-ingestion.md). Migrations 018/019 add bounded execution records and commands with forced RLS, no browser trusted-state writes, append-only evidence and composite provenance constraints. Existing source-analysis jobs remain separate; this orchestrator schedules Phase 4 verification jobs, not a retroactive implementation of all future job kinds.
+
+Production runner hosting, egress enforcement, key management and artifact lifecycle scheduling are deployment prerequisites. The backend interface and service loop are implemented; no cloud sandbox or live provider validation is claimed. No customer code, dynamic attack suite, production monitoring, fix PR or Verified badge is enabled.

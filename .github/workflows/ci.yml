@@ -20,6 +20,8 @@ jobs:
       - run: npm run type-check
       - run: npm run lint
       - run: npm run test
+      # Phase 4 suites are included in test; named commands support focused runs.
+      # Database suite also covers durable orchestration races and RLS.
       - run: npm run test:database
         env:
           LAUNCHGATE_REQUIRE_DATABASE: "1"
@@ -27,4 +29,4 @@ jobs:
       # Full advisory assessment is tracked in docs/launchgate/dependency-audit.md.
       # Known highs remain explicit; any critical advisory fails this job.
       - run: npm audit --audit-level=critical
-      - run: npm audit --omit=dev --audit-level=critical
+      - run: npm audit --omit=dev --audit-level=high

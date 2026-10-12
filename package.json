@@ -10,7 +10,11 @@
     "type-check": "tsc --noEmit",
     "test": "node --conditions=react-server --import tsx --test tests/*.test.ts",
     "test:launchgate": "node --conditions=react-server --import tsx --test tests/launchgate-*.test.ts",
-    "test:database": "node --import tsx --test tests/database/*.test.ts"
+    "test:database": "node --import tsx --test tests/database/*.test.ts",
+    "test:orchestration": "node --conditions=react-server --import tsx --test tests/launchgate-orchestration.test.ts",
+    "test:target-safety": "node --conditions=react-server --import tsx --test tests/launchgate-target-safety.test.ts",
+    "test:vercel": "node --conditions=react-server --import tsx --test tests/launchgate-vercel.test.ts",
+    "test:runner-evidence": "node --conditions=react-server --import tsx --test tests/launchgate-runner-evidence.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -54,5 +58,8 @@
   "engines": {
     "node": ">=24.19.0 <25",
     "npm": ">=11 <12"
+  },
+  "overrides": {
+    "next": { "postcss": "8.5.29" }
   }
 }

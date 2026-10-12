@@ -164,3 +164,22 @@ test("Phase 3 confirmation accepts explicit version action and rejects likely se
  const {handler,calls}=await api();assert.equal((await handler(request(`projects/${project}/invariant-proposals/${membershipId}/confirm`,"POST",{action:"REFINE",statement:"Only owners may change membership.",requestKey:org}))).status,201);assert.equal(calls[0].name,"lg_review_invariant");
  assert.equal((await handler(request(`projects/${project}/invariant-proposals/${membershipId}/confirm`,"POST",{action:"REFINE",statement:"sk-ant-syntheticsecret123456789",requestKey:org}))).status,422);
 });
+
+test("Phase 4 viewer cannot create runs and developer cannot authorize targets",async()=>{
+ const viewer=await api("VIEWER");assert.equal((await viewer.handler(request(`projects/${project}/runs`,"POST",{}))).status,403);
+ const developer=await api("DEVELOPER");assert.equal((await developer.handler(request(`projects/${project}/targets/authorize`,"POST",{}))).status,403);assert.equal(developer.calls.length,0);
+});
+test("Phase 4 run API only invokes user command with bounded accepted fields",async()=>{
+ const {handler,calls}=await api("DEVELOPER");const body={snapshotId:membershipId,authorizationId:org,requestKey:user,invariants:[]};
+ assert.equal((await handler(request(`projects/${project}/runs`,"POST",{...body,fence:999}))).status,422);assert.equal(calls.length,0);
+ assert.equal((await handler(request(`projects/${project}/runs`,"POST",body))).status,202);assert.equal(calls[0].name,"lg_execution_command");assert.equal(calls[0].args.p_action,"RUN");
+});
+test("Phase 4 cancellation records intent and cannot accept forged completion",async()=>{
+ const {handler,calls}=await api("DEVELOPER");assert.equal((await handler(request(`projects/${project}/runs/${membershipId}/cancel`,"POST",{state:"COMPLETED"}))).status,422);
+ assert.equal((await handler(request(`projects/${project}/runs/${membershipId}/cancel`,"POST",{}))).status,202);assert.equal(calls[0].args.p_action,"CANCEL");
+});
+test("Phase 4 target authorization cannot widen payment or operation scope",async()=>{
+ const {handler,calls}=await api();const input={deploymentId:membershipId,requestKey:user,expiresAt:new Date(Date.now()+60000).toISOString()};
+ assert.equal((await handler(request(`projects/${project}/targets/authorize`,"POST",{...input,paymentMode:"LIVE"}))).status,422);assert.equal(calls.length,0);
+ assert.equal((await handler(request(`projects/${project}/targets/authorize`,"POST",input))).status,201);assert.equal(calls[0].args.p_action,"AUTHORIZE");
+});

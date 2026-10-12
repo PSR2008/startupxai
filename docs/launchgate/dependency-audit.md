@@ -1,5 +1,15 @@
 # Phase 1 dependency audit - 2026-10-11
 
+## Phase 4 remediation - 2026-10-12 (current)
+
+Before: full audit **11 entries: 8 HIGH, 3 MODERATE**; production **2 entries: 1 HIGH, 1 MODERATE**. After: full **9 entries: 7 HIGH, 2 MODERATE**; production **0 vulnerabilities**. No criticals in either inventory. Full audit exits 1; production audit exits 0. Earlier phase sections below are historical.
+
+The production HIGH was `next@15.5.27 -> postcss@8.4.31`, including [GHSA-6g55-p6wh-862q](https://github.com/advisories/GHSA-6g55-p6wh-862q) and [GHSA-r28c-9q8g-f849](https://github.com/advisories/GHSA-r28c-9q8g-f849): attacker-controlled CSS source-map file disclosure. Associated moderate findings were GHSA-qx2v-qp2m-jg93 and GHSA-fxqj-rqcc-2cmp. It was production-installed through Next, used by the control-plane build/CSS toolchain. Orchestration, source ingestion, runner and target networking do not process CSS or import PostCSS. The affected path was not a required runner capability, but the package is now patched rather than relying only on isolation.
+
+A narrowly scoped npm override pins Next's PostCSS to **8.5.29**, retaining the PostCSS 8 API. `npm ls postcss` confirms Next resolves 8.5.29; the vulnerable nested installation and lock entry are removed. No `npm audit fix --force`, Next major migration or untrusted build execution was used. Application tests, typecheck, lint and production build validate compatibility; no visual redesign was made. CI now fails production audits at HIGH severity.
+
+Remaining full-audit findings are the inherited build/dev glob/braces and selector-parser chains documented below: @next/eslint-plugin-next, braces, chokidar, eslint-config-next, fast-glob, micromatch, tailwindcss (HIGH), postcss-nested and postcss-selector-parser (MODERATE). Customer code/config/CSS/glob patterns are not executed by any Phase 4 component. The fixed runner uses Node crypto, DNS, HTTPS and shared Zod contracts. The orchestrator uses these contracts and its supplied database/artifact adapters. There is no reachable or unassessed HIGH on the supported runner/target-networking path in this audit. This does not certify future browser/custom-code images; audit those separately before adding them.
+
 Target: no **unassessed** critical/high exposure. This is not a zero-vulnerability declaration. `npm audit` still exits 1; none of these findings are hidden or declared harmless.
 
 ## Phase 3 runtime-path assessment - 2026-10-12
