@@ -5,20 +5,21 @@ import { compilePlan,defaultCapabilities,labInvariant,planHash,type CaseId,type 
 import { labSourceIdentity,LocalLabProvider } from "../../reference-lab/host";
 import { signGrant } from "../../services/runner/grant";
 import type { LabFault } from "../../reference-lab/runtime";
+import type { BillingFault } from "../../reference-lab/billing/contracts";
 export const makePlan=(caseId:CaseId)=>compilePlan(labInvariant(caseId,randomUUID()),caseId,"seed-42",defaultCapabilities(caseId));
 export function labGrant(plan:TestPlan,variant:Variant){
  const base=grantFixture(),source=labSourceIdentity();
- return executionGrantSchema.parse({...base,snapshotId:null,commitSha:source.revision,deploymentUrl:"https://reference-lab.invalid/",referenceLab:{planHash:planHash(plan),caseId:plan.caseId,seed:plan.seed,variant,sourceDigest:source.sourceDigest},
-  authorization:{...base.authorization,method:"REFERENCE_LAB_HARNESS",targetHost:"reference-lab.invalid",allowedHosts:["reference-lab.invalid"],allowedOperations:["resource.read","resource.write","role.change","session.check"],requestLimit:32},
-  invariantVersions:[{id:plan.spec.id,version:plan.spec.version}],limits:{...base.limits,requests:32,artifactBytes:65536}});
+ return executionGrantSchema.parse({...base,exp:base.iat+plan.budget.durationMs/1000,snapshotId:null,commitSha:source.revision,deploymentUrl:"https://reference-lab.invalid/",referenceLab:{planHash:planHash(plan),caseId:plan.caseId,seed:plan.seed,variant,sourceDigest:source.sourceDigest},
+  authorization:{...base.authorization,expiresAt:new Date(Date.now()+180000).toISOString(),method:"REFERENCE_LAB_HARNESS",targetHost:"reference-lab.invalid",allowedHosts:["reference-lab.invalid"],allowedOperations:plan.billing?["payment.observe","webhook.deliver_test_event"]:["resource.read","resource.write","role.change","session.check"],requestLimit:plan.budget.requests,concurrencyLimit:plan.budget.concurrency},
+  invariantVersions:[{id:plan.spec.id,version:plan.spec.version}],limits:{...base.limits,requests:plan.budget.requests,durationSeconds:plan.budget.durationMs/1000,concurrency:plan.budget.concurrency,artifactBytes:65536}});
 }
-export async function executeCase(caseId:CaseId,variant:Variant,options:{fault?:LabFault;reproductionVariant?:Variant;reproductionFault?:LabFault;plan?:TestPlan}={}){
+export async function executeCase(caseId:CaseId,variant:Variant,options:{fault?:LabFault;billingFault?:BillingFault;reproductionVariant?:Variant;reproductionFault?:LabFault;plan?:TestPlan}={}){
  const plan=options.plan??makePlan(caseId),g=labGrant(plan,variant),keys=generateKeyPairSync("ed25519");let requests=0,started=false;
  const store={async command(action:string,data:Record<string,unknown>):Promise<unknown>{
   if(action==="LAB_CONTEXT")return {case:{plan,plan_hash:planHash(plan)},template:{variant,source_digest:g.referenceLab!.sourceDigest}};
   if(data.attemptId!==g.attemptId||data.fence!==g.fence||data.grantId!==g.jti)throw new Error("SCOPE");
   if(action==="START"){if(started)throw new Error("REPLAY");started=true;}
-  if(action==="REQUEST"){if(!started||++requests>32)throw new Error("BUDGET");}
+  if(action==="REQUEST"){if(!started||++requests>plan.budget.requests)throw new Error("BUDGET");}
   if(action==="LAB_COMPLETE"&&data.requests!==requests)throw new Error("ACCOUNTING");return {};
  }};
  const provider=new LocalLabProvider(keys.publicKey,store,{async put(a,id){return `${a}/${id}`;},async removeAttempt(){}},{...options,pace:async()=>{}});

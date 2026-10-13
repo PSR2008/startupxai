@@ -25,7 +25,8 @@ jobs:
       # Phase 4 suites are included in test; named commands support focused runs.
       # Database suite also covers durable orchestration races and RLS.
       - run: npm run test:database
-        # Includes the complete Phase 5 orchestration/finding/replay journey.
+        # Includes Phase 5 plus Phase 6 synthetic billing journeys, zero spend,
+        # transactional duplicate delivery, finding replay and tenant isolation.
         env:
           LAUNCHGATE_REQUIRE_DATABASE: "1"
       - run: npm run build

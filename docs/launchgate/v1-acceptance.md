@@ -179,3 +179,53 @@ Install, typecheck, lint and production build passed; build generated 56 pages. 
 | Git/scope | PASS: launchgate-rebuild only, Phase 4 HEAD preserved, main/archive refs unchanged; no commit/push/UI redesign/Verified badge |
 
 Scope remains **controlled local Reference Lab only**. No customer deployment, repository code, production sandbox, live provider, browser framework action integration, full Supabase hosting/type generation or remote CI result is claimed. Candidate/reproducing history is admitted atomically with evidence; FIX_PENDING/DISMISSED are reserved, not user-editable workflows. The local harness source SHA-256 is real; its legacy commit_sha field is a synthetic content revision, not a Git commit. Production hosting, egress isolation, key rotation, artifact retention/deletion scheduling and broader V1 criteria remain future work. See [engine](verification-engine.md), [runtime](reference-lab-runtime.md), [findings](findings.md) and [reproduction](reproduction.md).
+## Phase 6 evidence — 2026-10-13
+
+Final local validation: **660 application + 148 PostgreSQL/PostgREST tests = 808 passed**, zero failed/cancelled/skipped. This preserves the Phase 5 baseline (508 + 134) and adds 152 billing application tests plus 14 database cases. Focused suites overlap the full run and are not added again. The required database run took 827 seconds, including seven billing journeys and 15 billing runs. Its asserted disposable-container cleanup passed; a later inventory check could not reconnect to Docker after the daemon became unavailable. No billing temporary directories remained.
+
+| Named focused command | Passed |
+|---|---:|
+| `test:billing-lab` | 152 |
+| `test:price-integrity` | 9 |
+| `test:failed-payment` | 6 |
+| `test:capture-state` | 9 |
+| `test:webhook-signature` | 15 |
+| `test:webhook-replay` (includes ordering) | 15 |
+| `test:billing-concurrency` | 5 |
+| `test:cancellation-expiry` | 9 |
+| `test:upgrade-downgrade` | 12 |
+| `test:refund-policy` | 6 |
+| `test:billing-fix-replay` | 6 |
+| `test:billing-regression` (same suite as preceding alias) | 6 |
+| `test:startupx-dogfood` | 3 |
+| `test:billing-provider` | 36 |
+
+The billing total also includes 21 runtime/control/safety tests. Install, typecheck, lint and production build passed. Lint retains the existing unused `describe` warning in `tests/public-source.test.ts`, with zero errors. Production audit: zero vulnerabilities; full audit: seven high/two moderate inherited development/build findings, unresolved. The full audit required a retry after a registry error. No remote CI execution is claimed.
+
+| Phase 6 acceptance criterion | Evidence / result |
+|---|---|
+| Price/currency authority | PASS: vulnerable mutation reproduced; fixed server catalog passes |
+| Failed/uncaptured activation | PASS: failed, created, pending and authorized states cannot grant fixed entitlement |
+| Valid captured behavior | PASS: mandatory captured control and actual paid export; reject-all fix is inconclusive |
+| Webhook signature integrity | PASS: five invalid forms reproduce vulnerable effects and are rejected by fixed fixture |
+| Duplicate/concurrent delivery | PASS: exactly-once business effect with atomic inbox/state transaction; repeated races and rollback tested |
+| Delayed replay | PASS: original payment cannot extend period after logical time, connection reopen and unrelated event |
+| Event ordering | PASS: stale captures cannot overwrite cancellation, upgrade or refund |
+| Cancellation and expiry | PASS: confirmed immediate/period-end rules and deterministic boundary probes |
+| Upgrade/downgrade | PASS: confirmed immediate/next-period behavior and credit replacement |
+| Refund policy | PASS: revoke/manual-review rules; unknown policy never guessed |
+| Paid-feature correlation | PASS: real local protected export compared with persisted entitlement and stable reread |
+| Positive controls / uncertainty | PASS: missing controls, unknown state, observation/cleanup errors are inconclusive |
+| Reproduction / findings | PASS: fresh state/IDs, same seed/plan/oracle; two matching failures required |
+| Fixed replay / regressions | PASS: original oracle preserved; vulnerable fails, fixed passes, reintroduced defect fails |
+| Durable E2E A–E | PASS: failed payment, duplicate event, price, uncaptured payment, cancellation/expiry; concurrency also covered |
+| Browser forgery / tenant isolation | PASS: populated billing attempts, observations, findings, bundles and regression tables; sealed writes denied |
+| Zero financial spend / live stop | PASS: synthetic-only local provider; LIVE blocked independently of host authority |
+| Stripe/Razorpay | PASS for 36 synthetic contract cases; live E2E UNVERIFIED for both |
+| StartupX dogfood | PASS for three isolated equivalent patterns; production payment code unchanged |
+| StartupX coexistence | PASS: all prior tests/build preserved; historical migrations untouched |
+| Git/scope | PASS: launchgate-rebuild; no commit/push; main/archive unchanged; no UI redesign or badge |
+
+Migration 022 initially referenced a constraint name replaced by Phase 5's multi-column CHECK. It now resolves the existing operations constraint from PostgreSQL dependencies, fails closed on unexpected schema, and uses an explicit new name. The complete database rerun passed afterward.
+
+Scope remains controlled local Reference Lab. SQLite connection reopen is not OS-process restart certification; the two-handler race is not distributed-provider certification. Partial refunds, proration, grace/trials, live settlement, production egress isolation, browser engines, customer code, automatic fixes and commercial billing are outside Phase 6. See [billing verification](billing-verification.md), [webhook contracts](webhook-verification.md) and [entitlements](entitlement-model.md).

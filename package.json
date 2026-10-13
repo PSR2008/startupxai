@@ -22,7 +22,22 @@
     "test:reproduction": "node --conditions=react-server --import tsx --test tests/launchgate-reproduction.test.ts",
     "test:fix-replay": "node --conditions=react-server --import tsx --test tests/launchgate-fix-replay.test.ts",
     "test:regression": "node --conditions=react-server --import tsx --test tests/launchgate-regression.test.ts",
-    "test:phase5-journey": "npm run test:database"
+    "test:phase5-journey": "npm run test:database",
+    "test:billing-lab": "node --conditions=react-server --import tsx --test tests/launchgate-billing-*.test.ts",
+    "test:price-integrity": "node --conditions=react-server --import tsx --test tests/launchgate-billing-price.test.ts",
+    "test:failed-payment": "node --conditions=react-server --import tsx --test tests/launchgate-billing-payment.test.ts",
+    "test:capture-state": "node --conditions=react-server --import tsx --test tests/launchgate-billing-capture.test.ts",
+    "test:webhook-signature": "node --conditions=react-server --import tsx --test tests/launchgate-billing-signature.test.ts",
+    "test:webhook-replay": "node --conditions=react-server --import tsx --test tests/launchgate-billing-replay.test.ts tests/launchgate-billing-ordering.test.ts",
+    "test:billing-concurrency": "node --conditions=react-server --import tsx --test tests/launchgate-billing-concurrency.test.ts",
+    "test:cancellation-expiry": "node --conditions=react-server --import tsx --test tests/launchgate-billing-cancellation.test.ts",
+    "test:upgrade-downgrade": "node --conditions=react-server --import tsx --test tests/launchgate-billing-plans.test.ts",
+    "test:refund-policy": "node --conditions=react-server --import tsx --test tests/launchgate-billing-refund.test.ts",
+    "test:billing-fix-replay": "node --conditions=react-server --import tsx --test tests/launchgate-billing-regression.test.ts",
+    "test:billing-regression": "node --conditions=react-server --import tsx --test tests/launchgate-billing-regression.test.ts",
+    "test:startupx-dogfood": "node --conditions=react-server --import tsx --test tests/launchgate-billing-dogfood.test.ts",
+    "test:billing-provider": "node --conditions=react-server --import tsx --test tests/launchgate-billing-provider.test.ts",
+    "test:phase6-journeys": "npm run test:database"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

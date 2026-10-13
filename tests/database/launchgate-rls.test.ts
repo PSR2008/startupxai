@@ -595,3 +595,45 @@ dbtest("cancelled replay becomes inconclusive; old idempotency retry cannot repl
  execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_execution_command('${labProject}','CANCEL','{"runId":"${pending}"}','${correlation}')`);executionService("RECOVER");
  assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${labFinding}'`),"INCONCLUSIVE");assert.equal(query(owner,`SELECT state FROM lg_verification_runs WHERE id='${pending}'`),"CANCELLED");
 });
+
+// Phase 6 uses exactly the same admission, finding, replay and regression tables.
+let billingOrg:string,billingProject:string,billingFinding:string;
+dbtest("Phase 6 forward migration expands only controlled lab capabilities",()=>{
+ execute(readFileSync("migrations/022_launchgate_billing_lab.sql","utf8"));
+ billingOrg=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT id FROM lg_create_organization('Phase 6 synthetic billing','${correlation}')`);
+ billingProject=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT id FROM lg_create_project('${billingOrg}','No live money','${correlation}')`);
+ denied(owner,"SELECT launchgate_private.lab_create(NULL,NULL,'{}',NULL)");
+});
+for(const caseId of ["billing.failed","billing.duplicate","billing.price","billing.authorized","billing.cancel","billing.expiry","billing.concurrent"] as const)
+ dbtest(`Phase 6 durable billing journey ${caseId}: reproduce, find, fixed replay, regression`,async()=>{
+ const {generateKeyPairSync}=await import("node:crypto"),{mkdtemp,rm}=await import("node:fs/promises"),{tmpdir}=await import("node:os"),{join,resolve,sep}=await import("node:path");
+ const {compilePlan,defaultCapabilities,labInvariant}=await import("../../reference-lab/plans");const {registerLabRun,LocalLabProvider}=await import("../../reference-lab/host");
+ const {Orchestrator}=await import("../../services/orchestrator/orchestrator"),{LocalArtifacts}=await import("../../services/orchestrator/artifacts");
+ const plan=compilePlan(labInvariant(caseId,randomUUID()),caseId,"phase6-durable",defaultCapabilities(caseId));
+ const store={async command(action:string,data:Record<string,unknown>){return executionService(action,data);}};
+ const root=await mkdtemp(join(tmpdir(),"launchgate-phase6-")),keys=generateKeyPairSync("ed25519"),artifacts=new LocalArtifacts(root);
+ const provider=new LocalLabProvider(keys.publicKey,store,artifacts),orchestrator=new Orchestrator(store,provider,keys.privateKey,artifacts);
+ const process=async(run:string)=>{await orchestrator.tick();await provider.drain();await orchestrator.tick();const value=provider.results.get(run);assert.ok(value);assert.equal(query(owner,`SELECT state FROM lg_verification_runs WHERE id='${run}'`),"COMPLETED");assert.ok(value.traces.every(t=>t.billing?.financialSpend===0));return value;};
+ try{
+  const created=await registerLabRun(store,billingProject,owner,plan,"vulnerable") as {id:string};const original=await process(created.id);assert.equal(original.evaluation.outcome,"REPRODUCIBLE_FAILURE");
+  billingFinding=execute(`SELECT finding_id FROM lg_finding_occurrences WHERE run_id='${created.id}'`);
+  const replay=(variant:string)=>execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_finding_replay('${billingProject}','${billingFinding}','${variant}','${randomUUID()}','${correlation}')`);
+  const fixed=await process(replay("fixed"));assert.equal(fixed.evaluation.outcome,"PASS");assert.equal(fixed.bundle.planHash,original.bundle.planHash);assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${billingFinding}'`),"RESOLVED");
+  assert.equal(query(owner,`SELECT artifact->>'expectedOutcome' FROM lg_regression_tests WHERE finding_id='${billingFinding}'`),"PASS");
+  if(caseId==="billing.duplicate"){const again=await process(replay("vulnerable"));assert.equal(again.evaluation.outcome,"REPRODUCIBLE_FAILURE");assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${billingFinding}'`),"REGRESSION_FAILED");}
+  assert.equal(execute(`SELECT active||':'||reserved FROM lg_execution_budgets WHERE organization_id='${billingOrg}'`),"0:0");
+  assert.equal(execute(`SELECT consumed=(SELECT sum(requests) FROM lg_job_attempts WHERE organization_id='${billingOrg}') FROM lg_execution_budgets WHERE organization_id='${billingOrg}'`),"t");
+ }finally{await provider.drain().catch(()=>{});const target=resolve(root);assert.ok(target.startsWith(resolve(tmpdir())+sep+"launchgate-phase6-"));await rm(target,{recursive:true,force:true});}
+});
+for(const table of ["lg_test_attempts","lg_observations","lg_findings","lg_reproduction_bundles","lg_regression_tests"])
+ dbtest(`Phase 6 populated billing ${table}: tenant isolation and browser forgery denial`,()=>{
+  assert.equal(query(outsider,`SELECT count(*) FROM ${table} WHERE project_id='${billingProject}'`),"0");assert.ok(Number(query(owner,`SELECT count(*) FROM ${table} WHERE project_id='${billingProject}'`))>0);
+  denied(owner,`UPDATE ${table} SET project_id='${otherProject}' WHERE project_id='${billingProject}'`);
+ });
+dbtest("Phase 6 provider/payment/entitlement observations are sealed, synthetic and zero spend",()=>{
+ assert.equal(execute(`SELECT bool_and(trace#>>'{billing,financialSpend}'='0' AND jsonb_array_length(trace#>'{billing,events}')>0) FROM lg_test_attempts WHERE project_id='${billingProject}'`),"t");
+ assert.equal(execute(`SELECT count(*) FROM lg_reproduction_bundles WHERE project_id='${billingProject}'`),"15");
+ denied(owner,executionSql("LAB_COMPLETE",{outcome:"PASS",candidate:true}));
+ assert.match(raw(`UPDATE lg_test_attempts SET trace=jsonb_set(trace,'{billing,financialSpend}','1') WHERE project_id='${billingProject}'`).stderr,/42501|23514/);
+ assert.equal(execute(`SELECT count(*) FROM lg_target_authorizations WHERE project_id='${billingProject}' AND (spend_micros<>0 OR request_limit<>64 OR duration_seconds<>120)`),"0");
+});

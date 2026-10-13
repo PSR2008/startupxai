@@ -27,3 +27,6 @@ Original plus reproduction share at most 32 requests, a 60-second grant and conc
 Source identity is SHA-256 over the controlled lab source files. The existing deployment commit_sha field holds a SHA-1 content revision for this explicit REFERENCE_LAB provider; it is **not a Git commit**. No container image digest is invented. A source digest substitutes for image identity only in trusted REFERENCE_LAB admission, never production admission. Evidence is sealed in the control plane and stored through the existing private artifact adapter and manifest tables.
 
 Run `npm run test:lab-runtime`, `test:auth-dynamic`, `test:tenant-dynamic`, `test:role-dynamic`, `test:reproduction`, `test:fix-replay` and `test:regression`. These suites are included in `npm test`.
+## Phase 6 billing extension
+
+The existing compiler and evaluator also dispatch the 27 registered billing cases. Billing plans alone use a shared original/reproduction budget of 64 requests, 120 seconds, 16 event deliveries, 20 provider operations and zero financial spend; concurrency is one except the explicit two-delivery race. Phase 5 authorization cases retain their 32-request/60-second budget. Positive captured controls, confirmed policy, actual state/paid access, fresh reproduction and original-oracle fixed replay are mandatory. See [billing verification](billing-verification.md).

@@ -5,6 +5,7 @@ import { targetUrl } from "../services/runner/target";
 import { canonical } from "../services/runner/metadata";
 import { validatePlan,type TestPlan,type Identity } from "./plans";
 import { stateSchema,type LabRuntime } from "./runtime";
+import { billingTraceSchema } from "./billing/contracts";
 
 const responseSchema=z.object({status:z.number().int().min(100).max(599),marker:z.enum(["PRIVATE_A","PRIVATE_B"]).nullable()}).strict();
 export const traceSchema=z.object({id:z.string().uuid(),initialHash:z.string().regex(/^sha256:[a-f0-9]{64}$/),
@@ -12,7 +13,7 @@ export const traceSchema=z.object({id:z.string().uuid(),initialHash:z.string().r
  health:z.boolean(),positive:responseSchema.nullable(),controlBefore:stateSchema.nullable(),controlAfter:stateSchema.nullable(),
  before:stateSchema.nullable(),after:stateSchema.nullable(),response:responseSchema.nullable(),
  execution:z.enum(["COMPLETED","TIMEOUT","MISSING_CREDENTIALS","SETUP_FAILED","RUNNER_ERROR","UNOBSERVABLE"]),cleanup:z.boolean(),
- requests:z.number().int().min(0).max(32),durationMs:z.number().int().min(0).max(60000),completedAt:z.string().datetime()}).strict();
+ requests:z.number().int().min(0).max(64),durationMs:z.number().int().min(0).max(120000),completedAt:z.string().datetime(),billing:billingTraceSchema.optional()}).strict();
 export type RawTrace=z.infer<typeof traceSchema>;
 /** Fixed operation collector only. No assertions or final verdicts execute here.
  * LabRuntime is created by the controlled fixture host, never deserialized from
