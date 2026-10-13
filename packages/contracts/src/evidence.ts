@@ -23,7 +23,7 @@ export const evidenceSchema = z.object({
   runId: identifierSchema,
   scope: scopeSchema,
   source: z.enum(["DETERMINISTIC_EXECUTION", "MODEL_OUTPUT", "USER_CLAIM"]),
-  runner: z.object({ identity: identifierSchema, version: identifierSchema, imageDigest: digestSchema.nullable() }).strict(),
+  runner: z.object({ identity: identifierSchema, version: identifierSchema, imageDigest: digestSchema.nullable(), sourceDigest: digestSchema.optional() }).strict(),
   fixture: z.object({ seed: identifierSchema, logicalIdentities: z.array(identifierSchema).min(1).max(50) }).strict(),
   planDigest: digestSchema,
   original: attemptSchema,

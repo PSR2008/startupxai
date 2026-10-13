@@ -1,6 +1,10 @@
 # Phase 1 dependency audit - 2026-10-11
 
-## Phase 4 remediation - 2026-10-12 (current)
+## Phase 5 recheck - 2026-10-13 (current)
+
+No dependencies were added. Actual `npm audit --json` reports **0 critical / 7 high / 2 moderate**, exit 1. `npm audit --omit=dev --json` reports **zero vulnerabilities**, exit 0. The inherited development/build findings remain assessed below and unresolved. The local fixture uses Node HTTP/crypto/fetch and existing Zod/contracts; it does not process customer scripts, CSS, glob expressions or package installations. No HIGH/CRITICAL is reported on the installed production control-plane/runner path. This is a dependency inventory result, not a sandbox certification.
+
+## Phase 4 remediation - 2026-10-12
 
 Before: full audit **11 entries: 8 HIGH, 3 MODERATE**; production **2 entries: 1 HIGH, 1 MODERATE**. After: full **9 entries: 7 HIGH, 2 MODERATE**; production **0 vulnerabilities**. No criticals in either inventory. Full audit exits 1; production audit exits 0. Earlier phase sections below are historical.
 

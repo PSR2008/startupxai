@@ -14,7 +14,15 @@
     "test:orchestration": "node --conditions=react-server --import tsx --test tests/launchgate-orchestration.test.ts",
     "test:target-safety": "node --conditions=react-server --import tsx --test tests/launchgate-target-safety.test.ts",
     "test:vercel": "node --conditions=react-server --import tsx --test tests/launchgate-vercel.test.ts",
-    "test:runner-evidence": "node --conditions=react-server --import tsx --test tests/launchgate-runner-evidence.test.ts"
+    "test:runner-evidence": "node --conditions=react-server --import tsx --test tests/launchgate-runner-evidence.test.ts",
+    "test:lab-runtime": "node --conditions=react-server --import tsx --test tests/launchgate-lab-runtime.test.ts",
+    "test:auth-dynamic": "node --conditions=react-server --import tsx --test tests/launchgate-auth-dynamic.test.ts",
+    "test:tenant-dynamic": "node --conditions=react-server --import tsx --test tests/launchgate-tenant-dynamic.test.ts",
+    "test:role-dynamic": "node --conditions=react-server --import tsx --test tests/launchgate-role-dynamic.test.ts",
+    "test:reproduction": "node --conditions=react-server --import tsx --test tests/launchgate-reproduction.test.ts",
+    "test:fix-replay": "node --conditions=react-server --import tsx --test tests/launchgate-fix-replay.test.ts",
+    "test:regression": "node --conditions=react-server --import tsx --test tests/launchgate-regression.test.ts",
+    "test:phase5-journey": "npm run test:database"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

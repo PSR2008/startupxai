@@ -51,3 +51,9 @@ Core outcomes are PASS, REPRODUCIBLE_FAILURE and INCONCLUSIVE. NOT_APPLICABLE is
 ### LaunchGate Phase 4
 
 Durable orchestration and target authorization now have PostgreSQL commands, a separate orchestrator/runner protocol, Vercel ownership contracts, SSRF-resistant transport and sealed infrastructure observations. Start with [the orchestration guide](docs/launchgate/orchestration.md). Provider credentials and a production isolated runner backend remain deployment requirements; no customer code or attack suites run in this phase.
+
+### LaunchGate Phase 5
+
+Authentication, tenant isolation and privilege verification now execute against disposable synthetic HTTP fixtures only. The [verification engine](docs/launchgate/verification-engine.md) compiles fixed operations, requires positive controls and fresh-state reproduction, and seals scoped findings. [Fixed replay and native regressions](docs/launchgate/reproduction.md) preserve the original oracle. [Runtime setup](docs/launchgate/reference-lab-runtime.md) and [finding APIs](docs/launchgate/findings.md) describe the local-only boundary. Migrations 020/021 are forward additions; no production sandbox safety or arbitrary customer deployment testing is claimed.
+
+`npm test` includes the dynamic fixture suites. `npm run test:phase5-journey` runs the complete disposable database rehearsal and durable finding/fix/regression journey; set `LAUNCHGATE_REQUIRE_DATABASE=1` to make unavailable Docker a failure. No provider credentials or production data are used.

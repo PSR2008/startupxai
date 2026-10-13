@@ -61,7 +61,7 @@ async function api(role: OrganizationRole = "OWNER", dbError: { code: string; me
     from(table: string) {
       const builder = {
         select(columns: string) { reads.push({table,columns}); return builder; },
-        eq() { return builder; }, order() { return builder; }, limit() { return builder; },
+        eq() { return builder; }, in() { return builder; }, order() { return builder; }, limit() { return builder; },
         async maybeSingle() { return { data: table === "lg_projects" ? {id: project, organization_id: org,status:"ACTIVE"} : membership(role), error: null }; },
         async single() { return { data: {id:org}, error: null }; },
         then(resolve: (value: unknown) => void) { resolve({ data: [], error: null }); },
@@ -182,4 +182,18 @@ test("Phase 4 target authorization cannot widen payment or operation scope",asyn
  const {handler,calls}=await api();const input={deploymentId:membershipId,requestKey:user,expiresAt:new Date(Date.now()+60000).toISOString()};
  assert.equal((await handler(request(`projects/${project}/targets/authorize`,"POST",{...input,paymentMode:"LIVE"}))).status,422);assert.equal(calls.length,0);
  assert.equal((await handler(request(`projects/${project}/targets/authorize`,"POST",input))).status,201);assert.equal(calls[0].args.p_action,"AUTHORIZE");
+});
+
+test("Phase 5 viewer cannot request finding replay",async()=>{
+ const {handler,calls}=await api("VIEWER");assert.equal((await handler(request(`projects/${project}/findings/${membershipId}/replay`,"POST",{variant:"fixed",requestKey:org}))).status,403);assert.equal(calls.length,0);
+});
+test("Phase 5 replay accepts only fixed registry variant and no arbitrary URL or script",async()=>{
+ const {handler,calls}=await api();assert.equal((await handler(request(`projects/${project}/findings/${membershipId}/replay`,"POST",{variant:"fixed",requestKey:org,url:"https://external.example"}))).status,422);assert.equal(calls.length,0);
+ assert.equal((await handler(request(`projects/${project}/findings/${membershipId}/replay`,"POST",{variant:"fixed",requestKey:org}))).status,202);assert.equal(calls[0].name,"lg_finding_replay");
+});
+test("Phase 5 findings and regression metadata require project authorization",async()=>{
+ const {handler,reads}=await api();assert.equal((await handler(request(`projects/${project}/findings/${membershipId}`))).status,200);assert.equal((await handler(request(`projects/${project}/findings/${membershipId}/regressions`))).status,200);assert.ok(reads.some(r=>r.table==="lg_findings"));assert.ok(reads.some(r=>r.table==="lg_regression_tests"));
+});
+test("Phase 5 bundle endpoint exposes bounded metadata and no raw transport secrets",async()=>{
+ const {handler,reads}=await api();assert.equal((await handler(request(`projects/${project}/findings/${membershipId}/reproduction-bundles`))).status,200);assert.equal(reads.at(-1)?.columns,"run_id,attempt_id,manifest_digest");
 });

@@ -61,7 +61,9 @@ before(async () => {
   assert.equal(run.status, 0, run.stderr); started = true;
   let ready = false;
   for (let i = 0; i < 40; i++) {
-    if (docker(["exec", container, "pg_isready", "-U", "postgres"]).status === 0) { ready = true; break; }
+    // The image's temporary initialization server accepts Unix sockets but not TCP.
+    // Wait for the final server, otherwise bootstrap can race its shutdown.
+    if (docker(["exec", container, "pg_isready", "-h", "127.0.0.1", "-U", "postgres", "-d", "launchgate_test"]).status === 0) { ready = true; break; }
     await new Promise(resolve => setTimeout(resolve, 250));
   }
   assert.ok(ready, "disposable PostgreSQL did not start");
@@ -523,4 +525,73 @@ dbtest("three failed attempts dead-letter only after cleanup and release budgets
 dbtest("authorization/proof expiry and changed provider status deny execution",()=>{
  const auth=authorizeTarget();createRun(auth);execute(`UPDATE lg_authorization_proofs SET revoked_at=now() WHERE deployment_id='${deploymentId}'`);assert.equal(claimRun(),null);executionService("RECOVER");
  denied(owner,commandSql("AUTHORIZE",{deploymentId,requestKey:randomUUID(),expiresAt:new Date(Date.now()+100000).toISOString(),requestLimit:10,concurrencyLimit:1,durationSeconds:30}));
+});
+
+// Phase 5 extends the real database rehearsal without weakening earlier checks.
+let labOrg:string,labProject:string,labRun:string,labFinding:string,labRegression:string,labLastReplay:string,labLastRequest:string;
+dbtest("Phase 5 migrations apply after Phase 4 and preserve all previous data",()=>{
+ execute(readFileSync("migrations/020_launchgate_dynamic_model.sql","utf8"));execute(readFileSync("migrations/021_launchgate_dynamic_commands.sql","utf8"));
+ assert.equal(execute("SELECT count(*) FROM pg_class WHERE relname IN ('lg_findings','lg_reproduction_bundles','lg_test_attempts','lg_regression_tests') AND relrowsecurity AND relforcerowsecurity"),"4");
+});
+dbtest("Phase 5 end-to-end: provision, authorize, schedule, reproduce, fix, regress; no manual DB edits",async()=>{
+ const {generateKeyPairSync}=await import("node:crypto");const {mkdtemp,rm}=await import("node:fs/promises");const {tmpdir}=await import("node:os");const {join}=await import("node:path");
+ const {compilePlan,defaultCapabilities,labInvariant}=await import("../../reference-lab/plans");
+ const {registerLabRun,LocalLabProvider}=await import("../../reference-lab/host");
+ const {Orchestrator}=await import("../../services/orchestrator/orchestrator");const {LocalArtifacts}=await import("../../services/orchestrator/artifacts");
+ labOrg=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT id FROM lg_create_organization('Phase 5 synthetic organization','${correlation}')`);
+ labProject=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT id FROM lg_create_project('${labOrg}','Reference Lab only','${correlation}')`);
+ const plan=compilePlan(labInvariant("tenant.write",randomUUID()),"tenant.write","journey-seed",defaultCapabilities("tenant.write"));
+ const store={async command(action:string,data:Record<string,unknown>){return executionService(action,data);}};
+ const root=await mkdtemp(join(tmpdir(),"launchgate-phase5-"));const artifacts=new LocalArtifacts(root);const keys=generateKeyPairSync("ed25519");
+ const provider=new LocalLabProvider(keys.publicKey,store,artifacts);const orchestrator=new Orchestrator(store,provider,keys.privateKey,artifacts);
+ const process=async(run:string)=>{await orchestrator.tick();await provider.drain();await orchestrator.tick();const result=provider.results.get(run);assert.ok(result,`missing run ${run}`);assert.equal(execute(`SELECT state FROM lg_verification_runs WHERE id='${run}'`),"COMPLETED");return result;};
+ try{
+  const created=await registerLabRun(store,labProject,owner,plan,"vulnerable") as {id:string};labRun=created.id;
+  const original=await process(labRun);assert.equal(original.evaluation.outcome,"REPRODUCIBLE_FAILURE");assert.equal(original.traces.length,2);assert.notDeepEqual(original.traces[0].mapping,original.traces[1].mapping);
+  labFinding=execute(`SELECT finding_id FROM lg_finding_occurrences WHERE run_id='${labRun}'`);assert.ok(labFinding);
+  assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${labFinding}'`),"REPRODUCED");
+  const replay=(variant:string)=>{labLastRequest=randomUUID();labLastReplay=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_finding_replay('${labProject}','${labFinding}','${variant}','${labLastRequest}','${correlation}')`);return labLastReplay;};
+  const fixed=await process(replay("fixed"));assert.equal(fixed.evaluation.outcome,"PASS");assert.equal(fixed.bundle.planHash,original.bundle.planHash);assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${labFinding}'`),"RESOLVED");
+  labRegression=execute(`SELECT id FROM lg_regression_tests WHERE finding_id='${labFinding}'`);assert.ok(labRegression);
+  assert.equal(query(owner,`SELECT artifact->>'expectedOutcome' FROM lg_regression_tests WHERE id='${labRegression}'`),"PASS");
+  const reintroduced=await process(replay("vulnerable"));assert.equal(reintroduced.evaluation.outcome,"REPRODUCIBLE_FAILURE");assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${labFinding}'`),"REGRESSION_FAILED");
+  const fixedAgain=await process(replay("fixed"));assert.equal(fixedAgain.evaluation.outcome,"PASS");assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${labFinding}'`),"RESOLVED");
+  assert.equal(execute(`SELECT active||':'||reserved FROM lg_execution_budgets WHERE organization_id='${labOrg}'`),"0:0");
+  const consumed=Number(execute(`SELECT consumed FROM lg_execution_budgets WHERE organization_id='${labOrg}'`));assert.equal(consumed,[original,fixed,reintroduced,fixedAgain].reduce((n,r)=>n+r.requests,0));
+  assert.equal(execute(`SELECT count(*) FROM lg_reproduction_bundles WHERE project_id='${labProject}'`),"4");
+ }finally{await provider.drain().catch(()=>{});await rm(root,{recursive:true,force:true});}
+});
+for(const table of ["lg_findings","lg_finding_occurrences","lg_finding_events","lg_reproduction_bundles","lg_regression_tests","lg_test_attempts","lg_fixture_sets","lg_test_identities","lg_synthetic_resources"])
+ dbtest(`Phase 5 populated cross-org ${table} invisible`,()=>{assert.equal(query(outsider,`SELECT count(*) FROM ${table} WHERE project_id='${labProject}'`),"0");assert.ok(Number(query(owner,`SELECT count(*) FROM ${table} WHERE project_id='${labProject}'`))>0);});
+for(const table of ["lg_findings","lg_test_attempts","lg_assertion_results","lg_replay_attempts","lg_regression_tests","lg_reproduction_bundles"])
+ dbtest(`browser cannot forge dynamic ${table}`,()=>denied(owner,`INSERT INTO ${table}(organization_id) VALUES('${labOrg}')`));
+dbtest("browser cannot mark findings reproduced/resolved or forge regression result",()=>{
+ denied(owner,`UPDATE lg_findings SET state='REPRODUCED' WHERE id='${labFinding}'`);denied(owner,`UPDATE lg_findings SET state='RESOLVED' WHERE id='${labFinding}'`);denied(owner,`UPDATE lg_assertion_results SET result='PASS' WHERE project_id='${labProject}'`);
+ denied(owner,executionSql("LAB_COMPLETE",{}));denied(owner,executionSql("LAB_CREATE",{}));
+});
+dbtest("cross-project finding reference is rejected even with privileged database identity",()=>{
+ // Use an existing foreign run/attempt so only the finding's tenant parent is
+ // invalid. Reusing the original finding/run pair would hit uniqueness first.
+ assert.match(raw(`BEGIN; INSERT INTO lg_finding_occurrences(organization_id,project_id,finding_id,run_id,attempt_id,outcome) SELECT organization_id,project_id,'${labFinding}',run_id,id,'PASS' FROM lg_job_attempts WHERE project_id='${sourceProject}' LIMIT 1; ROLLBACK;`).stderr,/23503/);
+ denied(outsider,`SELECT lg_finding_replay('${labProject}','${labFinding}','fixed','${randomUUID()}','${correlation}')`);
+});
+dbtest("sealed dynamic manifest and regression recipe are append-only",()=>{
+ assert.match(raw(`UPDATE lg_reproduction_bundles SET manifest_digest='sha256:${"f".repeat(64)}' WHERE run_id='${labRun}'`).stderr,/23514|42501/);
+ assert.match(raw(`UPDATE lg_regression_tests SET artifact='{}' WHERE id='${labRegression}'`).stderr,/23514|42501/);
+});
+dbtest("dynamic evidence remains bound to immutable deployment, invariant and authorization",()=>{
+ assert.equal(execute(`SELECT count(*) FROM lg_reproduction_bundles b JOIN lg_verification_runs r ON r.id=b.run_id JOIN lg_test_cases c ON c.run_id=r.id WHERE r.project_id='${labProject}' AND b.bundle->>'deploymentId'=r.deployment_id::text AND b.bundle->>'authorizationId'=r.authorization_id::text AND b.bundle->>'invariantId'=c.invariant_id::text AND b.bundle->>'planHash'=c.plan_hash`),"4");
+ assert.equal(execute(`SELECT count(*) FROM lg_deployments WHERE project_id='${labProject}' AND provider='VERCEL'`),"0");
+});
+dbtest("completed replay retry is idempotent and cannot reopen a resolved finding",()=>{
+ const retry=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_finding_replay('${labProject}','${labFinding}','fixed','${labLastRequest}','${correlation}')`);
+ assert.equal(retry,labLastReplay);assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${labFinding}'`),"RESOLVED");
+ denied(owner,`SELECT lg_finding_replay('${labProject}','${labFinding}','vulnerable','${labLastRequest}','${correlation}')`,"22023");
+});
+dbtest("cancelled replay becomes inconclusive; old idempotency retry cannot replace active replay",()=>{
+ const pending=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_finding_replay('${labProject}','${labFinding}','fixed','${randomUUID()}','${correlation}')`);
+ execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_finding_replay('${labProject}','${labFinding}','fixed','${labLastRequest}','${correlation}')`);
+ assert.equal(query(owner,`SELECT active_replay FROM lg_findings WHERE id='${labFinding}'`),pending);
+ execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_execution_command('${labProject}','CANCEL','{"runId":"${pending}"}','${correlation}')`);executionService("RECOVER");
+ assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${labFinding}'`),"INCONCLUSIVE");assert.equal(query(owner,`SELECT state FROM lg_verification_runs WHERE id='${pending}'`),"CANCELLED");
 });

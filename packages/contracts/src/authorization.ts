@@ -5,7 +5,7 @@ const host = z.string().max(253).regex(/^(?=.{1,253}$)[a-z0-9]+(?:[.-][a-z0-9]+)
 export const targetAuthorizationSchema = z.object({
   id: identifierSchema, organizationId: identifierSchema, projectId: identifierSchema,
   targetHost: host,
-  method: z.enum(["DEPLOYMENT_CHALLENGE", "PROVIDER_OWNERSHIP_VERIFICATION"]),
+  method: z.enum(["DEPLOYMENT_CHALLENGE", "PROVIDER_OWNERSHIP_VERIFICATION", "REFERENCE_LAB_HARNESS"]),
   proofReference: identifierSchema,
   authorizingPrincipal: z.object({ userId: identifierSchema, origin: z.literal("supabase_verified_bearer") }).strict(),
   allowedHosts: z.array(host).min(1).max(20),

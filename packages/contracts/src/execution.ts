@@ -7,7 +7,8 @@ export const executionGrantSchema = z.object({
   jti: z.string().uuid(), iat: z.number().int(), exp: z.number().int(),
   jobId: z.string().uuid(), attemptId: z.string().uuid(), fence: z.number().int().positive(),
   runId: z.string().uuid(), organizationId: z.string().uuid(), projectId: z.string().uuid(),
-  snapshotId: z.string().uuid(), commitSha: z.string().regex(/^[a-f0-9]{40}$/),
+  snapshotId: z.string().uuid().nullable(), commitSha: z.string().regex(/^[a-f0-9]{40}$/),
+  referenceLab: z.object({planHash:digestSchema,caseId:z.string().max(60),seed:z.string().max(60),variant:z.enum(["vulnerable","fixed","inconclusive"]),sourceDigest:digestSchema}).strict().optional(),
   deploymentId: z.string().uuid(), deploymentUrl: z.string().url(),
   authorizationId: z.string().uuid(), authorizationVersion: z.number().int().positive(),
   authorization: targetAuthorizationSchema,
@@ -20,7 +21,8 @@ export const executionGrantSchema = z.object({
 }).strict().superRefine((g,c)=>{
   const a=g.authorization;
   if(g.exp<=g.iat||g.exp-g.iat>900||a.id!==g.authorizationId||a.organizationId!==g.organizationId||a.projectId!==g.projectId||
-    a.allowedHosts.length!==1||a.allowedPorts.length!==1||a.allowedPorts[0]!==443||a.allowedOperations.some(x=>x!=="resource.read")||
+    a.allowedHosts.length!==1||a.allowedPorts.length!==1||a.allowedPorts[0]!==443||a.allowedOperations.some(x=>!(g.referenceLab?["resource.read","resource.write","role.change","session.check"]:["resource.read"]).includes(x))||
+    (g.referenceLab ? a.method!=="REFERENCE_LAB_HARNESS"||a.targetHost!=="reference-lab.invalid"||g.deploymentUrl!=="https://reference-lab.invalid/" : g.snapshotId===null||a.method==="REFERENCE_LAB_HARNESS")||
     g.limits.requests>a.requestLimit||g.limits.concurrency>a.concurrencyLimit||g.exp*1000>Date.parse(a.expiresAt))
     c.addIssue({code:z.ZodIssueCode.custom,message:"Invalid execution scope"});
 });

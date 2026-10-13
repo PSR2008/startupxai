@@ -17,19 +17,21 @@ export interface RunnerProvider {
 }
 const uuid=z.string().uuid();
 const claimSchema=z.object({
- run:z.object({id:uuid,organization_id:uuid,project_id:uuid,snapshot_id:uuid,commit_sha:z.string(),deployment_id:uuid,authorization_id:uuid,authorization_version:z.number(),runner_image_digest:z.string().nullable()}),
+ run:z.object({id:uuid,organization_id:uuid,project_id:uuid,snapshot_id:uuid.nullable(),commit_sha:z.string(),deployment_id:uuid,authorization_id:uuid,authorization_version:z.number(),runner_image_digest:z.string().nullable()}),
  job:z.object({id:uuid,fence:z.number()}),
  attempt:z.object({id:uuid,runner_id:uuid,grant_id:uuid,deadline:z.string(),reserved_requests:z.number(),reserved_concurrency:z.number()}),
  authorization:z.object({id:uuid,principal_id:uuid,proof_id:uuid,starts_at:z.string(),expires_at:z.string(),request_limit:z.number(),concurrency_limit:z.number(),duration_seconds:z.number()}),
  deployment:z.object({target_url:z.string()}),invariants:z.array(z.object({id:uuid,version:z.number()})),
+ referenceLab:executionGrantSchema.innerType().shape.referenceLab,
 });
 export function grantFromClaim(input:unknown,now=Date.now()):ExecutionGrant {
  const c=claimSchema.parse(input),r=c.run,a=c.authorization,t=c.attempt;const u=targetUrl(c.deployment.target_url);
  return executionGrantSchema.parse({iss:"launchgate-orchestrator",aud:"launchgate-runner",jti:t.grant_id,iat:Math.floor(now/1000),exp:Math.floor(Date.parse(t.deadline)/1000),
   jobId:c.job.id,attemptId:t.id,fence:c.job.fence,runId:r.id,organizationId:r.organization_id,projectId:r.project_id,snapshotId:r.snapshot_id,commitSha:r.commit_sha,
   deploymentId:r.deployment_id,deploymentUrl:u.href,authorizationId:r.authorization_id,authorizationVersion:r.authorization_version,
-  authorization:{id:a.id,organizationId:r.organization_id,projectId:r.project_id,targetHost:u.hostname,method:"PROVIDER_OWNERSHIP_VERIFICATION",proofReference:a.proof_id,
-   authorizingPrincipal:{userId:a.principal_id,origin:"supabase_verified_bearer"},allowedHosts:[u.hostname],allowedPorts:[443],allowedOperations:["resource.read"],
+  ...(c.referenceLab?{referenceLab:c.referenceLab}:{}),
+  authorization:{id:a.id,organizationId:r.organization_id,projectId:r.project_id,targetHost:u.hostname,method:c.referenceLab?"REFERENCE_LAB_HARNESS":"PROVIDER_OWNERSHIP_VERIFICATION",proofReference:a.proof_id,
+   authorizingPrincipal:{userId:a.principal_id,origin:"supabase_verified_bearer"},allowedHosts:[u.hostname],allowedPorts:[443],allowedOperations:c.referenceLab?["resource.read","resource.write","role.change","session.check"]:["resource.read"],
    startsAt:new Date(a.starts_at).toISOString(),expiresAt:new Date(a.expires_at).toISOString(),requestLimit:a.request_limit,requestsPerSecond:2,concurrencyLimit:a.concurrency_limit,
    spendLimit:{currency:"USD",micros:0},revocation:{state:"ACTIVE"}},runner:{identity:t.runner_id,version:"lg-runner-1",imageDigest:r.runner_image_digest},policyVersion:1,invariantVersions:c.invariants,
   limits:{requests:t.reserved_requests,concurrency:t.reserved_concurrency,durationSeconds:a.duration_seconds,responseBytes:1048576,artifactBytes:4194304,spendMicros:0,requestsPerSecond:2,burst:5},

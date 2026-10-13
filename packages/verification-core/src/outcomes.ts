@@ -56,7 +56,7 @@ export function evaluateOutcome(specInput: unknown, evidenceInput: unknown, admi
     : admission.kind === "AUTHENTICATED_RUNNER" && admission.runId === e.runId && admission.manifestDigest === evidenceDigest(e);
   if (!admitted) return unknown("UNTRUSTED_EVIDENCE");
   if (e.scope.invariantId !== spec.id || e.scope.invariantVersion !== spec.version || e.planDigest !== planDigest(spec)) return unknown("SPECIFICATION_MISMATCH");
-  if (!e.runner.imageDigest || e.artifacts.some(a => a.redaction === "PENDING") ||
+  if (!(e.runner.imageDigest || e.scope.purpose === "REFERENCE_LAB" && e.runner.sourceDigest) || e.artifacts.some(a => a.redaction === "PENDING") ||
       new Set(e.artifacts.map(a => a.id)).size !== e.artifacts.length) return unknown("INCOMPLETE_PROVENANCE");
   if (Date.parse(e.createdAt) < Date.parse(e.original.completedAt)) return unknown("INVALID_CHRONOLOGY");
   const original = evaluateAttempt(spec, e.original);

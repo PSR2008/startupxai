@@ -39,6 +39,7 @@ export class TargetClient {
   private readonly transport:Transport=pinnedHttps,private readonly bypass?:{host:string;secret:string}){}
  async get(value:string,signal:AbortSignal):Promise<{status:number;bytes:number}> {
   const g=this.grant;const u=targetUrl(value,g.authorization.targetHost);
+  if(g.referenceLab)throw new Error("REFERENCE_LAB_TRANSPORT_REQUIRED");
   if(!g.authorization.allowedOperations.includes("resource.read")||g.paymentMode!=="TEST_ONLY"||g.limits.spendMicros!==0)throw new Error("OPERATION_SCOPE");
   const now=Date.now();this.tokens=Math.min(5,this.tokens+(now-this.updated)/500);this.updated=now;
   if(signal.aborted||now>=g.exp*1000||now>=Date.parse(g.authorization.expiresAt))throw new Error("STOP_REQUIRED");
