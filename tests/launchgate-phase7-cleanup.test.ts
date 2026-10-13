@@ -1,0 +1,10 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { phase7Plan } from "./fixtures/phase7-lab";
+import { labGrant } from "./fixtures/dynamic-lab";
+import { startAiFixture,activeAiFixtures } from "../reference-lab/ai/fixture";
+import { collectAi } from "../reference-lab/ai/collector";
+import { startBrowserFixture,activeBrowserFixtures } from "../reference-lab/browser/fixture";
+import { collectBrowser } from "../reference-lab/browser/collector";
+test("cancelled AI attempt disposes usage, reservation and provider storage",async()=>{const plan=phase7Plan("ai.quota"),runtime=await startAiFixture(plan,"fixed"),stop=new AbortController();stop.abort();const trace=await collectAi(plan,labGrant(plan,"fixed"),runtime,stop.signal,async()=>{},async()=>true,async()=>{});assert.equal(trace.execution,"TIMEOUT");assert.equal(trace.cleanup,true);assert.equal(activeAiFixtures(),0);});
+test("cancelled browser attempt closes browser and fixture sessions",async()=>{const plan=phase7Plan("browser.release"),runtime=await startBrowserFixture(plan,"fixed"),stop=new AbortController();stop.abort();const trace=await collectBrowser(plan,labGrant(plan,"fixed"),runtime,stop.signal,async()=>{},async()=>true,async()=>{});assert.equal(trace.execution,"TIMEOUT");assert.equal(trace.cleanup,true);assert.equal(activeBrowserFixtures(),0);});

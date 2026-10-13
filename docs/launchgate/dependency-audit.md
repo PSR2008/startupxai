@@ -1,6 +1,10 @@
 # Phase 1 dependency audit - 2026-10-11
 
-## Phase 6 recheck - 2026-10-13 (current)
+## Phase 7 recheck - 2026-10-14 (current)
+
+Added Playwright 1.64.0 as a development/Reference Lab runner dependency with its lockfile-pinned matching Chromium binary. No real AI provider dependency was added. Full `npm audit --json`: **0 critical / 7 high / 2 moderate**, exit 1. `npm audit --omit=dev --json`: **zero vulnerabilities**, exit 0. No new advisory entry was introduced; inherited build/dev findings below remain unresolved. Playwright is imported only by the separate Reference Lab runner/test path, not StartupX/Next routes. Browser workers require the development tooling installation; production omit-dev installation alone does not supply that runner capability. Browser binary security and controlled routing are not an arbitrary-code sandbox certification.
+
+## Phase 6 recheck - 2026-10-13
 
 No dependencies or lockfile changes were introduced. Production audit passed with **zero vulnerabilities**. The full audit initially hit a registry endpoint error; a successful retry reports **0 critical / 7 high / 2 moderate**, exit 1. The inherited development/build findings assessed below remain unresolved. Billing fixtures use native Node HTTP/crypto/SQLite and existing contracts; they do not execute customer code or call external billing providers. Install, typecheck, lint, all tests and production build passed. This audit does not certify a production sandbox or live provider integration.
 

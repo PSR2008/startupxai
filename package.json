@@ -37,10 +37,29 @@
     "test:billing-regression": "node --conditions=react-server --import tsx --test tests/launchgate-billing-regression.test.ts",
     "test:startupx-dogfood": "node --conditions=react-server --import tsx --test tests/launchgate-billing-dogfood.test.ts",
     "test:billing-provider": "node --conditions=react-server --import tsx --test tests/launchgate-billing-provider.test.ts",
-    "test:phase6-journeys": "npm run test:database"
+    "test:phase6-journeys": "npm run test:database",
+    "test:ai-lab": "node --conditions=react-server --import tsx --test tests/launchgate-ai-*.test.ts",
+    "test:anonymous-access": "node --conditions=react-server --import tsx --test tests/launchgate-ai-access.test.ts",
+    "test:model-boundary": "node --conditions=react-server --import tsx --test tests/launchgate-ai-access.test.ts",
+    "test:quota-boundary": "node --conditions=react-server --import tsx --test tests/launchgate-ai-quota.test.ts",
+    "test:concurrent-quota": "node --conditions=react-server --import tsx --test tests/launchgate-ai-quota.test.ts tests/launchgate-ai-runtime.test.ts",
+    "test:distributed-rate-limit": "node --conditions=react-server --import tsx --test tests/launchgate-ai-rate.test.ts",
+    "test:cost-ceiling": "node --conditions=react-server --import tsx --test tests/launchgate-ai-cost.test.ts",
+    "test:provider-failure-accounting": "node --conditions=react-server --import tsx --test tests/launchgate-ai-runtime.test.ts",
+    "test:phase7-fix-replay": "node --conditions=react-server --import tsx --test tests/launchgate-phase7-regression.test.ts",
+    "test:phase7-regression": "node --conditions=react-server --import tsx --test tests/launchgate-phase7-regression.test.ts",
+    "test:browser-journey": "node --conditions=react-server --import tsx --test tests/launchgate-browser-journey.test.ts tests/launchgate-browser-safety.test.ts",
+    "test:browser-regression": "node --conditions=react-server --import tsx --test tests/launchgate-phase7-regression.test.ts",
+    "test:startupx-ai-dogfood": "node --conditions=react-server --import tsx --test tests/launchgate-phase7-regression.test.ts",
+    "test:phase7-e2e": "npm run test:database",
+    "browser:install": "playwright install chromium --no-shell"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "@launchgate/contracts": "0.1.0",
+    "@launchgate/invariant-spec": "0.1.0",
+    "@launchgate/source-analysis": "0.1.0",
+    "@launchgate/verification-core": "0.1.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.4",
     "clsx": "^2.1.1",
@@ -55,13 +74,9 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "react-intersection-observer": "^9.15.1",
-    "tailwind-merge": "^2.6.0",
-    "zod": "^3.24.2",
     "server-only": "0.0.1",
-    "@launchgate/contracts": "0.1.0",
-    "@launchgate/invariant-spec": "0.1.0",
-    "@launchgate/verification-core": "0.1.0",
-    "@launchgate/source-analysis": "0.1.0"
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -70,6 +85,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.5.27",
+    "playwright": "^1.64.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.23.1",
@@ -83,6 +99,8 @@
     "npm": ">=11 <12"
   },
   "overrides": {
-    "next": { "postcss": "8.5.29" }
+    "next": {
+      "postcss": "8.5.29"
+    }
   }
 }

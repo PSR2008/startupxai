@@ -7,7 +7,7 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -17,6 +17,8 @@ jobs:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
+      # Controlled, credential-free Reference Lab Chromium journeys.
+      - run: npx playwright install --with-deps chromium --no-shell
       - run: npm run type-check
       - run: npm run lint
       - run: npm run test

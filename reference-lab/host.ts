@@ -14,9 +14,15 @@ import { evaluateLab,evaluateTrace,positiveControl } from "./evaluation";
 import { startBillingFixture } from "./billing/fixture";
 import { collectBilling } from "./billing/collector";
 import type { BillingFault } from "./billing/contracts";
+import { startAiFixture } from "./ai/fixture";
+import { collectAi } from "./ai/collector";
+import type { AiFault } from "./ai/contracts";
+import { startBrowserFixture } from "./browser/fixture";
+import { collectBrowser } from "./browser/collector";
+import type { BrowserFault } from "./browser/contracts";
 
 export function labSourceIdentity(){
- const files=["plans.ts","runtime.ts","runner.ts","evaluation.ts","host.ts","billing/contracts.ts","billing/provider.ts","billing/fixture.ts","billing/collector.ts","billing/oracle.ts"].map(name=>readFileSync(new URL(name,import.meta.url),"utf8"));
+ const files=["plans.ts","runtime.ts","runner.ts","evaluation.ts","host.ts","billing/contracts.ts","billing/provider.ts","billing/fixture.ts","billing/collector.ts","billing/oracle.ts","ai/contracts.ts","ai/binding.ts","ai/provider.ts","ai/fixture.ts","ai/collector.ts","ai/oracle.ts","browser/contracts.ts","browser/fixture.ts","browser/collector.ts","browser/oracle.ts"].map(name=>readFileSync(new URL(name,import.meta.url),"utf8"));
  const source=canonical(files);return {sourceDigest:digest(source),revision:createHash("sha1").update(source).digest("hex")};
 }
 export async function registerLabRun(store:ExecutionStore,projectId:string,actorId:string,planInput:TestPlan,variant:Variant,requestKey=randomUUID()){
@@ -43,7 +49,7 @@ export class LocalLabProvider implements RunnerProvider {
  private tasks=new Map<string,{abort:AbortController;promise:Promise<void>}>();
  readonly results=new Map<string,Awaited<ReturnType<typeof admitLab>>>();
  constructor(private readonly key:KeyObject,private readonly store:ExecutionStore,private readonly artifacts:ArtifactStore,
-  private readonly options:{pace?:()=>Promise<void>;fault?:LabFault;billingFault?:BillingFault;reproductionVariant?:Variant;reproductionFault?:LabFault}={}){}
+  private readonly options:{pace?:()=>Promise<void>;fault?:LabFault;billingFault?:BillingFault;aiFault?:AiFault;browserFault?:BrowserFault;reproductionVariant?:Variant;reproductionFault?:LabFault}={}){}
  async launch(input:{attemptId:string;runnerId:string;grant:string;deadline:string}) {
   const g=verifyGrant(input.grant,this.key);
   if(!g.referenceLab||g.attemptId!==input.attemptId||g.runner.identity!==input.runnerId||g.deploymentUrl!=="https://reference-lab.invalid/")throw new Error("CONTROLLED_LAB_ONLY");
@@ -63,6 +69,8 @@ export class LocalLabProvider implements RunnerProvider {
    let consumed=0;const consume=async()=>{if(++consumed>Math.min(plan.budget.requests,g.limits.requests))throw new Error("SHARED_REQUEST_BUDGET");await this.store.command("REQUEST",authority(g));};
    const collect=async(variant:Variant,fault?:LabFault)=>{
     bounded.throwIfAborted();await this.store.command("CHECK",authority(g));
+    if(plan.ai){const runtime=await startAiFixture(plan,variant,this.options.aiFault);return collectAi(plan,g,runtime,bounded,consume,async t=>positiveControl(plan,t),this.options.pace);}
+    if(plan.journey){const runtime=await startBrowserFixture(plan,variant,this.options.browserFault);return collectBrowser(plan,g,runtime,bounded,consume,async t=>positiveControl(plan,t),this.options.pace);}
     if(plan.billing){const runtime=await startBillingFixture(plan,variant,this.options.billingFault);return collectBilling(plan,g,runtime,bounded,consume,async t=>positiveControl(plan,t),this.options.pace);}
     const runtime=await startFixture(plan.caseId,variant,plan.seed,fault);
     return collectTrace(plan,g,runtime,bounded,consume,async t=>positiveControl(plan,t),this.options.pace);

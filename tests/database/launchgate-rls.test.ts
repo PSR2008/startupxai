@@ -32,6 +32,16 @@ function raw(sql: string, database = "launchgate_test") {
 function execute(sql: string, database?: string) {
   const result = raw(sql, database); assert.equal(result.status, 0, result.stderr); return result.stdout.trim();
 }
+// Live HTTP/browser fixture requests must not share an event loop with blocking
+// Docker RPCs: a synchronous lease check can otherwise trigger a false timeout.
+async function asyncExecutionService(action:string,data:Record<string,unknown>):Promise<unknown>{
+ const output=await new Promise<string>((resolve,reject)=>{
+  const child=spawn("docker",["exec","-i",container,"psql","-X","-qAt","-v","ON_ERROR_STOP=1","-U","postgres","-d","launchgate_test"],{windowsHide:true,timeout:120000});
+  let stdout="",stderr="";child.stdout.on("data",chunk=>{stdout+=chunk;});child.stderr.on("data",chunk=>{stderr+=chunk;});
+  child.on("error",reject);child.stdin.on("error",reject);child.on("close",code=>code===0?resolve(stdout.trim()):reject(new Error(`database command ${action}: ${stderr}`)));
+  child.stdin.end(`SET ROLE service_role; ${executionSql(action,data)};\n`);
+ });return JSON.parse(output||"null");
+}
 function transaction(user: string, sql: string, role = "authenticated") {
   return `BEGIN; SET LOCAL ROLE ${role}; SET LOCAL request.jwt.claim.sub='${user}'; ${sql}; ROLLBACK;`;
 }
@@ -541,7 +551,7 @@ dbtest("Phase 5 end-to-end: provision, authorize, schedule, reproduce, fix, regr
  labOrg=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT id FROM lg_create_organization('Phase 5 synthetic organization','${correlation}')`);
  labProject=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT id FROM lg_create_project('${labOrg}','Reference Lab only','${correlation}')`);
  const plan=compilePlan(labInvariant("tenant.write",randomUUID()),"tenant.write","journey-seed",defaultCapabilities("tenant.write"));
- const store={async command(action:string,data:Record<string,unknown>){return executionService(action,data);}};
+ const store={async command(action:string,data:Record<string,unknown>){return asyncExecutionService(action,data);}};
  const root=await mkdtemp(join(tmpdir(),"launchgate-phase5-"));const artifacts=new LocalArtifacts(root);const keys=generateKeyPairSync("ed25519");
  const provider=new LocalLabProvider(keys.publicKey,store,artifacts);const orchestrator=new Orchestrator(store,provider,keys.privateKey,artifacts);
  const process=async(run:string)=>{await orchestrator.tick();await provider.drain();await orchestrator.tick();const result=provider.results.get(run);assert.ok(result,`missing run ${run}`);assert.equal(execute(`SELECT state FROM lg_verification_runs WHERE id='${run}'`),"COMPLETED");return result;};
@@ -610,7 +620,7 @@ for(const caseId of ["billing.failed","billing.duplicate","billing.price","billi
  const {compilePlan,defaultCapabilities,labInvariant}=await import("../../reference-lab/plans");const {registerLabRun,LocalLabProvider}=await import("../../reference-lab/host");
  const {Orchestrator}=await import("../../services/orchestrator/orchestrator"),{LocalArtifacts}=await import("../../services/orchestrator/artifacts");
  const plan=compilePlan(labInvariant(caseId,randomUUID()),caseId,"phase6-durable",defaultCapabilities(caseId));
- const store={async command(action:string,data:Record<string,unknown>){return executionService(action,data);}};
+ const store={async command(action:string,data:Record<string,unknown>){return asyncExecutionService(action,data);}};
  const root=await mkdtemp(join(tmpdir(),"launchgate-phase6-")),keys=generateKeyPairSync("ed25519"),artifacts=new LocalArtifacts(root);
  const provider=new LocalLabProvider(keys.publicKey,store,artifacts),orchestrator=new Orchestrator(store,provider,keys.privateKey,artifacts);
  const process=async(run:string)=>{await orchestrator.tick();await provider.drain();await orchestrator.tick();const value=provider.results.get(run);assert.ok(value);assert.equal(query(owner,`SELECT state FROM lg_verification_runs WHERE id='${run}'`),"COMPLETED");assert.ok(value.traces.every(t=>t.billing?.financialSpend===0));return value;};
@@ -636,4 +646,47 @@ dbtest("Phase 6 provider/payment/entitlement observations are sealed, synthetic 
  denied(owner,executionSql("LAB_COMPLETE",{outcome:"PASS",candidate:true}));
  assert.match(raw(`UPDATE lg_test_attempts SET trace=jsonb_set(trace,'{billing,financialSpend}','1') WHERE project_id='${billingProject}'`).stderr,/42501|23514/);
  assert.equal(execute(`SELECT count(*) FROM lg_target_authorizations WHERE project_id='${billingProject}' AND (spend_micros<>0 OR request_limit<>64 OR duration_seconds<>120)`),"0");
+});
+
+// Phase 7 uses exactly the same admission, finding, replay and regression tables.
+let phase7Org:string,phase7Project:string,phase7Finding:string;
+dbtest("Phase 7 forward migration expands only controlled lab capabilities",()=>{
+ execute(readFileSync("migrations/023_launchgate_ai_browser_lab.sql","utf8"));
+ phase7Org=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT id FROM lg_create_organization('Phase 7 synthetic AI and browser','${correlation}')`);
+ phase7Project=execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT id FROM lg_create_project('${phase7Org}','No live money','${correlation}')`);
+ denied(owner,"SELECT launchgate_private.lab_create(NULL,NULL,'{}',NULL)");
+});
+for(const caseId of ["ai.anonymous","ai.model_body","ai.quota","ai.concurrent","ai.distributed","ai.cost","browser.release"] as const)
+ dbtest(`Phase 7 durable AI/browser journey ${caseId}: reproduce, find, fixed replay, regression`,async()=>{
+ const {generateKeyPairSync}=await import("node:crypto"),{mkdtemp,rm}=await import("node:fs/promises"),{tmpdir}=await import("node:os"),{join,resolve,sep}=await import("node:path");
+ const {compilePlan,defaultCapabilities,labInvariant}=await import("../../reference-lab/plans");const {registerLabRun,LocalLabProvider}=await import("../../reference-lab/host");
+ const {Orchestrator}=await import("../../services/orchestrator/orchestrator"),{LocalArtifacts}=await import("../../services/orchestrator/artifacts");
+ const plan=compilePlan(labInvariant(caseId,randomUUID()),caseId,"phase7-durable",defaultCapabilities(caseId));
+ const store={async command(action:string,data:Record<string,unknown>){return asyncExecutionService(action,data);}};
+ const root=await mkdtemp(join(tmpdir(),"launchgate-phase7-")),keys=generateKeyPairSync("ed25519"),artifacts=new LocalArtifacts(root);
+ const provider=new LocalLabProvider(keys.publicKey,store,artifacts),orchestrator=new Orchestrator(store,provider,keys.privateKey,artifacts);
+ const process=async(run:string)=>{await orchestrator.tick();await provider.drain();await orchestrator.tick();const value=provider.results.get(run);assert.ok(value);assert.equal(query(owner,`SELECT state FROM lg_verification_runs WHERE id='${run}'`),"COMPLETED");assert.ok(value.traces.every(t=>(t.ai?.realFinancialSpend??t.browser?.realFinancialSpend)===0));return value;};
+ try{
+  if(caseId==="browser.release"){const baseline=await registerLabRun(store,phase7Project,owner,plan,"fixed") as {id:string};assert.equal((await process(baseline.id)).evaluation.outcome,"PASS");}
+  const created=await registerLabRun(store,phase7Project,owner,plan,"vulnerable") as {id:string};const original=await process(created.id);assert.equal(original.evaluation.outcome,"REPRODUCIBLE_FAILURE");
+  phase7Finding=execute(`SELECT finding_id FROM lg_finding_occurrences WHERE run_id='${created.id}'`);
+  const replay=(variant:string)=>execute(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_finding_replay('${phase7Project}','${phase7Finding}','${variant}','${randomUUID()}','${correlation}')`);
+  const fixed=await process(replay("fixed"));assert.equal(fixed.evaluation.outcome,"PASS");assert.equal(fixed.bundle.planHash,original.bundle.planHash);assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${phase7Finding}'`),"RESOLVED");
+  assert.equal(query(owner,`SELECT artifact->>'expectedOutcome' FROM lg_regression_tests WHERE finding_id='${phase7Finding}'`),"PASS");
+  if(caseId==="browser.release"){const again=await process(replay("vulnerable"));assert.equal(again.evaluation.outcome,"REPRODUCIBLE_FAILURE");assert.equal(query(owner,`SELECT state FROM lg_findings WHERE id='${phase7Finding}'`),"REGRESSION_FAILED");}
+  assert.equal(execute(`SELECT active||':'||reserved FROM lg_execution_budgets WHERE organization_id='${phase7Org}'`),"0:0");
+  assert.equal(execute(`SELECT consumed=(SELECT sum(requests) FROM lg_job_attempts WHERE organization_id='${phase7Org}') FROM lg_execution_budgets WHERE organization_id='${phase7Org}'`),"t");
+ }finally{await provider.drain().catch(()=>{});const target=resolve(root);assert.ok(target.startsWith(resolve(tmpdir())+sep+"launchgate-phase7-"));await rm(target,{recursive:true,force:true});}
+});
+for(const table of ["lg_test_attempts","lg_observations","lg_findings","lg_reproduction_bundles","lg_regression_tests"])
+ dbtest(`Phase 7 populated AI/browser ${table}: tenant isolation and browser forgery denial`,()=>{
+  assert.equal(query(outsider,`SELECT count(*) FROM ${table} WHERE project_id='${phase7Project}'`),"0");assert.ok(Number(query(owner,`SELECT count(*) FROM ${table} WHERE project_id='${phase7Project}'`))>0);
+  denied(owner,`UPDATE ${table} SET project_id='${otherProject}' WHERE project_id='${phase7Project}'`);
+ });
+dbtest("Phase 7 AI/provider/browser observations are sealed, synthetic and zero spend",()=>{
+ assert.equal(execute(`SELECT bool_and(coalesce(trace#>>'{ai,realFinancialSpend}',trace#>>'{browser,realFinancialSpend}')='0') FROM lg_test_attempts WHERE project_id='${phase7Project}'`),"t");
+ assert.equal(execute(`SELECT count(*) FROM lg_reproduction_bundles WHERE project_id='${phase7Project}'`),"16");
+ denied(owner,executionSql("LAB_COMPLETE",{outcome:"PASS",candidate:true}));
+ assert.match(raw(`UPDATE lg_test_attempts SET trace=jsonb_set(trace,'{ai,realFinancialSpend}','1') WHERE project_id='${phase7Project}'`).stderr,/42501|23514/);
+ assert.equal(execute(`SELECT count(*) FROM lg_target_authorizations WHERE project_id='${phase7Project}' AND (spend_micros<>0 OR request_limit<>128 OR duration_seconds<>180)`),"0");
 });

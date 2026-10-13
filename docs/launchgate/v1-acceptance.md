@@ -229,3 +229,56 @@ The billing total also includes 21 runtime/control/safety tests. Install, typech
 Migration 022 initially referenced a constraint name replaced by Phase 5's multi-column CHECK. It now resolves the existing operations constraint from PostgreSQL dependencies, fails closed on unexpected schema, and uses an explicit new name. The complete database rerun passed afterward.
 
 Scope remains controlled local Reference Lab. SQLite connection reopen is not OS-process restart certification; the two-handler race is not distributed-provider certification. Partial refunds, proration, grace/trials, live settlement, production egress isolation, browser engines, customer code, automatic fixes and commercial billing are outside Phase 6. See [billing verification](billing-verification.md), [webhook contracts](webhook-verification.md) and [entitlements](entitlement-model.md).
+## Phase 7 evidence — 2026-10-14
+
+Final local application run: **809 passed**. Required disposable PostgreSQL/PostgREST run: **162 passed**. Combined: **971 tests**, zero failed/cancelled/skipped. This preserves the Phase 6 baseline of 660 application/148 database tests and adds 149 application/14 database cases. Focused commands overlap these totals and are not counted twice. Database runtime was 1,203 seconds; it exercised six durable AI journeys plus a browser baseline/regressed/fixed/reintroduced release chain, producing 16 Phase 7 runs.
+
+| Focused command | Passed |
+|---|---:|
+| `test:ai-lab` | 92 |
+| `test:anonymous-access` | 15 |
+| `test:model-boundary` (same access suite) | 15 |
+| `test:quota-boundary` | 18 |
+| `test:concurrent-quota` (quota + runtime) | 35 |
+| `test:distributed-rate-limit` | 15 |
+| `test:cost-ceiling` | 27 |
+| `test:provider-failure-accounting` (runtime suite) | 17 |
+| `test:phase7-fix-replay` | 9 |
+| `test:phase7-regression` (same replay suite) | 9 |
+| `test:browser-journey` (journeys + safety) | 46 |
+| `test:browser-regression` (same replay suite) | 9 |
+| `test:startupx-ai-dogfood` (same replay suite) | 9 |
+| Phase 7 cancellation/cleanup file | 2 |
+
+Install, typecheck, lint and production build passed. Lint retains the existing unused `describe` warning in `tests/public-source.test.ts`, with zero errors. Full dependency audit reports seven high/two moderate inherited development/build findings; production audit reports zero vulnerabilities. Playwright 1.64.0 and matching Chromium are explicitly installed for the controlled runner. CI now installs Chromium and has a 45-minute limit for the expanded credential-free rehearsal; no remote CI run is claimed.
+
+| Phase 7 acceptance criterion | Result / evidence |
+|---|---|
+| Anonymous provider access | PASS: vulnerable invocation reproduces; fixed denies before work with paid control intact |
+| Free/premium boundary | PASS: body, query and endpoint manipulation; paid premium access preserved |
+| Quota and reservation | PASS: five allowed, sixth denied before provider; 429 after work remains a failure |
+| Concurrent quota | PASS: ten-client barrier, one remaining unit, exactly one fixed admission; five repeated fixed runs |
+| Organization quota | PASS: multiple identities, sequential and barrier-controlled races against shared state |
+| Rate limits | PASS: fixed-window limit, burst, over-limit, concurrency and deterministic reset boundary |
+| Distributed limits | PASS: two logical connections/instances reproduce process-local bypass; shared durable key passes |
+| Cost ceiling | PASS: server-derived maximum reservation and actual reconciliation; forged client estimate ignored |
+| Input/expensive endpoints | PASS: anonymous/free/paid model paths and bounded input/batch/depth representations |
+| Failure policy | PASS: NOTHING and RESERVED_ONLY under both synthetic provider families |
+| Policy uncertainty | PASS: unknown policy/live mode stop; unsupported catalog combinations rejected |
+| Reproduction | PASS: fresh state/IDs and original program; differing overspend/state cannot block |
+| Replay/regressions | PASS: original oracle preserved; vulnerable/fixed/reintroduced cycles for seven AI families and browser release |
+| Zero real spend | PASS: deterministic provider calculations, no real provider credentials/calls |
+| Critical browser journeys | PASS: signup/login, protected/paid access, logout, create/read/update |
+| Unhappy paths | PASS: invalid/expired session, server error, missing input/entitlement, exhausted quota |
+| Browser controls / cosmetics | PASS: broken authorized control inconclusive; copy-only changes do not create findings |
+| Browser target safety | PASS: external redirect and unsupported origin/path rejection; bounded interpreter, no arbitrary scripts |
+| Browser cleanup | PASS: context/session disposal, controlled disconnection, navigation timeout and cancellation tests |
+| Trust / RLS | PASS: populated AI/browser evidence hidden cross-org; browser writes and sealed evidence mutation denied |
+| StartupX dogfood/coexistence | PASS: isolated synthetic Anthropic equivalent detects post-provider accounting; all prior tests/build green; production logic untouched |
+| Git scope | PASS: launchgate-rebuild, Phase 6 HEAD preserved, main/archive unchanged; no commit/push |
+
+The first database run exposed a Phase 5 probe timeout while synchronous Docker RPCs blocked the local HTTP event loop. The test-only live execution adapter now uses bounded asynchronous subprocesses; timeout/enforcement rules were not relaxed. The full rerun passed. An earlier focused regression run also detected a source-provenance mismatch while source was being edited; final runs used stable source and passed.
+
+The successful database rerun's cleanup assertions passed. The interrupted first run left `launchgate-rls-08bbf7ce-3b5b-4605-b454-6846acbcc49c` and its `-rest` companion, plus `%TEMP%/launchgate-billing-ENpRWH` and `%TEMP%/launchgate-phase6-irlm0Y`; automatic approval review initially blocked removal. **Cleanup-only review, 2026-10-14: PASS.** Ownership was verified through disposable labels, pinned test images, the paired container network, synthetic billing artifacts, SQLite fixture tables and the exact recorded paths; no directory contained a reparse point. Only those named resources were removed, together with the database container's exclusively attached anonymous test volume. Post-test checks confirm both containers, both directories and that volume are absent, with no additional Phase 7 fixture resources or Playwright browser processes found. Two older October 11 CI/no-environment repository-copy directories were inspected and left untouched. Focused AI runtime, browser safety and cancellation/cleanup suites passed **26 tests**, zero failures/skips. No source code changed during this cleanup review.
+
+Scope limits: controlled Reference Lab only; no live AI/provider certification, arbitrary customer deployment, customer code, generated browser scripts, merge blocking, fixes/PRs or Verified badge. Supported policy is the registered fixed-window catalog, not arbitrary pricing, token buckets or production distributed clock/crash recovery. Browser redirects use explicitly validated interpreter navigation rather than certifying native automatic redirect behavior. Static-to-dynamic correlation is an internal confirmed-binding helper, not automatic customer execution. See [AI cost verification](ai-cost-verification.md), [quota verification](quota-verification.md) and [browser journeys](browser-journeys.md).

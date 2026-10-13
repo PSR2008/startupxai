@@ -1,0 +1,11 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { executeCase } from "./fixtures/dynamic-lab";
+import { phase7Plan } from "./fixtures/phase7-lab";
+import { validatePlan } from "../reference-lab/plans";
+import { permittedBrowserUrl } from "../reference-lab/browser/collector";
+import { activeBrowserFixtures } from "../reference-lab/browser/fixture";
+for(const fault of ["BROKEN","CRASH","TIMEOUT","ESCAPE"] as const)test(`browser ${fault}: inconclusive with fixture cleanup`,async()=>{const {result}=await executeCase("browser.login","fixed",{browserFault:fault});assert.equal(result.evaluation.outcome,"INCONCLUSIVE");assert.equal(activeBrowserFixtures(),0);if(fault==="ESCAPE")assert.ok(result.traces[0].browser!.blocked>0);});
+test("copy changes do not create a business finding",async()=>{const {result}=await executeCase("browser.login","fixed",{browserFault:"COPY"});assert.equal(result.evaluation.outcome,"PASS");});
+test("journey schema and immutable compiler reject arbitrary scripts, selectors and URLs",()=>{const plan=phase7Plan("browser.login");for(const step of [{kind:"EVALUATE",script:"fetch('https://example.com')"},{kind:"NAVIGATE",path:"https://example.com"},{kind:"CLICK",target:"body"}])assert.throws(()=>validatePlan({...plan,journey:{...plan.journey,steps:[step]}}));assert.throws(()=>validatePlan({...plan,journey:{...plan.journey,steps:[{kind:"NAVIGATE",path:"/paid"}]}}),/PLAN_CHANGED/);});
+test("browser target scope excludes external origins, redirects, credentials and unsupported paths",()=>{const origin="http://127.0.0.1:12345";assert.equal(permittedBrowserUrl(origin+"/login",origin),true);for(const url of ["http://localhost:12345/login","http://127.0.0.1:12346/login","https://example.com/login",origin+"/login?url=https://example.com",origin+"/other","file:///etc/passwd","http://secret@127.0.0.1:12345/login"])assert.equal(permittedBrowserUrl(url,origin),false);});

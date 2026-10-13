@@ -61,3 +61,6 @@ Authentication, tenant isolation and privilege verification now execute against 
 ### LaunchGate Phase 6
 
 [Billing verification](docs/launchgate/billing-verification.md) adds 27 controlled billing/webhook cases with real local HTTP and transactional SQLite fixtures. [Webhook contracts](docs/launchgate/webhook-verification.md) and [confirmed entitlement policies](docs/launchgate/entitlement-model.md) reuse the existing reproduction, finding, fixed replay and regression pipeline. Run `npm run test:billing-lab` and `npm run test:phase6-journeys`. All provider events are synthetic and financial spend is zero; live Stripe/Razorpay compatibility and production StartupX billing fixes are not claimed.
+### LaunchGate Phase 7
+
+[AI cost verification](docs/launchgate/ai-cost-verification.md) adds synthetic provider observation, [atomic quota and shared rate-limit checks](docs/launchgate/quota-verification.md), and [controlled Chromium journeys](docs/launchgate/browser-journeys.md). Install the matching browser with `npm run browser:install`; run `npm run test:ai-lab`, `npm run test:browser-journey`, and `npm run test:phase7-e2e`. Only disposable Reference Lab targets execute; no paid AI calls, customer scripts or live provider certification are involved.
