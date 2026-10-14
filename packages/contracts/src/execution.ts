@@ -8,6 +8,7 @@ export const executionGrantSchema = z.object({
   jobId: z.string().uuid(), attemptId: z.string().uuid(), fence: z.number().int().positive(),
   runId: z.string().uuid(), organizationId: z.string().uuid(), projectId: z.string().uuid(),
   snapshotId: z.string().uuid().nullable(), commitSha: z.string().regex(/^[a-f0-9]{40}$/),
+  releasePolicy: z.object({releaseId:z.string().uuid(),policyId:z.string().uuid(),policyVersion:z.number().int().positive()}).strict().optional(),
   referenceLab: z.object({planHash:digestSchema,caseId:z.string().max(60),seed:z.string().max(60),variant:z.enum(["vulnerable","fixed","inconclusive"]),sourceDigest:digestSchema}).strict().optional(),
   deploymentId: z.string().uuid(), deploymentUrl: z.string().url(),
   authorizationId: z.string().uuid(), authorizationVersion: z.number().int().positive(),

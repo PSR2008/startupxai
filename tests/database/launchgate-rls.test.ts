@@ -60,7 +60,7 @@ function denied(user: string, sql: string, code = "42501", role?: string) {
 const rpcMember = (action: string, membership: string | null, role: string | null, status = "ACTIVE", user = candidate) =>
   `SELECT id FROM public.lg_manage_member('${org}','${action}','${user}',${membership ? `'${membership}'` : "NULL"},${role ? `'${role}'` : "NULL"},'${status}','${correlation}')`;
 const memberId = (n: number) => uid(400 + n);
-function dbtest(name: string, fn: () => void | Promise<void>) { test(name, { skip: blocked ? "BLOCKED_BY_ENVIRONMENT: Docker engine unavailable" : false }, fn); }
+function dbtest(name: string, fn: () => void | Promise<void>) { test(name, { skip: blocked && process.env.LAUNCHGATE_REQUIRE_DATABASE !== "1" ? "BLOCKED_BY_ENVIRONMENT: Docker engine unavailable" : false }, fn); }
 
 before(async () => {
   if (blocked) {

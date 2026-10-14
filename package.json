@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit",
     "test": "node --conditions=react-server --import tsx --test tests/*.test.ts",
     "test:launchgate": "node --conditions=react-server --import tsx --test tests/launchgate-*.test.ts",
-    "test:database": "node --import tsx --test tests/database/*.test.ts",
+    "test:database": "node --conditions=react-server --import tsx --test tests/database/*.test.ts",
     "test:orchestration": "node --conditions=react-server --import tsx --test tests/launchgate-orchestration.test.ts",
     "test:target-safety": "node --conditions=react-server --import tsx --test tests/launchgate-target-safety.test.ts",
     "test:vercel": "node --conditions=react-server --import tsx --test tests/launchgate-vercel.test.ts",
@@ -52,7 +52,16 @@
     "test:browser-regression": "node --conditions=react-server --import tsx --test tests/launchgate-phase7-regression.test.ts",
     "test:startupx-ai-dogfood": "node --conditions=react-server --import tsx --test tests/launchgate-phase7-regression.test.ts",
     "test:phase7-e2e": "npm run test:database",
-    "browser:install": "playwright install chromium --no-shell"
+    "browser:install": "playwright install chromium --no-shell",
+    "test:release": "node --conditions=react-server --import tsx --test tests/launchgate-release-*.test.ts",
+    "test:gate-engine": "node --conditions=react-server --import tsx --test tests/launchgate-release-gate.test.ts",
+    "test:coverage": "node --conditions=react-server --import tsx --test tests/launchgate-release-gate.test.ts",
+    "test:stale-evidence": "node --conditions=react-server --import tsx --test tests/launchgate-release-stale.test.ts",
+    "test:impact-analysis": "node --conditions=react-server --import tsx --test tests/launchgate-release-impact.test.ts",
+    "test:regression-selection": "node --conditions=react-server --import tsx --test tests/launchgate-release-impact.test.ts",
+    "test:github-checks": "node --conditions=react-server --import tsx --test tests/launchgate-release-github.test.ts",
+    "test:cross-domain-release": "node --conditions=react-server --import tsx --test tests/launchgate-release-cross-domain.test.ts",
+    "test:release-scenarios": "node --conditions=react-server --import tsx --test tests/launchgate-release-cross-domain.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

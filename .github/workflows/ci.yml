@@ -22,11 +22,15 @@ jobs:
       - run: npm run type-check
       - run: npm run lint
       - run: npm run test
+      # Includes Phase 8 gate/coverage/freshness, impact/regression selection,
+      # signed GitHub Checks contracts and eight-domain Reference Lab releases.
       # Includes executable local Reference Lab auth/tenant/role triplets,
       # reproduction, fix replay and regression. No external targets or secrets.
       # Phase 4 suites are included in test; named commands support focused runs.
       # Database suite also covers durable orchestration races and RLS.
       - run: npm run test:database
+        # Also exercises Phase 8 release RLS, fenced scheduling, immutable
+        # evaluations and provider-contract discovery/publication without secrets.
         # Includes Phase 5 plus Phase 6 synthetic billing journeys, zero spend,
         # transactional duplicate delivery, finding replay and tenant isolation.
         env:

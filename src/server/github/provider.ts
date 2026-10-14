@@ -27,17 +27,45 @@ export class GitHubProvider {
   authorizationUrl(state:string) {
     const url=new URL("https://github.com/login/oauth/authorize");url.searchParams.set("client_id",this.config.clientId);url.searchParams.set("redirect_uri",this.config.redirectUri);url.searchParams.set("state",state);return url.toString();
   }
-  private async request(path:string,token:string,body?:unknown,signal?:AbortSignal):Promise<unknown> {
+  private async request(path:string,token:string,body?:unknown,signal?:AbortSignal,method?:"PATCH"):Promise<unknown> {
     if(!path.startsWith("/")||path.startsWith("//"))throw new ApiError("ACCESS_DENIED");
     const url=new URL(path,"https://api.github.com");if(url.origin!=="https://api.github.com")throw new ApiError("ACCESS_DENIED");
-    const response=await this.transport(url,{method:body===undefined?"GET":"POST",redirect:"error",signal:signal?AbortSignal.any([signal,AbortSignal.timeout(10000)]):AbortSignal.timeout(10000),headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","Content-Type":"application/json"},...(body===undefined?{}:{body:JSON.stringify(body)})});
+    const response=await this.transport(url,{method:method??(body===undefined?"GET":"POST"),redirect:"error",signal:signal?AbortSignal.any([signal,AbortSignal.timeout(10000)]):AbortSignal.timeout(10000),headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","Content-Type":"application/json"},...(body===undefined?{}:{body:JSON.stringify(body)})});
     if(!response.ok){await response.body?.cancel();throw new ApiError("ACCESS_DENIED");}
     try{return JSON.parse(Buffer.from(await boundedBody(response,2097152)).toString("utf8"));}catch{throw new ApiError("INVALID_REQUEST");}
   }
   private async installation(installationId:number,signal?:AbortSignal) {
     const data=installationSchema.parse(await this.request(`/app/installations/${id.parse(installationId)}`,appJwt(this.config),undefined,signal));
-    if(data.id!==installationId||data.app_id!==this.config.appId||data.suspended_at!==null||data.permissions.contents!=="read"||Object.entries(data.permissions).some(([key,value])=>!["metadata","contents"].includes(key)||value!=="read"))throw new ApiError("ACCESS_DENIED");
+    if(data.id!==installationId||data.app_id!==this.config.appId||data.suspended_at!==null||data.permissions.contents!=="read"||Object.entries(data.permissions).some(([key,value])=>key==="checks"?value!=="write":!["metadata","contents"].includes(key)||value!=="read"))throw new ApiError("ACCESS_DENIED");
     return data;
+  }
+  // Caller holds the durable publication lease. Reconcile by stable external_id
+  // after an uncertain POST; GitHub does not offer an idempotency-key header.
+  async publishCheck(input:{installationId:number;repositoryId:number;headSha:string;externalId:string;conclusion:"success"|"failure"|"action_required";title:string;summary:string},checkpoint:()=>Promise<void>) {
+    const parsed=z.object({installationId:id,repositoryId:id,headSha:sha,externalId:z.string().regex(/^lg:[a-f0-9-]{36}:[a-f0-9]{40}$/),conclusion:z.enum(["success","failure","action_required"]),title:z.string().max(100),summary:z.string().max(10000)}).strict().parse(input);
+    const signal=AbortSignal.timeout(30000);await checkpoint();
+    const installation=await this.installation(parsed.installationId,signal);
+    if(installation.permissions.checks!=="write")throw new ApiError("ACCESS_DENIED");
+    const access=z.object({token:z.string().min(10).max(4096),expires_at:z.string().datetime()}).parse(await this.request(`/app/installations/${parsed.installationId}/access_tokens`,appJwt(this.config),{repository_ids:[parsed.repositoryId],permissions:{checks:"write",metadata:"read"}},signal));
+    if(Date.parse(access.expires_at)<=Date.now()||Date.parse(access.expires_at)>Date.now()+3700000)throw new ApiError("ACCESS_DENIED");
+    const repo=repositorySchema.parse(await this.request(`/repositories/${parsed.repositoryId}`,access.token,undefined,signal));
+    if(repo.id!==parsed.repositoryId)throw new ApiError("ACCESS_DENIED");
+    const base=`/repos/${repo.owner.login}/${repo.name}`;
+    const check=z.object({id,head_sha:sha,external_id:z.string().nullable(),app:z.object({id})});
+    const matches:Array<z.infer<typeof check>>=[];
+    for(let page=1;page<=10;page++){
+      await checkpoint();
+      const list=z.object({total_count:z.number().int().nonnegative(),check_runs:z.array(check).max(100)}).parse(await this.request(`${base}/commits/${parsed.headSha}/check-runs?check_name=LaunchGate%20Release%20Gate&filter=all&per_page=100&page=${page}`,access.token,undefined,signal));
+      matches.push(...list.check_runs.filter(c=>c.external_id===parsed.externalId&&c.head_sha===parsed.headSha&&c.app.id===this.config.appId));
+      if(list.total_count<=page*100)break;
+      if(page===10)throw new ApiError("ACCESS_DENIED");
+    }
+    if(matches.length>1)throw new ApiError("ACCESS_DENIED");
+    const body={name:"LaunchGate Release Gate",external_id:parsed.externalId,status:"completed",conclusion:parsed.conclusion,output:{title:parsed.title,summary:parsed.summary}};
+    await checkpoint();
+    const result=check.parse(await this.request(matches.length?`${base}/check-runs/${matches[0].id}`:`${base}/check-runs`,access.token,matches.length?body:{...body,head_sha:parsed.headSha},signal,matches.length?"PATCH":undefined));
+    if(result.head_sha!==parsed.headSha||result.external_id!==parsed.externalId||result.app.id!==this.config.appId)throw new ApiError("ACCESS_DENIED");
+    return {checkId:result.id,headSha:result.head_sha};
   }
   async verifyConnection(code:string,installationId:number,repositoryId:number):Promise<VerifiedRepository> {
     const signal=AbortSignal.timeout(30000);

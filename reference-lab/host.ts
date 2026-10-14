@@ -32,7 +32,8 @@ export async function registerLabRun(store:ExecutionStore,projectId:string,actor
 export async function admitLab(token:string,key:KeyObject,tracesInput:unknown[],store:ExecutionStore,artifacts:ArtifactStore){
  const g=verifyGrant(token,key);if(!g.referenceLab)throw new Error("LAB_GRANT_REQUIRED");
  await store.command("CHECK",authority(g));
- const context=z.object({case:z.object({plan:z.unknown(),plan_hash:z.string()}),template:z.object({source_digest:z.string(),variant:z.string()})}).parse(await store.command("LAB_CONTEXT",{runId:g.runId}));
+ const context=z.object({case:z.object({plan:z.unknown(),plan_hash:z.string()}),template:z.object({source_digest:z.string(),variant:z.string()}),releasePolicy:z.object({releaseId:z.string().uuid(),policyId:z.string().uuid(),policyVersion:z.number().int().positive()}).optional()}).parse(await store.command("LAB_CONTEXT",{runId:g.runId}));
+ if(canonical(context.releasePolicy??null)!==canonical(g.releasePolicy??null))throw new Error("RELEASE_POLICY_BINDING");
  const plan=validatePlan(context.case.plan);const actual=labSourceIdentity();
  if(plan.caseId!==g.referenceLab.caseId||plan.seed!==g.referenceLab.seed||!g.authorization.allowedOperations.includes(plan.spec.operation.kind))throw new Error("LAB_SCOPE");
  if(planHash(plan)!==g.referenceLab.planHash||context.case.plan_hash!==g.referenceLab.planHash||actual.sourceDigest!==g.referenceLab.sourceDigest||actual.revision!==g.commitSha||context.template.variant!==g.referenceLab.variant||context.template.source_digest!==actual.sourceDigest||g.invariantVersions.length!==1||g.invariantVersions[0].id!==plan.spec.id||g.invariantVersions[0].version!==plan.spec.version)throw new Error("LAB_PROVENANCE");

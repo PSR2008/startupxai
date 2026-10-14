@@ -5,17 +5,20 @@ import { hash } from "@launchgate/source-analysis";
 import { boundedBody } from "./provider";
 import { type SourceStore } from "./store";
 import { ApiError,serializeApiError } from "../http/api-error";
+import { releaseEvent } from "../../../services/releases/webhook";
+import type { ReleaseStore } from "../../../services/releases/worker";
 
 export function verifySignature(raw:Uint8Array,signature:string|null,secret:string) {
   if(!signature||!/^sha256=[a-f0-9]{64}$/.test(signature))return false;
   return timingSafeEqual(createHmac("sha256",secret).update(raw).digest(),Buffer.from(signature.slice(7),"hex"));
 }
-export async function receiveWebhook(request:Request,config:{appId:number;webhookSecret:string},store:SourceStore):Promise<Response> {
+export async function receiveWebhook(request:Request,config:{appId:number;webhookSecret:string},store:SourceStore,releases?:ReleaseStore):Promise<Response> {
   try {
     const raw=await boundedBody(new Response(request.body),262144);
     if(!verifySignature(raw,request.headers.get("x-hub-signature-256"),config.webhookSecret))throw new ApiError("ACCESS_DENIED");
     const delivery=z.string().uuid().parse(request.headers.get("x-github-delivery"));
     const eventHeader=request.headers.get("x-github-event");const event=["installation","installation_repositories","repository"].includes(eventHeader??"")?eventHeader!:"IGNORED";
+    if(releases){const release=releaseEvent(eventHeader??"",JSON.parse(Buffer.from(raw).toString("utf8")));if(release){await releases.command("DELIVERY",{...release,appId:config.appId,deliveryId:delivery,digest:hash(raw)});return Response.json({ok:true},{headers:{"Cache-Control":"no-store"}});}}
     const parsed=z.object({action:z.string().max(100).optional(),installation:z.object({id:z.number().int().positive().safe()}).optional()}).parse(JSON.parse(Buffer.from(raw).toString("utf8")));
     // Signed webhooks can revoke, never grant/rebind access. Conservatively require
     // a new verified setup after removal, transfer or deletion; never trust order.
