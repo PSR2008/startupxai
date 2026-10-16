@@ -29,7 +29,7 @@ export function loadReleaseEvidence(input: StoredRun): ReleaseEvidence | null {
 }
 const contextSchema = z.object({ release: releaseSchema, policy: releasePolicySchema, state: z.string(), generation: z.number().int().positive(), runs: z.array(runSchema),
   exceptions: z.array(z.object({ id: uuid, organization_id: uuid, project_id: uuid, release_id: uuid, invariant_id: uuid, finding_id: uuid.nullable(), reason: z.string(), actor_id: uuid, actor_role: z.enum(["OWNER", "ADMIN"]), created_at: z.string(), expires_at: z.string(), revoked_at: z.string().nullable(), ticket: z.string().nullable() })),
-  findings: z.array(z.object({ id: uuid, invariant_id: uuid, invariant_version: z.number(), state: z.string(), origin: runSchema.nullable().optional(), regression_invariant_id: uuid.nullable().optional() })),
+  findings: z.array(z.object({ id: uuid, invariant_id: uuid, invariant_version: z.number(), state: z.string(), active_replay: uuid.nullable().optional(), origin: runSchema.nullable().optional(), regression_invariant_id: uuid.nullable().optional() })),
   dependencies: z.array(z.unknown()), evaluation: z.object({ id: uuid, evaluation: z.unknown() }).nullable(),
   selection:z.object({selected:z.array(z.object({invariantId:z.string()}))}).nullable().optional(),checkStartedGeneration:z.number().optional(),
   check: z.object({ publication_state: z.string() }).nullable(), repository: z.object({ repositoryId: z.number(), installationId: z.number() }).nullable() });
@@ -95,7 +95,7 @@ export class ReleaseWorker {
               const source=await this.store.command("SOURCES",lease) as {head:SourceSnapshot|null};
               if(previous&&source.head)proof=unchangedDependencyProof(context.release,requirement,previous,source.head,context.dependencies as VerificationDependency[]);
             }
-            findings.push({ id: finding.id, invariantId: finding.invariant_id, invariantVersion: finding.invariant_version, state: finding.state, origin, unchangedProof: proof, regressionInvariantId: finding.regression_invariant_id ?? null });
+            findings.push({ id: finding.id, invariantId: finding.invariant_id, invariantVersion: finding.invariant_version, state: finding.state, origin, unchangedProof: proof, regressionInvariantId: finding.regression_invariant_id ?? null, activeReplayRunId: finding.active_replay ?? null });
           }
           else if (context.policy.requirements.some(r => r.required && r.invariant.id === finding.invariant_id)) {
             // Missing historical provenance is not silently ignored. Its affected

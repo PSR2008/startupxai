@@ -101,3 +101,31 @@ Migration 023 expands existing fixture families and reserved-host capabilities; 
 `services/releases` adds exact candidate/policy identity, explicit coverage, evidence freshness, conservative architecture-based selection, scoped exceptions and immutable evaluation provenance around the existing verification core. Registered lab runs keep their Phase 4 job lifecycle and Phase 5–7 oracles; a signed release-policy binding and shared immutable deployment connect them to one candidate before execution.
 
 Migrations 024–027 separate immutable facts from release state/leases and operational GitHub publication. Browser APIs expose authorized reads and narrow role-checked configuration commands. A separately hosted release worker reconciles signed delivery inbox entries, queues exact snapshots, waits for verified deployment binding, schedules supported verification and updates an exact-SHA GitHub Check. Unsupported verification remains explicit incomplete assurance. Source tokens retain read-only contents permission; publication uses narrowly scoped Checks write. See [release gates](release-gates.md), [coverage](coverage.md), [impact analysis](impact-analysis.md), and [GitHub Checks](github-checks.md).
+
+
+## Phase 9 constrained remediation
+
+`services/remediation` coordinates consented proposals, exact source validation,
+registered patched previews and verified resolution. It reuses Phase 3 syntax and
+provenance checks, Phase 4 execution/grants/cleanup, Phase 5 native findings and
+replays, Phase 6/7 domain collectors and Phase 8 release policies/coverage.
+The analysis GitHub App remains read-oriented; an optional separate App verifies
+selected-repository write capability. No model determines a verdict.
+
+Forward migrations 028?031 add scoped proposals, private patch artifacts, local
+or provider PR metadata, immutable terminal verification, capability records and
+audit events. Private leases and request receipts fence work and retain separate
+consent for generation and PR creation. Dispatch affinity isolates patched
+preview execution and cleanup from ordinary workers. The default release worker
+also excludes remediation-owned candidates; their driver evaluates full policy.
+
+A passing original replay can satisfy its gate item while the finding remains in
+FIX_VERIFICATION. Only complete passing policy coverage can transition it to
+RESOLVED. Recurrence reopens it as REGRESSION_FAILED without rewriting the earlier
+verified proof. Failed/interrupted verification cancels remaining scoped runs and
+uses existing cleanup commands to release reservations.
+
+The worker is an explicitly enabled controlled Reference Lab host, not a customer
+code sandbox. The live GitHub PR/customer preview workflow is not certified.
+See [remediation](remediation.md), [fix PRs](fix-prs.md), and
+[verified resolution](fix-verification.md).

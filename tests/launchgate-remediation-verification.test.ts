@@ -1,0 +1,54 @@
+import { architectureDigest } from "../services/remediation/architecture";
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
+import { evidenceDigest } from "@launchgate/verification-core";
+import { executeCase, makePlan } from "./fixtures/dynamic-lab";
+import { planHash } from "../reference-lab/plans";
+import { templateSource, generateProposal, DeterministicRemediationProvider } from "../services/remediation/provider";
+import { withRegisteredPreview } from "../services/remediation/preview";
+import { verifyResolution, fixCheck } from "../services/remediation/verification";
+import { invariantSetDigest, type ReleaseEvidence } from "../services/releases/engine";
+import type { ReleasePolicy, Release } from "../services/releases/contracts";
+import type { RemediationContext } from "../services/remediation/contracts";
+import { digest } from "../services/runner/metadata";
+import { rejectAllBusinessOperations } from "../services/remediation/bad-fix-fixture";
+
+const envelope = (r: Awaited<ReturnType<typeof executeCase>>): ReleaseEvidence => ({ invariantId: r.plan.spec.id, evidence: r.result.evidence, admission: { kind: "REFERENCE_LAB" }, manifestDigest: evidenceDigest(r.result.evidence), sealedManifestDigest: r.result.manifestDigest, authorization: { id: r.grant.authorization.id, expiresAt: r.grant.authorization.expiresAt, revokedAt: null }, testVersion: "lab-test-1", fixtureVersion: 1, planHash: planHash(r.plan) });
+test("fix verification binds old/new evidence and refuses stale, missing, waived or broken controls", async () => {
+  const plan = makePlan("tenant.read"), old = await executeCase("tenant.read", "vulnerable", { plan }), file = templateSource("tenant.read").file;
+  const c: RemediationContext = { organizationId: old.grant.organizationId, projectId: old.grant.projectId, findingId: randomUUID(), invariantId: plan.spec.id, invariantVersion: 1, sourceSha: old.grant.commitSha, deploymentId: old.grant.deploymentId, connectionId: null, planHash: planHash(plan), originalManifest: old.result.manifestDigest, reproduced: true, files: [file], allowedPaths: [file.path], provenance: "REGISTERED_REFERENCE_LAB", caseId: "tenant.read", architectureDigest: architectureDigest([file]) };
+  const p = await generateProposal(new DeterministicRemediationProvider(), c);
+  await withRegisteredPreview(c, p, c.sourceSha, async preview => {
+    const binding = { organizationId: c.organizationId, projectId: c.projectId, deploymentId: randomUUID(), releasePolicy: { releaseId: randomUUID(), policyId: randomUUID(), policyVersion: 1 } };
+    const fixed = await executeCase("tenant.read", "vulnerable", { plan, preview, releaseBinding: binding });
+    const policy: ReleasePolicy = { id: binding.releasePolicy.policyId, version: 1, blockingSeverities: ["high", "critical"], requiredFamilies: [plan.family], requirements: [{ invariant: plan.spec, required: true, baseline: true, kind: "REGRESSION", family: plan.family, runnerVersion: fixed.result.evidence.runner.version, testVersion: "lab-test-1", fixtureVersion: 1, planHash: planHash(plan), estimatedCost: 32, applicabilityProof: null }], freshnessSeconds: 600, environments: ["SANDBOX"], minimumCoverage: 1, requiredInconclusive: "NON_APPROVAL", allowExceptions: false, maximumExceptionSeconds: 60 };
+    const adjacentPlan = makePlan("tenant.write");
+    const adjacent = await executeCase("tenant.write", "vulnerable", { plan: adjacentPlan, preview, releaseBinding: binding });
+    policy.requirements.push({ ...policy.requirements[0], invariant: adjacentPlan.spec, planHash: planHash(adjacentPlan) });
+    const release: Release = { id: binding.releasePolicy.releaseId, candidate: { organizationId:c.organizationId,projectId:c.projectId,commitSha:fixed.grant.commitSha,deploymentId:binding.deploymentId,policyId:policy.id,policyVersion:1,evidenceScope:"REFERENCE_LAB",purpose:"REFERENCE_LAB" }, repositoryConnectionId: null, snapshotId: null, provider: "REFERENCE_LAB", providerDeploymentId: "registered-preview", deploymentCommitSha: preview.identity().revision, environmentId: randomUUID(), environment: "SANDBOX", invariantSetDigest: invariantSetDigest(policy), requestedBy: randomUUID(), createdAt: new Date().toISOString(), baseSha: c.sourceSha, headSha: preview.identity().revision, pullRequest: null, branch: null };
+    const input = { context: c, proposal: p, original: envelope(old), originalPlan: plan, fixSha: preview.identity().revision, release, policy, evidence: [envelope(fixed), envelope(adjacent)], now: new Date().toISOString() };
+    assert.equal(verifyResolution(input).status, "VERIFIED");
+    const rolePlan=makePlan("role.member_owner"),role=await executeCase("role.member_owner","vulnerable",{plan:rolePlan,preview,releaseBinding:binding});
+    const adjacentFailurePolicy:ReleasePolicy={...policy,requiredFamilies:[...policy.requiredFamilies,rolePlan.family],requirements:[...policy.requirements,{...policy.requirements[0],invariant:rolePlan.spec,family:rolePlan.family,planHash:planHash(rolePlan)}]};
+    assert.equal(verifyResolution({...input,policy:adjacentFailurePolicy,release:{...release,invariantSetDigest:invariantSetDigest(adjacentFailurePolicy)},evidence:[...input.evidence,envelope(role)],now:new Date().toISOString()}).status,"VERIFICATION_FAILED");
+    assert.equal(verifyResolution({ ...input, evidence: [] }).status, "INCONCLUSIVE");
+    assert.equal(verifyResolution({ ...input, evidence: [envelope(old)] }).status, "INCONCLUSIVE");
+    assert.equal(verifyResolution({ ...input, fixSha: c.sourceSha }).status, "INCONCLUSIVE");
+    assert.equal(verifyResolution({ ...input, release: { ...release, deploymentCommitSha: c.sourceSha } }).status, "INCONCLUSIVE");
+    assert.equal(verifyResolution({ ...input, evidence: [{ ...envelope(fixed), authorization: { ...envelope(fixed).authorization, revokedAt: new Date().toISOString() } }] }).status, "INCONCLUSIVE");
+    assert.throws(() => verifyResolution({ ...input, context: { ...c, originalManifest: digest("wrong") } }));
+    const badPreview={...preview,startFixture:async(...args:Parameters<NonNullable<typeof preview.startFixture>>)=>rejectAllBusinessOperations(await preview.startFixture!(...args))};
+    const broken = await executeCase("tenant.read", "vulnerable", { plan, preview:badPreview, releaseBinding: binding });
+    assert.equal(verifyResolution({ ...input, evidence: [envelope(broken)], now: new Date().toISOString() }).status, "INCONCLUSIVE");
+    const missing = makePlan("tenant.delete"), broad: ReleasePolicy = { ...policy, requirements: [...policy.requirements, { ...policy.requirements[0], invariant: missing.spec, planHash: planHash(missing) }] };
+    assert.equal(verifyResolution({ ...input, policy: broad, release: { ...release, invariantSetDigest: invariantSetDigest(broad) } }).status, "INCONCLUSIVE");
+    const modified = { ...policy, requirements: [{ ...policy.requirements[0], planHash: digest("weakened") }] };
+    assert.equal(verifyResolution({ ...input, policy: modified, release: { ...release, invariantSetDigest: invariantSetDigest(modified) } }).status, "INCONCLUSIVE");
+  });
+});
+test("fix check never approves incomplete or failing verification", () => {
+  assert.equal(fixCheck("VERIFIED", randomUUID()).conclusion, "success");
+  assert.equal(fixCheck("VERIFICATION_FAILED", randomUUID()).conclusion, "failure");
+  assert.equal(fixCheck("INCONCLUSIVE", randomUUID()).conclusion, "action_required");
+});

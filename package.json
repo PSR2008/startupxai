@@ -8,9 +8,9 @@
     "start": "next start",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
-    "test": "node --conditions=react-server --import tsx --test tests/*.test.ts",
+    "test": "node --conditions=react-server --import tsx --test --test-concurrency=4 tests/*.test.ts",
     "test:launchgate": "node --conditions=react-server --import tsx --test tests/launchgate-*.test.ts",
-    "test:database": "node --conditions=react-server --import tsx --test tests/database/*.test.ts",
+    "test:database": "node --conditions=react-server --import tsx --test --test-concurrency=1 tests/database/*.test.ts",
     "test:orchestration": "node --conditions=react-server --import tsx --test tests/launchgate-orchestration.test.ts",
     "test:target-safety": "node --conditions=react-server --import tsx --test tests/launchgate-target-safety.test.ts",
     "test:vercel": "node --conditions=react-server --import tsx --test tests/launchgate-vercel.test.ts",
@@ -61,7 +61,15 @@
     "test:regression-selection": "node --conditions=react-server --import tsx --test tests/launchgate-release-impact.test.ts",
     "test:github-checks": "node --conditions=react-server --import tsx --test tests/launchgate-release-github.test.ts",
     "test:cross-domain-release": "node --conditions=react-server --import tsx --test tests/launchgate-release-cross-domain.test.ts",
-    "test:release-scenarios": "node --conditions=react-server --import tsx --test tests/launchgate-release-cross-domain.test.ts"
+    "test:release-scenarios": "node --conditions=react-server --import tsx --test tests/launchgate-release-cross-domain.test.ts",
+    "test:remediation": "node --conditions=react-server --import tsx --test tests/launchgate-remediation-*.test.ts",
+    "test:patch-validation": "node --conditions=react-server --import tsx --test tests/launchgate-remediation-patch.test.ts",
+    "test:malicious-patch": "node --conditions=react-server --import tsx --test tests/launchgate-remediation-patch.test.ts",
+    "test:remediation-provider": "node --conditions=react-server --import tsx --test tests/launchgate-remediation-patch.test.ts",
+    "test:github-remediation": "node --conditions=react-server --import tsx --test tests/launchgate-remediation-github.test.ts",
+    "test:fix-verification": "node --conditions=react-server --import tsx --test tests/launchgate-remediation-verification.test.ts",
+    "test:bad-fix": "node --conditions=react-server --import tsx --test tests/launchgate-remediation-verification.test.ts",
+    "test:phase9-e2e": "node --conditions=react-server --import tsx --test tests/database/launchgate-remediation.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

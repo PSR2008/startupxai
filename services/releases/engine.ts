@@ -21,6 +21,7 @@ export interface FindingContext {
   // verifies the complete transitive file set against both stored snapshots.
   unchangedProof: { releaseId: string; invariantVersion: number; digest: string; complete: boolean } | null;
   regressionInvariantId: string | null;
+  activeReplayRunId?: string | null;
 }
 export interface CoverageItem {
   invariantId: string; required: boolean; kind: Requirement["kind"]; status: CoverageStatus;
@@ -33,7 +34,7 @@ export interface ReleaseEvaluation {
   validUntil: string | null;
   decision: "SHIP" | "BLOCK" | "INCONCLUSIVE"; reasons: string[];
   coverage: CoverageItem[]; counts: Record<CoverageStatus, number> & { requiredTotal: number; applicableTotal: number };
-  findings: Array<{ id: string; applicability: "EXACT" | "UNCHANGED" | "RESOLVED_REGRESSION_PASSED" | "NOT_ESTABLISHED"; blocking: boolean }>;
+  findings: Array<{ id: string; applicability: "EXACT" | "UNCHANGED" | "RESOLVED_REGRESSION_PASSED" | "EXACT_REPLAY_PASSED" | "NOT_ESTABLISHED"; blocking: boolean }>;
   regressions: string[]; exceptions: string[]; manifests: string[];
 }
 export function invariantSetDigest(policy: ReleasePolicy): string {
@@ -111,6 +112,10 @@ export function evaluateRelease(input: {
       const reproduced = origin.success && evidenceDigest(origin.data) === f.origin.manifestDigest && evaluateOutcome(r.invariant, origin.data, f.origin.admission).outcome === "REPRODUCIBLE_FAILURE";
       const regressionPassed = f.regressionInvariantId && coverage.some(c => c.invariantId === f.regressionInvariantId && c.kind === "REGRESSION" && c.status === "PASS");
       if (f.state === "RESOLVED" && regressionPassed) applicability = "RESOLVED_REGRESSION_PASSED";
+      else if (reproduced && f.state === "FIX_VERIFICATION" && regressionPassed && f.activeReplayRunId && input.evidence.some(record => {
+        const replay = evidenceSchema.safeParse(record.evidence);
+        return replay.success && replay.data.runId === f.activeReplayRunId && record.invariantId === f.regressionInvariantId && record.planHash === f.origin.planHash;
+      })) applicability = "EXACT_REPLAY_PASSED";
       else if (reproduced && origin.success && sameCandidate(origin.data.scope, release.candidate)) applicability = "EXACT";
       else if (reproduced && origin.success && origin.data.scope.organizationId === release.candidate.organizationId && origin.data.scope.projectId === release.candidate.projectId &&
         f.state !== "RESOLVED" && f.state !== "DISMISSED" && f.unchangedProof?.complete && f.unchangedProof.releaseId === release.id && f.unchangedProof.invariantVersion === r.invariant.version && /^sha256:[a-f0-9]{64}$/.test(f.unchangedProof.digest)) applicability = "UNCHANGED";

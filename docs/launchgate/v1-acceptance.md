@@ -317,3 +317,97 @@ The durable finding regression test proves reproduced BLOCK, fixed replay SHIP, 
 Validation repairs: the first new migration execution exposed a reserved SQL identifier; a later reconciliation test caught a PL/pgSQL alias collision. Both were corrected in the new forward migrations. The durable fixture initially bypassed pacing and correctly encountered the service request limiter; normal pacing was restored. A lab admission marker mismatch was also corrected without relaxing evidence validation. The final 23-test database run passed. Mandatory database mode now fails instead of reporting an unavailable Docker engine as skipped success.
 
 Scope limits: **live GitHub Checks E2E, live Vercel discovery and actual merge blocking are UNVERIFIED**. Required-check name/expected App and bypass settings must be configured by the repository operator. GitHub Checks has no native freshness TTL: worker/provider outages can delay expiry updates, so operation requires monitoring and fresh reruns after expiry. Provider deployment ownership still comes from the existing verified ingestion path; webhook URLs cannot establish it. Customer dynamic adapters beyond the controlled registered lab remain unavailable and cannot SHIP through missing assurance. Check creation retries reconcile GitHub external IDs; ambiguous duplicate records fail closed. No fix PR, contents-write permission, auto-merge, public badge, UI redesign or Phase 9 implementation was introduced. See [release gates](release-gates.md), [coverage](coverage.md), [impact analysis](impact-analysis.md), and [GitHub Checks](github-checks.md).
+
+
+## Phase 9 - constrained remediation (2026-10-16; controlled acceptance PASS)
+
+Work is based on committed Phase 8 `53ef4c7` on `launchgate-rebuild`. No commit,
+push, history rewrite or main/archive change is authorized or performed.
+Forward migrations 028-031 preserve migrations 001-027.
+
+Implemented: separate generation/PR consent, OWNER/ADMIN actions, bounded exact
+source proposals, malicious-patch rejection, Phase 3 syntax/provenance validation,
+registered patched-source previews, exact replay, mandatory controls/adjacent
+regressions, immutable verified proof, permanent native regression and recurrence.
+Optional GitHub write authority is a separate App and selected-repository
+capability; the analysis integration retains Contents read. Real GitHub PR and
+Vercel preview E2E remain UNVERIFIED. The controlled worker creates an explicit
+local PR representation, never a fabricated live provider result.
+
+Final application run: **904 passed**, zero failures/cancellations/skips, with
+bounded test concurrency. Production build passed. Typecheck passed; lint retains
+only the existing unused `describe` warning in `tests/public-source.test.ts`.
+Install completed without dependency/lockfile changes; npm reported pending
+lifecycle-script approvals for the existing esbuild/unrs-resolver packages, and no
+extra approval or dependency upgrade was performed. Production audit reports
+**zero vulnerabilities**; full audit retains **7 high / 2 moderate** development
+and build advisories. The final Phase 9 database run passed all **14 tests**,
+including four full remediation/recurrence journeys, the deny-all bad fix,
+injected runner failure with zero remaining execution reservations, RLS and
+capability authority. All **162 legacy database tests** and **23 release database
+tests** also passed. Combined: **1,103 unique tests passed**, zero failures,
+cancellations or skips in the accepted runs. Focused reruns overlap this total
+and are not counted twice. Final type-check, production build and
+`git diff --check` passed; lint has zero errors and the one existing warning.
+No remote CI result is claimed.
+
+Validation findings: an absent-record JSON shape was corrected; the gate now
+recognizes the exact active passing replay without prematurely resolving a
+finding. The adjacent quota concurrency replay caught a barrier-placement bug in
+the proposed patch; the registered transformation now fixes both admission and
+barrier placement. Competing broad tests/build/database rehearsals caused strict
+runner/browser timeouts; application concurrency is now four files and database
+concurrency one, without weakening timeouts or assertions. Interruption also
+exposed a reservation-cleanup gap; scoped abandonment now uses existing durable
+recovery and cleanup before workspace disposal. The final Phase 9 and legacy
+database rehearsals verified these repairs with no failures or skipped tests.
+The first final release-suite run passed 22/23 tests, then Windows Modern Standby
+interrupted the last journey (confirmed by Kernel-Power standby/resume events).
+Its execution grant expired and was rejected by the existing scope validation.
+Another interrupted rerun passed 17/23 and failed six dependent checks after
+large wall-clock gaps. A subsequent run requested temporary process-scoped
+Windows wakefulness, without changing persistent power settings, authorization
+expiry or assertions. Only a complete uninterrupted passing run counts toward
+the acceptance total. That final run passed all 23 release tests; the temporary
+awake request was released when its process finished.
+
+An interrupted run left only
+`launchgate-remediation-4d6bd4ec-7180-4410-8b22-3d196f2ca540`, with its exclusively
+attached anonymous volume
+`a1d509e3abbccf0f8f88c50cb462ad9e07ed2f079a8fd2d6e741b73bc77e7123`.
+Disposable/Phase 9 labels, the pinned test PostgreSQL image and exclusive volume
+attachment were verified before removing that exact stopped container and volume.
+The two older October 11 repository-copy directories were left untouched.
+Final inventory on 2026-10-16 found no LaunchGate-named containers, no containers
+with the LaunchGate disposable label, and no Phase 9 temporary workspaces. All
+database suites' scoped container/volume cleanup hooks passed. Only
+`launchgate-ci-xp55exvq` and `launchgate-noenv-8u6xljrw`, the previously recorded
+October 11 directories, remained; neither was modified or deleted.
+
+Final Git state: branch `launchgate-rebuild`, HEAD `53ef4c7`; `main` remains
+`a61ba8c` and `startupxai-final` remains `a11b1de`. There are 11 modified tracked
+files and 26 new files, all unstaged. No commit, push or history change occurred.
+
+Phase 9 acceptance evidence:
+
+| Criterion | Controlled implementation / evidence |
+| --- | --- |
+| Explicit permission | Separate audited generation and PR actions; OWNER/ADMIN only; finding discovery cannot create a PR |
+| Optional scoped write authority | Separate App and selected numeric repository capability; expiration/revocation; analysis permissions unchanged |
+| Exact source binding | Vulnerable revision, context/plan hashes, original blobs and exact hunk matching; stale proposals rejected |
+| Bounded safe patch | Four files, 160 changed lines, 32 KiB diff; source-only workspace; syntax/provenance checks and exact registered transformation |
+| Malicious input | Traversal, secret/code injection, unsupported paths, test/oracle weakening and broad-denial attempts rejected |
+| Human release decision | Draft/local PR remains pending; no merge, force push or production deployment |
+| Exact verification | Original plan and oracle, positive controls and mandatory adjacent regressions; distinct source/deployment identity |
+| Verified evidence | Durable gate and sealed results checked independently; workspace cleanup precedes VERIFIED persistence |
+| Resolution and recurrence | PR alone cannot resolve; successful exact verification resolves while retaining native regression; reintroduction reopens |
+| Trust boundary | Six forced-RLS tables, cross-org isolation, browser/service forgery denial, immutable proof and scoped dispatch |
+| Four remediation journeys | Tenant read, owner role, duplicate webhook and concurrent quota each passed generation through verification and recurrence |
+| Bad fix | Deny-all business operations failed positive controls and remained INCONCLUSIVE |
+| Failure cleanup | Injected runner disconnect left execution budget active/reserved at zero; scoped durable cleanup completed |
+| StartupX coexistence | Existing application assertions pass; no StartupX product feature changed |
+| Live providers | GitHub adapter/capability contracts pass; live PR, customer preview and model generation remain UNVERIFIED |
+
+See [remediation](remediation.md), [fix PRs](fix-prs.md), and
+[fix verification](fix-verification.md). No auto-merge, production deployment,
+public badge, UI redesign, arbitrary customer execution or Phase 10 work.

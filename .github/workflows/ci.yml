@@ -7,7 +7,7 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,6 +21,7 @@ jobs:
       - run: npx playwright install --with-deps chromium --no-shell
       - run: npm run type-check
       - run: npm run lint
+      # Includes Phase 9 bounded/malicious patches, isolated previews and GitHub contracts.
       - run: npm run test
       # Includes Phase 8 gate/coverage/freshness, impact/regression selection,
       # signed GitHub Checks contracts and eight-domain Reference Lab releases.
@@ -28,6 +29,7 @@ jobs:
       # reproduction, fix replay and regression. No external targets or secrets.
       # Phase 4 suites are included in test; named commands support focused runs.
       # Database suite also covers durable orchestration races and RLS.
+      # Includes Phase 9 durable tenant/role/webhook/quota remediation and bad-fix rejection.
       - run: npm run test:database
         # Also exercises Phase 8 release RLS, fenced scheduling, immutable
         # evaluations and provider-contract discovery/publication without secrets.

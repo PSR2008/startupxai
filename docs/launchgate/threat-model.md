@@ -101,3 +101,39 @@ Fresh reproduction compares logical provider state/counts and browser checks/bus
 - Publication binds exact SHA and expected App identity. Incomplete assurance maps to action_required, never neutral/skipped/success. Same-SHA operational updates are fenced/serialized and retain immutable local evaluation history. GitHub has no create-check idempotency header; uncertain POST retries reconcile external IDs, while ambiguous duplicates fail closed.
 - Signed events request discovery but cannot establish repository permissions or deployment ownership. Fork PRs are excluded in V1. Verified deployment arrival remains an existing provider-ingestion responsibility. No customer code, generated attack script, fix PR, auto-merge or live credential test is introduced.
 - Check summaries exclude raw payloads, evidence, secrets and free-form model/customer text. Required-check configuration and bypass permissions are controlled by repository administrators; live merge blocking is unverified without credentials and a configured ruleset.
+
+
+## Phase 9 remediation trust boundary
+
+- Consent: OWNER/ADMIN-only generation, validation, PR and verification requests
+  are separate and audited. Finding discovery never creates a PR.
+- Write authority: a separate optional GitHub App is limited to selected numeric
+  repository IDs and Contents/Pull requests write. Analysis permissions remain
+  unchanged. Scope, expiration, current installation permissions and revocation
+  checkpoints are revalidated; tokens are not persisted.
+- Source attacks: exact source/context/plan binding, strict bounded diff parsing,
+  existing regular-file modes, private scratch space, syntax/provenance validation
+  and an exact registered transformation allowlist. Pattern scanning alone is not
+  trusted to authorize execution. Repository text is untrusted; suspected secrets
+  are refused. Workflows, tests, policies, binaries and arbitrary scripts cannot
+  be changed by an automatic patch.
+- False fixes: unchanged oracle, authorized positive controls, mandatory adjacent
+  coverage, exact new preview identity, sealed manifests and deterministic gate
+  evaluation. A deny-all 403 cannot resolve the finding. A model, PR or build
+  cannot mark VERIFIED. A passing replay alone cannot bypass adjacent failures.
+- Concurrency: fenced remediation leases and separate execution/cleanup dispatch
+  prevent preview workers from claiming customer or another proposal's jobs.
+  Failure cleanup cancels scoped runs and releases execution reservations.
+- Persistence: RLS and compound scoped foreign keys protect proposals, artifacts,
+  PRs, verification and capabilities. Proposal identity, patch/PR facts and terminal
+  verification are immutable. Native regression records survive resolution and
+  recurrence; historical verified records are not overwritten.
+
+Residual limits: local registered fixture code executes with trusted harness
+imports, so this is not isolation suitable for arbitrary customer/model code.
+Customer adapters and live model/GitHub PR/Vercel E2E remain unavailable or
+unverified. Remote create calls are reconciled by stable identity, not claimed to
+have provider-supported exactly-once semantics. Hard process termination may need
+owned-resource inventory cleanup. GitHub required-check freshness still depends
+on worker/provider availability. No auto-merge, production deploy, public badge
+or automatic StartupX patching is introduced.

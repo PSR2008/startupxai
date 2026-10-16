@@ -65,3 +65,16 @@ test("resolved finding requires fresh regression pass; reintroduction blocks", (
   assert.equal(evaluateRelease({ ...f, findings: [finding] }).decision, "SHIP");
   assert.equal(evaluateRelease({ ...f, evidence: [origin], findings: [finding] }).decision, "BLOCK");
 });
+
+test("pending remediation needs the exact active replay before full policy can approve", () => {
+  const f = releaseFixture(), origin = releaseFixture("vulnerable").evidence[0];
+  f.policy.requirements[0].kind = "REGRESSION";
+  const finding = { id: "finding-1", invariantId: f.policy.requirements[0].invariant.id, invariantVersion: 1, state: "FIX_VERIFICATION", origin, unchangedProof: null, regressionInvariantId: f.policy.requirements[0].invariant.id, activeReplayRunId: (f.evidence[0].evidence as Evidence).runId };
+  assert.equal(evaluateRelease({ ...f, findings: [finding] }).decision, "SHIP");
+  assert.equal(evaluateRelease({ ...f, findings: [finding] }).findings[0].applicability, "EXACT_REPLAY_PASSED");
+  assert.notEqual(evaluateRelease({ ...f, findings: [{ ...finding, activeReplayRunId: "unrelated" }] }).decision, "SHIP");
+  assert.notEqual(evaluateRelease({ ...f, evidence: [], findings: [finding] }).decision, "SHIP");
+  f.policy.requirements.push({ ...f.policy.requirements[0], invariant: { ...f.policy.requirements[0].invariant, id: "adjacent" } });
+  f.release.invariantSetDigest = invariantSetDigest(f.policy);
+  assert.equal(evaluateRelease({ ...f, findings: [finding] }).decision, "INCONCLUSIVE");
+});
