@@ -21,8 +21,10 @@ jobs:
       - run: npx playwright install --with-deps chromium --no-shell
       - run: npm run type-check
       - run: npm run lint
+      - run: node --import tsx scripts/launchgate-resource-inventory.ts capture
       # Includes Phase 9 bounded/malicious patches, isolated previews and GitHub contracts.
       - run: npm run test
+      - run: node --import tsx scripts/launchgate-resource-inventory.ts check
       # Includes Phase 8 gate/coverage/freshness, impact/regression selection,
       # signed GitHub Checks contracts and eight-domain Reference Lab releases.
       # Includes executable local Reference Lab auth/tenant/role triplets,
@@ -37,6 +39,8 @@ jobs:
         # transactional duplicate delivery, finding replay and tenant isolation.
         env:
           LAUNCHGATE_REQUIRE_DATABASE: "1"
+      - run: node --import tsx scripts/launchgate-resource-inventory.ts check
+        if: always()
       - run: npm run build
       # Full advisory assessment is tracked in docs/launchgate/dependency-audit.md.
       # Known highs remain explicit; any critical advisory fails this job.

@@ -137,3 +137,23 @@ have provider-supported exactly-once semantics. Hard process termination may nee
 owned-resource inventory cleanup. GitHub required-check freshness still depends
 on worker/provider availability. No auto-merge, production deploy, public badge
 or automatic StartupX patching is introduced.
+# Phase 10 execution and operations boundary
+
+Customer content remains hostile and non-executing by default. Production
+providers must enforce per-attempt isolation, resource ceilings, read-only source,
+ephemeral scratch, no host interfaces/ambient identity, metadata denial and exact
+target egress. LaunchGate validates scope/policy/identity and refuses unsafe
+configuration, but contract tests do not establish kernel or hypervisor security.
+
+New threat cases: ambiguous provisioning timeout leaves an orphan; restarted
+workers race cleanup; a stale capability appears healthy; secret rotation leaves
+old authority valid; artifact outage produces incomplete evidence. Persist intent
+before provisioning, reconcile deterministic keys, fence cleanup, bound capability
+freshness and key overlap, and fail evidence finalization when storage fails.
+Local tests exercise these boundaries; live provider destruction, KMS, encryption,
+upstream revocation, telemetry and hosted restore remain unverified.
+
+Operational records never contain secret bytes or raw provider errors. Structured
+events accept fixed names, IDs and numeric counters only. Exact resource ownership
+is checked before cleanup; no broad container, bucket or temporary-directory delete
+is permitted. Existing older temporary directories are not test-owned cleanup targets.

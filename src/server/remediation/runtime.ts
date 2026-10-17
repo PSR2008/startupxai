@@ -1,4 +1,5 @@
 import "server-only";
+import { requireLocalEnvironment } from "../production/configuration";
 import { createPrivateKey, createPublicKey } from "node:crypto";
 import { isAbsolute, resolve, sep } from "node:path";
 import { createClient } from "@supabase/supabase-js";
@@ -14,6 +15,7 @@ import { caseSchema, compilePlan, defaultCapabilities, planHash, type TestPlan }
 
 /** Separate trusted process, opt-in controlled lab only. Not a customer sandbox. */
 export async function runRemediationWorker(signal: AbortSignal) {
+  requireLocalEnvironment();
   const url=configuredValue("NEXT_PUBLIC_SUPABASE_URL"),key=configuredValue("SUPABASE_SERVICE_ROLE_KEY"),pem=process.env.LAUNCHGATE_RUNNER_PRIVATE_KEY,root=process.env.LAUNCHGATE_PRIVATE_ARTIFACT_ROOT;
   if(process.env.LAUNCHGATE_REMEDIATION_LAB_ENABLED!=="1"||!url||!key||!pem||!root||!isAbsolute(root)||resolve(root)===resolve(process.cwd())||resolve(root).startsWith(resolve(process.cwd())+sep))throw new Error("CONTROLLED_REMEDIATION_CONFIGURATION_REQUIRED");
   const privateKey=createPrivateKey(pem.replaceAll("\\n","\n"));if(privateKey.asymmetricKeyType!=="ed25519")throw new Error("SIGNING_KEY_TYPE");

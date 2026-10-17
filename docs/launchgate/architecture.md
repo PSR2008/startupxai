@@ -129,3 +129,18 @@ The worker is an explicitly enabled controlled Reference Lab host, not a custome
 code sandbox. The live GitHub PR/customer preview workflow is not certified.
 See [remediation](remediation.md), [fix PRs](fix-prs.md), and
 [verified resolution](fix-verification.md).
+# Phase 10 production boundary
+
+The vendor-neutral sandbox contract, production RunnerProvider adapter, scoped
+credential broker, private object storage adapter, rotation and durable reaper
+live under `services/production`. They reuse Phase 4 grants, target safety,
+execution recovery and evidence admission. `src/server/production/runtime.ts`
+composes the existing Orchestrator with managed dependencies; no provider is
+registered by default. Local remediation startup cannot run in production mode.
+
+Production configuration, integration evidence and readiness are distinct. An
+authenticated control-plane service owns qualification records; browser roles
+cannot declare VERIFIED. Readiness is rechecked before dispatch and credential
+delivery. No production capability was live-qualified in Phase 10: the user
+selected credential-free local testing. See [production runner](production-runner.md),
+[readiness](production-readiness.md) and [qualification](integration-qualification.md).

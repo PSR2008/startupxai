@@ -1,7 +1,9 @@
 import "server-only";
 
-/** Future trusted-worker dependency. No implementation, plaintext table, route or
- * service-role client exists. A backend must authenticate the lease, enforce scope,
+export type { ManagedSecretStore, SecretReference, CredentialLease } from "../../../services/production/secrets";
+/** Legacy callback boundary retained for existing consumers. The Phase 10
+ * ManagedSecretStore adds versioned references, rotation and scoped delivery.
+ * A backend must authenticate the lease, enforce scope,
  * check current membership/org status and revocation, and audit use before resolving.
  * Do not return a lease or resolved bytes through a browser-facing API. */
 export interface SecretLease {

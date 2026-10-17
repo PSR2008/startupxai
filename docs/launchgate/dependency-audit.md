@@ -193,3 +193,21 @@ Execution path: Tailwind content scanning/watch and/or Next ESLint file matching
 CI runs `npm audit --audit-level=critical` to reject newly reported criticals while the assessed highs remain visible in its output. This is not a high-severity clean bill of health. Re-run and review the full audit on every dependency change and before deployment; changed advisory lists require renewed assessment. `npm audit` (without a threshold) remains part of manual Phase 1 validation and returns nonzero for these unresolved findings.
 
 No exploit attempts were performed. Advisory inspection, npm dependency-tree inspection, existing source import/configuration review and full local checks support this assessment. Real provider calls and native image exploitability have not been tested. Production release must resolve applicable high exposures, not merely point to this document.
+# Phase 10 review - 2026-10-16
+
+`npm audit`: 7 high, 2 moderate, 0 critical (existing dev/build tree).
+`npm audit --omit=dev`: **0 vulnerabilities**. No new dependency, SDK or lockfile
+change was introduced. No forced incompatible upgrade was applied. The existing
+build/lint advisories below remain assessed; production runtime is clean at this
+audit snapshot, not permanently certified.
+
+| Boundary | Runtime dependencies |
+| --- | --- |
+| Runner / sandbox contract | Node crypto/net/dns/https and existing zod/contracts; no cloud SDK or customer execution package |
+| GitHub / Vercel | Existing server-only, zod, native fetch/crypto; no new integration dependencies |
+| Object storage / secret broker | Node crypto and existing zod; managed transport is operator-supplied and unqualified |
+| Operational persistence | Existing @supabase/supabase-js, server-only; no runner receives this client |
+
+Install completed with existing esbuild/unrs-resolver lifecycle-script approval
+warnings. No additional script approval was granted. Any future cloud SDK/image
+must receive a separate dependency and image-digest review before qualification.

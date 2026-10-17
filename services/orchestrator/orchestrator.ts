@@ -41,7 +41,7 @@ export function grantFromClaim(input:unknown,now=Date.now()):ExecutionGrant {
 }
 export class Orchestrator {
  readonly workerId=randomUUID();
- constructor(private readonly store:ExecutionStore,private readonly provider:RunnerProvider,private readonly key:KeyObject,private readonly artifacts:ArtifactStore){}
+ constructor(private readonly store:ExecutionStore,private readonly provider:RunnerProvider,private readonly key:KeyObject|{sign(grant:ExecutionGrant):string},private readonly artifacts:ArtifactStore){}
  async tick() {
   await this.store.command("RECOVER",{});
   const cleanup=await this.store.command("CLEANUP_CLAIM",{workerId:this.workerId});
@@ -52,7 +52,7 @@ export class Orchestrator {
    await this.store.command("CLEANUP_DONE",{attemptId:c.attempt.id,fence:c.attempt.fence,workerId:this.workerId});
   }
   const claim=await this.store.command("CLAIM",{workerId:this.workerId});
-  if(claim){const g=grantFromClaim(claim);await this.provider.launch({attemptId:g.attemptId,runnerId:g.runner.identity,grant:signGrant(g,this.key),deadline:new Date(g.exp*1000).toISOString()});}
+  if(claim){const g=grantFromClaim(claim);await this.provider.launch({attemptId:g.attemptId,runnerId:g.runner.identity,grant:"sign" in this.key?this.key.sign(g):signGrant(g,this.key),deadline:new Date(g.exp*1000).toISOString()});}
  }
  async run(signal:AbortSignal) {
   while(!signal.aborted){

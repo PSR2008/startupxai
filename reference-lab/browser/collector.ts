@@ -30,7 +30,9 @@ export async function collectBrowser(plan:TestPlan,g:ExecutionGrant,runtime:Brow
   for(const step of steps){bounded.throwIfAborted();const remaining=deadline-Date.now();if(remaining<=0)throw new Error("JOURNEY_TIMEOUT");page.setDefaultTimeout(Math.min(1500,remaining));page.setDefaultNavigationTimeout(Math.min(5000,remaining));if(++b.actions>100)throw new Error("ACTION_LIMIT");const locator="target" in step?page.getByTestId(step.target):null;
    if(step.kind==="NAVIGATE"){await page.goto(runtime.origin+prefix+step.path,{waitUntil:"domcontentloaded"});b.urls.push(new URL(page.url()).pathname);}
    else if(step.kind==="FILL")await locator!.fill(step.value);
-   else if(step.kind==="SUBMIT"||step.kind==="CLICK")await Promise.all([page.waitForNavigation({waitUntil:"domcontentloaded"}),locator!.click()]);
+   // The explicit navigation wait owns the navigation deadline. Otherwise
+   // click also waits for the budgeted route under its shorter action timeout.
+   else if(step.kind==="SUBMIT"||step.kind==="CLICK")await Promise.all([page.waitForNavigation({waitUntil:"domcontentloaded"}),locator!.click({noWaitAfter:true})]);
    else if(step.kind==="WAIT_FOR")await locator!.waitFor({state:"visible"});
    else if(step.kind==="ASSERT_VISIBLE")checks.push(await locator!.isVisible()===step.expected);
    else if(step.kind==="ASSERT_URL")checks.push(new URL(page.url()).pathname===prefix+step.path);

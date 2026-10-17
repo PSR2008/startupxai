@@ -69,7 +69,11 @@
     "test:github-remediation": "node --conditions=react-server --import tsx --test tests/launchgate-remediation-github.test.ts",
     "test:fix-verification": "node --conditions=react-server --import tsx --test tests/launchgate-remediation-verification.test.ts",
     "test:bad-fix": "node --conditions=react-server --import tsx --test tests/launchgate-remediation-verification.test.ts",
-    "test:phase9-e2e": "node --conditions=react-server --import tsx --test tests/database/launchgate-remediation.test.ts"
+    "test:phase9-e2e": "node --conditions=react-server --import tsx --test tests/database/launchgate-remediation.test.ts",
+    "test:production-boundaries": "node --conditions=react-server --import tsx --test tests/launchgate-production.test.ts",
+    "test:production-database": "node --conditions=react-server --import tsx --test tests/database/launchgate-production.test.ts",
+    "launchgate:readiness": "node --conditions=react-server --import tsx scripts/launchgate-readiness.ts",
+    "test:resource-inventory": "node --import tsx scripts/launchgate-resource-inventory.ts check"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

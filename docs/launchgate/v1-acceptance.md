@@ -411,3 +411,242 @@ Phase 9 acceptance evidence:
 See [remediation](remediation.md), [fix PRs](fix-prs.md), and
 [fix verification](fix-verification.md). No auto-merge, production deployment,
 public badge, UI redesign, arbitrary customer execution or Phase 10 work.
+
+## Phase 10 - production boundary and operational readiness (2026-10-17; combined database validation accepted)
+
+Baseline: committed Phase 9 `863ac0c` on `launchgate-rebuild`, clean tree. The user
+explicitly selected local readiness testing without dedicated staging assets or
+provider budget. No live credentials were used, no production target was probed,
+and no cloud sandbox, payment, PR or AI diagnostic was created.
+
+Implemented: replaceable sandbox lifecycle contract and existing-orchestrator
+adapter; strict egress/filesystem policy; scoped credential broker; versioned
+managed-secret interface with encrypted in-memory test implementation; private
+object storage adapter; signing rotation; environment/configuration validation;
+truthful capability registry; safe observability; bounded retries/circuit;
+supervisor and durable cleanup reaper. Migration 032 adds forced-RLS operational
+resource metadata, immutable qualifications and safe audit events. Earlier
+migrations are unchanged. Local Reference Lab is refused in production/staging.
+
+Focused validation: **59 Phase 10 application tests** plus the existing
+orchestration tests and new rotating-signer test passed (63 unique focused tests).
+**8 new PostgreSQL tests passed**, including forced RLS, scope/idempotency,
+trusted-only qualification, restart/fence recovery, budget release and local
+logical backup/restore. LOCAL_RESTORE_VERIFIED; HOSTED_RESTORE_UNVERIFIED.
+The artifact-retention/cleanup refinement also passed a final eight-test database
+rerun. The final application run passed **964 tests**, zero failures/skips.
+The complete database run passed 205/207: all eight Phase 10, 23 release and 14
+remediation tests passed; a legacy browser baseline was INCONCLUSIVE rather than
+PASS, causing its dependent evidence-count assertion to fail as well. The legacy
+162-test suite subsequently passed in isolation, including browser.release and
+sealed evidence, without changing assertions or limits (162 passed, zero skipped).
+Those initial runs covered **207 database tests** and **964 application tests**, or
+**1,171 unique tests**. The initial combined database command was not a clean pass;
+the isolated rerun does not establish combined-suite repeatability or resolve the
+original failures. Database acceptance was reopened for two clean full runs
+and a supported failure classification; the completed review below records the
+root cause, fix, and both post-fix passes. The final production build passed.
+Final boundary refinements register artifact retention before upload, preserve
+cleanup after authorization revocation, bound provider calls, reject nonfinite
+rotation overlap, and append DEGRADED status on sandbox/credential/artifact
+failures. Trusted qualification reads enforce tenant/environment binding and are
+reloaded before dispatch/delivery. These refinements passed focused tests and the
+final 964-test application run without weakening existing assurance checks.
+
+Install completed without dependencies/lock changes. Type-check passed; lint has
+zero errors and the existing unused `describe` warning. Audit: production zero
+vulnerabilities; full tree seven high/two moderate existing development/build
+advisories. No forced upgrade or lifecycle-script approval was performed.
+
+| Production-sensitive capability | Current status |
+| --- | --- |
+| Production sandbox / OS boundary qualification | BLOCKED_BY_ENVIRONMENT |
+| GitHub live E2E | UNVERIFIED |
+| Vercel live E2E | UNVERIFIED |
+| Supabase hosted validation / hosted restore | UNVERIFIED |
+| Stripe test API | UNVERIFIED |
+| Razorpay test API | UNVERIFIED |
+| OpenAI live diagnostic | UNVERIFIED |
+| Anthropic live diagnostic | UNVERIFIED |
+| Managed secret backend / upstream credential rotation | UNVERIFIED |
+| Private cloud object storage / URL invalidation | UNVERIFIED |
+| Full controlled staging E2E | UNVERIFIED |
+| Sandbox / managed-secret / object-store cloud transports | NOT_IMPLEMENTED |
+
+Implementation acceptance checklist (local evidence only):
+
+| Requirement | Evidence / result |
+| --- | --- |
+| Replaceable production runner boundary | Complete lifecycle interface and existing RunnerProvider/Orchestrator adapter; no arbitrary commands |
+| No silent local production provider | Production factory and local-worker entry reject invalid modes; managed dependencies required |
+| Scoped credentials and rotation | Audience/scope/TTL/revocation tests, forbidden control-plane purposes, bounded key overlap and rotating orchestrator signer |
+| Explicit network/filesystem policy | IPv4/IPv6/private/metadata/host/port/path denial tests; OS enforcement remains unqualified |
+| Secret/artifact abstractions | Managed interfaces, encrypted test secrets, private scoped object keys, hashes, retention and cleanup intent |
+| Failure cannot produce PASS | Provisioning-stage failures, hung calls, missing runners, ceilings, revocation and storage failure tests |
+| Truthful readiness | Fresh live proof required; synthetic/stale/degraded/missing records cannot approve; tenant-bound trusted reads |
+| Retries and degradation | Idempotency-only retries, bounded timeout/backoff/circuit, automatic DEGRADED records |
+| Durable cleanup and restart | Resource intent, cleanup fencing, restart simulation, failed cleanup retained, native budget recovery |
+| RLS and trust | Three new forced-RLS tables; browser mutation/service RPC denial; immutable qualification/audit history |
+| Environment separation | Scope/environment checks and separate managed dependency requirements; cloud separation UNVERIFIED |
+| Runtime dependencies | Production npm audit zero vulnerabilities; existing dev/build advisories documented |
+| StartupX coexistence | Final 966 application tests pass; no StartupX feature removed |
+| Backup/restore | Isolated local logical restore verified; hosted recovery UNVERIFIED |
+| Resource inventory | Final baseline comparison passed; no LaunchGate containers or new temporary resources remain |
+
+Final resource checks: both the disposable-label and LaunchGate-name container
+inventories are empty. The pre-existing October 11 temporary directories
+`launchgate-ci-xp55exvq` and `launchgate-noenv-8u6xljrw` remain untouched, as do
+baseline logs. No unrelated resource was removed. Test cleanup removed owned
+containers and the Phase 10 harness verified its owned anonymous volumes.
+
+Final Git state: `launchgate-rebuild`, HEAD `863ac0c`; main and archive refs
+unchanged. Eleven tracked files modified and 27 new files, all unstaged; no commit or
+push. `git diff --check` passed. Combined database acceptance is complete;
+production readiness remains false pending real managed providers and live proof.
+
+No production-readiness claim. Provider infrastructure enforcement, measured
+attestation, cost/region/concurrency limits and hosted observability require a
+selected provider and dedicated account. Local Docker proves database behavior,
+not production sandbox security. Existing analysis remains non-executing; no
+arbitrary customer scripts, public badge, polished UI or Phase 11 work.
+
+See [production runner](production-runner.md), [integration qualification](integration-qualification.md),
+[readiness](production-readiness.md), [operations](operations.md),
+[rotation](key-rotation.md), and [recovery](recovery.md).
+
+### Phase 10 combined database validation review
+
+The earlier isolated legacy rerun is not sufficient to close the combined-suite
+failures. Original log: `phase10-database.log`, created 2026-10-16 11:47:08 UTC,
+completed 12:24:46 UTC; 207 tests, 205 passed, two failed.
+
+| Original order | File / test | Failure |
+| --- | --- | --- |
+| 201 (legacy test 156) | `tests/database/launchgate-rls.test.ts:670`, Phase 7 durable AI/browser journey browser.release: reproduce, find, fixed replay, regression | Fixed baseline evaluation was INCONCLUSIVE; assertion required PASS |
+| 207 (legacy test 162) | `tests/database/launchgate-rls.test.ts:688`, Phase 7 AI/provider/browser observations are sealed, synthetic and zero spend | `lg_reproduction_bundles` count was 13; assertion required 16 |
+
+Both ran after all eight Phase 10 tests. File order was production (8), release
+(23), remediation (14), legacy RLS (162), with file concurrency one. Each file
+creates a distinct UUID-named disposable PostgreSQL container and database
+`launchgate_test`; only the legacy file starts PostgREST, sharing that container's
+network namespace. The original legacy container UUID is not present in retained
+test logs and cannot be recovered from the removed container; it must not be
+invented. The name pattern is `launchgate-rls-<UUID>` and its PostgREST sibling
+`launchgate-rls-<UUID>-rest`.
+
+The legacy file deliberately tests progressive upgrades from 001 through 023;
+the browser tests run after 023, using execution tables/commands (018/019),
+dynamic evidence and reproduction tables/commands (020/021), and the browser
+lab extension (023). The three newer files independently apply 001 through 032
+in lexical/numeric order before their tests. Applying 032 ahead of the legacy
+upgrade assertions would invalidate their historical table-count assertions;
+these checks are preserved. The release file also tests browser execution with
+the full 032 schema. No database is manually preseeded or reused across files.
+
+The count failure is downstream of the baseline assertion: six AI journeys
+produce 12 bundles and the inconclusive browser baseline produces one; aborting
+that test prevents its vulnerable/replay/recurrence runs from adding three more.
+The original log retains no browser trace or underlying Playwright error, so it
+does not prove the cause of INCONCLUSIVE. No timeout, sleep, host suspension,
+resource contention, migration collision or connection leak is claimed as fact.
+The repeatability investigation and cleanup results follow.
+
+The first repeatability attempt (`phase10-combined-run1.log`) was interrupted at
+2026-10-16 17:28:33 UTC before completion. Windows System event 1074 records a
+user-session power-off request at 22:58:44 IST, followed by event 42 at 22:58:48.
+The next session found Docker stopped. This incomplete attempt is not counted as
+a pass and does not explain the original 12:24 UTC assertion failure.
+The interrupted run's recorded, labelled PostgreSQL/PostgREST pair was
+`launchgate-rls-64e79773-0f73-4b06-bbe0-a7b030c4afac` and its `-rest` sibling.
+The attached volume was
+`f6c6b7a1027bd9e01c6aea253d02bc526647792a4bb05fc3d5b35e928709aa23`.
+Its newly created temp directories were `launchgate-billing-ShPa0s` (synthetic
+SQLite fixture files) and empty `launchgate-phase6-Kx5cDo`; timestamps match the
+interrupted billing journey. Ownership was checked before cleanup. A combined
+recursive cleanup command was policy-rejected; narrower literal container and
+file removals succeeded without recursive deletion. Containers/volumes were
+empty and the original temp baseline matched before restarting validation on
+October 17. The two October 11 directories were untouched.
+
+Fresh full run #1 (`phase10-combined-fresh-1.log`) ran October 17 from 04:17:01
+to 04:56:01 UTC: **207/207 passed**, zero failures, cancellations or skips;
+2,337,075 ms. Both original failing assertions passed in their original order.
+No source/test/migration changes, selective skips, reordered tests or changed
+limits were used. `LAUNCHGATE_REQUIRE_DATABASE=1` made Docker mandatory and
+`DEBUG=pw:api` added browser diagnostics. A process-local Windows execution-state
+request prevented idle suspension while validating; no persistent power setting
+was changed, and deliberate shutdown remains possible.
+The PostgreSQL identities were `launchgate-production-a64e61f0-7e18-4117-a905-feac18f11e9b`,
+`launchgate-release-bc254a9f-f8cc-4912-a1d5-f053d705053a`,
+`launchgate-remediation-384c6675-b8f3-42c9-b115-2a578bbc0dea`, and
+`launchgate-rls-e2ed0798-37db-4662-a7e7-954bbc2decb0` (plus its `-rest` sibling).
+After completion Docker listed zero containers and zero volumes; the temp
+baseline check passed before full run #2 started.
+
+Pre-fix full run #2 (`phase10-combined-fresh-2.log`) ran 04:56:05–05:34:27 UTC:
+**206/207 passed**. The same browser journey returned INCONCLUSIVE during its
+vulnerable recurrence (`launchgate-rls.test.ts:676`, expected REPRODUCIBLE_FAILURE).
+The final bundle count passed because all four browser runs had been created.
+Cleanup again reported zero containers/volumes and no new temp resources.
+
+The diagnostic log identifies the faulty wait: at 05:34:11.591 UTC,
+`locator.click` started, completed the physical click at 11.954, then waited for
+navigation. At 13.141 it failed under the 1500ms action timeout. The authorized
+route reached `route.fetch` only at 13.149, after context cleanup had begun.
+The separately registered navigation wait allowed 5000ms but could not prevent
+the shorter, redundant click wait from rejecting Promise.all. This is a browser
+collector timing bug, not evidence of a schema collision or shared PostgREST.
+[Playwright's click contract](https://github.com/microsoft/playwright/blob/main/docs/src/api/class-locator.md?plain=1)
+explicitly includes navigation in the action timeout unless `noWaitAfter` is set.
+
+A targeted regression injects 1800ms into the control form's request authorization:
+the original collector failed with UNOBSERVABLE instead of COMPLETED. Setting
+`noWaitAfter:true` on click leaves the existing explicit 5000ms navigation wait
+responsible for navigation and preserves the 1500ms action limit. No sleep,
+timeout, journey budget or assertion was relaxed. The regression then passed;
+a 5500ms authorization delay still failed safely and cleaned up. Both regression
+tests plus all seven existing browser safety tests passed (9/9). Application test
+count increases from 964 to 966 solely for these two new regression cases;
+the combined database test count remains 207. Final post-fix full-suite validation
+is complete below; pre-fix passing runs are not substituted for it.
+
+Post-fix validation: type-check passed; lint passed with only the existing unused
+`describe` warning; all **966 application tests passed**, zero skipped; production
+build passed. These workloads finished before database validation restarted.
+Post-fix full database run #1 (`phase10-navigation-db-1.log`) ran October 17,
+11:42:05–12:20:57 UTC: **207/207 passed**, zero failures/cancellations/skips,
+2,329,869 ms. Its disposable containers were production
+`9d9e6d3c-b278-4b92-a78b-ad7780eb4360`, release
+`1d64a7e9-24ee-4867-a3c4-ca63f4da0bd5`, remediation
+`a8e6fd85-75a8-4c9a-903a-18e47b7d0007`, and legacy RLS
+`4cad2907-35af-46bb-999b-ecf3f4cac924` (standard `launchgate-<suite>-` prefixes,
+plus the RLS `-rest` sibling). Lifecycle events record their destruction.
+The between-run check found zero containers, zero volumes, and no new temp
+resources. Post-fix full run #2 (`phase10-navigation-db-2.log`) ran from 12:21:01
+to 13:00:19 UTC from scratch: **207/207 passed**, zero failures/cancellations/skips,
+2,355,842 ms. Its disposable containers were production
+`34ae84d5-efcd-46b6-bf9f-dbff388689f2`, release
+`5f4c61ad-3149-4682-8652-bcf1f85da666`, remediation
+`ee4de327-5a81-4865-b52a-8fff7f00b27f`, and legacy RLS
+`c908c6f2-5e53-4202-a80a-799783356270` (same prefixes and `-rest` convention).
+Lifecycle records confirm destruction of all five. The final check again found
+zero containers, zero volumes, and no new temporary resources. No managed or
+external credential lease was issued by these local database runs. Their
+ephemeral signing keys are process-local, budget-release assertions passed, and
+destroying each owned database removed its remaining test-only lease/reservation
+records. No unrelated resource or the two pre-existing temp directories changed.
+
+Classification: **RESOLVED_ROOT_CAUSE**. The retained original log cannot prove
+its exact low-level browser exception, but the full-suite recurrence captured
+the duplicate-wait timeout and the controlled regression reproduced that bug
+before the fix and passed afterward. The original bundle-count discrepancy is
+the consequence of aborting the browser journey early. No schema contamination,
+shared PostgREST state, identifier collision or leaked connection was demonstrated.
+
+Final database verdict: **PASS**. Two consecutive post-fix complete runs passed;
+the accepted final application/database coverage is **1,173 unique tests**
+(966 + 207), without counting repeated runs twice. Review changes are confined
+to `reference-lab/browser/collector.ts`, the two-case regression file
+`tests/launchgate-browser-navigation.test.ts`, and this ledger. No migration,
+database test assertion, test ordering, timeout or production functionality was
+changed. No commit, push, main/archive modification or Phase 11 work.
