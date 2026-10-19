@@ -4,7 +4,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 const root = process.cwd();
-const page = readFileSync(join(root, "src/app/page.tsx"), "utf8");
+const page = readFileSync(join(root, "src/app/startupx/page.tsx"), "utf8");
 const section = readFileSync(join(root, "src/components/marketing/ProductScrollStackSection.tsx"), "utf8");
 const stack = readFileSync(join(root, "src/components/marketing/ScrollStack.tsx"), "utf8");
 const stackCss = readFileSync(join(root, "src/components/marketing/ScrollStack.css"), "utf8");

@@ -13,6 +13,10 @@ import { findingRoute } from "../execution/findings";
 import { releaseRoute } from "../releases/api";
 import { remediationRoute } from "../remediation/api";
 import { capabilityRoute } from "../remediation/capability";
+import { productReadRoute } from "./product-reads";
+import { productLabRoute } from "./product-lab";
+import { capabilityRegistry } from "../../../services/production/readiness";
+import { qualificationReader, operationsStore } from "../production/store";
 
 type Session = { principal: VerifiedPrincipal; db: SupabaseClient };
 type SessionFactory = (request: Request) => Promise<Session>;
@@ -47,6 +51,8 @@ export function createLaunchGateHandler(sessionFactory: SessionFactory = session
       const url = new URL(request.url);
       const path = url.pathname.replace(/^\/api\/v1\//, "").split("/");
       const method = request.method;
+      if (["projects", "organizations"].includes(path[0]) && path[2] === "reference-lab") return await productLabRoute(request, { principal, db }, path, correlationId);
+      if (path[0] === "projects" && path[2] === "views") return await productReadRoute(request, { principal, db }, path, correlationId);
       if (path[0] === "projects" && path[2] === "remediation-capabilities") return await capabilityRoute(request, { principal, db }, path, correlationId);
       if (path[0] === "projects" && (path[2] === "fix-proposals" || path[2] === "findings" && path[4] === "fix-proposals")) return await remediationRoute(request, { principal, db }, path, correlationId);
       if (path[0] === "projects" && ["releases", "policies"].includes(path[2])) return await releaseRoute(request, { principal, db }, path, correlationId);
@@ -66,6 +72,12 @@ export function createLaunchGateHandler(sessionFactory: SessionFactory = session
       }
       if (path[0] === "organizations" && path.length >= 2) {
         const org = uuidSchema.parse(path[1]);
+        if (path.length === 3 && path[2] === "capabilities" && method === "GET") {
+          await requireOrganizationRole(reader, principal, org, "ADMIN");
+          const environment = z.enum(["development", "test", "staging", "production"]).parse(process.env.LAUNCHGATE_ENVIRONMENT ?? "development");
+          const records = await qualificationReader(operationsStore(), org, environment)();
+          return result({ environment, capabilities: capabilityRegistry(environment, records), qualifications: records.map(({ capability, observedAt, expiresAt, status }) => ({ capability, observedAt, expiresAt, status })) });
+        }
         if (path.length === 2 && method === "GET") {
           await requireOrganizationMembership(reader, principal, org);
           const { data, error } = await db.from("lg_organizations").select("*").eq("id", org).single(); databaseError(error); return result(data);

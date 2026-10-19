@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 
+// Controlled local identity provider for browser integration tests. Production
+// CSP never adds a loopback origin or wildcard from this setting.
+function localTestAuthOrigin() {
+  if (process.env.LAUNCHGATE_ENVIRONMENT !== "test") return "";
+  try { const url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""); return url.protocol === "http:" && url.hostname === "127.0.0.1" ? ` ${url.origin}` : ""; } catch { return ""; }
+}
+
 const nextConfig: NextConfig = {
   async headers() {
     return [
@@ -26,7 +33,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https:",
-              "connect-src 'self' https://api.anthropic.com https://*.supabase.co https://api.razorpay.com https://lumberjack.razorpay.com https://cdn.razorpay.com",
+              "connect-src 'self' https://api.anthropic.com https://*.supabase.co https://api.razorpay.com https://lumberjack.razorpay.com https://cdn.razorpay.com" + localTestAuthOrigin(),
               "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com",
             ].join("; "),
           },

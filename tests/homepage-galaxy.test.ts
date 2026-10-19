@@ -4,7 +4,7 @@ import { join } from "node:path";
 import test from "node:test";
 
 const root = process.cwd();
-const page = readFileSync(join(root, "src/app/page.tsx"), "utf8");
+const page = readFileSync(join(root, "src/app/startupx/page.tsx"), "utf8");
 const waitlisty = readFileSync(join(root, "src/components/marketing/waitlisty/WaitlistyHomepage.tsx"), "utf8");
 const waitlistyCss = readFileSync(join(root, "src/components/marketing/waitlisty/WaitlistyHomepage.module.css"), "utf8");
 const galaxy = readFileSync(join(root, "src/components/marketing/Galaxy.tsx"), "utf8");

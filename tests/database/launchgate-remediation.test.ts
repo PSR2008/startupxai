@@ -131,6 +131,7 @@ dbtest("Phase 9 verified write capability is optional, repository scoped and rev
   denied(rpcSql("lg_fix_service","CAPABILITY_VERIFIED",{...input,repositoryId:101,appId:88,installationId:456}));
   const cap=JSON.parse(sql(rpcSql("lg_fix_service","CAPABILITY_VERIFIED",{...input,repositoryId:101,appId:123,installationId:456})));
   assert.equal(cap.enabled,true);assert.equal(cap.repository_id,101);
+  assert.equal(sql(`SELECT expires_at-verified_at=interval '1 hour' FROM lg_remediation_capabilities WHERE id='${cap.id}'`),"t");
   assert.equal(sql(`SET ROLE authenticated; SET request.jwt.claim.sub='${outsider}'; SELECT count(*) FROM lg_remediation_capabilities;`),"0");
   denied(`SET ROLE authenticated; SET request.jwt.claim.sub='${developer}'; SELECT lg_fix_capability_revoke('${project}','${cap.id}','${correlation}');`);
   sql(`SET ROLE authenticated; SET request.jwt.claim.sub='${owner}'; SELECT lg_fix_capability_revoke('${project}','${cap.id}','${correlation}');`);

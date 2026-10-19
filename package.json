@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "test:product-ui": "node --conditions=react-server --import tsx scripts/test-product-ui.ts",
+    "reference-lab:worker": "node --conditions=react-server --import tsx scripts/run-product-lab.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

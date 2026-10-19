@@ -1,0 +1,34 @@
+import { before, after, test } from "node:test";
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { readFileSync, readdirSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+import { productLabCatalog } from "../../services/product-lab/catalog";
+import { invariantSetDigest } from "../../services/releases/engine";
+const container=`launchgate-product-rls-${randomUUID()}`,owner=randomUUID(),outsider=randomUUID(),viewer=randomUUID(),correlation=randomUUID();
+const docker=(args:string[],input?:string)=>spawnSync("docker",args,{input,encoding:"utf8",timeout:120000,windowsHide:true});
+let started=false,org="",project="",lab:ReturnType<typeof JSON.parse>;
+const raw=(text:string)=>docker(["exec","-i",container,"psql","-X","-qAt","-v","ON_ERROR_STOP=1","-U","postgres","-d","launchgate_test"],text);
+const sql=(text:string)=>{const r=raw(text);assert.equal(r.status,0,r.stderr);return r.stdout.trim();};
+const literal=(value:unknown)=>`'${JSON.stringify(value).replaceAll("'","''")}'::jsonb`;
+const actor=(id:string,text:string)=>`SET ROLE authenticated;SET request.jwt.claim.sub='${id}';${text}`;
+const denied=(text:string)=>{const r=raw(text);assert.notEqual(r.status,0);assert.match(r.stderr,/permission denied|access|immutable|actor|reference lab/i);};
+before(async()=>{
+ assert.equal(docker(["info"]).status,0,"Docker is required; product RLS tests must not skip");
+ const r=docker(["run","-d","--name",container,"--label","launchgate.disposable=true","--label","launchgate.phase=11","--network","none","-e","POSTGRES_HOST_AUTH_METHOD=trust","-e","POSTGRES_DB=launchgate_test","postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24"]);assert.equal(r.status,0,r.stderr);started=true;
+ for(let i=0;i<60;i++){if(docker(["exec",container,"pg_isready","-h","127.0.0.1","-U","postgres"]).status===0)break;await new Promise(r=>setTimeout(r,250));}
+ sql(`CREATE ROLE anon NOLOGIN;CREATE ROLE authenticated NOLOGIN;CREATE ROLE service_role NOLOGIN BYPASSRLS;CREATE SCHEMA auth;CREATE TABLE auth.users(id uuid PRIMARY KEY);CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;GRANT USAGE ON SCHEMA auth,public TO anon,authenticated,service_role;GRANT EXECUTE ON FUNCTION auth.uid() TO anon,authenticated,service_role;`);
+ for(const file of readdirSync("migrations").filter(x=>/^\d+.*\.sql$/.test(x)).sort())sql(readFileSync(`migrations/${file}`,"utf8"));
+ sql(`INSERT INTO auth.users VALUES('${owner}'),('${viewer}'),('${outsider}');`);
+ org=sql(actor(owner,`SELECT id FROM lg_create_organization('Product test','${correlation}');`));
+ sql(`INSERT INTO lg_organization_memberships(organization_id,user_id,role) VALUES('${org}','${viewer}','VIEWER');`);
+ lab=JSON.parse(sql(actor(owner,`SELECT lg_product_lab_command('${org}',NULL,'CREATE',NULL,'${correlation}');`)));project=lab.project_id;
+});
+after(()=>{if(started){assert.equal(docker(["inspect","--format",'{{index .Config.Labels "launchgate.phase"}}',container]).stdout.trim(),"11");assert.equal(docker(["rm","--force","--volumes",container]).status,0);assert.notEqual(docker(["inspect",container]).status,0);}});
+test("Phase 11 lab creation is a separate immutable project purpose",()=>{assert.equal(sql(`SELECT purpose FROM lg_projects WHERE id='${project}'`),"REFERENCE_LAB");denied(`UPDATE lg_projects SET purpose='CUSTOMER_VERIFICATION' WHERE id='${project}';`);});
+test("Phase 11 lab RLS hides other tenants and internal lease columns",()=>{assert.equal(sql(actor(outsider,"SELECT count(project_id) FROM lg_product_labs")),"0");assert.equal(sql(actor(viewer,"SELECT count(project_id) FROM lg_product_labs")),"1");denied(actor(owner,"SELECT lease_id FROM lg_product_labs"));});
+test("Phase 11 viewer cannot confirm or enqueue demo execution",()=>{denied(actor(viewer,`SELECT lg_product_lab_command('${org}','${project}','RUN',NULL,'${correlation}');`));});
+test("Phase 11 browser cannot mutate proof or invoke lab service",()=>{denied(actor(owner,`UPDATE lg_product_labs SET state='COMPLETED';`));denied(actor(owner,"SELECT lg_product_lab_service('CLAIM','{}');"));});
+test("Phase 11 confirmation atomically persists policy and is retry safe",()=>{const {policy}=productLabCatalog(lab);const payload={name:"Reference Lab tenant isolation",policy,invariantSetDigest:invariantSetDigest(policy)};for(let i=0;i<2;i++)sql(actor(owner,`SELECT lg_product_lab_command('${org}','${project}','CONFIRM',${literal(payload)},'${correlation}');`));assert.equal(sql(`SELECT state FROM lg_product_labs WHERE project_id='${project}'`),"CONFIRMED");assert.equal(sql(`SELECT count(*) FROM lg_policy_versions WHERE project_id='${project}'`),"1");});
+test("Phase 11 execution request is durable and duplicate-safe",()=>{for(let i=0;i<2;i++)sql(actor(owner,`SELECT lg_product_lab_command('${org}','${project}','RUN',NULL,'${correlation}');`));assert.equal(sql(`SELECT state FROM lg_product_labs WHERE project_id='${project}'`),"RUN_REQUESTED");});
+test("Phase 11 lab claims are exclusive and completion requires real evidence",()=>{const claim=JSON.parse(sql("SET ROLE service_role;SELECT lg_product_lab_service('CLAIM','{}');"));assert.equal(claim.project_id,project);assert.equal(sql("SET ROLE service_role;SELECT lg_product_lab_service('CLAIM','{}');"),"");const r=raw(`SET ROLE service_role;SELECT lg_product_lab_service('COMPLETE',${literal({projectId:project,leaseId:claim.lease_id,releaseId:randomUUID()})});`);assert.notEqual(r.status,0);assert.match(r.stderr,/lab evidence/);sql(`SET ROLE service_role;SELECT lg_product_lab_service('FAIL',${literal({projectId:project,leaseId:claim.lease_id})});`);});

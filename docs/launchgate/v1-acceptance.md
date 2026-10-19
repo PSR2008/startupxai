@@ -650,3 +650,114 @@ to `reference-lab/browser/collector.ts`, the two-case regression file
 `tests/launchgate-browser-navigation.test.ts`, and this ledger. No migration,
 database test assertion, test ordering, timeout or production functionality was
 changed. No commit, push, main/archive modification or Phase 11 work.
+
+## Phase 11 — customer product UI (18 October 2026)
+
+Status: **LOCAL VALIDATION PASS — ready for review; one manual cleanup item remains**.
+Work remains uncommitted on `launchgate-rebuild`; main and startupxai-final are
+unchanged. No Phase 12 implementation, public badge, commercial billing,
+automatic merge, or production target execution is included.
+
+The route/data review and operator instructions are in `product-ui.md`.
+LaunchGate now owns `/`; StartupX's original homepage is preserved at `/startupx`,
+with its existing app/authentication routes retained. LaunchGate's `/app` shell
+provides real organization/project onboarding, repository/source discovery,
+invariant confirmation, runs, releases, findings/evidence, remediation,
+regressions, policies, integrations, team, audit and settings surfaces.
+
+The UI uses caller-authenticated APIs and bounded tenant-scoped read models.
+Secret fields and internal artifact locators are excluded. Finding labels match
+the recorded invariant version; composite-key lists have deterministic ordering.
+SHIP expiry becomes STALE; waivers never rewrite evidence outcomes. Static
+architecture detection is distinct from dynamic proof. Missing, stale or
+inconclusive assurance never becomes approval.
+
+The isolated Reference Lab is a separate immutable project purpose (migration
+033), with durable confirmation, execution requests, fenced claims and real
+release evidence. It cannot acquire customer repository connections. The local
+operator uses existing orchestrator/release/remediation workers and real HTTP
+fixtures. Fixture PRs and previews are explicitly labeled; no GitHub or hosted
+provider success is fabricated.
+
+### Validation evidence
+
+- Application suite: **989/989 PASS**, zero skips, including 23 focused Phase 11
+  UI/API/presentation tests. Legacy homepage tests now target the preserved
+  StartupX route; their assertions remain intact.
+- Product browser journey: passed onboarding → reproduced finding → BLOCK →
+  proposal → validation → explicit fixture PR → verified replay → SHIP.
+  Mobile navigation, native dialog focus/Tab/Escape restoration, signed-out
+  access, HTML secret exclusion and VIEWER read/administrative-denial checks pass.
+- Captures: seven pages at 1440, 1280, 768 and 390 pixels (28 screenshots), with
+  programmatic page-overflow checks and visual review sheets. Screenshots are
+  under `.launchgate/phase11-qa`; the Next development indicator is test tooling.
+- Type-check: PASS. Lint: zero errors, one pre-existing unused `describe` warning
+  in `tests/public-source.test.ts`.
+- Production build: PASS. Homepage first load 108 kB; authenticated shell 187 kB (103 kB shared).
+- Dependency audit: production **0 vulnerabilities**; full tree **7 high and
+  2 moderate**, pre-existing development/build dependencies. No dependency update
+  or script approval is introduced by this phase.
+- Full database suite: **214/214 PASS**, zero failures or skips, in 2,331,327 ms
+  (38 minutes 51 seconds). This is the complete combined run from fresh disposable
+  databases: 207 existing plus seven Phase 11 tests.
+
+### Database investigation
+
+The first attempt was 209/214. One new test incorrectly expected textual `null`
+for SQL NULL in `psql -At`; its assertion now expects the empty output. A genuine
+pre-existing remediation permission bug sampled `clock_timestamp()` twice and
+exceeded the strict one-hour expiry bound by one microsecond. Forward migration
+034 samples once; the existing test now asserts an exact one-hour lifetime.
+No authorization constraint or execution timeout was weakened.
+
+The other initial failures coincided with recorded Windows Modern Standby.
+A second attempt was 208/214 after a lid-triggered suspension lasting several
+hours and later idle suspension. Migration 034's regression passed in that run;
+long-running execution cases and their dependent evidence counts did not.
+Retained logs are `phase11-database.log`, `phase11-database-standby-run2.log` and
+`phase11-environment-evidence*.log`. These attempts are not accepted as green.
+A fresh full attempt is recorded in `phase11-database-final.log`.
+
+### Capability and cleanup limits
+
+Hosted capabilities remain UNVERIFIED and Production Sandbox remains BLOCKED BY
+ENVIRONMENT in this unqualified local setup. GitHub's existing setup contract
+requires installation/repository IDs; source processing requires its operator
+worker. Customer policy activation requires registered plans. Team access uses
+existing account IDs; email invitations are unsupported. Read views and filters
+have explicit bounded scopes. Evidence is a redacted, bounded presentation.
+
+The successful product browser test asserted zero active/reserved execution
+budget and zero live credential resources before destroying its database.
+Its named containers, anonymous volume and temporary artifacts were removed.
+An older interrupted run left the owned directory
+`C:\Users\Punith\AppData\Local\Temp\launchgate-phase11-artifacts-cUwgyN`.
+Automatic approval review blocked recursive deletion; its two named containers
+were removed separately. This one directory remains a manual cleanup item:
+
+```powershell
+Remove-Item -LiteralPath 'C:\Users\Punith\AppData\Local\Temp\launchgate-phase11-artifacts-cUwgyN' -Recurse -Force
+```
+
+The temporary legacy-homepage backup was content verified against HEAD and
+removed; the actual StartupX source remains preserved. Unrelated pre-existing
+temporary directories were not touched. Final resource inventory is recorded below; manual cleanup remains explicitly outstanding.
+
+Final review on 19 October 2026: Docker inventory contains **zero containers and
+zero volumes**. Temporary directory inventory contains only the two unrelated
+pre-existing directories (`launchgate-ci-xp55exvq`, `launchgate-noenv-8u6xljrw`)
+and the single explicitly recorded manual cleanup item above. No new test
+artifact directory remains. No external credential lease or provider spend was
+used. The successful full suite and browser harness completed their owned
+resource cleanup. No Windows script-policy or power-plan setting was changed.
+
+`git diff --check` passes. The working tree has 10 modified tracked files and
+40 new files, all uncommitted. HEAD remains
+`53aa442544fa81914418428c8a8192e00d349fe5`; protected refs remain
+main `a61ba8c8873fa0eedf48879f90aa4869f8991b8f` and startupxai-final
+`a11b1de6a36dddc535745aa24e006008e9fa4c20`. No push occurred.
+
+Local functional/test acceptance: **PASS**. Cleanup status:
+**MANUAL_ACTION_REQUIRED** for the one old directory; this is not described as
+a leak-free completion. Hosted operational qualification remains outside this
+local validation and is visibly unverified. Phase 12 has not started.
