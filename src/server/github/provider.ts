@@ -24,6 +24,27 @@ export function appJwt(config:GitHubConfig,now=Date.now()) {
 }
 export class GitHubProvider {
   constructor(private readonly config:GitHubConfig,private readonly transport:typeof fetch=fetch){}
+  async installUrl() {
+    const app=z.object({slug:z.string().regex(/^[A-Za-z0-9-]{1,100}$/)}).parse(await this.request('/app',appJwt(this.config)));
+    return `https://github.com/apps/${app.slug}/installations/new`;
+  }
+  async discoverRepositories(code:string) {
+    const signal=AbortSignal.timeout(30000);
+    const response=await this.transport('https://github.com/login/oauth/access_token',{method:'POST',redirect:'error',signal,headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({client_id:this.config.clientId,client_secret:this.config.clientSecret,code,redirect_uri:this.config.redirectUri})});
+    if(!response.ok){await response.body?.cancel();throw new ApiError('ACCESS_DENIED');}
+    const token=z.object({access_token:z.string().min(10).max(4096)}).parse(JSON.parse(Buffer.from(await boundedBody(response,16384)).toString('utf8'))).access_token;
+    const installations=z.object({installations:z.array(z.object({id,app_id:id})).max(10)}).parse(await this.request('/user/installations?per_page=10',token,undefined,signal));
+    const repositories: Array<{installationId:number;repositoryId:number;name:string;visibility:string;checksPermission:string}>=[];
+    for(const item of installations.installations.filter(i=>i.app_id===this.config.appId)) {
+      const installation=await this.installation(item.id,signal);
+      const page=z.object({repositories:z.array(repositorySchema).max(100)}).parse(await this.request(`/user/installations/${item.id}/repositories?per_page=100`,token,undefined,signal));
+      for(const repo of page.repositories) {
+        if(repositories.length>=100)break;
+        repositories.push({installationId:item.id,repositoryId:repo.id,name:`${repo.owner.login}/${repo.name}`,visibility:repo.private?'PRIVATE':'PUBLIC',checksPermission:installation.permissions.checks==='write'?'VERIFIED':'MISSING'});
+      }
+    }
+    return repositories;
+  }
   authorizationUrl(state:string) {
     const url=new URL("https://github.com/login/oauth/authorize");url.searchParams.set("client_id",this.config.clientId);url.searchParams.set("redirect_uri",this.config.redirectUri);url.searchParams.set("state",state);return url.toString();
   }

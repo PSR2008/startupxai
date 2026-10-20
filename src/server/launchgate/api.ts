@@ -15,6 +15,8 @@ import { remediationRoute } from "../remediation/api";
 import { capabilityRoute } from "../remediation/capability";
 import { productReadRoute } from "./product-reads";
 import { productLabRoute } from "./product-lab";
+import { distributionRead } from "./distribution-reads";
+import { machineRoute, credentialRoute, sharingRoute } from "./distribution";
 import { capabilityRegistry } from "../../../services/production/readiness";
 import { qualificationReader, operationsStore } from "../production/store";
 
@@ -46,11 +48,16 @@ export function createLaunchGateHandler(sessionFactory: SessionFactory = session
     const correlationId = randomUUID();
     const headers = { "Cache-Control": "no-store", "X-Correlation-ID": correlationId };
     try {
+      const earlyPath = new URL(request.url).pathname.replace(/^\/api\/v1\//, "").split("/");
+      if (earlyPath[0] === "distribution" && earlyPath[1] === "machine") return await machineRoute(request, earlyPath);
       const { principal, db } = await sessionFactory(request);
       const reader = authorizationReader(db);
       const url = new URL(request.url);
       const path = url.pathname.replace(/^\/api\/v1\//, "").split("/");
       const method = request.method;
+      if (path[0] === "projects" && path[2] === "sharing") return await sharingRoute(request, db, path, correlationId);
+      if (path[0] === "cli-sessions" || path[0] === "projects" && path[2] === "ci-credentials") return await credentialRoute(request, db, path, correlationId);
+      if (path[0] === "projects" && path[2] === "distribution") return await distributionRead(request, { principal, db }, path);
       if (["projects", "organizations"].includes(path[0]) && path[2] === "reference-lab") return await productLabRoute(request, { principal, db }, path, correlationId);
       if (path[0] === "projects" && path[2] === "views") return await productReadRoute(request, { principal, db }, path, correlationId);
       if (path[0] === "projects" && path[2] === "remediation-capabilities") return await capabilityRoute(request, { principal, db }, path, correlationId);

@@ -761,3 +761,146 @@ Local functional/test acceptance: **PASS**. Cleanup status:
 **MANUAL_ACTION_REQUIRED** for the one old directory; this is not described as
 a leak-free completion. Hosted operational qualification remains outside this
 local validation and is visibly unverified. Phase 12 has not started.
+
+## Phase 12 implementation checkpoint — 19 October 2026
+
+Phase 11 is now committed by the user at `f5896e2`; Phase 12 began from a clean
+`launchgate-rebuild` working tree. This section supersedes only the earlier
+statement that Phase 12 had not started. **Phase 12 acceptance is NOT complete.**
+
+Implemented so far: independently buildable `@launchgate/cli`, Phase 3 parser
+reuse, bounded non-executing local inspection, explicit static checks, offline
+preflight, strict data-only initialization, versioned JSON, safe project URL
+output, and an authenticated existing-release read/check path. Remote projections
+use existing principal/membership/RLS controls, current evaluation generation,
+release state and evidence expiry. No migration or new database authority exists.
+The CLI documentation identifies unsupported commands and unfinished auth/CI work.
+
+Validation at this checkpoint: 20/20 CLI tests and 996/996 application tests
+(989 existing plus seven distribution-read tests), with zero skips. The seven
+focused API reruns are the same tests, not additional unique coverage. CLI build,
+typecheck, lint and production build pass; lint retains the pre-existing unused
+`describe` warning in `tests/public-source.test.ts`. Production audit: zero
+vulnerabilities. Full audit: seven high and two moderate development/build
+advisories. No new third-party dependency version was introduced; the CLI uses
+the existing parser's pinned TypeScript 5.9.3. Local logs use `phase12-*.log`;
+audit reports are ignored under `.launchgate/phase12`.
+
+Outstanding acceptance work: completed CLI login/session storage and history/wait
+commands; scoped CI credentials; GitHub Action; App onboarding improvements;
+public assessment with durable abuse controls/cache; sharing/revocation; public
+assurance and badge freshness; required UI/docs/telemetry; security/RLS tests;
+controlled distribution demo; complete fresh database suite. No Phase 12 database
+run has been performed. Prior Phase 11 DB results are not Phase 12 validation.
+
+No Phase 12 test temporary directory, Docker container or volume remains after
+the checkpoint tests. The separately documented Phase 11 manual cleanup item
+is not claimed resolved. No provider credential lease or budget was used.
+No package/Action publication, deployment, commit or push occurred. Protected
+branch refs remain unchanged. Continue Phase 12; do not treat this checkpoint as
+approval to begin Phase 13.
+
+
+## Phase 12 final acceptance - reviewed 20 October 2026
+
+**Phase 12 COMPLETE for the requested local implementation and acceptance scope.**
+This supersedes the incomplete Phase 12 checkpoint above. It is not a hosted
+production-readiness claim. Phase 13 has not started.
+
+Implemented: browser-approved one-day human CLI sessions with origin/state-bound
+loopback delivery and user-only credential-file fallback; separate hashed,
+project-scoped CI credentials with rotation, expiry, revocation and audit;
+authoritative CLI history/check/wait with safe aggregate coverage; exact-SHA
+repository-local GitHub Action; GitHub App installation/repository selection;
+bounded public static assessment; durable quota, immutable cache and provider
+backoff; explicit immutable-evaluation sharing; opt-in public assurance and
+freshness-aware SVG badges; setup UI, privacy-conscious telemetry and documentation.
+
+Forward migrations 035 and 036 add distribution identity and public projection
+boundaries. Migrations 001-034 are unchanged. New tables force RLS; browser roles
+cannot write machine usage, hashes, share contents, badge states or gate decisions.
+The privileged gateway permits only the two constrained distribution RPCs.
+Organization deletion immediately withdraws public identity and assurance.
+
+### Final validation evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| npm install | PASS; existing allow-scripts policy unchanged | phase12-install-final.log |
+| CLI independent build / tests | PASS, 26/26 | phase12-cli-build-final.log, phase12-cli-tests-final.log |
+| Full application suite | PASS, 1058/1058, no skips | phase12-tests-acceptance.log |
+| Full combined database suite | PASS, 237/237, no skips | phase12-database-final.log |
+| Distribution contract subset | PASS, 66/66 | phase12-distribution-tests-final.log |
+| GitHub onboarding/provider contracts | PASS, included in app total | phase12-github-tests.log |
+| Distribution database/RLS subset | PASS, 23/23, included in DB total | phase12-db-distribution-final.log |
+| Production-server distribution demo | PASS, real APIs and disposable PostgreSQL/PostgREST | phase12-demo-acceptance.log |
+| Typecheck / lint / production build | PASS; one pre-existing unused describe lint warning | phase12-typecheck-acceptance.log, phase12-lint-acceptance.log, phase12-build-acceptance.log |
+| Production dependency audit | 0 vulnerabilities | .launchgate/phase12/audit-production-final-2026-10-20.json |
+| Full dependency audit | 7 high, 2 moderate development/build advisories | .launchgate/phase12/audit-final-2026-10-20.json |
+
+Counts are unique: 1058 application + 237 database + 26 standalone CLI = 1321
+passing automated tests, plus the controlled browser demo. The 66 distribution
+contracts (19 Action, 21 assessment, 19 public share/badge/security, seven legacy
+distribution reads) are included in 1058, not additional tests. The database count
+is the existing 214 plus 23 distribution tests. The final complete command used
+fresh disposable databases, all current migrations 001-036 in order in current-
+schema harnesses, and the preserved staged legacy migration-upgrade rehearsal.
+No reused database or selectively skipped tests substituted for this combined run.
+The earlier 231/231 combined run preceded six additional security tests and final
+SQL refinements; the final 237/237 result validates those refinements as well.
+
+The demo proves actual browser CLI authorization and logout, static-only fixture
+inspection, confirmed Reference Lab verification, reproduced BLOCK, constrained
+fix/replay and SHIP, sanitized historical sharing, expiry/revocation, public
+VERIFIED, policy/superseding-release STALE and restored VERIFIED. It verifies zero
+active execution reservations and credential leases before teardown. Twenty-eight
+existing responsive screenshots plus four distribution screenshots are retained
+as intentional review artifacts under .launchgate/phase12-qa. Desktop assessment,
+desktop sharing and mobile assurance were visually reviewed.
+
+Failures encountered were corrected rather than hidden: the original privileged
+client placement violated the existing trust-boundary test and was moved into a
+restricted RPC gateway without weakening that test; browser CLI delivery needed a
+loopback connect-src allowance restricted to /app/cli; a visual selector's em dash
+was corrupted by the shell and was encoded explicitly. A development-server run
+returned internal JSON parse errors during navigation. Acceptance now builds and
+serves immutable production output instead of depending on hot compilation. That
+exposed a test navigation race: both old and new pages had an organization field;
+the test now waits for the onboarding URL before entering data. No assertions
+were weakened, sleeps increased or retries added to hide these failures.
+
+### Acceptance and limits
+
+CLI, Action, public assessment, sharing, badge freshness, scoped CI credentials,
+public endpoint security, RLS, UI and required validation: **PASS**. Static results
+cannot become dynamic assurance. CI cannot administer organizations, create public
+shares or authorize remediation. The Action reconciles candidates from the existing
+connected pipeline; a missing candidate remains INCONCLUSIVE. Normal checks need
+no repository write permission. CI's external actions are pinned to immutable,
+verified Node 24 upstream revisions; hosted execution is not claimed qualified.
+
+Native keychain providers are not bundled: the documented owner-only file fallback
+is used. Windows was exercised locally; macOS/Linux end-to-end OS qualification
+remains external. Live GitHub/provider integrations, proxy configuration and access-
+log redaction need operational qualification. Detailed finding sharing and optional
+CLI share creation are not exposed; human web sharing is implemented. Known dev
+advisories remain recorded. No commercial billing, publication or deployment occurred.
+
+### Cleanup and Git verification
+
+On final review, Docker was restarted solely to inspect cleanup: **zero containers
+and zero volumes**. No new LaunchGate temporary directories remain. The two unrelated
+pre-existing directories launchgate-ci-xp55exvq and launchgate-noenv-8u6xljrw were
+untouched. The previously documented Phase 11 directory
+C:\Users\Punith\AppData\Local\Temp\launchgate-phase11-artifacts-cUwgyN
+is now absent; this continuation did not remove it or bypass the prior rejection.
+Browser contexts and test servers are closed. No live provider spend or credentials
+were used. Logs, builds and screenshots are intentional ignored review artifacts.
+
+StartupX remains intact, including its original /share/[token] page; LaunchGate
+sharing uses /assurance/share/[token]. The full app regression suite passes.
+Branch remains launchgate-rebuild at f5896e2. No staged changes, commit or push.
+Protected refs remain main a61ba8c8873fa0eedf48879f90aa4869f8991b8f and
+startupxai-final a11b1de6a36dddc535745aa24e006008e9fa4c20.
+The working tree contains 19 modified tracked files and 43 new files.
+Final git diff --check passes. Phase 13 requires a separate user instruction.

@@ -7,6 +7,16 @@ function localTestAuthOrigin() {
   try { const url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""); return url.protocol === "http:" && url.hostname === "127.0.0.1" ? ` ${url.origin}` : ""; } catch { return ""; }
 }
 
+const contentSecurityPolicy = [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://checkout.razorpay.com https://api.razorpay.com https://cdn.razorpay.com https://lumberjack.razorpay.com https://fonts.googleapis.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: https:",
+              "connect-src 'self' https://api.anthropic.com https://*.supabase.co https://api.razorpay.com https://lumberjack.razorpay.com https://cdn.razorpay.com" + localTestAuthOrigin(),
+              "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com",
+            ].join("; ");
+
 const nextConfig: NextConfig = {
   async headers() {
     return [
@@ -27,16 +37,15 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://checkout.razorpay.com https://api.razorpay.com https://cdn.razorpay.com https://lumberjack.razorpay.com https://fonts.googleapis.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https:",
-              "connect-src 'self' https://api.anthropic.com https://*.supabase.co https://api.razorpay.com https://lumberjack.razorpay.com https://cdn.razorpay.com" + localTestAuthOrigin(),
-              "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com",
-            ].join("; "),
+            value: contentSecurityPolicy,
           },
+        ],
+      },
+      {
+        source: "/app/cli",
+        headers: [
+          { key: "Content-Security-Policy", value: contentSecurityPolicy.replace("connect-src ", "connect-src http://127.0.0.1:* ") },
+          { key: "Referrer-Policy", value: "no-referrer" },
         ],
       },
     ];

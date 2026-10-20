@@ -1,0 +1,10 @@
+{
+  "name": "@launchgate/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": { "launchgate": "dist/main.mjs" },
+  "files": ["dist"],
+  "engines": { "node": ">=24.19.0 <25" },
+  "scripts": { "build": "node build.mjs", "test": "node --test test/*.test.mjs" },
+  "dependencies": { "typescript": "5.9.3" }
+}

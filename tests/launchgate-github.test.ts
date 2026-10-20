@@ -18,8 +18,9 @@ function provider(options:{visible?:boolean;selected?:boolean;admin?:boolean;sus
   const url=String(input);const body=init?.body?JSON.parse(String(init.body)):undefined;requests.push({url,body,authorization:new Headers(init?.headers).get("authorization")});
   assert.equal(init?.redirect,"error");assert.ok(init?.signal);assert.ok(["https://github.com","https://api.github.com"].includes(new URL(url).origin));
   const path=new URL(url).pathname;let data:unknown;
-  if(path==="/login/oauth/access_token")data={access_token:"synthetic-transient-user-token"};
-  else if(path==="/user/installations")data={installations:options.visible===false?[]:[{id:456}]};
+  if(path==="/app")data={slug:"launchgate-test"};
+  else if(path==="/login/oauth/access_token")data={access_token:"synthetic-transient-user-token"};
+  else if(path==="/user/installations")data={installations:options.visible===false?[]:[{id:456,app_id:123}]};
   else if(path==="/app/installations/456")data={id:456,app_id:123,account:{id:12},suspended_at:options.suspended?new Date().toISOString():null,permissions:{metadata:"read",contents:options.write?"write":"read"}};
   else if(path==="/user/installations/456/repositories")data={repositories:options.selected===false?[]:[repo]};
   else if(path==="/repos/fixture/sample"||path==="/repositories/789")data={...repo,name:options.rename??repo.name,permissions:{admin:options.admin!==false}};
@@ -55,3 +56,7 @@ test("job publishes static metadata only and is fenced by lease",async()=>{const
  assert.deepEqual(await processSnapshot(snapshotId,{store,provider:{async ingestCommit(){return {commitSha:"a".repeat(40),treeSha:"b".repeat(40),source};}}}),{state:"COMPLETE"});
  const published=writes.find(w=>w.action==="COMPLETE")!;assert.equal(published.data.lease,lease);assert.ok(!JSON.stringify(published.data.files).includes("text"));assert.doesNotMatch(JSON.stringify(published.data),/export const role/);
 });
+
+test("GitHub onboarding resolves the configured app installation URL",async()=>{assert.equal(await provider().provider.installUrl(),"https://github.com/apps/launchgate-test/installations/new");});
+test("GitHub repository picker returns bounded verified metadata without OAuth secrets",async()=>{const result=await provider().provider.discoverRepositories("synthetic-code");assert.equal(result.length,1);assert.equal(result[0].repositoryId,789);assert.equal(result[0].checksPermission,"MISSING");assert.doesNotMatch(JSON.stringify(result),/token|clientSecret|privateKey/);});
+test("GitHub repository picker rejects suspended and overprivileged installations",async()=>{for(const options of [{suspended:true},{write:true}])await assert.rejects(provider(options).provider.discoverRepositories("synthetic-code"),{code:"ACCESS_DENIED"});});

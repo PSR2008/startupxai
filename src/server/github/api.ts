@@ -24,6 +24,15 @@ export async function sourceRoute(request:Request,session:{principal:VerifiedPri
  const role=async(minimum:"ADMIN"|"DEVELOPER")=>requireOrganizationRole(reader,principal,context.organizationId,minimum);
  const rpc=async(name:string,args:Record<string,unknown>)=>{const {data,error}=await db.rpc(name,args);databaseError(error);return data;};
  if(path[2]==="github") {
+  if(path.length===4&&path[3]==="onboarding"&&request.method==="GET") {
+   await role('ADMIN');return respond({installUrl:await new GitHubProvider(githubConfiguration()).installUrl()});
+  }
+  if(path.length===4&&path[3]==="discover"&&request.method==="POST") {
+   await role('ADMIN');const input=await json(request,z.object({state:z.string().regex(/^[a-f0-9]{64}$/),code:z.string().min(1).max(512)}).strict());
+   const setup=z.object({project_id:uuid,installation_id:positive,repository_id:positive}).parse(await sourceStore().command('READ_SETUP',{stateHash:hash(input.state),actorId:principal.userId}));
+   if(setup.project_id!==projectId||setup.installation_id!==1||setup.repository_id!==1)throw new ApiError('ACCESS_DENIED');
+   return respond(await new GitHubProvider(githubConfiguration()).discoverRepositories(input.code));
+  }
   if(path.length===4&&path[3]==="setup"&&request.method==="POST") {
    await role("ADMIN");const input=await json(request,z.object({installationId:positive,repositoryId:positive,applicationRoot:z.string().max(240).default("").refine(p=>!p||safePath(p))}).strict());
    const provider=new GitHubProvider(githubConfiguration());const state=randomBytes(32).toString("hex");

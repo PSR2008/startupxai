@@ -1,3 +1,38 @@
+# LaunchGate
+
+**Your AI says it works. LaunchGate proves it can ship.**
+
+LaunchGate helps developers discover the business invariants their app should
+satisfy, reproduce failures, and gate releases using recorded verification evidence.
+
+**Not production-ready yet.** Hosted integrations and execution providers still
+require operational qualification. Local Reference Lab evidence is labelled and
+must not be represented as verification of a customer deployment.
+
+- Free local inspection and `/assess` suggest stack and invariant families without
+  executing repository code. Static analysis does not prove runtime behavior.
+- Connect a GitHub repository, confirm intended invariants, and authorize an owned
+  preview/staging deployment before dynamic verification.
+- Authoritative release decisions are SHIP, BLOCK or INCONCLUSIVE. Incomplete
+  required assurance does not approve a release or pass CI.
+- Remediation proposals require explicit approval, bounded patches, isolated replay
+  and required adjacent coverage before a fix can be considered verified.
+- The CLI and repository-local GitHub Action bring exact-commit checks into developer
+  workflows. Sharing is explicit; badges describe a release policy and tested scope,
+  with freshness checks rather than permanent security claims.
+
+Build the unpublished CLI with `npm run build:cli`, then run
+`node packages/cli/dist/main.mjs inspect --json`. Nothing is published to npm or
+GitHub Marketplace. See [CLI](docs/launchgate/cli.md),
+[Action](docs/launchgate/github-action.md), [assessment](docs/launchgate/public-assessment.md),
+[sharing](docs/launchgate/share-pages.md), [badges](docs/launchgate/verified-badge.md),
+and [distribution security](docs/launchgate/distribution-security.md).
+
+LaunchGate owns `/` and `/app`. StartupX remains available at `/startupx`; its code
+and history are preserved below.
+
+---
+
 # StartupX AI / LaunchGate foundation
 
 The running application remains StartupX AI. LaunchGate Phase 1 adds deterministic contracts and server foundations without replacing product pages, payments, migrations or integrations.

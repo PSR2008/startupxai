@@ -1,0 +1,26 @@
+name: LaunchGate Release Gate
+description: Check authoritative assurance for the exact GitHub commit. No repository write permission required.
+inputs:
+  project:
+    description: LaunchGate project UUID
+    required: true
+  token:
+    description: Project-scoped LaunchGate CI credential
+    required: true
+  server:
+    description: Reviewed HTTPS LaunchGate origin (must match LAUNCHGATE_TRUSTED_ORIGIN)
+    required: true
+  wait:
+    description: Wait for the existing connected release pipeline
+    default: 'true'
+  timeout:
+    description: Maximum seconds to wait (1 through 900)
+    default: '300'
+outputs:
+  decision:
+    description: SHIP, BLOCK or INCONCLUSIVE
+  release:
+    description: Exact reconciled release UUID
+runs:
+  using: node24
+  main: index.mjs

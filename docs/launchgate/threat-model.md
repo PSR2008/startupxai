@@ -157,3 +157,27 @@ Operational records never contain secret bytes or raw provider errors. Structure
 events accept fixed names, IDs and numeric counters only. Exact resource ownership
 is checked before cleanup; no broad container, bucket or temporary-directory delete
 is permitted. Existing older temporary directories are not test-owned cleanup targets.
+
+
+## Phase 12 distribution boundary
+
+The CLI reuses Phase 3 ingestion/parser isolation. Human CLI sessions and project CI
+credentials use separate hash-only stores and constrained RPC authentication, not
+unrestricted user impersonation. Forward migrations 035?036 add forced-RLS metadata,
+explicit immutable-evaluation shares, public assurance settings, durable quotas,
+fenced immutable assessment caching and aggregate telemetry. Public projections
+reuse existing release/gate records; no new proof authority is created.
+
+Public assessment never executes source or dispatches verification. GitHub URLs
+are parsed to a fixed API host, redirects refused, and request/byte/tree/time budgets
+enforced. Private repositories cannot enter anonymous analysis. Cache keys include
+canonical repository ID, SHA, engine, schema and bound policy.
+
+Shares expose one evaluation by expiring/revocable random capability; badges require
+separate opt-in and re-check current release generation, policy, expiry and tracked
+public branch SHA. All public output uses explicit projections. CI tokens cannot
+share, administer organizations or request remediation writes. Browser callers cannot
+forge cache results, last-used metadata, gate decisions or badge states.
+
+See [distribution security](distribution-security.md) for storage, privacy, SSRF,
+XSS, enumeration, quota, token leakage and operational qualification boundaries.

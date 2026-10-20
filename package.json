@@ -75,7 +75,11 @@
     "test:production-boundaries": "node --conditions=react-server --import tsx --test tests/launchgate-production.test.ts",
     "test:production-database": "node --conditions=react-server --import tsx --test tests/database/launchgate-production.test.ts",
     "launchgate:readiness": "node --conditions=react-server --import tsx scripts/launchgate-readiness.ts",
-    "test:resource-inventory": "node --import tsx scripts/launchgate-resource-inventory.ts check"
+    "test:resource-inventory": "node --import tsx scripts/launchgate-resource-inventory.ts check",
+    "test:distribution-demo": "node --conditions=react-server --import tsx scripts/test-distribution-demo.ts",
+    "test:distribution": "node --conditions=react-server --import tsx --test tests/launchgate-distribution*.test.ts tests/launchgate-action.test.ts tests/launchgate-assessment.test.ts",
+    "test:cli": "npm run test --workspace @launchgate/cli",
+    "build:cli": "npm run build --workspace @launchgate/cli"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
