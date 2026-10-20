@@ -42,3 +42,9 @@ LAUNCHGATE_ARTIFACT_PRIVATE=1, LAUNCHGATE_ARTIFACT_ENCRYPTION=PROVIDER_KMS,
 LAUNCHGATE_VERIFICATION_PAYMENT_MODE=TEST_ONLY, and
 LAUNCHGATE_UNRESTRICTED_EGRESS=0. These settings alone do not create a provider or
 qualify it. Never put secret values in client-facing environment variables.
+
+## Phase 13 launch policy
+
+Minimum fresh live qualifications: github.live, github.checks.live, vercel.live, supabase.hosted, artifact_store.managed, secret_store.managed, sandbox.production, staging.deployment, staging.full_e2e, staging.recovery, staging.cleanup. Every required item must be VERIFIED with real evidence. Payment and AI providers are additionally required only for enabled dependent features; `launchPolicy` accepts that explicit feature list. Do not enable dependent features based on the aggregate base readiness alone. Optional remediation is not required for read-only launch. See [current matrix](live-qualification-matrix.md).
+
+Local implementation, LIVE VERIFIED, UNVERIFIED, BLOCKED, DEGRADED and STALE are distinct UI states. No single production-ready claim is allowed while a required capability is missing. Configuration presence cannot qualify an integration.

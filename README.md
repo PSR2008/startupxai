@@ -9,6 +9,8 @@ satisfy, reproduce failures, and gate releases using recorded verification evide
 require operational qualification. Local Reference Lab evidence is labelled and
 must not be represented as verification of a customer deployment.
 
+Phase 13 adds safe qualification inventory, configuration-bound status and durable diagnostic budgets. `npm run launchgate:qualify` produces a local report without provider calls. Dedicated assets remain unavailable; see [staging setup](docs/launchgate/staging.md) and [live matrix](docs/launchgate/live-qualification-matrix.md).
+
 - Free local inspection and `/assess` suggest stack and invariant families without
   executing repository code. Static analysis does not prove runtime behavior.
 - Connect a GitHub repository, confirm intended invariants, and authorize an owned

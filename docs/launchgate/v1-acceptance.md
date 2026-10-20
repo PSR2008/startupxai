@@ -904,3 +904,115 @@ Protected refs remain main a61ba8c8873fa0eedf48879f90aa4869f8991b8f and
 startupxai-final a11b1de6a36dddc535745aa24e006008e9fa4c20.
 The working tree contains 19 modified tracked files and 43 new files.
 Final git diff --check passes. Phase 13 requires a separate user instruction.
+
+
+## Phase 13 - dedicated staging qualification (2026-10-20)
+
+### Scope and availability
+
+User authorized Phase 13 on launchgate-rebuild after committing Phase 12 at
+`d2d82e5c7486f63d167eb421b27d8c58a13c4df8`. No commit, push, deployment,
+publication, paid provisioning or Phase 14 work occurred.
+
+Initial safe inventory: GitHub analysis/remediation App and webhook, Vercel,
+Stripe, OpenAI, managed artifact/secret/sandbox selectors and staging selectors
+MISSING. Supabase, Razorpay and Anthropic values PLACEHOLDER. No dedicated approved
+repository, deployment, hosted database or provider account/budget was available.
+No secret values were printed. Existing local registry supplied no live evidence.
+
+The safe qualification command persisted local timestamped reports under ignored
+`.launchgate/phase13/`; the unavailable hosted registry was not written. Nineteen
+capabilities are BLOCKED_BY_ENVIRONMENT; optional GitHub remediation is UNVERIFIED.
+All live qualifications, Windows CLI against staging, actual hosted Action,
+external assessment/share/badge, deployment/recovery and full E2E remain unavailable.
+macOS/Linux CLI remains UNVERIFIED. No live request or provider spend occurred.
+OpenAI spend $0.00; Anthropic spend $0.00; financial live spend $0.00.
+
+### Implemented and reviewed
+
+Twenty capability evidence checklists, strict dedicated-staging manifest,
+configuration/credential/permission/version binding, contract-only admission
+refusal, cleanup-gated qualification, one-hour expiry, safe reason codes and
+truthful UI freshness are implemented. Migration 037 adds forced-RLS configuration
+bindings and immutable diagnostic reservations. Trusted service operations alone
+can write; browser mutation and old-RPC bypass are denied. Runtime credential
+changes invalidate prior verification without exposing credential values.
+
+AI reservations enforce a durable global Phase 13 ceiling of $0.10 per provider
+within the authoritative staging ledger before driver execution. Duplicate tickets,
+production diagnostics, invalid amounts and exhausted budgets are denied; unknown
+outcomes are not refunded. Drivers must additionally prove a current worst-case
+request/pricing bound. No live pricing or diagnostic driver was exercised.
+
+No concrete live qualification drivers are registered by the command. With approved
+assets but no driver, status is NOT_IMPLEMENTED. The local framework and contracts
+must not be described as working hosted integrations. External revocation requires
+webhook/operator invalidation; arbitrary provider permission polling is not claimed.
+
+Security review/regressions cover missing approvals, strict metadata-only manifests,
+origin restrictions, malformed URLs, cross-tenant/project/config observation
+rejection, contract evidence refusal, redacted provider errors, cleanup failure,
+credential rotation, budget admission, forced RLS and old service bypass. Existing
+OAuth/webhook/SSRF/CI/share/badge/target/egress contracts run in the full app suite.
+Managed sandbox escape and real egress controls remain unqualified without a provider.
+
+See [staging setup](staging.md), [live matrix](live-qualification-matrix.md),
+[readiness policy](production-readiness.md), operations and recovery docs.
+Minimum live requirements include GitHub, Checks, Vercel, hosted DB, managed
+storage/secrets, production sandbox, staging deployment/E2E/recovery/cleanup.
+Payment/AI qualifications are additional requirements for dependent enabled features.
+
+### Validation and failure accounting
+
+- npm.cmd install: completed; lockfile unchanged. npm reported unapproved install
+  scripts for esbuild/unrs-resolver; existing installed tooling built/tested successfully.
+- Type-check: PASS. Lint: PASS, zero errors; one pre-existing unused describe warning
+  in tests/public-source.test.ts.
+- Full app suite final: **1092/1092 PASS**, zero skips (1058 baseline + 34 new tests).
+  The initial run was 1090/1092: browser.signup vulnerable and navigation 1800ms
+  failed at about 15,049ms, health false, before fixture interaction, matching the
+  unchanged Chromium launch timeout. Database work was concurrent. No assertion,
+  timeout or test ordering was changed. After DB/build completed, the entire same
+  app command passed. This supports launch/resource contention as an explanation;
+  no browser root cause beyond the observed pre-fixture launch failure is claimed.
+- Qualification-focused suite: **34/34 PASS**.
+- Full combined DB suite: **243/243 PASS**, zero skips, 2,426,078ms. Count is 237
+  baseline + six Phase 13 DB tests. Fresh owned disposable environments were used;
+  current-schema harnesses applied migrations 001 through 037 in filename order.
+  The legacy RLS suite retains its staged historical upgrade rehearsal. This is
+  full combined acceptance, not an isolated rerun.
+- A focused DB attempt initially failed in its before hook: the production harness
+  used socket pg_isready, which accepted the image's temporary initialization
+  server before it shut down. Bootstrap then found no PostgreSQL socket. Changed
+  only readiness to TCP 127.0.0.1, matching the other harnesses; no sleeps increased.
+  The corrected production/qualification tests passed inside the full combined run.
+- Production build: PASS, all 65 static pages generated. CLI build PASS;
+  Windows local CLI suite **26/26 PASS**. Integration contracts included in full app.
+- npm audit --omit=dev: **0 vulnerabilities**. Full npm audit: **7 high, 2 moderate**
+  development-tool advisories, unchanged from Phase 12. Breaking dependency upgrades
+  were not applied. Full audit is not described as clean.
+
+Review logs are ignored phase13-*.log files. StartupX routes and regression tests
+remain intact, including original /share/[token]; no StartupX production asset was
+used. No live integration result was inferred from local synthetic fixtures.
+
+### Cleanup and Git
+
+Final inventory: **zero Docker containers, zero volumes**, no new LaunchGate temp
+directories. Pre-existing launchgate-ci-xp55exvq and launchgate-noenv-8u6xljrw were
+untouched. Database fixture identities, leases and diagnostic reservations were
+confined to destroyed disposable databases. No external identity, credential lease,
+reservation, sandbox or artifact was created. Intentional local qualification
+reports/builds/logs remain ignored review artifacts, not orphaned resources.
+Resource-inventory check passed.
+
+Branch and HEAD unchanged: launchgate-rebuild / d2d82e5. Protected refs unchanged:
+main a61ba8c8873fa0eedf48879f90aa4869f8991b8f;
+startupxai-final a11b1de6a36dddc535745aa24e006008e9fa4c20.
+No staged changes. Phase 13 changes remain uncommitted for review.
+
+**Verdict:** local qualification framework and required local validation PASS;
+external live qualification BLOCKED_BY_ENVIRONMENT. LaunchGate is **not production-ready**.
+Phase 14 has not started. Recommended next scope is provision/approve dedicated
+staging assets, implement the selected concrete qualification drivers and complete
+the documented live matrix before considering production launch.

@@ -83,7 +83,7 @@ export function createLaunchGateHandler(sessionFactory: SessionFactory = session
           await requireOrganizationRole(reader, principal, org, "ADMIN");
           const environment = z.enum(["development", "test", "staging", "production"]).parse(process.env.LAUNCHGATE_ENVIRONMENT ?? "development");
           const records = await qualificationReader(operationsStore(), org, environment)();
-          return result({ environment, capabilities: capabilityRegistry(environment, records), qualifications: records.map(({ capability, observedAt, expiresAt, status }) => ({ capability, observedAt, expiresAt, status })) });
+          return result({ environment, capabilities: capabilityRegistry(environment, records), qualifications: records.map(({ capability, observedAt, expiresAt, status, freshness, reason }) => ({ capability, observedAt, expiresAt, status, freshness: freshness ?? (expiresAt <= Date.now() ? "STALE" : "CURRENT"), reason })) });
         }
         if (path.length === 2 && method === "GET") {
           await requireOrganizationMembership(reader, principal, org);

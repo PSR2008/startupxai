@@ -39,3 +39,13 @@ for expired live resources, stale heartbeats, dead letters and cleanup failures.
 Hard provider deadlines and storage/secret TTLs must remain effective without the
 control plane. No cloud resource inventory endpoint is implemented without a
 selected provider; provider-side orphan reconciliation remains unqualified.
+
+## Phase 13 qualifications and diagnostic admission
+
+Migration 037 adds forced-RLS configuration bindings and immutable AI diagnostic reservations. Only the trusted operations RPC can write; owner/admin reads are tenant-scoped. Qualification observations retain digests and fixed reason codes, never raw responses or secrets.
+
+Run `npm.cmd run launchgate:qualify` for a safe local availability report. Hosted persistence is explicit and requires an approved strict manifest/exact staging DB; see [setup](staging.md). No live drivers are registered by this command. Hosted availability is not inferred from local fixture tests.
+
+Framework evidence TTL is one hour. Update configuration, credential and permission revisions on provider/account changes or revocation. The server also compares a digest of relevant runtime configuration/credentials; changed values make prior VERIFIED records STALE/UNVERIFIED. External secret-reference rotations require a revision update. Requalify after sandbox version/project/permission changes. Digests are server metadata, never included in browser readiness projection.
+
+AI reservations serialize through a database advisory lock and enforce $0.10 total per provider for Phase 13 across organizations. Tickets cannot be reused or refunded; a crash consumes the reserved upper bound. One authoritative staging ledger must cover all diagnostic runners. Never reset it or switch databases to renew the allowance. Drivers must separately prove the quoted upper bound from current pricing and request limits; no live pricing or spending was exercised.

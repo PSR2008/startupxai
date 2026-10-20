@@ -53,3 +53,9 @@ prints safe local readiness states and performs no network probes.
 All other setup rows above similarly require named dedicated assets before
 credentials are loaded. Local readiness does not discover or reuse unrelated
 accounts, and no general CI workflow accepts permanent production credentials.
+
+## Phase 13 qualification framework
+
+`services/production/qualification.ts` defines 20 required evidence checklists. Synthetic/contract observations cannot become VERIFIED. Missing assets block without provider calls; optional absent remediation remains UNVERIFIED. Approved assets without a registered driver are NOT_IMPLEMENTED. Failed cleanup prevents verification.
+
+Migration 037 extends the trusted, append-only registry with configuration/runtime digests and safe reason codes. Browser roles cannot write qualifications or reserve diagnostic budgets. The previous RPC is no longer service-callable. Local reports are persisted separately when hosted persistence is unavailable. See [staging setup](staging.md) and [actual live matrix](live-qualification-matrix.md); no provider was live-qualified in this phase.

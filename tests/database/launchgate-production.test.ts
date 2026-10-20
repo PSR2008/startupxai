@@ -19,7 +19,7 @@ const scope=()=>({environment:"test",organizationId:org,runId:run,attemptId:atte
 before(async()=>{
  if(blocked){if(process.env.LAUNCHGATE_REQUIRE_DATABASE==="1")throw new Error("Docker required");return;}
  const r=docker(["run","--detach","--name",container,"--label","launchgate.disposable=true","--label","launchgate.phase=10","--network","none","--env","POSTGRES_HOST_AUTH_METHOD=trust","--env","POSTGRES_DB=launchgate_test","postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24"]);assert.equal(r.status,0,r.stderr);started=true;
- let ready=false;for(let n=0;n<40;n++){if(docker(["exec",container,"pg_isready","-U","postgres"]).status===0){ready=true;break;}await new Promise(r=>setTimeout(r,250));}assert.ok(ready);
+ let ready=false;for(let n=0;n<40;n++){if(docker(["exec",container,"pg_isready","-h","127.0.0.1","-U","postgres"]).status===0){ready=true;break;}await new Promise(r=>setTimeout(r,250));}assert.ok(ready);
  sql(`CREATE ROLE anon NOLOGIN;CREATE ROLE authenticated NOLOGIN;CREATE ROLE service_role NOLOGIN BYPASSRLS;CREATE SCHEMA auth;CREATE TABLE auth.users(id uuid PRIMARY KEY);CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;GRANT USAGE ON SCHEMA auth,public TO anon,authenticated,service_role;GRANT EXECUTE ON FUNCTION auth.uid() TO anon,authenticated,service_role;`);
  for(const file of readdirSync("migrations").filter(f=>/^0\d+.*\.sql$/.test(f)).sort())sql(readFileSync(`migrations/${file}`,"utf8"));
  sql(`INSERT INTO auth.users VALUES('${owner}'),('${outsider}');`);
@@ -74,3 +74,39 @@ dbtest("Phase 10 failed runner reservation recovers through existing durable cle
  execute("RECOVER",{});const workerId=randomUUID(),cleanup=execute("CLEANUP_CLAIM",{workerId});assert.ok(cleanup);execute("CLEANUP_DONE",{attemptId:cleanup.attempt.id,fence:cleanup.attempt.fence,workerId});
  assert.equal(sql(`SELECT active||':'||reserved FROM lg_execution_budgets WHERE organization_id='${org}'`),"0:0");assert.equal(rpc("LEAKS",{}).length,0);
 });
+
+// Phase 13 fixture-only admission tests. Synthetic rows never qualify a live environment.
+dbtest("Phase 13 qualifications bind the complete staging configuration",()=>{
+ const configurationDigest='sha256:'+'c'.repeat(64);rpc('QUALIFICATION_CONFIG',{organizationId:org,environment:'staging',configurationDigest,runtimeDigest:'sha256:'+'a'.repeat(64)});
+ const input={organizationId:org,environment:'staging',capability:'github.checks.live',status:'VERIFIED',live:true,evidenceDigest:'sha256:'+'d'.repeat(64),configurationDigest,runtimeDigest:'sha256:'+'a'.repeat(64),reason:'LIVE_CHECKS_PASSED',expiresAt:new Date(Date.now()+60000).toISOString()};
+ denied(`SET ROLE service_role;SELECT lg_operations_service('QUALIFY',${literal({...input,configurationDigest:'sha256:'+'e'.repeat(64)})});`);
+ rpc('QUALIFY',input);assert.equal(rpc('QUALIFICATIONS',{organizationId:org,environment:'staging'})[0].status,'VERIFIED');
+ rpc('QUALIFICATION_CONFIG',{organizationId:org,environment:'staging',configurationDigest:'sha256:'+'f'.repeat(64),runtimeDigest:'sha256:'+'a'.repeat(64)});
+ const stale=rpc('QUALIFICATIONS',{organizationId:org,environment:'staging'})[0];assert.equal(stale.status,'UNVERIFIED');assert.equal(stale.freshness,'STALE');
+});
+dbtest("Phase 13 browser cannot forge qualification configuration or AI budget",()=>{
+ for(const table of ['lg_qualification_configurations','lg_qualification_budget_reservations']){
+  assert.equal(sql(`SELECT relrowsecurity AND relforcerowsecurity FROM pg_class WHERE oid='${table}'::regclass`),'t');
+  denied(`SET ROLE authenticated;SET request.jwt.claim.sub='${owner}';DELETE FROM ${table};`);
+  assert.equal(sql(`SET ROLE authenticated;SET request.jwt.claim.sub='${outsider}';SELECT count(*) FROM ${table}`),'0');
+ }
+ denied(`SET ROLE authenticated;SELECT lg_operations_service('QUALIFICATION_CONFIG',${literal({organizationId:org,environment:'staging',configurationDigest:'sha256:'+'a'.repeat(64)})});`);
+});
+dbtest("Phase 13 AI diagnostic ceilings are durable, provider-specific and nonrefundable",()=>{
+ const reservation={id:randomUUID(),organizationId:org,environment:'staging',provider:'openai',reservedMicroUsd:60000};
+ rpc('QUALIFICATION_BUDGET',reservation);
+ denied(`SET ROLE service_role;SELECT lg_operations_service('QUALIFICATION_BUDGET',${literal(reservation)});`);
+ denied(`SET ROLE service_role;SELECT lg_operations_service('QUALIFICATION_BUDGET',${literal({...reservation,id:randomUUID(),reservedMicroUsd:40001})});`);
+ rpc('QUALIFICATION_BUDGET',{...reservation,id:randomUUID(),reservedMicroUsd:40000});
+ rpc('QUALIFICATION_BUDGET',{...reservation,id:randomUUID(),provider:'anthropic',reservedMicroUsd:100000});
+ assert.equal(sql(`SELECT sum(reserved_micro_usd) FROM lg_qualification_budget_reservations WHERE provider='openai'`),'100000');
+ denied('DELETE FROM lg_qualification_budget_reservations');denied('UPDATE lg_qualification_budget_reservations SET reserved_micro_usd=1');
+});
+dbtest("Phase 13 diagnostic reservations reject production and invalid amounts",()=>{
+ for(const change of [{environment:'production'},{reservedMicroUsd:0},{reservedMicroUsd:-1},{reservedMicroUsd:100001}])denied(`SET ROLE service_role;SELECT lg_operations_service('QUALIFICATION_BUDGET',${literal({id:randomUUID(),organizationId:org,environment:'staging',provider:'openai',reservedMicroUsd:1,...change})});`);
+});
+dbtest("Phase 13 all new capability identifiers persist truthful blocked status",()=>{
+ for(const capability of ['github.remediation.live','artifact_store.managed','secret_store.managed','staging.full_e2e','staging.deployment','staging.recovery','staging.cleanup','cli.windows.staging','github.action.live','assessment.external','sharing.external'])rpc('QUALIFY',{organizationId:org,environment:'staging',capability,status:'BLOCKED_BY_ENVIRONMENT',live:false,evidenceDigest:null,reason:'ASSETS_MISSING',expiresAt:new Date(Date.now()+60000).toISOString()});
+ assert.equal(rpc('QUALIFICATIONS',{organizationId:org,environment:'staging'}).filter((x:{status:string})=>x.status==='BLOCKED_BY_ENVIRONMENT').length,11);
+});
+dbtest("Phase 13 old service function cannot bypass new qualification admission",()=>{denied(`SET ROLE service_role;SELECT lg_operations_service_v12('QUALIFY','{}');`);});

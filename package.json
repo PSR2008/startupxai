@@ -79,7 +79,9 @@
     "test:distribution-demo": "node --conditions=react-server --import tsx scripts/test-distribution-demo.ts",
     "test:distribution": "node --conditions=react-server --import tsx --test tests/launchgate-distribution*.test.ts tests/launchgate-action.test.ts tests/launchgate-assessment.test.ts",
     "test:cli": "npm run test --workspace @launchgate/cli",
-    "build:cli": "npm run build --workspace @launchgate/cli"
+    "build:cli": "npm run build --workspace @launchgate/cli",
+    "launchgate:qualify": "node --conditions=react-server --import tsx scripts/launchgate-qualification.ts",
+    "test:qualification": "node --conditions=react-server --import tsx --test tests/launchgate-qualification.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

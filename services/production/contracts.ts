@@ -4,7 +4,7 @@ export const environmentSchema = z.enum(["development", "test", "staging", "prod
 export const scopeSchema = z.object({ environment: environmentSchema, organizationId: z.string().uuid(), runId: z.string().uuid(), attemptId: z.string().uuid() }).strict();
 export type Scope = z.infer<typeof scopeSchema>;
 export const scopeKey = (scope: Scope) => { const s = scopeSchema.parse(scope); return `${s.environment}/${s.organizationId}/${s.runId}/${s.attemptId}`; };
-export const capabilityNames = ["github.live", "vercel.live", "supabase.hosted", "stripe.test", "razorpay.test", "openai.live", "anthropic.live", "sandbox.production", "secrets.managed", "artifacts.private", "staging.e2e"] as const;
+export const capabilityNames = ["github.live", "vercel.live", "supabase.hosted", "stripe.test", "razorpay.test", "openai.live", "anthropic.live", "sandbox.production", "secrets.managed", "artifacts.private", "staging.e2e", "github.checks.live", "github.remediation.live", "artifact_store.managed", "secret_store.managed", "staging.full_e2e", "staging.deployment", "staging.recovery", "staging.cleanup", "cli.windows.staging", "github.action.live", "assessment.external", "sharing.external"] as const;
 export const capabilitySchema = z.enum(capabilityNames);
 export const statusSchema = z.enum(["VERIFIED", "UNVERIFIED", "BLOCKED_BY_ENVIRONMENT", "DEGRADED", "NOT_IMPLEMENTED"]);
 export type CapabilityStatus = z.infer<typeof statusSchema>;

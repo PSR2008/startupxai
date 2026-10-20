@@ -5,6 +5,7 @@ import type { OperationsStore } from "../../../services/production/contracts";
 import { capabilitySchema, environmentSchema, statusSchema } from "../../../services/production/contracts";
 import { z } from "zod";
 import type { Qualification } from "../../../services/production/readiness";
+import { runtimeConfigurationDigest } from "./inventory";
 export function operationsStore(): OperationsStore {
   const url = configuredValue("NEXT_PUBLIC_SUPABASE_URL"), key = configuredValue("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !key) throw new Error("OPERATIONS_DATABASE_UNAVAILABLE");
@@ -15,7 +16,10 @@ export function operationsStore(): OperationsStore {
 export function qualificationReader(store:OperationsStore,organizationId:string,environment:z.infer<typeof environmentSchema>){
   z.string().uuid().parse(organizationId);environmentSchema.parse(environment);
   return async():Promise<Qualification[]>=>{
-    const rows=z.array(z.object({organization_id:z.literal(organizationId),environment:z.literal(environment),capability:capabilitySchema,status:statusSchema,evidence_digest:z.string().nullable(),live:z.boolean(),observed_at:z.string(),expires_at:z.string()})).parse(await store.command("QUALIFICATIONS",{organizationId,environment}));
-    return rows.map(r=>({capability:r.capability,environment:r.environment,status:r.status,evidenceDigest:r.evidence_digest,live:r.live,observedAt:Date.parse(r.observed_at),expiresAt:Date.parse(r.expires_at)}));
+    const rows=z.array(z.object({organization_id:z.literal(organizationId),environment:z.literal(environment),capability:capabilitySchema,status:statusSchema,evidence_digest:z.string().nullable(),live:z.boolean(),observed_at:z.string(),expires_at:z.string(),freshness:z.enum(["STALE","CURRENT"]).optional(),safe_reason:z.string().regex(/^[A-Z_]{1,80}$/).optional(),runtime_digest:z.string().nullable().optional()})).parse(await store.command("QUALIFICATIONS",{organizationId,environment}));
+    return rows.map(r=>{
+      const changed=r.status==="VERIFIED"&&r.runtime_digest!==runtimeConfigurationDigest();
+      return {capability:r.capability,environment:r.environment,status:changed?"UNVERIFIED":r.status,evidenceDigest:r.evidence_digest,live:r.live,observedAt:Date.parse(r.observed_at),expiresAt:Date.parse(r.expires_at),...(changed?{freshness:"STALE" as const,reason:"CONFIGURATION_CHANGED"}:r.freshness?{freshness:r.freshness}:{}),...(!changed&&r.safe_reason?{reason:r.safe_reason}:{})};
+    });
   };
 }
